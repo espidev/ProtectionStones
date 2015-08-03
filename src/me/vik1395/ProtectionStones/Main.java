@@ -107,6 +107,7 @@ public class Main extends JavaPlugin
 			        p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
+			        /*p.sendMessage(ChatColor.YELLOW + "/ps tp {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");*/
 			        p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
@@ -826,6 +827,82 @@ public class Main extends JavaPlugin
 				          return true;
 					}
 				}
+			/*****************************************************************************************************/
+				/*if (args[0].equalsIgnoreCase("tp")) 
+	            {
+					if(p.hasPermission("protectionstones.tp"))
+					{
+						if(args.length!=2)
+						{
+							p.sendMessage(ChatColor.RED + "Usage: /ps tp [num]");
+							p.sendMessage(ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps");
+							return true;
+						}
+		            	Map<String, ProtectedRegion> regions = rgm.getRegions();
+		            	String name = p.getName().toLowerCase();
+		            	int size = regions.size();
+		            	int rgnum = Integer.parseInt(args[1]);
+		            	String[] regionIDList = new String[size];
+		            	int index = 0, count = 0, tpx, tpy, tpz;
+		            	String idname;
+		            	try 
+						{
+							LocalPlayer lp = wg.wrapPlayer(p);
+							count = rgm.getRegionCountOfPlayer(lp);
+		                }
+						catch (Exception e) {}	
+		            	
+		            	if(rgnum<=0)
+		            	{
+		            		p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
+		            		return true;
+		            	}
+		            	
+		            	if(rgnum<=count)
+		            	{
+			            	for (Iterator<String> playerCount = regions.keySet().iterator(); playerCount.hasNext(); ) 
+			            	{
+			            		idname = (String)playerCount.next();
+			                	try 
+			                	{
+			                		if (((ProtectedRegion)regions.get(idname)).getOwners().getPlayers().contains(name)) 
+			                		{
+			                			regionIDList[index] = idname;
+			                			if(index == (rgnum-1))
+			                			{
+			                				String rawpos = "";
+			                				String[] pos = rawpos.split("x|y|z");
+			                				pos[0] = pos[0].substring(2);
+			                				if(pos.length==3)
+			                				{
+				                				p.sendMessage(ChatColor.GREEN + "Teleporting...");
+				                				tpx = Integer.parseInt(pos[0]);
+				                				tpy = Integer.parseInt(pos[1]);
+				                				tpz = Integer.parseInt(pos[2]);
+				                				Location tploc = new Location(p.getWorld(), tpx, tpy, tpz);
+				                				p.teleport(tploc);
+			                				}
+			                				else
+			                				{
+			                					p.sendMessage(ChatColor.RED + "Error in teleporting to protected region!");
+			                				}
+			                				return true;
+			                			}
+			                			index++;
+			                		}
+			                	}
+			                	catch (Exception localException6){} 
+			                }
+	                		p.sendMessage(ChatColor.RED + "Could not find protected region!");
+			            	
+		            	}
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You fo not have permission to use this command.");
+					}
+	              return true;
+	            }*/
 			/*****************************************************************************************************/
 				else if(args[0].equalsIgnoreCase("admin"))
 				{

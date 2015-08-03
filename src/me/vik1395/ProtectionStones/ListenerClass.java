@@ -1,18 +1,20 @@
 package me.vik1395.ProtectionStones;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -22,7 +24,6 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -121,18 +122,16 @@ public class ListenerClass implements Listener
 
 					RegionManager rgm = wg.getRegionManager(p.getWorld());
 					ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
-					DefaultDomain owners = region.getOwners();
-					owners.addPlayer(lp);
-					region.setOwners(owners);
+					region.getOwners().addPlayer(p.getName());
 					rgm.addRegion(region);
 					boolean overLap = rgm.overlapsUnownedRegion(region, lp);
 					if (overLap) 
 					{
-						p.sendMessage(ChatColor.RED + "You can't protect that area, it overlaps another region.");
 						rgm.removeRegion(id);
 						p.updateInventory();
 						try 
 						{
+							rgm.saveChanges();
 							rgm.save();
 						} 
 						catch (StorageException e1) 
@@ -192,7 +191,15 @@ public class ListenerClass implements Listener
 	                }
 					region.setFlags(newFlags);
 					p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
-					
+					try 
+					{
+						rgm.saveChanges();
+						rgm.save();
+					} 
+					catch (StorageException e1) 
+					{
+						e1.printStackTrace();
+					}
 					
 					if(Main.hide)
 					{
@@ -318,7 +325,7 @@ public class ListenerClass implements Listener
         }
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPistonExtend(BlockPistonExtendEvent e)
     {
 		if (Main.blockpiston) 
@@ -326,32 +333,18 @@ public class ListenerClass implements Listener
 			List<Block> pushedBlocks = e.getBlocks();
             if (pushedBlocks != null) 
             {
-                for (Block block : pushedBlocks) 
-                {
-                    Material mat = block.getType();
+            	Iterator<Block> it = pushedBlocks.iterator();
+            	
+            	while(it.hasNext())
+            	{
+            		Block b = it.next();
+            		Material mat = b.getType();
+            		
                     if (Main.mat == mat) 
                     {
                         e.setCancelled(true);
                     }
-                }
-            }
-        }
-    }
-	
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onPistonRetract(BlockPistonRetractEvent e)
-    {
-		if ((Main.blockpiston) && (e.isSticky())) 
-		{
-            World world = e.getBlock().getWorld();
-            Material mat = world.getBlockAt(e.getRetractLocation()).getType();
-            if (mat != null) 
-            {
-            	if (Main.mat == mat) 
-                {
-                    e.setCancelled(true);
-                }
+            	}
             }
         }
     }
