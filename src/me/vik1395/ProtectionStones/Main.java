@@ -88,6 +88,7 @@ public class Main extends JavaPlugin
 		exworlds = getConfig().getStringList("Exclude Worlds");
 		priority = getConfig().getInt("Priority");
 		allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
+		uuid = getConfig().getBoolean("UUID");
 		
 		getLogger().info("ProtectionStones has successfully started!");
 		getLogger().info("Created by Vik1395");
