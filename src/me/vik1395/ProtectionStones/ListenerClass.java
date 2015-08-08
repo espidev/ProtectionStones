@@ -123,6 +123,10 @@ public class ListenerClass implements Listener
 					RegionManager rgm = wg.getRegionManager(p.getWorld());
 					ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
 					region.getOwners().addPlayer(p.getName());
+					if(Main.uuid)
+					{
+						region.getOwners().addPlayer(p.getUniqueId());
+					}
 					rgm.addRegion(region);
 					boolean overLap = rgm.overlapsUnownedRegion(region, lp);
 					if (overLap) 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -54,7 +55,7 @@ public class Main extends JavaPlugin
 	public static List<String> toggleList = new ArrayList<String>();
 	public static List<String> allowedFlags = new ArrayList<String>();
 	public static Material mat;
-	public static boolean hide, nodrop, blockpiston, silktouch;
+	public static boolean hide, nodrop, blockpiston, silktouch, uuid;
 	public static int x, y, z, priority;
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Map<CommandSender, Integer> viewTaskList = new HashMap();
@@ -62,6 +63,7 @@ public class Main extends JavaPlugin
 	public void onEnable()
 	{
 		saveDefaultConfig();
+		getConfig().options().copyDefaults(true);
 		plugin = this;
 		getServer().getPluginManager().registerEvents(new ListenerClass(), this);
 		if(getServer().getPluginManager().getPlugin("WorldGuard").isEnabled() && getServer().getPluginManager().getPlugin("WorldGuard").isEnabled())
@@ -107,7 +109,7 @@ public class Main extends JavaPlugin
 			        p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
-			        /*p.sendMessage(ChatColor.YELLOW + "/ps tp {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");*/
+			        p.sendMessage(ChatColor.YELLOW + "/ps tp {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");
 			        p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
@@ -203,8 +205,13 @@ public class Main extends JavaPlugin
 		                        else
 		                        {
 		                            String playerName = args[1];
+		                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
 		                            DefaultDomain members = rgm.getRegion(id).getMembers();
 		                            members.addPlayer(playerName);
+		                            if(uuid)
+		                            {
+		                            	members.addPlayer(uid);
+		                            }
 		                            rgm.getRegion(id).setMembers(members);
 		                            try 
 						            {
@@ -235,8 +242,13 @@ public class Main extends JavaPlugin
 		                            return true;
 		                        }
 		                        String playerName = args[1];
+	                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
 		                        DefaultDomain members = rgm.getRegion(id).getMembers();
 		                        members.removePlayer(playerName);
+		                        if(uuid)
+	                            {
+	                            	members.removePlayer(uid);
+	                            }
 		                        rgm.getRegion(id).setMembers(members);
 		                        try 
 					            {
@@ -267,8 +279,13 @@ public class Main extends JavaPlugin
 		                        else
 		                        {
 		                            String playerName = args[1];
+		                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
 		                            DefaultDomain owners = rgm.getRegion(id).getOwners();
 		                            owners.addPlayer(playerName);
+			                        if(uuid)
+		                            {
+		                            	owners.addPlayer(uid);
+		                            }
 		                            rgm.getRegion(id).setOwners(owners);
 		                            try 
 						            {
@@ -299,8 +316,13 @@ public class Main extends JavaPlugin
 		                            return true;
 		                        }
 		                        String playerName = args[1];
+	                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
 		                        DefaultDomain owners = rgm.getRegion(id).getOwners();
 		                        owners.removePlayer(playerName);
+		                        if(uuid)
+	                            {
+	                            	owners.addPlayer(uid);
+	                            }
 		                        rgm.getRegion(id).setOwners(owners);
 		                        try 
 					            {
@@ -828,7 +850,7 @@ public class Main extends JavaPlugin
 					}
 				}
 			/*****************************************************************************************************/
-				/*if (args[0].equalsIgnoreCase("tp")) 
+				if (args[0].equalsIgnoreCase("tp")) 
 	            {
 					if(p.hasPermission("protectionstones.tp"))
 					{
@@ -858,51 +880,52 @@ public class Main extends JavaPlugin
 		            		return true;
 		            	}
 		            	
-		            	if(rgnum<=count)
+		            	if(rgnum>count)
 		            	{
-			            	for (Iterator<String> playerCount = regions.keySet().iterator(); playerCount.hasNext(); ) 
-			            	{
-			            		idname = (String)playerCount.next();
-			                	try 
-			                	{
-			                		if (((ProtectedRegion)regions.get(idname)).getOwners().getPlayers().contains(name)) 
-			                		{
-			                			regionIDList[index] = idname;
-			                			if(index == (rgnum-1))
-			                			{
-			                				String rawpos = "";
-			                				String[] pos = rawpos.split("x|y|z");
-			                				pos[0] = pos[0].substring(2);
-			                				if(pos.length==3)
-			                				{
-				                				p.sendMessage(ChatColor.GREEN + "Teleporting...");
-				                				tpx = Integer.parseInt(pos[0]);
-				                				tpy = Integer.parseInt(pos[1]);
-				                				tpz = Integer.parseInt(pos[2]);
-				                				Location tploc = new Location(p.getWorld(), tpx, tpy, tpz);
-				                				p.teleport(tploc);
-			                				}
-			                				else
-			                				{
-			                					p.sendMessage(ChatColor.RED + "Error in teleporting to protected region!");
-			                				}
-			                				return true;
-			                			}
-			                			index++;
-			                		}
-			                	}
-			                	catch (Exception localException6){} 
-			                }
-	                		p.sendMessage(ChatColor.RED + "Could not find protected region!");
-			            	
+		            		p.sendMessage(ChatColor.RED + "You only have " + count + " protected regions!");
+		            		return true;
 		            	}
+		            	
+		            	for (Iterator<String> playerCount = regions.keySet().iterator(); playerCount.hasNext(); ) 
+		            	{
+		            		idname = (String)playerCount.next();
+		                	try 
+		                	{
+		                		if (((ProtectedRegion)regions.get(idname)).getOwners().getPlayers().contains(name)) 
+		                		{
+		                			regionIDList[index] = idname;
+		                			if(index == (rgnum-1))
+		                			{
+		                				String[] pos = idname.split("x|y|z");
+		                				if(pos.length==3)
+		                				{
+			                				pos[0] = pos[0].substring(2);
+			                				p.sendMessage(ChatColor.GREEN + "Teleporting...");
+			                				tpx = Integer.parseInt(pos[0]);
+			                				tpy = Integer.parseInt(pos[1])+1;
+			                				tpz = Integer.parseInt(pos[2]);
+			                				Location tploc = new Location(p.getWorld(), tpx, tpy, tpz);
+			                				p.teleport(tploc);
+		                				}
+		                				else
+		                				{
+		                					p.sendMessage(ChatColor.RED + "Error in teleporting to protected region!");
+		                				}
+		                				return true;
+		                			}
+		                			index++;
+		                		}
+		                	}
+		                	catch (Exception localException6){} 
+		                }
+                		p.sendMessage(ChatColor.RED + "Could not find protected region!");
 					}
 					else
 					{
-						p.sendMessage(ChatColor.RED + "You fo not have permission to use this command.");
+						p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
 					}
 	              return true;
-	            }*/
+	            }
 			/*****************************************************************************************************/
 				else if(args[0].equalsIgnoreCase("admin"))
 				{
