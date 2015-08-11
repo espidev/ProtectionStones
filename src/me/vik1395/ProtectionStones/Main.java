@@ -110,7 +110,8 @@ public class Main extends JavaPlugin
 			        p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
-			        p.sendMessage(ChatColor.YELLOW + "/ps tp {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");
+			        p.sendMessage(ChatColor.YELLOW + "/ps home {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");
+			        p.sendMessage(ChatColor.YELLOW + "/ps tp {player} {num}");
 			        p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
@@ -445,11 +446,6 @@ public class Main extends JavaPlugin
 		                            int psx = Integer.parseInt(id.substring(2, indexX));
 		                            int psy = Integer.parseInt(id.substring(indexX + 1, indexY));
 		                            int psz = Integer.parseInt(id.substring(indexY + 1, indexZ));
-		                            //Vector minVector = rgm.getRegion(id).getMinimumPoint();
-		                            //Vector maxVector = rgm.getRegion(id).getMaximumPoint();
-		                            //int minX = minVector.getBlockX();
-		                            //int maxX = maxVector.getBlockX();
-		                            //int size = (maxX - minX) / 2;
 
 		                            Block blockToUnhide = p.getWorld().getBlockAt(psx, psy, psz);
 	                                blockToUnhide.setType(mat);
@@ -851,30 +847,55 @@ public class Main extends JavaPlugin
 					}
 				}
 			/*****************************************************************************************************/
-				if (args[0].equalsIgnoreCase("tp")) 
+				if ((args[0].equalsIgnoreCase("tp") && p.hasPermission("protectionstones.tp")) || (args[0].equalsIgnoreCase("home") && p.hasPermission("protectionstones.home"))) 
 	            {
-					if(p.hasPermission("protectionstones.tp"))
+					Map<String, ProtectedRegion> regions = rgm.getRegions();
+	            	String name = p.getName().toLowerCase();
+	            	int size = regions.size();
+	            	int rgnum = Integer.parseInt(args[1]);
+	            	String[] regionIDList = new String[size];
+	            	int index = 0, count = 0, tpx, tpy, tpz;
+	            	String idname;
+	            	
+					if(args[0].equalsIgnoreCase("tp"))
+					{
+						if(args.length!=3)
+						{
+							p.sendMessage(ChatColor.RED + "Usage: /ps tp [player] [num]");
+							return true;
+						}
+						try 
+						{
+							LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getPlayer(args[1]));
+							count = rgm.getRegionCountOfPlayer(lp);
+		                }
+						catch (Exception e) 
+						{
+							p.sendMessage(ChatColor.RED + "Error while searching for " + args[1] + "'s regions. Please make sure you have entered the correct name.");
+							return true;
+						}
+					}
+					else if(args[0].equalsIgnoreCase("home"))
 					{
 						if(args.length!=2)
 						{
-							p.sendMessage(ChatColor.RED + "Usage: /ps tp [num]");
+							p.sendMessage(ChatColor.RED + "Usage: /ps home [num]");
 							p.sendMessage(ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps");
 							return true;
 						}
-		            	Map<String, ProtectedRegion> regions = rgm.getRegions();
-		            	String name = p.getName().toLowerCase();
-		            	int size = regions.size();
-		            	int rgnum = Integer.parseInt(args[1]);
-		            	String[] regionIDList = new String[size];
-		            	int index = 0, count = 0, tpx, tpy, tpz;
-		            	String idname;
-		            	try 
+						try 
 						{
-							LocalPlayer lp = wg.wrapPlayer(p);
+							LocalPlayer lp = wg.wrapOfflinePlayer(p);
 							count = rgm.getRegionCountOfPlayer(lp);
 		                }
-						catch (Exception e) {}	
-		            	
+						catch (Exception e) {}
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+						return true;
+					}
+					
 		            	if(rgnum<=0)
 		            	{
 		            		p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
@@ -920,11 +941,7 @@ public class Main extends JavaPlugin
 		                	catch (Exception localException6){} 
 		                }
                 		p.sendMessage(ChatColor.RED + "Could not find protected region!");
-					}
-					else
-					{
-						p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
-					}
+					
 	              return true;
 	            }
 			/*****************************************************************************************************/
@@ -992,12 +1009,7 @@ public class Main extends JavaPlugin
 				                		blockMaterial = "AIR";
 				                		if (args[1].equalsIgnoreCase("unhide"))
 				                		{
-				                			//Vector minVector = rgm.getRegion(regionIDList[i]).getMinimumPoint();
-					                        //Vector maxVector = rgm.getRegion(regionIDList[i]).getMaximumPoint();
 					                        blockMaterial = Main.mat.name();
-					                        //int minX = minVector.getBlockX();
-					                        //int maxX = maxVector.getBlockX();
-					                        //int size = (maxX - minX) / 2;
 					                    }
 				                		blockToChange.setType(Material.getMaterial(blockMaterial));
 				                	}
