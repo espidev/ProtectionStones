@@ -852,7 +852,7 @@ public class Main extends JavaPlugin
 					Map<String, ProtectedRegion> regions = rgm.getRegions();
 	            	String name = p.getName().toLowerCase();
 	            	int size = regions.size();
-	            	int rgnum = Integer.parseInt(args[1]);
+	            	int rgnum; 
 	            	String[] regionIDList = new String[size];
 	            	int index = 0, count = 0, tpx, tpy, tpz;
 	            	String idname;
@@ -866,7 +866,8 @@ public class Main extends JavaPlugin
 						}
 						try 
 						{
-							LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getPlayer(args[1]));
+							rgnum = Integer.parseInt(args[2]);
+							LocalPlayer lp = wg.wrapPlayer(Bukkit.getPlayer(args[1]));
 							count = rgm.getRegionCountOfPlayer(lp);
 		                }
 						catch (Exception e) 
@@ -885,10 +886,15 @@ public class Main extends JavaPlugin
 						}
 						try 
 						{
-							LocalPlayer lp = wg.wrapOfflinePlayer(p);
+							rgnum = Integer.parseInt(args[1]);
+							LocalPlayer lp = wg.wrapPlayer(p);
 							count = rgm.getRegionCountOfPlayer(lp);
 		                }
-						catch (Exception e) {}
+						catch (Exception e) 
+						{
+							p.sendMessage(ChatColor.RED + "Error while searching for your regions.");
+							return true;
+						}
 					}
 					else
 					{
