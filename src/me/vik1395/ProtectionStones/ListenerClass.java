@@ -352,4 +352,28 @@ public class ListenerClass implements Listener
             }
         }
     }
+    
+    	@EventHandler(priority = EventPriority.HIGH)
+	public void onPistonRetract(BlockPistonRetractEvent e)
+    {
+		if (Main.blockpiston) 
+		{
+			List<Block> retractedBlocks = e.getBlocks();
+            if (retractedBlocks != null) 
+            {
+            	Iterator<Block> it = retractedBlocks.iterator();
+            	
+            	while(it.hasNext())
+            	{
+            		Block b = it.next();
+            		Material mat = b.getType();
+            		
+                    if (Main.mat == mat) 
+                    {
+                        e.setCancelled(true);
+                    }
+            	}
+            }
+        }
+    }
 }
