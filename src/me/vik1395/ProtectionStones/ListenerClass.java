@@ -89,7 +89,6 @@ public class ListenerClass implements Listener
 								{
 									max =lim;
 								}
-								System.out.print(max);
 							}
 				        }
 						if(count>=max)
@@ -338,6 +337,30 @@ public class ListenerClass implements Listener
             if (pushedBlocks != null) 
             {
             	Iterator<Block> it = pushedBlocks.iterator();
+            	
+            	while(it.hasNext())
+            	{
+            		Block b = it.next();
+            		Material mat = b.getType();
+            		
+                    if (Main.mat == mat) 
+                    {
+                        e.setCancelled(true);
+                    }
+            	}
+            }
+        }
+    }
+    
+    	@EventHandler(priority = EventPriority.HIGH)
+	public void onPistonRetract(BlockPistonRetractEvent e)
+    {
+		if (Main.blockpiston) 
+		{
+			List<Block> retractedBlocks = e.getBlocks();
+            if (retractedBlocks != null) 
+            {
+            	Iterator<Block> it = retractedBlocks.iterator();
             	
             	while(it.hasNext())
             	{
