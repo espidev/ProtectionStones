@@ -89,7 +89,6 @@ public class ListenerClass implements Listener
 								{
 									max =lim;
 								}
-								System.out.print(max);
 							}
 				        }
 						if(count>=max)
