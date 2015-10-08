@@ -57,11 +57,11 @@ public class Main extends JavaPlugin
 	public static Material mat;
 	public static boolean hide, nodrop, blockpiston, silktouch, uuid;
 	public static int x, y, z, priority;
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Map<CommandSender, Integer> viewTaskList = new HashMap();
+	public Map<CommandSender, Integer> viewTaskList;
 	
 	public void onEnable()
 	{
+		viewTaskList = new HashMap<>();
 		saveDefaultConfig();
 		getConfig().options().copyDefaults(true);
 		plugin = this;
@@ -94,6 +94,7 @@ public class Main extends JavaPlugin
 		getLogger().info("Created by Vik1395");
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender s, Command cmd, String label, String[] args)
 	{
@@ -109,8 +110,9 @@ public class Main extends JavaPlugin
 					p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
+			        p.sendMessage(ChatColor.YELLOW + "/ps count [player]");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
-			        p.sendMessage(ChatColor.YELLOW + "/ps home {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own");
+			        p.sendMessage(ChatColor.YELLOW + "/ps home {num} - " + ChatColor.GREEN +"{num} has to be within the number of protected regions you own. Use /ps count to check");
 			        p.sendMessage(ChatColor.YELLOW + "/ps tp {player} {num}");
 			        p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
@@ -207,7 +209,7 @@ public class Main extends JavaPlugin
 		                        else
 		                        {
 		                            String playerName = args[1];
-		                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
+		                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
 		                            DefaultDomain members = rgm.getRegion(id).getMembers();
 		                            members.addPlayer(playerName);
 		                            if(uuid)
@@ -244,7 +246,7 @@ public class Main extends JavaPlugin
 		                            return true;
 		                        }
 		                        String playerName = args[1];
-	                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
+	                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
 		                        DefaultDomain members = rgm.getRegion(id).getMembers();
 		                        members.removePlayer(playerName);
 		                        if(uuid)
@@ -281,7 +283,7 @@ public class Main extends JavaPlugin
 		                        else
 		                        {
 		                            String playerName = args[1];
-		                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
+		                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
 		                            DefaultDomain owners = rgm.getRegion(id).getOwners();
 		                            owners.addPlayer(playerName);
 			                        if(uuid)
@@ -318,7 +320,7 @@ public class Main extends JavaPlugin
 		                            return true;
 		                        }
 		                        String playerName = args[1];
-	                            UUID uid = Bukkit.getPlayer(playerName).getUniqueId();
+	                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
 		                        DefaultDomain owners = rgm.getRegion(id).getOwners();
 		                        owners.removePlayer(playerName);
 		                        if(uuid)
@@ -710,6 +712,41 @@ public class Main extends JavaPlugin
 		            }
 		        }
 			/*****************************************************************************************************/
+				if (args[0].equalsIgnoreCase("count")) 
+				{
+					int count = 0;
+					LocalPlayer playerName = null;
+					
+					if(args.length==1)
+					{
+						playerName = wg.wrapPlayer(p);
+						try 
+						{
+							count = rgm.getRegionCountOfPlayer(playerName);
+		                }
+						catch (Exception e) {}
+						p.sendMessage(ChatColor.YELLOW + "Your region count: " + count);
+						return true;
+					}
+					else if(args.length==2)
+					{
+				        playerName = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
+				        try 
+						{
+							count = rgm.getRegionCountOfPlayer(playerName);
+		                }
+						catch (Exception e) {}
+						p.sendMessage(ChatColor.YELLOW + args[1] + "'s region count: " + count);
+						return true;
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "Usage: /ps count, /ps count [player]");
+						return true;
+					}
+	            }
+				
+			/*****************************************************************************************************/
 				if(args[0].equalsIgnoreCase("region"))
 				{
 					if (args.length >= 3) 
@@ -730,6 +767,7 @@ public class Main extends JavaPlugin
 								p.sendMessage(ChatColor.YELLOW + args[2] + "'s region count: " + count);
 								return true;
 				            }
+							
 							String idname;
 				            if (args[1].equalsIgnoreCase("list")) 
 				            {
@@ -859,6 +897,7 @@ public class Main extends JavaPlugin
 	            	
 					if(args[0].equalsIgnoreCase("tp"))
 					{
+						LocalPlayer lp;
 						if(args.length!=3)
 						{
 							p.sendMessage(ChatColor.RED + "Usage: /ps tp [player] [num]");
@@ -867,14 +906,33 @@ public class Main extends JavaPlugin
 						try 
 						{
 							rgnum = Integer.parseInt(args[2]);
-							LocalPlayer lp = wg.wrapPlayer(Bukkit.getPlayer(args[1]));
+							lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
 							count = rgm.getRegionCountOfPlayer(lp);
+							name = lp.getName();
 		                }
 						catch (Exception e) 
 						{
 							p.sendMessage(ChatColor.RED + "Error while searching for " + args[1] + "'s regions. Please make sure you have entered the correct name.");
 							return true;
 						}
+						
+						if(rgnum<=0)
+		            	{
+		            		p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
+		            		return true;
+		            	}
+						
+						if(rgnum<=0)
+		            	{
+		            		p.sendMessage(ChatColor.RED + lp.getName() + " doesn't own a protected region!");
+		            		return true;
+		            	}
+		            	
+		            	if(rgnum>count)
+		            	{
+		            		p.sendMessage(ChatColor.RED + lp.getName() + " only has " + count + " protected regions!");
+		            		return true;
+		            	}
 					}
 					else if(args[0].equalsIgnoreCase("home"))
 					{
@@ -895,14 +953,8 @@ public class Main extends JavaPlugin
 							p.sendMessage(ChatColor.RED + "Error while searching for your regions.");
 							return true;
 						}
-					}
-					else
-					{
-						p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
-						return true;
-					}
-					
-		            	if(rgnum<=0)
+						
+						if(rgnum<=0)
 		            	{
 		            		p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
 		            		return true;
@@ -913,7 +965,14 @@ public class Main extends JavaPlugin
 		            		p.sendMessage(ChatColor.RED + "You only have " + count + " protected regions!");
 		            		return true;
 		            	}
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+						return true;
+					}
 		            	
+					
 		            	for (Iterator<String> playerCount = regions.keySet().iterator(); playerCount.hasNext(); ) 
 		            	{
 		            		idname = (String)playerCount.next();
@@ -946,7 +1005,7 @@ public class Main extends JavaPlugin
 		                	}
 		                	catch (Exception localException6){} 
 		                }
-                		p.sendMessage(ChatColor.RED + "Could not find protected region!");
+                		p.sendMessage(ChatColor.RED + "Could not find protected region(s) for " + name + "!");
 					
 	              return true;
 	            }
@@ -1136,11 +1195,11 @@ public class Main extends JavaPlugin
 								if (args.length > 2) 
 								{
 									String playerName = args[2];
-									if (Bukkit.getPlayer(playerName).getFirstPlayed() > 0L) 
+									if (Bukkit.getOfflinePlayer(playerName).getFirstPlayed() > 0L) 
 									{
-										long lastPlayed = (System.currentTimeMillis() - Bukkit.getPlayer(playerName).getLastPlayed()) / 86400000L;
+										long lastPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getLastPlayed()) / 86400000L;
 										p.sendMessage(ChatColor.YELLOW + playerName + " last played " + lastPlayed + " days ago.");
-										if (Bukkit.getPlayer(playerName).isBanned())
+										if (Bukkit.getOfflinePlayer(playerName).isBanned())
 										{
 											p.sendMessage(ChatColor.YELLOW + playerName + " is banned.");
 										}
@@ -1185,16 +1244,16 @@ public class Main extends JavaPlugin
 								if (args.length > 2) 
 								{
 									String playerName = args[2];
-					                if (Bukkit.getPlayer(playerName).getFirstPlayed() > 0L)
+					                if (Bukkit.getOfflinePlayer(playerName).getFirstPlayed() > 0L)
 					                {
 					                	p.sendMessage(ChatColor.YELLOW + playerName + ":");
 					                	p.sendMessage(ChatColor.YELLOW + "================");
-					                	long firstPlayed = (System.currentTimeMillis() - Bukkit.getPlayer(playerName).getFirstPlayed()) / 86400000L;
+					                	long firstPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getFirstPlayed()) / 86400000L;
 					                	p.sendMessage(ChatColor.YELLOW + "First played " + firstPlayed + " days ago.");
-					                	long lastPlayed = (System.currentTimeMillis() - Bukkit.getPlayer(playerName).getLastPlayed()) / 86400000L;
+					                	long lastPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getLastPlayed()) / 86400000L;
 					                	p.sendMessage(ChatColor.YELLOW + "Last played " + lastPlayed + " days ago.");
 					                	String banMessage = "Not Banned";
-					                	if (Bukkit.getPlayer(playerName).isBanned()) 
+					                	if (Bukkit.getOfflinePlayer(playerName).isBanned()) 
 					                	{
 					                		banMessage = "Banned";
 					                	}
@@ -1203,7 +1262,7 @@ public class Main extends JavaPlugin
 					                	try 
 					                	{
 					                		LocalPlayer thePlayer = null;
-					                		thePlayer = wg.wrapPlayer(Bukkit.getPlayer(args[2]));
+					                		thePlayer = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[2]));
 					                		count = rgm.getRegionCountOfPlayer(thePlayer);
 					                	}
 					                	catch (Exception localException1) {}

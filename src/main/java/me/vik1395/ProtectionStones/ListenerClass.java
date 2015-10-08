@@ -194,6 +194,7 @@ public class ListenerClass implements Listener
 						}
 	                }
 					region.setFlags(newFlags);
+					region.setPriority(Main.priority);
 					p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
 					try 
 					{
