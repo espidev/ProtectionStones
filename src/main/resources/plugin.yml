@@ -1,0 +1,13 @@
+name: ProtectionStones
+version: 1.3.1
+description: A greif prevention plugin.
+author: Vik1395
+
+depend: [WorldGuard, WorldEdit]
+main: me.vik1395.ProtectionStones.Main
+
+commands:
+  ps:
+    description: Teleports player to a random position within the world border.
+    aliases: [protectionstone, protectionstones, pstone]
+    usage: /ps help
