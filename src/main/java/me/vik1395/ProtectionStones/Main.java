@@ -118,7 +118,7 @@ public class Main extends JavaPlugin
 			        p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
-			        p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
+			        p.sendMessage(ChatColor.YELLOW + "/ps region list|remove|regen|disown {playername}");//\\
 			        p.sendMessage(ChatColor.YELLOW + "/ps admin {version|settings|hide|unhide|");//\\
 			        p.sendMessage(ChatColor.YELLOW + "           cleanup|lastlogon|lastlogons|stats}");//\\
 			        return true;
@@ -719,6 +719,10 @@ public class Main extends JavaPlugin
 					
 					if(args.length==1)
 					{
+						if(!p.hasPermission("protectionstones.count"))
+						{
+							p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+						}
 						playerName = wg.wrapPlayer(p);
 						try 
 						{
@@ -730,6 +734,11 @@ public class Main extends JavaPlugin
 					}
 					else if(args.length==2)
 					{
+						if(!p.hasPermission("protectionstones.count.others"))
+						{
+							p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+						}
+						
 				        playerName = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
 				        try 
 						{
