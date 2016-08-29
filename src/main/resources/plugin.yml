@@ -1,7 +1,7 @@
 name: ProtectionStones
-version: 1.3.2
-description: A greif prevention plugin.
-author: Vik1395
+version: ${version}
+description: ${description}
+authors: [Vik1395,Dragoboss]
 
 depend: [WorldGuard, WorldEdit]
 main: me.vik1395.ProtectionStones.Main
@@ -11,3 +11,14 @@ commands:
     description: Teleports player to a random position within the world border.
     aliases: [protectionstone, protectionstones, pstone]
     usage: /ps help
+    
+##### So What is this berrycraft-edit? #####
+# I (dragoboss) edited a couple lines in this plugin version to better
+# suit the BerryCraft server. I made the following edits:
+#
+# 1. Re-Added the /ps reclaim command
+# 2. Added possibility to deny pStones in certain worlds.
+# 3. Updated to 1.10
+# 4. Added ability to add multiple block types for protection and set their specs
+# 5. A lot of fixes, command updates, bugs squashes, etc.
+#####          That is about it.       #####
