@@ -5,8 +5,10 @@ This plugin uses a specified type of minecraft block as a protection block. When
 The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 **Dependencies**
-WorldGuard 6.0+
-WorldEdit 6.0+
+-------------
+
+    WorldGuard 6.0+
+    WorldEdit 6.0+
 
 **Configuration**
 -------------
