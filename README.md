@@ -81,6 +81,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps tp {player} {num} - Teleports you to one of a given player's regions.
     /ps toggle - Use this command to turn on or off ProtectionStones blocks.
     /ps view - Use this command to view the borders of your protected region.
+    /ps reclaim - Use this command to pickup a placed ProtectionStone and remove the region.
     /ps priority {number|null} - Use this command to set your region's priority.
     /ps region count|list|remove|regen|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
@@ -93,6 +94,7 @@ The permissions are very similar to the old plugin.
 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions.
+    protectionstones.reclaim - Allow players to reclaim their stones and remove their regions.
     protectionstones.view - Allows players the use of /ps view command.
     protectionstones.info - Allows players use of /ps info command.
     protectionstones.hide - Allow players to hide their ProtectionStones block.
