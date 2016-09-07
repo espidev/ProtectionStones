@@ -402,7 +402,8 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                         entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
                                         String setmat = hideFile.getString(entry);
                                         String subtype = null;
-                                        if (blockToUnhide.getType() == Material.AIR) {
+                                        Material currentType = blockToUnhide.getType();
+                                        if (!Main.mats.contains(currentType.toString())) {
                                             if (setmat.contains("-")) {
                                                 String[] str = setmat.split("-");
                                                 setmat = str[0];
@@ -444,8 +445,9 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                         String entry = (int) blockToHide.getLocation().getX() + "x";
                                         entry = entry + (int) blockToHide.getLocation().getY() + "y";
                                         entry = entry + (int) blockToHide.getLocation().getZ() + "z";
-                                        if (blockToHide.getType() != Material.AIR) {
-                                            hideFile.set(entry, blockToHide.getType().toString() + "-" + blockToHide.getData());
+                                        Material currentType = blockToHide.getType();
+                                        if (Main.mats.contains(currentType.toString())) {
+                                            hideFile.set(entry, currentType.toString() + "-" + blockToHide.getData());
                                             try {
                                                 hideFile.save(psStoneData);
                                             } catch (IOException ex) {
@@ -1002,10 +1004,10 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                         entry = entry + (int) blockToChange.getLocation().getZ() + "z";
                                         String subtype = null;
                                         if (args[1].equalsIgnoreCase("unhide")) {
-                                            if (blockToChange.getType() == Material.getMaterial(blockMaterial)) {
+                                            //if (blockToChange.getType() == Material.getMaterial(blockMaterial) || blockToChange.getType() == Material.LAVA || blockToChange.getType() == Material.WATER ) {
                                                 YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
                                                 blockMaterial = hideFile.getString(entry);
-                                                if (blockMaterial.contains("-")) {
+                                                if (blockMaterial != null && blockMaterial.contains("-")) {
                                                     String[] str = blockMaterial.split("-");
                                                     blockMaterial = str[0];
                                                     subtype = str[1];
@@ -1016,7 +1018,10 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                                 } catch (IOException ex) {
                                                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                                                 }
-                                            }
+                                                if (blockMaterial != null) {
+                                                    blockToChange.setType(Material.getMaterial(blockMaterial));
+                                                }
+                                            //}
                                         } else if (args[1].equalsIgnoreCase("hide")) {
                                             if (blockToChange.getType() != Material.getMaterial(blockMaterial)) {
                                                 YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
@@ -1029,8 +1034,10 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                             } else {
                                                 if (subtype != null && (blockToChange.getData() != (byte)(Integer.parseInt(subtype))));
                                             }
+                                            if (Main.mats.contains(blockToChange.getType().toString()) || Main.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) { 
+                                                blockToChange.setType(Material.getMaterial(blockMaterial)); 
+                                            }
                                         }
-                                        blockToChange.setType(Material.getMaterial(blockMaterial));
                                         if (subtype != null) {
                                             blockToChange.setData((byte) Integer.parseInt(subtype));
                                         }
@@ -1375,7 +1382,6 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
             YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
             WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
             System.out.print("Patching initial hiddenpstones.yml");
-            hideFile.set("InitialHideDone", true);
             for (World world: Bukkit.getWorlds()) {
                 RegionManager rgm = wg.getRegionManager(world);
                 Map<String, ProtectedRegion> regions = rgm.getRegions();
