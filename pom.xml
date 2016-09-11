@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.vik1395</groupId>
   <artifactId>ProtectionStones</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.1_wg6.1.3</version>
   <name>ProtectionStones</name>
   <description>A grief prevention plugin.</description>
   
@@ -72,7 +72,7 @@
     <dependency>
         <groupId>com.sk89q.worldguard</groupId>
         <artifactId>worldguard-legacy</artifactId>
-        <version>6.1.2-SNAPSHOT</version>
+        <version>6.1.3-SNAPSHOT</version>
     </dependency>
     <dependency>
         <groupId>com.sk89q.worldedit</groupId>
