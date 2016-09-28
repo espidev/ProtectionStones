@@ -28,8 +28,8 @@
     import com.sk89q.worldguard.domains.DefaultDomain;
     import com.sk89q.worldguard.protection.flags.DefaultFlag;
     import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
+    import com.sk89q.worldguard.protection.flags.RegionGroup;
+    import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
     import com.sk89q.worldguard.protection.flags.StateFlag;
     import com.sk89q.worldguard.protection.managers.RegionManager;
     import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -101,10 +101,10 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                 String[] split = material.split("-");
                 if (split.length > 1 && split.length < 3) {
                     if (!(Material.getMaterial(split[0]) == null)){
-                        mats.add(material);
+                        mats.add(material.toUpperCase());
                     }
                 } else {
-                    mats.add(split[0]);
+                    mats.add(split[0].toUpperCase());
                 }
             }
             flags = getConfig().getStringList("Flags");
@@ -409,15 +409,19 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                                 setmat = str[0];
                                                 subtype = str[1];
                                             }
-                                            hideFile.set(entry, null);
-                                            try {
-                                                hideFile.save(psStoneData);
-                                            } catch (IOException ex) {
-                                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                                            }
-                                                blockToUnhide.setType(Material.getMaterial(setmat));
-                                            if (subtype != null) {
-                                                blockToUnhide.setData((byte)(Integer.parseInt(subtype)));
+                                            if (hideFile.contains(entry)) {
+                                                hideFile.set(entry, null);
+                                                try {
+                                                    hideFile.save(psStoneData);
+                                                } catch (IOException ex) {
+                                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                }
+                                                    blockToUnhide.setType(Material.getMaterial(setmat));
+                                                if (subtype != null) {
+                                                    blockToUnhide.setData((byte)(Integer.parseInt(subtype)));
+                                                }
+                                            } else {
+                                                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
                                             }
                                         } else {
                                             p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
@@ -447,13 +451,17 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                         entry = entry + (int) blockToHide.getLocation().getZ() + "z";
                                         Material currentType = blockToHide.getType();
                                         if (Main.mats.contains(currentType.toString())) {
-                                            hideFile.set(entry, currentType.toString() + "-" + blockToHide.getData());
-                                            try {
-                                                hideFile.save(psStoneData);
-                                            } catch (IOException ex) {
-                                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                            if (!(hideFile.contains(entry))) {
+                                                hideFile.set(entry, currentType.toString() + "-" + blockToHide.getData());
+                                                try {
+                                                    hideFile.save(psStoneData);
+                                                } catch (IOException ex) {
+                                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                }
+                                                blockToHide.setType(Material.AIR);
+                                            } else {
+                                                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
                                             }
-                                            blockToHide.setType(Material.AIR);
                                         } else {
                                             p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
                                         }
@@ -1012,24 +1020,32 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
                                                     blockMaterial = str[0];
                                                     subtype = str[1];
                                                 }
-                                                hideFile.set(entry, null);
-                                                try {
-                                                    hideFile.save(Main.psStoneData);
-                                                } catch (IOException ex) {
-                                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
-                                                if (blockMaterial != null) {
-                                                    blockToChange.setType(Material.getMaterial(blockMaterial));
+                                                if (hideFile.contains(entry)) {
+                                                    hideFile.set(entry, null);
+                                                    try {
+                                                        hideFile.save(Main.psStoneData);
+                                                    } catch (IOException ex) {
+                                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+                                                    if (blockMaterial != null) {
+                                                        blockToChange.setType(Material.getMaterial(blockMaterial));
+                                                    }
+                                                }  else {
+                                                    p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
                                                 }
                                             //}
                                         } else if (args[1].equalsIgnoreCase("hide")) {
                                             if (blockToChange.getType() != Material.getMaterial(blockMaterial)) {
                                                 YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
-                                                hideFile.set(entry, blockToChange.getType().toString());
-                                                try {
-                                                    hideFile.save(Main.psStoneData);
-                                                } catch (IOException ex) {
-                                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                if (!(hideFile.contains(entry))) {
+                                                    hideFile.set(entry, blockToChange.getType().toString());
+                                                    try {
+                                                        hideFile.save(Main.psStoneData);
+                                                    } catch (IOException ex) {
+                                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+                                                } else {
+                                                    p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
                                                 }
                                             } else {
                                                 if (subtype != null && (blockToChange.getData() != (byte)(Integer.parseInt(subtype))));
