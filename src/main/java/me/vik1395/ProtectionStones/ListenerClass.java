@@ -25,6 +25,7 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
@@ -33,9 +34,16 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.MainHand;
+import org.bukkit.metadata.MetadataValue;
 
 /*
 
@@ -310,8 +318,42 @@ public class ListenerClass implements Listener {
                             e.setCancelled(true);
                         }
                     } else if(StoneTypeData.SilkTouch(blocktypedata)) {
-                        pb.breakNaturally();
                         e.setCancelled(true);
+                        ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
+                        ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
+                        Collection<ItemStack> drops = null;
+                        Collection<ItemStack> baseDrops = null;
+                        if (left.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+                            baseDrops = pb.getDrops(left);
+                            if (!(baseDrops.isEmpty())) {
+                                int fortuneLevel = left.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+                                if (fortuneLevel > 5) fortuneLevel = 5;
+                                ItemStack stack = baseDrops.iterator().next();
+                                double amount = stack.getAmount();
+                                amount = Math.random() * amount * fortuneLevel + 2;
+                                stack.setAmount((int) amount);
+                            }
+                            drops = baseDrops;
+                        } else if (right.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
+                            baseDrops = pb.getDrops(right);
+                            if (!(baseDrops.isEmpty())) {
+                                int fortuneLevel = right.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+                                if (fortuneLevel > 5) fortuneLevel = 5;
+                                ItemStack stack = baseDrops.iterator().next();
+                                double amount = stack.getAmount();
+                                amount = Math.random() * amount * fortuneLevel + 2;
+                                stack.setAmount((int) amount);
+                            }
+                            drops = baseDrops;
+                        } else {
+                            pb.breakNaturally();
+                            return;
+                        }                        
+                        for (ItemStack drop:drops) {
+                            pb.getWorld().dropItem(pb.getLocation(), drop);
+                        }
+                        pb.setType(Material.AIR);
+                        
                     } else {
                         e.setCancelled(false);
                     }
@@ -366,6 +408,72 @@ public class ListenerClass implements Listener {
                 if (type > 0) {
                     if (StoneTypeData.BlockPiston(blocktypedata)){
                        e.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (Main.config.getBoolean("Teleport to PVP.Block Teleport") == true) {
+            Player p = event.getPlayer();
+            WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+
+            if (!wg.isEnabled()) { return; }
+            RegionManager rgm = wg.getRegionManager(event.getFrom().getWorld());
+            if (rgm.getApplicableRegions(event.getTo()) != null) {
+                ApplicableRegionSet regions = rgm.getApplicableRegions(event.getTo());
+                ApplicableRegionSet regionsFrom = rgm.getApplicableRegions(event.getFrom());
+                
+                if (event.getCause() == TeleportCause.ENDER_PEARL) return;
+                try { if (event.getCause() == TeleportCause.CHORUS_FRUIT) return; } catch (NoSuchFieldError e1) {}
+                boolean ownsAll = false;
+                for (ProtectedRegion r: regions){
+                    if (r.getOwners().contains(p.getName())) {
+                        ownsAll = true;
+                    }
+                }
+                if (!ownsAll) {
+                    if (p.hasMetadata("psBypass")){
+                        List<MetadataValue> values = p.getMetadata("psBypass");
+                        for (MetadataValue value: values) {
+                            if (value.asBoolean() == true) {
+                                return;
+                            } else {
+                                if (regions.allows(DefaultFlag.PVP)) {
+                                    event.setCancelled(true);
+                                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cTeleportation blocked! &eDestination was a &cPVP &earea and cannot be teleported to."));
+                                }
+                            }
+                        }
+                    } else {
+                        if (regions.allows(DefaultFlag.PVP)) {
+                            event.setCancelled(true);
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cTeleportation blocked! &eDestination was a &cPVP &earea and cannot be teleported to."));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerMove(PlayerMoveEvent event) {
+        if (Main.config.getBoolean("Teleport to PVP.Display Warning") == true ) {
+            Player p = event.getPlayer();
+            WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+
+            if (!wg.isEnabled()) { return; }
+            RegionManager rgm = wg.getRegionManager(event.getFrom().getWorld());
+            if (rgm.getApplicableRegions(event.getTo()) != null) {
+                ApplicableRegionSet region = rgm.getApplicableRegions(event.getTo());
+                ApplicableRegionSet regionFrom = rgm.getApplicableRegions(event.getFrom());
+                if (regionFrom != null) {
+                    if (!(regionFrom.allows(DefaultFlag.PVP))) {
+                        if (region.allows(DefaultFlag.PVP)) {
+                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cWarning! &eThis area is a &cPVP &earea! You may &cdie &eand &close stuff&e!"));
+                        }
                     }
                 }
             }

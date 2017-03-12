@@ -36,6 +36,7 @@
     import java.io.File;
     import java.io.IOException;
     import java.util.Collection;
+    import java.util.Collections;
     import java.util.HashSet;
     import java.util.logging.Level;
     import java.util.logging.Logger;
@@ -44,6 +45,8 @@
     import org.bukkit.configuration.file.YamlConfiguration;
     import org.bukkit.inventory.ItemStack;
     import org.bukkit.inventory.PlayerInventory;
+    import org.bukkit.metadata.FixedMetadataValue;
+    import org.bukkit.metadata.MetadataValue;
 
     /*
 
@@ -73,9 +76,11 @@
         public static boolean uuid;
         public static int x, y, z, priority;
         public Map<CommandSender, Integer> viewTaskList;
-
+        public static Collection<UUID> pvpTPBypass = null;
+        
         @Override
         public void onEnable() {
+            pvpTPBypass = Collections.EMPTY_LIST;
             viewTaskList = new HashMap<>();
             saveDefaultConfig();
             getConfig().options().copyDefaults(true);
@@ -110,8 +115,7 @@
             flags = getConfig().getStringList("Flags");
             allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
             deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
-            uuid = getConfig().getBoolean("UUID");
-
+            
             initConfig();
 
             getLogger().info("ProtectionStones has successfully started!");
@@ -143,6 +147,7 @@
                         p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
                         p.sendMessage(ChatColor.YELLOW + "/ps admin {version|settings|hide|unhide|");//\\
                         p.sendMessage(ChatColor.YELLOW + "           cleanup|lastlogon|lastlogons|stats}");//\\
+                        p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
                         return true;
                     } else if (args[0].equalsIgnoreCase("toggle")) {
                         if (p.hasPermission("protectionstones.toggle")) {
@@ -942,9 +947,7 @@
                     }
                     if (rgnum <= index) {
                         String region = rgm.getRegion(playerRegions.get(rgnum)).getId();
-                        System.out.print(region);
                         String[] pos = region.split("x|y|z");
-                        System.out.print(pos.toString());
                         if (pos.length == 3) {
                             pos[0] = pos[0].substring(2);
                             p.sendMessage(ChatColor.GREEN + "Teleporting...");
@@ -1140,16 +1143,12 @@
                                     return true;
                                 }
                             } else if(args[1].equalsIgnoreCase("lastlogon")) {
-                                System.out.print("ProtectionStones LastLogon debug #0");
                                 if (args.length > 2) {
                                     String playerName = args[2];
-                                    System.out.print("ProtectionStones LastLogon debug #1");
                                     if (Bukkit.getOfflinePlayer(playerName).getFirstPlayed() > 0L) {
-                                        System.out.print("ProtectionStones LastLogon debug #2");
                                         long lastPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getLastPlayed()) / 86400000L;
                                         p.sendMessage(ChatColor.YELLOW + playerName + " last played " + lastPlayed + " days ago.");
                                         if (Bukkit.getOfflinePlayer(playerName).isBanned()) {
-                                            System.out.print("ProtectionStones LastLogon debug #3");
                                             p.sendMessage(ChatColor.YELLOW + playerName + " is banned.");
                                         }
                                     } else {
@@ -1335,7 +1334,32 @@
                     } else {
                         p.sendMessage(ChatColor.RED + "You don't have permission to use the Reclaim Command");
                     }
-                return true;
+                    return true;
+                } else if (args[0].equalsIgnoreCase("bypass")){ 
+                    if (p.hasPermission("protectionstones.bypass")) {
+                        if (args.length > 1) {
+                            p = Bukkit.getPlayer(args[1]);
+                        }
+                        
+                        boolean bool = false;
+                        if (!(p.hasMetadata("psBypass"))){ 
+                            p.setMetadata("psBypass", new FixedMetadataValue(this, true));
+                        } else {
+                            List<MetadataValue> values = p.getMetadata("psBypass");
+                            for (MetadataValue value: values) {
+                                if (value.asBoolean() == true) {
+                                    p.setMetadata("psBypass", new FixedMetadataValue(this, false));
+                                } else {
+                                    p.setMetadata("psBypass", new FixedMetadataValue(this, true));
+                                }
+                                bool = value.asBoolean();
+                            }
+                        }
+                        p.sendMessage(ChatColor.GREEN + "ProtectionStones PVP Teleport Bypass: " + ChatColor.DARK_GREEN + bool + " for " + p.getName());
+                        return true;
+                    } else {
+                        p.sendMessage(ChatColor.RED + "You don't have permission to use the bypass command");
+                    }
                 } else {
                     p.sendMessage(ChatColor.RED + "No such command. please type /ps help for more info");
                 }
