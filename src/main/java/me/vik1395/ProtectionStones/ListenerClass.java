@@ -42,7 +42,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.MainHand;
 import org.bukkit.metadata.MetadataValue;
 
 /*

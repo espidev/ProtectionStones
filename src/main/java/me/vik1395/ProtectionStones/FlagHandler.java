@@ -13,7 +13,7 @@ public class FlagHandler {
     WorldGuardPlugin wg = (WorldGuardPlugin)Main.wgd;
 
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
-        Flag<?> rawFlag =  DefaultFlag.fuzzyMatchFlag(args[1]);
+        Flag<?> rawFlag = DefaultFlag.fuzzyMatchFlag(wg.getFlagRegistry(), args[1]);
         if(rawFlag instanceof StateFlag) {
             StateFlag flag = (StateFlag)rawFlag;    
             if (args[2].equalsIgnoreCase("default")) {
