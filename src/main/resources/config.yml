@@ -1,4 +1,4 @@
-ConfVer: 1
+ConfVer: 2
 #Protection Stones Configuration Page
 #Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
 
@@ -52,3 +52,9 @@ Region:
     #No Drop: false
     #Block Piston: true
     #Priority: 1
+# Section for blocking/showing warning when people enter PVP flagged PStones
+Teleport to PVP:
+    #Display warning if they walk into PVP flagged PStone
+    Display Warning: false
+    #Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
+    Block Teleport: false
