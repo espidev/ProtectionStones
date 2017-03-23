@@ -42,6 +42,8 @@ Region:
     No Drop: false
     #Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
     Block Piston: true
+    #Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
+    Silk Touch: false
     #Default priority type for this block type pstone
     Priority: 0
   #STONE-1:    # the "-1" part would mean 'Granite' to be used as pstone, but not regular stone
