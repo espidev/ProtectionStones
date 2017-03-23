@@ -6,9 +6,12 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 
 **Dependencies**
 -------------
-
-    WorldGuard 6.0+
-    WorldEdit 6.0+
+* ProtectionStones 1.4.1 and under:
+  * WorldGuard 6.0 to 6.1.2
+  * WorldEdit 6.0+
+* ProtectionStones 1.4.2 and up:
+  * WorldGuard 6.1.3+
+  * WorldEdit 6.0+
 
 **Configuration**
 -------------
@@ -56,6 +59,8 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
         Auto Hide: false
         #Disable returning the block when the pstone is removed/reclaimed?
         No Drop: false
+        #Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
+        Silk Touch: false
         #Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
         Block Piston: true
         #Default priority type for this block type pstone
@@ -67,7 +72,14 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
         #Auto Hide: false
         #No Drop: false
         #Block Piston: true
-        #Priority: 1
+        #Silk Touch: false
+        #Priority: 
+    # Section for blocking/showing warning when people enter PVP flagged PStones
+    Teleport to PVP:
+      #Display warning if they walk into PVP flagged PStone
+      Display Warning: false
+      #Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
+      Block Teleport: false
 
 Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
@@ -86,6 +98,8 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps region count|list|remove|regen|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
+    /ps bypass
+    
 
 **Permissions**
 -----------
@@ -110,5 +124,6 @@ The permissions are very similar to the old plugin.
     protectionstones.admin - This permission allows users to override all ProtectionStones regions.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
+    protectionstones.bypass - Acces to the /ps bypass command.
 
 This plugin is licensed under **CC Attribution-NonCommercial-ShareAlike 4.0 International**. In very basic terms, Do whatever you want with the code of this plugin, as long as you give credits to the author and/or the plugin itself.
