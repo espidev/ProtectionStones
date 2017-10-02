@@ -79,6 +79,10 @@ public class Main extends JavaPlugin {
 	public static int x, y, z, priority;
 	public Map<CommandSender, Integer> viewTaskList;
 	public static Collection<UUID> pvpTPBypass = null;
+	
+	public static boolean isCooldownEnable = false;
+	public static int cooldown = 0;
+	public static String cooldownMessage = null;
 
 	@Override
 	public void onEnable() {
@@ -119,6 +123,10 @@ public class Main extends JavaPlugin {
 		deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
 
 		initConfig();
+		
+		isCooldownEnable = getConfig().getBoolean("cooldown.enable");
+		cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
+		cooldownMessage = getConfig().getString("cooldown.message");
 
 		getLogger().info("ProtectionStones has successfully started!");
 		getLogger().info("Created by Vik1395");
