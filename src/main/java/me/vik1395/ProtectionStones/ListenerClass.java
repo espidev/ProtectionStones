@@ -60,7 +60,8 @@ You may find an abridged version of the License at http://creativecommons.org/li
  */
 
 public class ListenerClass implements Listener {
-    StoneTypeData StoneTypeData = new StoneTypeData();
+    StoneTypeData StoneTypeData = new StoneTypeData(); 
+    private HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
@@ -81,6 +82,21 @@ public class ListenerClass implements Listener {
             type = 2;
         }
         if (type > 0) {
+	    if (Main.isCooldownEnable) {
+                double currentTime = System.currentTimeMillis();
+                if (this.lastProtectStonePlaced.containsKey(p)) {
+                    int cooldown = Main.cooldown;
+                    double lastPlace = this.lastProtectStonePlaced.get(p);
+                    if (lastPlace + cooldown > currentTime) {
+                        e.setCancelled(true);
+                        if (Main.cooldownMessage == null) return;
+                        String cooldownMessage = Main.cooldownMessage.replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000)));
+                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', cooldownMessage));
+                        return;
+                    }
+                }
+                this.lastProtectStonePlaced.put(p, currentTime);
+            }
             if (wg.canBuild(p, b.getLocation())) {
                 if(p.hasPermission("protectionstones.create")) {
                     if(Main.toggleList!=null) {
