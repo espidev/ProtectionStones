@@ -60,3 +60,7 @@ Teleport to PVP:
     Display Warning: false
     #Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
     Block Teleport: false
+cooldown:
+  enable: false
+  cooldown: 10
+  message: "&6Warning: &7Please wait for %time% seconds before place again!"
