@@ -172,19 +172,31 @@ public class ListenerClass implements Listener {
                     rgm.addRegion(region);
                     boolean overLap = rgm.overlapsUnownedRegion(region, lp);
                     if (overLap) {
-                        rgm.removeRegion(id);
-                        p.updateInventory();
-                        try {
-                            rgm.saveChanges();
-                            rgm.save();
-                        } catch (StorageException e1) {
-                            e1.printStackTrace();
+                        ApplicableRegionSet rp = rgm.getApplicableRegions(region);
+                        boolean powerfulOverLap = false;
+                        for (ProtectedRegion rg : rp) {
+                            if (!rg.isOwner(lp) && rg.getPriority() <= region.getPriority()) { // if protection priority > overlap priority
+                                powerfulOverLap = true;
+                                break;
+                            }
                         }
-                        if (!p.hasPermission("protectionstones.admin")) {
-                            p.sendMessage(ChatColor.RED + "You can not a protection here as it overlaps another unowned region");
-                            e.setCancelled(true);
-                            return;
+                        if (powerfulOverLap) { // if we overlap a less powerful region
+                            rgm.removeRegion(id);
+                            p.updateInventory();
+                            try {
+                                rgm.saveChanges();
+                                rgm.save();
+                            } catch (StorageException e1) {
+                                e1.printStackTrace();
+                            } // commented out below because the region gets removed anyways ¯\_(ツ)_/¯
+                            //if (!p.hasPermission("protectionstones.admin")) {
+                                p.sendMessage(ChatColor.RED + "You cannot protect this area since it overlaps a less powerful region.");
+                                e.setCancelled(true);
+                                return;
+                            //}
                         }
+
+
                     }
 
                     HashMap<Flag<?>, Object> newFlags = new HashMap<Flag<?>, Object>();
