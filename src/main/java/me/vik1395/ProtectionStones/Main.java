@@ -964,7 +964,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("add")) {
 					if (p.hasPermission("protectionstones.members")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -996,7 +996,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("remove")) {
 					if (p.hasPermission("protectionstones.members")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1026,7 +1026,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("addowner")) {
 					if (p.hasPermission("protectionstones.owners")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1058,7 +1058,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("removeowner")) {
 					if (p.hasPermission("protectionstones.owners")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1088,7 +1088,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("view")) {
 					if (p.hasPermission("protectionstones.view")) {
-						if (hasAccess(rgn, p, localPlayer, true)) {
+						if (hasNoAccess(rgn, p, localPlayer, true)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1171,7 +1171,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("unhide")) {
 					if (p.hasPermission("protectionstones.unhide")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1224,7 +1224,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("hide")) {
 					if (p.hasPermission("protectionstones.hide")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1267,7 +1267,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("priority")) {
 					if (p.hasPermission("protectionstones.priority")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1292,7 +1292,7 @@ public class Main extends JavaPlugin {
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("flag")) {
 					if (p.hasPermission("protectionstones.flags")) {
-						if (hasAccess(rgn, p, localPlayer, false)) {
+						if (hasNoAccess(rgn, p, localPlayer, false)) {
 							p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 							return true;
 						}
@@ -1313,7 +1313,7 @@ public class Main extends JavaPlugin {
 				}
 				/*****************************************************************************************************/
 				else if (args[0].equalsIgnoreCase("info")) {
-					if (hasAccess(rgn, p, localPlayer, true)) {
+					if (hasNoAccess(rgn, p, localPlayer, true)) {
 						p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
 						return true;
 					}
@@ -1443,18 +1443,18 @@ public class Main extends JavaPlugin {
 		return true;
 	}
 
-	public boolean hasAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
+	public boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
 		if (region == null) {
 			// Region is not valid
-			return false;
+			return true;
 		}
 
 		if (p.hasPermission("protectionstones.superowner") || region.isOwner(lp) || (canBeMember && region.isMember(lp))) {
 			// Player has permission here
-			return true;
+			return false;
 		} else {
 			// No permissions
-			return false;
+			return true;
 		}
 	}
 
