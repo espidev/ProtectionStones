@@ -7,15 +7,16 @@ import com.google.common.base.Joiner;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
 import java.util.Arrays;
 
 public class FlagHandler {
-    WorldGuardPlugin wg = (WorldGuardPlugin)Main.wgd;
+    WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
 
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
         Flag<?> rawFlag = DefaultFlag.fuzzyMatchFlag(wg.getFlagRegistry(), args[1]);
-        if(rawFlag instanceof StateFlag) {
-            StateFlag flag = (StateFlag)rawFlag;    
+        if (rawFlag instanceof StateFlag) {
+            StateFlag flag = (StateFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
@@ -24,20 +25,20 @@ public class FlagHandler {
                 RegionGroup group = null;
                 if (Arrays.toString(args).contains("-g")) {
                     int i = 0;
-                    for (String s: args) {
+                    for (String s : args) {
                         i++;
                         if (s.equalsIgnoreCase("-g")) {
                             group = getRegionGroup(args[i]);
                         }
                     }
                 }
-                if(Arrays.toString(args).contains("allow")) {
-                        region.setFlag(flag, StateFlag.State.ALLOW);
-                        if (group != null) {
-                            region.setFlag(flag.getRegionGroupFlag(), group);
-                        }
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-                } else if(Arrays.toString(args).contains("deny")) {
+                if (Arrays.toString(args).contains("allow")) {
+                    region.setFlag(flag, StateFlag.State.ALLOW);
+                    if (group != null) {
+                        region.setFlag(flag.getRegionGroupFlag(), group);
+                    }
+                    p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                } else if (Arrays.toString(args).contains("deny")) {
                     region.setFlag(flag, StateFlag.State.DENY);
                     if (group != null) {
                         region.setFlag(flag.getRegionGroupFlag(), group);
@@ -52,8 +53,8 @@ public class FlagHandler {
                     }
                 }
             }
-        } else if(rawFlag instanceof DoubleFlag) {
-            DoubleFlag flag = (DoubleFlag)rawFlag;
+        } else if (rawFlag instanceof DoubleFlag) {
+            DoubleFlag flag = (DoubleFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
@@ -61,8 +62,8 @@ public class FlagHandler {
                 region.setFlag(flag, Double.parseDouble(args[1]));
             }
             p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-        } else if(rawFlag instanceof IntegerFlag) {
-            IntegerFlag flag = (IntegerFlag)rawFlag;
+        } else if (rawFlag instanceof IntegerFlag) {
+            IntegerFlag flag = (IntegerFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
@@ -70,28 +71,28 @@ public class FlagHandler {
                 region.setFlag(flag, Integer.parseInt(args[1]));
             }
             p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-        } else if(rawFlag instanceof StringFlag) {
-            StringFlag flag = (StringFlag)rawFlag;
+        } else if (rawFlag instanceof StringFlag) {
+            StringFlag flag = (StringFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
             } else {
-                String flagValue = Joiner.on(" ").join(args).substring(args[0].length()+args[1].length()+2);
+                String flagValue = Joiner.on(" ").join(args).substring(args[0].length() + args[1].length() + 2);
                 String msg = flagValue.replaceAll("%player%", p.getName());
                 region.setFlag(flag, msg);
             }
             p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-        } else if(rawFlag instanceof BooleanFlag) {
-            BooleanFlag flag = (BooleanFlag)rawFlag;
+        } else if (rawFlag instanceof BooleanFlag) {
+            BooleanFlag flag = (BooleanFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
                 p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
             } else {
-                if(args[2].equalsIgnoreCase("true")) {
+                if (args[2].equalsIgnoreCase("true")) {
                     region.setFlag(flag, true);
                     p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-                } else if(args[2].equalsIgnoreCase("false")) {
+                } else if (args[2].equalsIgnoreCase("false")) {
                     region.setFlag(flag, false);
                     p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
                 }
@@ -114,15 +115,15 @@ public class FlagHandler {
     private RegionGroup getRegionGroup(String arg) {
         if (arg.equalsIgnoreCase("member") || arg.equalsIgnoreCase("members")) {
             return RegionGroup.MEMBERS;
-        } else if (arg.equalsIgnoreCase("nonmembers") || arg.equalsIgnoreCase("nonmember") 
-                || arg.equalsIgnoreCase("nomember")|| arg.equalsIgnoreCase("nomembers")
-                || arg.equalsIgnoreCase("non_members") || arg.equalsIgnoreCase("non_member") 
-                || arg.equalsIgnoreCase("no_member")|| arg.equalsIgnoreCase("no_members")) {
+        } else if (arg.equalsIgnoreCase("nonmembers") || arg.equalsIgnoreCase("nonmember")
+                || arg.equalsIgnoreCase("nomember") || arg.equalsIgnoreCase("nomembers")
+                || arg.equalsIgnoreCase("non_members") || arg.equalsIgnoreCase("non_member")
+                || arg.equalsIgnoreCase("no_member") || arg.equalsIgnoreCase("no_members")) {
             return RegionGroup.NON_MEMBERS;
-        } else if (arg.equalsIgnoreCase("nonowners") || arg.equalsIgnoreCase("nonowner") 
-                || arg.equalsIgnoreCase("noowner")|| arg.equalsIgnoreCase("noowners")
-                || arg.equalsIgnoreCase("non_owners") || arg.equalsIgnoreCase("non_owner") 
-                || arg.equalsIgnoreCase("no_owner")|| arg.equalsIgnoreCase("no_owners")) {
+        } else if (arg.equalsIgnoreCase("nonowners") || arg.equalsIgnoreCase("nonowner")
+                || arg.equalsIgnoreCase("noowner") || arg.equalsIgnoreCase("noowners")
+                || arg.equalsIgnoreCase("non_owners") || arg.equalsIgnoreCase("non_owner")
+                || arg.equalsIgnoreCase("no_owner") || arg.equalsIgnoreCase("no_owners")) {
             return RegionGroup.NON_OWNERS;
         } else if (arg.equalsIgnoreCase("owner") || arg.equalsIgnoreCase("owners")) {
             return RegionGroup.OWNERS;
@@ -133,7 +134,7 @@ public class FlagHandler {
         } else if (arg.endsWith("empty")) {
             return null;
         }
-        
+
         return null;
     }
 }
