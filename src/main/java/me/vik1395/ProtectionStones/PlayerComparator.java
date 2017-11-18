@@ -5,9 +5,9 @@
  */
 package me.vik1395.ProtectionStones;
 
-import java.util.Comparator;
-
 import org.bukkit.OfflinePlayer;
+
+import java.util.Comparator;
 
 /**
  * @author Dragoboss
