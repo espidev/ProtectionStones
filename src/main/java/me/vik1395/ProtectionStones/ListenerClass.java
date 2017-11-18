@@ -175,12 +175,12 @@ public class ListenerClass implements Listener {
                         ApplicableRegionSet rp = rgm.getApplicableRegions(region);
                         boolean powerfulOverLap = false;
                         for (ProtectedRegion rg : rp) {
-                            if (!rg.isOwner(lp) && rg.getPriority() <= region.getPriority()) { // if protection priority > overlap priority
+                            if (!rg.isOwner(lp) && rg.getPriority() >= region.getPriority()) { // if protection priority < overlap priority
                                 powerfulOverLap = true;
                                 break;
                             }
                         }
-                        if (powerfulOverLap) { // if we overlap a less powerful region
+                        if (powerfulOverLap) { // if we overlap a more powerful region
                             rgm.removeRegion(id);
                             p.updateInventory();
                             try {
@@ -190,7 +190,7 @@ public class ListenerClass implements Listener {
                                 e1.printStackTrace();
                             } // commented out below because the region gets removed anyways ¯\_(ツ)_/¯
                             //if (!p.hasPermission("protectionstones.admin")) {
-                                p.sendMessage(ChatColor.RED + "You cannot protect this area since it overlaps a less powerful region.");
+                                p.sendMessage(ChatColor.RED + "You cannot protect this area since it overlaps a more powerful region.");
                                 e.setCancelled(true);
                                 return;
                             //}
