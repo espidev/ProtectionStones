@@ -11,4 +11,3 @@ commands:
     description: Teleports player to a random position within the world border.
     aliases: [protectionstone, protectionstones, pstone]
     usage: /ps help
-    Permission: protectionstones
