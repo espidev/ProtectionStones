@@ -15,7 +15,7 @@ public class FlagHandler {
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
         Flag<?> rawFlag = DefaultFlag.fuzzyMatchFlag(wg.getFlagRegistry(), args[1]);
         if(rawFlag instanceof StateFlag) {
-            StateFlag flag = (StateFlag)rawFlag;    
+            StateFlag flag = (StateFlag)rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
