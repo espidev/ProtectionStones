@@ -1,10 +1,13 @@
-A Updated source and maintained version can be found here https://github.com/jerzean/ProtectionStones-Minecraft
+A Updated source from the original developer which can be found here 
+
+Here is the compiled Plugin ready to drop into your plugins folder
+http://j.gs/AQxH
 this is updated on my free time please open a issue here on github if any errors arrive
         thanks
             -Jerzean
 -------------
 
-ProtectionStones is based off the original ProtectionStones plugin at Bukkit by AxelDios and was recoded by vik1395,Dragoboss. It works very similar to the original plugin and most of the code has been derived from it. The main reason I have made this is because the plugin is dead and and has been very glitchy in 1.8, especially with the release on worldguard and worldedit 6.0.
+ProtectionStonesx is based off the original ProtectionStones plugin at Bukkit by AxelDios and was recoded by vik1395,Dragoboss. It works very similar to the original plugin and most of the code has been derived from it. The main reason I have made this is because the plugin is dead and and has been very glitchy in 1.8, especially with the release on worldguard and worldedit 6.0.
 
 This plugin uses a specified type of minecraft block/blocks as a protection block. When a player placed a block of that type, they are able to protect a region around them. The size of the protected region is configurable in the plugins config file. You can also set which flags players can change and also the default flags to be set when a new region is created.
 
@@ -12,13 +15,7 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 
 **Dependencies**
 -------------
-* ProtectionStones 1.4.1 and under:
-  * WorldGuard 6.0 to 6.1.2
-  * WorldEdit 6.0+
-* ProtectionStones 1.4.2 and up:
-  * WorldGuard 6.1.3+
-  * WorldEdit 6.0+
-* ProtectionStones 1.4.3
+* ProtectionStones 2.0.0
   * WorldGuard 6.2.1
   * worldEdit 6.0+
 **Configuration**
