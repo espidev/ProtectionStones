@@ -5,15 +5,14 @@
  */
 package me.vik1395.ProtectionStones;
 
-import java.util.Comparator;
 import org.bukkit.OfflinePlayer;
 
+import java.util.Comparator;
+
 /**
- *
  * @author Dragoboss
  */
-class PlayerComparator implements Comparator<OfflinePlayer>
- {
+class PlayerComparator implements Comparator<OfflinePlayer> {
 
     @Override
     public int compare(OfflinePlayer o1, OfflinePlayer o2) {

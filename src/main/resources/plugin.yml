@@ -1,7 +1,7 @@
 name: ProtectionStones
 version: ${version}
 description: ${description}
-authors: [Vik1395,Dragoboss,Jarzean]
+authors: [Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
 main: me.vik1395.ProtectionStones.Main
