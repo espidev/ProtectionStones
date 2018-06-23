@@ -33,8 +33,8 @@ Region:
   #Default block type
   ENDER_STONE:
     X Radius: 20
-    #Set Y to 0 if you want it to protect from sky to bedrock. If 0 dosent work set it to 256
-    Y Radius: 0
+    #Set Y to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+    Y Radius: -1
     Z Radius: 20
     #Hide pstone right away when placed?
     Auto Hide: false
