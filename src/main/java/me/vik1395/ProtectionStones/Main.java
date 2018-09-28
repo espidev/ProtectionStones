@@ -2,12 +2,15 @@ package me.vik1395.ProtectionStones;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -56,7 +59,7 @@ public class Main extends JavaPlugin {
     public static List<String> deniedWorlds = new ArrayList<>();
     public static Collection<String> mats = new HashSet<>();
     public static boolean uuid;
-    public static int x, y, z, priority;
+    public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
     public static Collection<UUID> pvpTPBypass = null;
 
@@ -90,9 +93,12 @@ public class Main extends JavaPlugin {
 
         for (String material : this.getConfig().getString("Blocks").split(",")) {
             String[] split = material.split("-");
+
             if (split.length > 1 && split.length < 3) {
                 if (!(Material.getMaterial(split[0]) == null)) {
                     mats.add(material.toUpperCase());
+                } else {
+                    Bukkit.getLogger().info("Unrecognized block: " + split[0] + ". Please make sure you have updated your block name for 1.13!");
                 }
             } else {
                 mats.add(split[0].toUpperCase());
@@ -121,7 +127,6 @@ public class Main extends JavaPlugin {
             Player p = (Player) s;
             if (cmd.getName().equalsIgnoreCase("ps")) {
                 WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
-                RegionManager rgm = wg.getRegionManager(p.getWorld());
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
                     p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
@@ -150,6 +155,7 @@ public class Main extends JavaPlugin {
                 double z = p.getLocation().getZ();
                 Vector v = new Vector(x, y, z);
                 String id = "";
+                RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
                 List<String> idList = rgm.getApplicableRegionsIDs(v);
                 if (idList.size() == 1) {
                     id = idList.toString();
@@ -229,7 +235,8 @@ public class Main extends JavaPlugin {
                                         }
                                     }
                                 }
-                            } catch (Exception e) { }
+                            } catch (Exception e) {
+                            }
                             p.sendMessage(ChatColor.YELLOW + "Your region count: " + count);
                         } else {
                             p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
@@ -259,7 +266,8 @@ public class Main extends JavaPlugin {
                                         }
                                     }
                                 }
-                            } catch (Exception e) { }
+                            } catch (Exception e) {
+                            }
                             p.sendMessage(ChatColor.YELLOW + args[1] + "'s region count: " + count);
                         } else {
                             p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
@@ -303,7 +311,8 @@ public class Main extends JavaPlugin {
                                         }
                                     }
                                     //count = rgm.getRegionCountOfPlayer(playerName);
-                                } catch (Exception e) { }
+                                } catch (Exception e) {
+                                }
                                 p.sendMessage(ChatColor.YELLOW + args[2] + "'s region count: " + count);
                                 return true;
                             }
@@ -338,7 +347,8 @@ public class Main extends JavaPlugin {
                                                 }
                                             }
                                         }
-                                    } catch (Exception localException6) { }
+                                    } catch (Exception localException6) {
+                                    }
                                 }
                                 if (index == 0) {
                                     p.sendMessage(ChatColor.YELLOW + "No regions found for " + name);
@@ -349,7 +359,7 @@ public class Main extends JavaPlugin {
                                 return true;
                             }
                             if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("regen")) || (args[1].equalsIgnoreCase("disown"))) {
-                                RegionManager mgr = wg.getRegionManager(p.getWorld());
+                                RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
                                 Map<String, ProtectedRegion> regions = mgr.getRegions();
                                 String name = args[2].toLowerCase();
                                 UUID playerid = null;
@@ -374,7 +384,8 @@ public class Main extends JavaPlugin {
                                                 }
                                             }
                                         }
-                                    } catch (Exception localException7) { }
+                                    } catch (Exception localException7) {
+                                    }
                                 }
                                 if (index == 0) {
                                     p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2]);
@@ -466,7 +477,8 @@ public class Main extends JavaPlugin {
                                 }
                             }
                         }
-                    } catch (Exception localException6) { }
+                    } catch (Exception localException6) {
+                    }
                     if (args[0].equalsIgnoreCase("tp")) {
                         LocalPlayer lp;
                         try {
@@ -545,7 +557,8 @@ public class Main extends JavaPlugin {
                                 p.sendMessage(getConfig().saveToString().split("\n"));
                             }
                             if ((args[1].equalsIgnoreCase("hide")) || (args[1].equalsIgnoreCase("unhide"))) {
-                                RegionManager mgr = wg.getRegionManager(p.getWorld());
+                                RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                                RegionManager mgr = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
                                 Map<String, ProtectedRegion> regions = mgr.getRegions();
                                 if (regions.isEmpty()) {
                                     p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");
@@ -561,7 +574,8 @@ public class Main extends JavaPlugin {
                                             regionIDList[index] = idname;
                                             index++;
                                         }
-                                    } catch (Exception e) { }
+                                    } catch (Exception e) {
+                                    }
                                 }
                                 if (index == 0) {
                                     p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");
@@ -616,14 +630,15 @@ public class Main extends JavaPlugin {
                                                     p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
                                                 }
                                             } else {
-                                                if (subtype != null && (blockToChange.getData() != (byte) (Integer.parseInt(subtype))));
+                                                if (subtype != null && (blockToChange.getData() != (byte) (Integer.parseInt(subtype))))
+                                                    ;
                                             }
                                             if (Main.mats.contains(blockToChange.getType().toString()) || Main.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
                                                 blockToChange.setType(Material.getMaterial(blockMaterial));
                                             }
                                         }
                                         if (subtype != null) {
-                                            blockToChange.setData((byte) Integer.parseInt(subtype));
+                                            //TODO removed subtype support blockToChange.setData((byte) Integer.parseInt(subtype));
                                         }
                                     }
                                 }
@@ -641,7 +656,7 @@ public class Main extends JavaPlugin {
                                         }
                                         p.sendMessage(ChatColor.YELLOW + "Cleanup " + args[2] + " " + days + " days");
                                         p.sendMessage(ChatColor.YELLOW + "================");
-                                        RegionManager mgr = wg.getRegionManager(p.getWorld());
+                                        RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
                                         Map<String, ProtectedRegion> regions = mgr.getRegions();
                                         int size = regions.size();
                                         String name = "";
@@ -660,7 +675,8 @@ public class Main extends JavaPlugin {
                                                             regionIDList[index] = idname;
                                                             index++;
                                                         }
-                                                    } catch (Exception e) { }
+                                                    } catch (Exception e) {
+                                                    }
                                                 }
                                                 if (index == 0) {
                                                     p.sendMessage(ChatColor.YELLOW + "No regions found for " + name);
@@ -722,26 +738,26 @@ public class Main extends JavaPlugin {
                                     p.sendMessage(ChatColor.YELLOW + "A player name is required.");
                                 }
                             } else if (args[1].equalsIgnoreCase("lastlogons")) {
-                                        int days = 0;
-                                    if (args.length > 2) {
-                                        days = Integer.parseInt(args[2]);
+                                int days = 0;
+                                if (args.length > 2) {
+                                    days = Integer.parseInt(args[2]);
+                                }
+                                OfflinePlayer[] offlinePlayerList = getServer().getOfflinePlayers();
+                                int playerCount = offlinePlayerList.length;
+                                int playerCounter = 0;
+                                p.sendMessage(ChatColor.YELLOW + "" + days + " Days Plus:");
+                                p.sendMessage(ChatColor.YELLOW + "================");
+                                Arrays.sort(offlinePlayerList, new PlayerComparator());
+                                for (int iii = 0; iii < playerCount; iii++) {
+                                    long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
+                                    if (lastPlayed >= days) {
+                                        playerCounter++;
+                                        p.sendMessage(ChatColor.YELLOW + offlinePlayerList[iii].getName() + " " + lastPlayed + " days");
                                     }
-                                    OfflinePlayer[] offlinePlayerList = getServer().getOfflinePlayers();
-                                    int playerCount = offlinePlayerList.length;
-                                    int playerCounter = 0;
-                                    p.sendMessage(ChatColor.YELLOW + "" + days + " Days Plus:");
-                                    p.sendMessage(ChatColor.YELLOW + "================");
-                                    Arrays.sort(offlinePlayerList, new PlayerComparator());
-                                    for (int iii = 0; iii < playerCount; iii++) {
-                                        long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
-                                        if (lastPlayed >= days) {
-                                            playerCounter++;
-                                            p.sendMessage(ChatColor.YELLOW + offlinePlayerList[iii].getName() + " " + lastPlayed + " days");
-                                        }
-                                    }
-                                    p.sendMessage(ChatColor.YELLOW + "================");
-                                    p.sendMessage(ChatColor.YELLOW + "" + playerCounter + " Total Players Shown");
-                                    p.sendMessage(ChatColor.YELLOW + "" + playerCount + " Total Players Checked");
+                                }
+                                p.sendMessage(ChatColor.YELLOW + "================");
+                                p.sendMessage(ChatColor.YELLOW + "" + playerCounter + " Total Players Shown");
+                                p.sendMessage(ChatColor.YELLOW + "" + playerCount + " Total Players Checked");
                             } else if (args[1].equalsIgnoreCase("stats")) {
                                 if (args.length > 2) {
                                     String playerName = args[2];
@@ -762,7 +778,8 @@ public class Main extends JavaPlugin {
                                             LocalPlayer thePlayer = null;
                                             thePlayer = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[2]));
                                             count = rgm.getRegionCountOfPlayer(thePlayer);
-                                        } catch (Exception localException1) { }
+                                        } catch (Exception localException1) {
+                                        }
                                         p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
                                         p.sendMessage(ChatColor.YELLOW + "================");
                                     } else {
@@ -775,7 +792,8 @@ public class Main extends JavaPlugin {
                                 int count = 0;
                                 try {
                                     count = rgm.size();
-                                } catch (Exception localException2) { }
+                                } catch (Exception localException2) {
+                                }
                                 p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
                                 p.sendMessage(ChatColor.YELLOW + "================");
                             }
@@ -867,7 +885,7 @@ public class Main extends JavaPlugin {
                                         if (freeSpace) {
                                             PlayerInventory inventory = p.getInventory();
                                             inventory.addItem(new ItemStack[]{
-                                                oreblock
+                                                    oreblock
                                             });
                                             middleblock.setType(Material.AIR);
                                             rgm.removeRegion(id);
@@ -878,7 +896,7 @@ public class Main extends JavaPlugin {
                                             }
                                             p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("This area is no longer protected.").toString());
                                         } else {
-                                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have enough room in your inventory.").toString());
+                                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have enough room in your inventory.").toString());
                                         }
                                     } else {
                                         middleblock.setType(Material.AIR);
@@ -936,26 +954,26 @@ public class Main extends JavaPlugin {
                             p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
                             return true;
                         }
-                            if (args.length < 2) {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
-                                return true;
-                            } else {
-                                String playerName = args[1];
-                                UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-                                DefaultDomain members = rgm.getRegion(id).getMembers();
-                                members.addPlayer(playerName);
-                                if (uuid) {
-                                    members.addPlayer(uid);
-                                }
-                                rgm.getRegion(id).setMembers(members);
-                                try {
-                                    rgm.save();
-                                } catch (Exception e) {
-                                    System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                                }
-                                p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been added to your region.").toString());
-                                return true;
+                        if (args.length < 2) {
+                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
+                            return true;
+                        } else {
+                            String playerName = args[1];
+                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
+                            DefaultDomain members = rgm.getRegion(id).getMembers();
+                            members.addPlayer(playerName);
+                            if (uuid) {
+                                members.addPlayer(uid);
                             }
+                            rgm.getRegion(id).setMembers(members);
+                            try {
+                                rgm.save();
+                            } catch (Exception e) {
+                                System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+                            }
+                            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been added to your region.").toString());
+                            return true;
+                        }
                     } else {
                         p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Members Commands").toString());
                         return true;
@@ -1085,7 +1103,7 @@ public class Main extends JavaPlugin {
                         Vector playerVector = new Vector(px, py, pz);
                         final int playerY = playerVector.getBlockY();
                         final World theWorld = p.getWorld();
-                                /*  */
+                        /*  */
                         final Material bm1 = getBlock(theWorld, minX, playerY, minZ);
                         final Material bm2 = getBlock(theWorld, maxX, playerY, minZ);
                         final Material bm3 = getBlock(theWorld, minX, playerY, maxZ);
@@ -1098,22 +1116,22 @@ public class Main extends JavaPlugin {
                         final Material bm10 = getBlock(theWorld, maxX, minY, minZ);
                         final Material bm11 = getBlock(theWorld, minX, minY, maxZ);
                         final Material bm12 = getBlock(theWorld, maxX, minY, maxZ);
-                                /*  */
+                        /*  */
                         setBlock(theWorld, minX, playerY, minZ, Material.GLASS);
                         setBlock(theWorld, maxX, playerY, minZ, Material.GLASS);
                         setBlock(theWorld, minX, playerY, maxZ, Material.GLASS);
                         setBlock(theWorld, maxX, playerY, maxZ, Material.GLASS);
-                                /*  */
+                        /*  */
                         setBlock(theWorld, minX, maxY, minZ, Material.GLASS);
                         setBlock(theWorld, maxX, maxY, minZ, Material.GLASS);
                         setBlock(theWorld, minX, maxY, maxZ, Material.GLASS);
                         setBlock(theWorld, maxX, maxY, maxZ, Material.GLASS);
-                                /*  */
+                        /*  */
                         setBlock(theWorld, minX, minY, minZ, Material.GLASS);
                         setBlock(theWorld, maxX, minY, minZ, Material.GLASS);
                         setBlock(theWorld, minX, minY, maxZ, Material.GLASS);
                         setBlock(theWorld, maxX, minY, maxZ, Material.GLASS);
-                                /*  */
+                        /*  */
                         int taskID = getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                             public void run() {
                                 Main.this.setBlock(theWorld, minX, playerY, minZ, bm1);
@@ -1173,7 +1191,7 @@ public class Main extends JavaPlugin {
                                     }
                                     blockToUnhide.setType(Material.getMaterial(setmat));
                                     if (subtype != null) {
-                                        blockToUnhide.setData((byte) (Integer.parseInt(subtype)));
+                                        //TODO removed subtype support blockToUnhide.setData((byte) (Integer.parseInt(subtype)));
                                     }
                                 } else {
                                     p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
@@ -1227,10 +1245,10 @@ public class Main extends JavaPlugin {
                         } else {
                             p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("Not a ProtectionStones Region").toString());
                         }
-                } else {
-                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use that command").toString());
-                }
-                return true;
+                    } else {
+                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use that command").toString());
+                    }
+                    return true;
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("priority")) {
@@ -1260,20 +1278,20 @@ public class Main extends JavaPlugin {
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("flag")) {
                     if (p.hasPermission("protectionstones.flags")) {
-                            if (hasNoAccess(rgn, p, localPlayer, false)) {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                                return true;
-                            }
-                            if (args.length >= 3) {
-                                if (allowedFlags.contains(args[1].toLowerCase()) || p.hasPermission("protectionstones.flag." + args[1].toLowerCase()) || p.hasPermission("protectionstones.flag.*")) {
-                                    FlagHandler fh = new FlagHandler();
-                                    fh.setFlag(args, rgm.getRegion(id), p);
-                                } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to set that flag").toString());
-                                }
+                        if (hasNoAccess(rgn, p, localPlayer, false)) {
+                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
+                            return true;
+                        }
+                        if (args.length >= 3) {
+                            if (allowedFlags.contains(args[1].toLowerCase()) || p.hasPermission("protectionstones.flag." + args[1].toLowerCase()) || p.hasPermission("protectionstones.flag.*")) {
+                                FlagHandler fh = new FlagHandler();
+                                fh.setFlag(args, rgm.getRegion(id), p);
                             } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps flag {flagname} {flagvalue}").toString());
+                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to set that flag").toString());
                             }
+                        } else {
+                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps flag {flagname} {flagvalue}").toString());
+                        }
                     } else {
                         p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use flag commands").toString());
                     }
@@ -1294,9 +1312,7 @@ public class Main extends JavaPlugin {
                                     p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Region:").append(ChatColor.YELLOW).append(id).append(ChatColor.BLUE).append(", Priority: ").append(ChatColor.YELLOW).append(rgm.getRegion(id).getPriority()).toString());
                                     String myFlag = "";
                                     String myFlagValue = "";
-                                    int n = DefaultFlag.flagsList.length;
-                                    for (int i = 0; i < n; i++) {
-                                        Flag<?> flag = DefaultFlag.flagsList[i];
+                                    for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
                                         if (region.getFlag(flag) != null) {
                                             myFlagValue = region.getFlag(flag).toString();
                                             RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
@@ -1377,9 +1393,8 @@ public class Main extends JavaPlugin {
                             if (p.hasPermission("protectionstones.flags")) {
                                 String myFlag = "";
                                 String myFlagValue = "";
-                                int n = DefaultFlag.flagsList.length;
-                                for (int i = 0; i < n; i++) {
-                                    Flag<?> flag = DefaultFlag.flagsList[i];
+                                WorldGuard.getInstance().getFlagRegistry().getAll();
+                                for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
                                     if (rgm.getRegion(id).getFlag(flag) != null) {
                                         myFlagValue = rgm.getRegion(id).getFlag(flag).toString();
                                         myFlag = (new StringBuilder(String.valueOf(myFlag))).append(flag.getName()).append(": ").append(myFlagValue).append(", ").toString();
@@ -1392,7 +1407,7 @@ public class Main extends JavaPlugin {
                                     p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Flags: ").append(ChatColor.RED).append("(none)").toString());
                                 }
                             } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Flags Commands").toString());
+                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Flags Commands").toString());
                             }
                         } else {
                             p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps info members|owners|flags").toString());
@@ -1480,28 +1495,27 @@ public class Main extends JavaPlugin {
         WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
         System.out.print("Patching initial hiddenpstones.yml");
         for (World world : Bukkit.getWorlds()) {
-                RegionManager rgm = wg.getRegionManager(world);
-                Map<String, ProtectedRegion> regions = rgm.getRegions();
-                for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
-                        String selected = region.next();
-                        if (selected.startsWith("ps")) {
-                                Material mat = Material.valueOf(block.toString());
-                                String sub = null;
-                                if (block.toString().contains("-")) {
-                                        sub = block.toString().split("-")[1];
-                                }
-                                if (sub != null) {
-                                        hideFile.set(selected, mat.toString() + "-" + sub);
-                                } else {
-                                        hideFile.set(selected, mat.toString() + "-0");
-                                }
-                        }
+            RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            Map<String, ProtectedRegion> regions = rgm.getRegions();
+            for (String selected : regions.keySet()) {
+                if (selected.startsWith("ps")) {
+                    Material mat = Material.valueOf(block.toString());
+                    String sub = null;
+                    if (block.toString().contains("-")) {
+                        sub = block.toString().split("-")[1];
+                    }
+                    if (sub != null) {
+                        hideFile.set(selected, mat.toString() + "-" + sub);
+                    } else {
+                        hideFile.set(selected, mat.toString() + "-0");
+                    }
                 }
+            }
         }
         try {
-                hideFile.save(psStoneData);
+            hideFile.save(psStoneData);
         } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
