@@ -78,7 +78,6 @@ public class ListenerClass implements Listener {
         int type = 0;
         String blocktypedata = b.getType().toString() + "-" + b.getData();
         String blocktype = b.getType().toString();
-        Bukkit.getLogger().info(blocktype + " " + blocktypedata);
         if (Main.mats.contains(blocktypedata)) {
             type = 1;
         } else if (Main.mats.contains(blocktype)) {
