@@ -195,7 +195,7 @@ public class ListenerClass implements Listener {
                                 e1.printStackTrace();
                             } // commented out below because the region gets removed anyways ¯\_(ツ)_/¯
                             //if (!p.hasPermission("protectionstones.admin")) {
-                            p.sendMessage(ChatColor.BOLD + "[" + ChatColor.DARK_AQUA + "Esti" + ChatColor.GOLD + "Net" + ChatColor.RESET + "" + ChatColor.BOLD + "] " + ChatColor.RESET + "" + ChatColor.RED + "You can not place a protection here as it overlaps another region");
+                            p.sendMessage(ChatColor.YELLOW + "You can not place a protection here as it overlaps another region");
                             e.setCancelled(true);
                             return;
                             //}
