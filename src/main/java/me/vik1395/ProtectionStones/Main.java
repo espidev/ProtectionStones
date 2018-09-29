@@ -213,9 +213,9 @@ public class Main extends JavaPlugin {
 
                     if (args.length == 1) {
                         if (p.hasPermission("protectionstones.count")) {
-                            playerName = wg.wrapPlayer(p).getName();
+                            playerName = p.getName();
                             if (uuid) {
-                                playerid = wg.wrapPlayer(p).getUniqueId();
+                                playerid = p.getUniqueId();
                             }
                             try {
                                 Map<String, ProtectedRegion> regions = rgm.getRegions();
@@ -244,9 +244,9 @@ public class Main extends JavaPlugin {
                         return true;
                     } else if (args.length == 2) {
                         if (p.hasPermission("protectionstones.count.others")) {
-                            playerName = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1])).getName();
+                            playerName = Bukkit.getOfflinePlayer(args[1]).getName();
                             if (uuid) {
-                                playerid = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1])).getUniqueId();
+                                playerid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
                             }
                             try {
                                 Map<String, ProtectedRegion> regions = rgm.getRegions();
