@@ -1,6 +1,7 @@
 package me.vik1395.ProtectionStones;
 
 import com.google.common.base.Joiner;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -10,10 +11,9 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 
 public class FlagHandler {
-    WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
 
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
-        Flag<?> rawFlag = DefaultFlag.fuzzyMatchFlag(wg.getFlagRegistry(), args[1]);
+        Flag<?> rawFlag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[1]);
         if (rawFlag instanceof StateFlag) {
             StateFlag flag = (StateFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {

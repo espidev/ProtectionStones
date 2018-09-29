@@ -5,6 +5,7 @@ authors: [Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
 main: me.vik1395.ProtectionStones.Main
+api-version: 1.13
 
 commands:
   ps:
