@@ -18,6 +18,7 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 * ProtectionStones 1.6.0
   * WorldGuard 7.0 (Beta 3)
   * worldEdit 7.0 (Beta 5)
+  
 **Configuration**
 -------------
 

@@ -1,11 +1,7 @@
 package me.vik1395.ProtectionStones;
 
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -15,8 +11,6 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import me.vik1395.ProtectionStones.ListenerClass;
-import me.vik1395.ProtectionStones.StoneTypeData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -31,7 +25,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.BlockVector;
 
 import java.io.File;
 import java.io.IOException;
@@ -163,7 +156,7 @@ public class Main extends JavaPlugin {
                     p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
                     p.sendMessage(ChatColor.YELLOW + "           cleanup | lastlogon | lastlogons | stats}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
-                    p.sendMessage(mats.toString());
+                    p.sendMessage(ChatColor.YELLOW + "enabled blocks " + mats.toString());
                     return true;
                 }
 
@@ -868,7 +861,7 @@ public class Main extends JavaPlugin {
                                 if (setmat != null) blockToUnhide.setType(Material.getMaterial(setmat));
                                 BlockVector3 max = region.getMaximumPoint();
                                 BlockVector3 min = region.getMinimumPoint();
-                                BlockVector3 middle = max.add(min).multiply((int) 0.5);
+                                BlockVector3 middle = max.add(min).divide(2);
                                 Collection<Block> blocks = new HashSet<>();
                                 if (type == 2) blocktypedata = blockToUnhide.getType().toString();
                                 if (StoneTypeData.RegionY(blocktypedata) == 0) {
