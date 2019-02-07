@@ -1,11 +1,4 @@
-A Updated source from the original developer which can be found here 
-
-Here is the compiled Plugin ready to drop into your plugins folder
-http://j.gs/AQxH
-this is updated on my free time please open a issue here on github if any errors arrive
-        thanks
-            -Jerzean
--------------
+An updated source from the original developer which can be found here .
 
 ProtectionStonesx is based off the original ProtectionStones plugin at Bukkit by AxelDios and was recoded by vik1395,Dragoboss. It works very similar to the original plugin and most of the code has been derived from it. The main reason I have made this is because the plugin is dead and and has been very glitchy in 1.8, especially with the release on worldguard and worldedit 6.0.
 
@@ -16,8 +9,9 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 **Dependencies**
 -------------
 * ProtectionStones 2.0.0
-  * WorldGuard 6.2.1
-  * worldEdit 6.0+
+  * WorldGuard 7.0+
+  * WorldEdit 7.0+
+  
 **Configuration**
 -------------
 

@@ -1,8 +1,8 @@
 package me.vik1395.ProtectionStones;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -25,6 +25,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.BlockVector;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,7 +154,7 @@ public class Main extends JavaPlugin {
                 double x = p.getLocation().getX();
                 double y = p.getLocation().getY();
                 double z = p.getLocation().getZ();
-                Vector v = new Vector(x, y, z);
+                BlockVector3 v = BlockVector3.at(x, y, z);
                 String id = "";
                 RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
                 List<String> idList = rgm.getApplicableRegionsIDs(v);
@@ -836,9 +837,9 @@ public class Main extends JavaPlugin {
                                     type = 2;
                                 }
                                 if (setmat != null) blockToUnhide.setType(Material.getMaterial(setmat));
-                                BlockVector max = region.getMaximumPoint();
-                                BlockVector min = region.getMinimumPoint();
-                                Vector middle = max.add(min).multiply(0.5);
+                                Vector3 max = region.getMaximumPoint().toVector3();
+                                Vector3 min = region.getMinimumPoint().toVector3();
+                                Vector3 middle = max.add(min).multiply(0.5);
                                 Collection<Block> blocks = new HashSet<>();
                                 if (type == 2) blocktypedata = blockToUnhide.getType().toString();
                                 if (StoneTypeData.RegionY(blocktypedata) == 0) {
@@ -865,7 +866,7 @@ public class Main extends JavaPlugin {
                                     } else if (it != null && StoneTypeData.RegionY(it.getType().toString()) == 0) {
                                         middleblock = it;
                                     } else {
-                                        middleblock = p.getWorld().getBlockAt((int) middle.getX(), (int) middle.getY(), (int) middle.getZ());
+                                        middleblock = p.getWorld().getBlockAt((int)middle.getX(), (int)middle.getY(), (int)middle.getZ());
                                     }
 
                                     if (!StoneTypeData.NoDrop(middleblock.getType().toString() + "-" + middleblock.getData()) && !StoneTypeData.NoDrop(middleblock.getType().toString())) {
@@ -1089,8 +1090,8 @@ public class Main extends JavaPlugin {
                                 return true;
                             }
                         }
-                        Vector minVector = rgm.getRegion(id).getMinimumPoint();
-                        Vector maxVector = rgm.getRegion(id).getMaximumPoint();
+                        BlockVector3 minVector = rgm.getRegion(id).getMinimumPoint();
+                        BlockVector3 maxVector = rgm.getRegion(id).getMaximumPoint();
                         final int minX = minVector.getBlockX();
                         final int minY = minVector.getBlockY();
                         final int minZ = minVector.getBlockZ();
@@ -1100,7 +1101,7 @@ public class Main extends JavaPlugin {
                         double px = p.getLocation().getX();
                         double py = p.getLocation().getY();
                         double pz = p.getLocation().getZ();
-                        Vector playerVector = new Vector(px, py, pz);
+                        BlockVector3 playerVector = BlockVector3.at(px, py, pz);
                         final int playerY = playerVector.getBlockY();
                         final World theWorld = p.getWorld();
                         /*  */
@@ -1350,8 +1351,8 @@ public class Main extends JavaPlugin {
                                     } else {
                                         p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.RED).append("(no members)").toString());
                                     }
-                                    BlockVector min = region.getMinimumPoint();
-                                    BlockVector max = region.getMaximumPoint();
+                                    BlockVector3 min = region.getMinimumPoint();
+                                    BlockVector3 max = region.getMaximumPoint();
                                     p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Bounds: ").append(ChatColor.YELLOW).append("(").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(") -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")").toString());
                                     return true;
                                 }
