@@ -1,8 +1,12 @@
 package me.vik1395.ProtectionStones;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -11,6 +15,8 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.vik1395.ProtectionStones.ListenerClass;
+import me.vik1395.ProtectionStones.StoneTypeData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -25,6 +31,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.BlockVector;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +69,14 @@ public class Main extends JavaPlugin {
     public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
     public static Collection<UUID> pvpTPBypass = null;
+    public static String SPOX = null;
+    public static String SPOY = null;
+    public static Double SPRX = null;
+    public static Double SPRY = null;
+    public static Double MCLX = null;
+    public static Double MCLNX = null;
+    public static Double MCLY = null;
+    public static Double MCLNY = null;
 
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
@@ -104,18 +119,22 @@ public class Main extends JavaPlugin {
                 mats.add(split[0].toUpperCase());
             }
         }
+        SPOX = getConfig().getString("SpawnProtect.X");
+        SPOY = getConfig().getString("SpawnProtect.Y");
+
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
         deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
 
         initConfig();
-
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
         cooldownMessage = getConfig().getString("cooldown.message");
 
-        getLogger().info("ProtectionStones has successfully started!");
+
+        getLogger().info("ProtectionStonesX has successfully started!");
         getLogger().info("Created by Vik1395");
+        getLogger().info("Updated an maintained by Jerzean");
     }
 
     StoneTypeData StoneTypeData = new StoneTypeData();
@@ -141,9 +160,10 @@ public class Main extends JavaPlugin {
                     p.sendMessage(ChatColor.YELLOW + "/ps reclaim");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps admin {version|settings|hide|unhide|");//\\
-                    p.sendMessage(ChatColor.YELLOW + "           cleanup|lastlogon|lastlogons|stats}");//\\
+                    p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
+                    p.sendMessage(ChatColor.YELLOW + "           cleanup | lastlogon | lastlogons | stats}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
+                    p.sendMessage(mats.toString());
                     return true;
                 }
 
@@ -153,7 +173,8 @@ public class Main extends JavaPlugin {
                 double x = p.getLocation().getX();
                 double y = p.getLocation().getY();
                 double z = p.getLocation().getZ();
-                Vector v = new Vector(x, y, z);
+                BlockVector3 v;
+                v = BlockVector3.at(x, y ,z);
                 String id = "";
                 RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
                 List<String> idList = rgm.getApplicableRegionsIDs(v);
@@ -436,7 +457,7 @@ public class Main extends JavaPlugin {
                 }
                 /*****************************************************************************************************/
                 else if ((args[0].equalsIgnoreCase("tp") && p.hasPermission("protectionstones.tp")) || (args[0].equalsIgnoreCase("home") && p.hasPermission("protectionstones.home"))) {
-                    String name = p.getName().toLowerCase();
+                    String names = p.getName().toLowerCase();
                     UUID playerid = null;
                     int rgnum = 0;
                     int index = 0, tpx, tpy, tpz;
@@ -456,21 +477,18 @@ public class Main extends JavaPlugin {
                         }
                         rgnum = Integer.parseInt(args[1]);
                     }
-                    if (uuid) {
-                        playerid = p.getUniqueId();
-                    }
                     try {
                         Map<String, ProtectedRegion> regions = rgm.getRegions();
                         for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
                             selected = region.next();
                             if (selected.startsWith("ps")) {
-                                if (uuid) {
-                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(playerid)) {
+                                if (args[0].equalsIgnoreCase("home")) {
+                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(p.getName())) {
                                         index++;
                                         playerRegions.put(index, selected);
                                     }
-                                } else {
-                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(name)) {
+                                } else if (args[0].equalsIgnoreCase("tp")){
+                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(args[1])) {
                                         index++;
                                         playerRegions.put(index, selected);
                                     }
@@ -546,13 +564,18 @@ public class Main extends JavaPlugin {
                         p.sendMessage(ChatColor.RED + "You do not have permission to use that command.");
                     } else {
                         if (args.length < 2) {
-                            p.sendMessage(ChatColor.RED + "Correct usage: /ps admin {version|settings|hide|unhide|");
-                            p.sendMessage(ChatColor.RED + "                          cleanup|lastlogon|lastlogons|stats}");
+                            p.sendMessage(ChatColor.RED + "Correct usage: /ps admin { version | settings | hide | unhide |");
+                            p.sendMessage(ChatColor.RED + "                          cleanup | lastlogon | lastlogons | stats }");
+                            p.sendMessage(ChatColor.RED + "                          setspawn | setspawnprotect | setmaxclaimdist");
                         } else if (args.length > 1) {
                             Block blockToChange;
                             if (args[1].equalsIgnoreCase("version")) {
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStones " + getDescription().getVersion());
-                                p.sendMessage(ChatColor.YELLOW + "CraftBukkit  " + Bukkit.getVersion());
+                                p.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + getDescription().getVersion());
+                                p.sendMessage(ChatColor.YELLOW + "Devlopers: " + getDescription().getAuthors());
+                                p.sendMessage(ChatColor.YELLOW + "CraftBukkit:  " + Bukkit.getVersion());
+                                p.sendMessage(ChatColor.YELLOW + "WG: " + wg.getDescription().getVersion());
+                                p.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
+
                             } else if (args[1].equalsIgnoreCase("settings")) {
                                 p.sendMessage(getConfig().saveToString().split("\n"));
                             }
@@ -797,6 +820,13 @@ public class Main extends JavaPlugin {
                                 p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
                                 p.sendMessage(ChatColor.YELLOW + "================");
                             }
+                            if (args[1].equalsIgnoreCase("setspawn") || args[1].equalsIgnoreCase("setmaxclaimdist") || args[1].equalsIgnoreCase("setspawnprotect")) {
+                                if (args[1].equalsIgnoreCase("setspawn")){
+                                    getConfig().set("SpawnPoint.X",p.getLocation().getX());
+                                    getConfig().set("SpawnPoint.Y",p.getLocation().getY());
+                                    saveConfig();
+                                }
+                            }
                         }
                     }
                 }
@@ -836,9 +866,9 @@ public class Main extends JavaPlugin {
                                     type = 2;
                                 }
                                 if (setmat != null) blockToUnhide.setType(Material.getMaterial(setmat));
-                                BlockVector max = region.getMaximumPoint();
-                                BlockVector min = region.getMinimumPoint();
-                                Vector middle = max.add(min).multiply(0.5);
+                                BlockVector3 max = region.getMaximumPoint();
+                                BlockVector3 min = region.getMinimumPoint();
+                                BlockVector3 middle = max.add(min).multiply((int) 0.5);
                                 Collection<Block> blocks = new HashSet<>();
                                 if (type == 2) blocktypedata = blockToUnhide.getType().toString();
                                 if (StoneTypeData.RegionY(blocktypedata) == 0) {
@@ -1073,7 +1103,7 @@ public class Main extends JavaPlugin {
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("view")) {
-                    if (p.hasPermission("protectionstones.view")) {
+                    if (p.hasPermission("protectionstones.view") || p.hasPermission( "protectionstones.view.others")) {
                         if (hasNoAccess(rgn, p, localPlayer, true)) {
                             p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
                             return true;
@@ -1089,8 +1119,8 @@ public class Main extends JavaPlugin {
                                 return true;
                             }
                         }
-                        Vector minVector = rgm.getRegion(id).getMinimumPoint();
-                        Vector maxVector = rgm.getRegion(id).getMaximumPoint();
+                        BlockVector3 minVector = rgm.getRegion(id).getMinimumPoint();
+                        BlockVector3 maxVector = rgm.getRegion(id).getMaximumPoint();
                         final int minX = minVector.getBlockX();
                         final int minY = minVector.getBlockY();
                         final int minZ = minVector.getBlockZ();
@@ -1100,7 +1130,7 @@ public class Main extends JavaPlugin {
                         double px = p.getLocation().getX();
                         double py = p.getLocation().getY();
                         double pz = p.getLocation().getZ();
-                        Vector playerVector = new Vector(px, py, pz);
+                        BlockVector3 playerVector = BlockVector3.at(px, py, pz);
                         final int playerY = playerVector.getBlockY();
                         final World theWorld = p.getWorld();
                         /*  */
@@ -1117,20 +1147,20 @@ public class Main extends JavaPlugin {
                         final Material bm11 = getBlock(theWorld, minX, minY, maxZ);
                         final Material bm12 = getBlock(theWorld, maxX, minY, maxZ);
                         /*  */
-                        setBlock(theWorld, minX, playerY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, playerY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, playerY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, playerY, maxZ, Material.GLASS);
+                        setBlock(theWorld, minX, playerY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, playerY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, minX, playerY, maxZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, playerY, maxZ, Material.GLOWSTONE);
                         /*  */
-                        setBlock(theWorld, minX, maxY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, maxY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, maxY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, maxY, maxZ, Material.GLASS);
+                        setBlock(theWorld, minX, maxY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, maxY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, minX, maxY, maxZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, maxY, maxZ, Material.GLOWSTONE);
                         /*  */
-                        setBlock(theWorld, minX, minY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, minY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, minY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, minY, maxZ, Material.GLASS);
+                        setBlock(theWorld, minX, minY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, minY, minZ, Material.GLOWSTONE);
+                        setBlock(theWorld, minX, minY, maxZ, Material.GLOWSTONE);
+                        setBlock(theWorld, maxX, minY, maxZ, Material.GLOWSTONE);
                         /*  */
                         int taskID = getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                             public void run() {
@@ -1350,8 +1380,8 @@ public class Main extends JavaPlugin {
                                     } else {
                                         p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.RED).append("(no members)").toString());
                                     }
-                                    BlockVector min = region.getMinimumPoint();
-                                    BlockVector max = region.getMaximumPoint();
+                                    BlockVector3 min = region.getMinimumPoint();
+                                    BlockVector3 max = region.getMaximumPoint();
                                     p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Bounds: ").append(ChatColor.YELLOW).append("(").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(") -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")").toString());
                                     return true;
                                 }

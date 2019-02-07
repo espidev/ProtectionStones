@@ -1,7 +1,7 @@
 A Updated source from the original developer which can be found here 
 
 Here is the compiled Plugin ready to drop into your plugins folder
-http://j.gs/AQxH
+http://j.gs/CJ3I
 this is updated on my free time please open a issue here on github if any errors arrive
         thanks
             -Jerzean
@@ -15,9 +15,9 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 
 **Dependencies**
 -------------
-* ProtectionStones 2.0.0
-  * WorldGuard 6.2.1
-  * worldEdit 6.0+
+* ProtectionStones 1.6.0
+  * WorldGuard 7.0 (Beta 3)
+  * worldEdit 7.0 (Beta 5)
 **Configuration**
 -------------
 
