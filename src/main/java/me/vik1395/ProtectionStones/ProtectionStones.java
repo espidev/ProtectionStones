@@ -11,8 +11,11 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.vik1395.ProtectionStones.commands.ArgAdmin;
 import me.vik1395.ProtectionStones.commands.ArgCount;
+import me.vik1395.ProtectionStones.commands.ArgHome;
 import me.vik1395.ProtectionStones.commands.ArgRegion;
+import me.vik1395.ProtectionStones.commands.ArgTp;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -189,385 +192,31 @@ public class ProtectionStones extends JavaPlugin {
                 }
                 ProtectedRegion rgn = rgm.getRegion(id);
 
-                /*****************************************************************************************************/
                 if (args[0].equalsIgnoreCase("toggle")) {
                     if (p.hasPermission("protectionstones.toggle")) {
-                            if (!toggleList.contains(p.getName())) {
-                                toggleList.add(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
-                            } else {
-                                toggleList.remove(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
-                            }
+                        if (!toggleList.contains(p.getName())) {
+                            toggleList.add(p.getName());
+                            p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
+                        } else {
+                            toggleList.remove(p.getName());
+                            p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
+                        }
                     } else {
                         p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
                     }
                     return true;
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("count")) {
+                } else if (args[0].equalsIgnoreCase("count")) {
                     return ArgCount.argumentCount(p, args);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("region")) {
+                } else if (args[0].equalsIgnoreCase("region")) {
                     return ArgRegion.argumentRegion(p, args);
-                }
-                /*****************************************************************************************************/
-                else if ((args[0].equalsIgnoreCase("tp") && p.hasPermission("protectionstones.tp")) || (args[0].equalsIgnoreCase("home") && p.hasPermission("protectionstones.home"))) {
-                    String name = p.getName().toLowerCase();
-                    UUID playerid = null;
-                    int rgnum = 0;
-                    int index = 0, tpx, tpy, tpz;
-                    String selected;
-                    Map<Integer, String> playerRegions = new HashMap<>();
-                    if (args[0].equalsIgnoreCase("tp")) {
-                        if (args.length != 3) {
-                            p.sendMessage(ChatColor.RED + "Usage: /ps tp [player] [num]");
-                            return true;
-                        }
-                        rgnum = Integer.parseInt(args[2]);
-                    } else {
-                        if (args.length != 2) {
-                            p.sendMessage(ChatColor.RED + "Usage: /ps home [num]");
-                            p.sendMessage(ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps");
-                            return true;
-                        }
-                        rgnum = Integer.parseInt(args[1]);
-                    }
-                        playerid = p.getUniqueId();
-                    try {
-                        Map<String, ProtectedRegion> regions = rgm.getRegions();
-                        for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
-                            selected = region.next();
-                            if (selected.startsWith("ps")) {
-                                    if (regions.get(selected).getOwners().contains(playerid)) {
-                                        index++;
-                                        playerRegions.put(index, selected);
-                                    }
-                            }
-                        }
-                    } catch (Exception localException6) {
-                    }
-                    if (args[0].equalsIgnoreCase("tp")) {
-                        LocalPlayer lp;
-                        try {
-                            lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
-                        } catch (Exception e) {
-                            p.sendMessage(ChatColor.RED + "Error while searching for " + args[1] + "'s regions. Please make sure you have entered the correct name.");
-                            return true;
-                        }
-                        if (rgnum <= 0) {
-                            p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
-                            return true;
-                        }
-                        if (index <= 0) {
-                            p.sendMessage(ChatColor.RED + lp.getName() + " doesn't own any protected regions!");
-                            return true;
-                        }
-                        if (rgnum > index) {
-                            p.sendMessage(ChatColor.RED + lp.getName() + " only has " + index + " protected regions!");
-                            return true;
-                        }
-                    } else if (args[0].equalsIgnoreCase("home")) {
-                        try {
-                            LocalPlayer lp = wg.wrapPlayer(p);
-                        } catch (Exception e) {
-                            p.sendMessage(ChatColor.RED + "Error while searching for your regions.");
-                            return true;
-                        }
-                        if (rgnum <= 0) {
-                            p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
-                            return true;
-                        }
-                        if (index <= 0) {
-                            p.sendMessage(ChatColor.RED + "You don't own any protected regions!");
-                        }
-                        if (rgnum > index) {
-                            p.sendMessage(ChatColor.RED + "You only have " + index + " total regions!");
-                            return true;
-                        }
-                    } else {
-                        p.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
-                        return true;
-                    }
-                    if (rgnum <= index) {
-                        String region = rgm.getRegion(playerRegions.get(rgnum)).getId();
-                        String[] pos = region.split("x|y|z");
-                        if (pos.length == 3) {
-                            pos[0] = pos[0].substring(2);
-                            p.sendMessage(ChatColor.GREEN + "Teleporting...");
-                            tpx = Integer.parseInt(pos[0]);
-                            tpy = Integer.parseInt(pos[1]);
-                            tpz = Integer.parseInt(pos[2]);
-                            Location tploc = new Location(p.getWorld(), tpx, tpy, tpz);
-                            p.teleport(tploc);
-                        } else {
-                            p.sendMessage(ChatColor.RED + "Error in teleporting to protected region!");
-                        }
-                        return true;
-                    } else {
-                        p.sendMessage(ChatColor.RED + "Error in finding the region to teleport to!");
-                    }
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("admin")) {
+                } else if (args[0].equalsIgnoreCase("tp") || (args[0].equalsIgnoreCase("home"))) {
+                    return ArgTp.argumentTp(p, args);
+                } else if (args[0].equalsIgnoreCase("admin")) {
                     if (!p.hasPermission("protectionstones.admin")) {
                         p.sendMessage(ChatColor.RED + "You do not have permission to use that command.");
-                    } else {
-                        if (args.length < 2) {
-                            p.sendMessage(ChatColor.RED + "Correct usage: /ps admin {version|settings|hide|unhide|");
-                            p.sendMessage(ChatColor.RED + "                          cleanup|lastlogon|lastlogons|stats}");
-                        } else if (args.length > 1) {
-                            Block blockToChange;
-                            if (args[1].equalsIgnoreCase("version")) {
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStones " + getDescription().getVersion());
-                                p.sendMessage(ChatColor.YELLOW + "CraftBukkit  " + Bukkit.getVersion());
-                            } else if (args[1].equalsIgnoreCase("settings")) {
-                                p.sendMessage(getConfig().saveToString().split("\n"));
-                            }
-                            if ((args[1].equalsIgnoreCase("hide")) || (args[1].equalsIgnoreCase("unhide"))) {
-                                RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-                                RegionManager mgr = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
-                                Map<String, ProtectedRegion> regions = mgr.getRegions();
-                                if (regions.isEmpty()) {
-                                    p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");
-                                }
-                                int regionSize = regions.size();
-                                String[] regionIDList = new String[regionSize];
-                                String blockMaterial = "AIR";
-                                String hMessage = "hidden";
-                                int index = 0;
-                                for (String idname : regions.keySet()) {
-                                    try {
-                                        if (idname.substring(0, 2).equals("ps")) {
-                                            regionIDList[index] = idname;
-                                            index++;
-                                        }
-                                    } catch (Exception e) {
-                                    }
-                                }
-                                if (index == 0) {
-                                    p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");
-                                } else {
-                                    for (int i = 0; i < index; i++) {
-                                        int indexX = regionIDList[i].indexOf("x");
-                                        int indexY = regionIDList[i].indexOf("y");
-                                        int indexZ = regionIDList[i].length() - 1;
-                                        int psx = Integer.parseInt(regionIDList[i].substring(2, indexX));
-                                        int psy = Integer.parseInt(regionIDList[i].substring(indexX + 1, indexY));
-                                        int psz = Integer.parseInt(regionIDList[i].substring(indexY + 1, indexZ));
-                                        blockToChange = p.getWorld().getBlockAt(psx, psy, psz);
-                                        blockMaterial = "AIR";
-                                        String entry = (int) blockToChange.getLocation().getX() + "x";
-                                        entry = entry + (int) blockToChange.getLocation().getY() + "y";
-                                        entry = entry + (int) blockToChange.getLocation().getZ() + "z";
-                                        String subtype = null;
-                                        if (args[1].equalsIgnoreCase("unhide")) {
-                                            //if (blockToChange.getType() == Material.getMaterial(blockMaterial) || blockToChange.getType() == Material.LAVA || blockToChange.getType() == Material.WATER ) {
-                                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-                                            blockMaterial = hideFile.getString(entry);
-                                            if (blockMaterial != null && blockMaterial.contains("-")) {
-                                                String[] str = blockMaterial.split("-");
-                                                blockMaterial = str[0];
-                                                subtype = str[1];
-                                            }
-                                            if (hideFile.contains(entry)) {
-                                                hideFile.set(entry, null);
-                                                try {
-                                                    hideFile.save(ProtectionStones.psStoneData);
-                                                } catch (IOException ex) {
-                                                    Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
-                                                if (blockMaterial != null) {
-                                                    blockToChange.setType(Material.getMaterial(blockMaterial));
-                                                }
-                                            } else {
-                                                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
-                                            }
-                                            //}
-                                        } else if (args[1].equalsIgnoreCase("hide")) {
-                                            if (blockToChange.getType() != Material.getMaterial(blockMaterial)) {
-                                                YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-                                                if (!(hideFile.contains(entry))) {
-                                                    hideFile.set(entry, blockToChange.getType().toString());
-                                                    try {
-                                                        hideFile.save(ProtectionStones.psStoneData);
-                                                    } catch (IOException ex) {
-                                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-                                                    }
-                                                } else {
-                                                    p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
-                                                }
-                                            } else {
-                                                if (subtype != null && (blockToChange.getData() != (byte) (Integer.parseInt(subtype))))
-                                                    ;
-                                            }
-                                            if (ProtectionStones.mats.contains(blockToChange.getType().toString()) || ProtectionStones.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
-                                                blockToChange.setType(Material.getMaterial(blockMaterial));
-                                            }
-                                        }
-                                        if (subtype != null) {
-                                            //TODO removed subtype support blockToChange.setData((byte) Integer.parseInt(subtype));
-                                        }
-                                    }
-                                }
-
-                                if (args[1].equalsIgnoreCase("unhide")) {
-                                    hMessage = "unhidden";
-                                }
-                                p.sendMessage(ChatColor.YELLOW + "All ProtectionStones have been " + hMessage);
-                            } else if (args[1].equalsIgnoreCase("cleanup")) {
-                                if (args.length >= 3) {
-                                    if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("regen")) || (args[2].equalsIgnoreCase("disown"))) {
-                                        int days = 30;
-                                        if (args.length > 3) {
-                                            days = Integer.parseInt(args[3]);
-                                        }
-                                        p.sendMessage(ChatColor.YELLOW + "Cleanup " + args[2] + " " + days + " days");
-                                        p.sendMessage(ChatColor.YELLOW + "================");
-                                        RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
-                                        Map<String, ProtectedRegion> regions = mgr.getRegions();
-                                        int size = regions.size();
-                                        String name = "";
-                                        int index = 0;
-                                        String[] regionIDList = new String[size];
-                                        OfflinePlayer[] offlinePlayerList = getServer().getOfflinePlayers();
-                                        int playerCount = offlinePlayerList.length;
-                                        for (int iii = 0; iii < playerCount; iii++) {
-                                            long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
-                                            if (lastPlayed >= days) {
-                                                index = 0;
-                                                name = offlinePlayerList[iii].getName().toLowerCase();
-                                                for (String idname : regions.keySet()) {
-                                                    try {
-                                                        if (((ProtectedRegion) regions.get(idname)).getOwners().getPlayers().contains(name)) {
-                                                            regionIDList[index] = idname;
-                                                            index++;
-                                                        }
-                                                    } catch (Exception e) {
-                                                    }
-                                                }
-                                                if (index == 0) {
-                                                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + name);
-                                                } else {
-                                                    p.sendMessage(ChatColor.YELLOW + args[2] + ": " + name);
-                                                    for (int i = 0; i < index; i++) {
-                                                        if (args[2].equalsIgnoreCase("disown")) {
-                                                            DefaultDomain owners = rgm.getRegion(regionIDList[i]).getOwners();
-                                                            owners.removePlayer(name);
-                                                            rgm.getRegion(regionIDList[i]).setOwners(owners);
-                                                        } else {
-                                                            if (args[2].equalsIgnoreCase("regen")) {
-                                                                if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-                                                                    Bukkit.dispatchCommand(p, "region select " + regionIDList[i]);
-                                                                    Bukkit.dispatchCommand(p, "/regen");
-                                                                }
-                                                            } else if (regionIDList[i].substring(0, 2).equals("ps")) {
-                                                                int indexX = regionIDList[i].indexOf("x");
-                                                                int indexY = regionIDList[i].indexOf("y");
-                                                                int indexZ = regionIDList[i].length() - 1;
-                                                                int psx = Integer.parseInt(regionIDList[i].substring(2, indexX));
-                                                                int psy = Integer.parseInt(regionIDList[i].substring(indexX + 1, indexY));
-                                                                int psz = Integer.parseInt(regionIDList[i].substring(indexY + 1, indexZ));
-                                                                Block blockToRemove = p.getWorld().getBlockAt(psx, psy, psz);
-                                                                blockToRemove.setType(Material.AIR);
-                                                            }
-                                                            mgr.removeRegion(regionIDList[i]);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        try {
-                                            rgm.save();
-                                        } catch (Exception e) {
-                                            System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                                        }
-                                        p.sendMessage(ChatColor.YELLOW + "================");
-                                        p.sendMessage(ChatColor.YELLOW + "Completed " + args[2] + " cleanup");
-                                        return true;
-                                    }
-                                } else {
-                                    p.sendMessage(ChatColor.YELLOW + "/ps admin cleanup {remove|regen|disown} {days}");
-                                    return true;
-                                }
-                            } else if (args[1].equalsIgnoreCase("lastlogon")) {
-                                if (args.length > 2) {
-                                    String playerName = args[2];
-                                    if (Bukkit.getOfflinePlayer(playerName).getFirstPlayed() > 0L) {
-                                        long lastPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getLastPlayed()) / 86400000L;
-                                        p.sendMessage(ChatColor.YELLOW + playerName + " last played " + lastPlayed + " days ago.");
-                                        if (Bukkit.getOfflinePlayer(playerName).isBanned()) {
-                                            p.sendMessage(ChatColor.YELLOW + playerName + " is banned.");
-                                        }
-                                    } else {
-                                        p.sendMessage(ChatColor.YELLOW + "Player name not found.");
-                                    }
-                                } else {
-                                    p.sendMessage(ChatColor.YELLOW + "A player name is required.");
-                                }
-                            } else if (args[1].equalsIgnoreCase("lastlogons")) {
-                                int days = 0;
-                                if (args.length > 2) {
-                                    days = Integer.parseInt(args[2]);
-                                }
-                                OfflinePlayer[] offlinePlayerList = getServer().getOfflinePlayers();
-                                int playerCount = offlinePlayerList.length;
-                                int playerCounter = 0;
-                                p.sendMessage(ChatColor.YELLOW + "" + days + " Days Plus:");
-                                p.sendMessage(ChatColor.YELLOW + "================");
-                                Arrays.sort(offlinePlayerList, new PlayerComparator());
-                                for (int iii = 0; iii < playerCount; iii++) {
-                                    long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
-                                    if (lastPlayed >= days) {
-                                        playerCounter++;
-                                        p.sendMessage(ChatColor.YELLOW + offlinePlayerList[iii].getName() + " " + lastPlayed + " days");
-                                    }
-                                }
-                                p.sendMessage(ChatColor.YELLOW + "================");
-                                p.sendMessage(ChatColor.YELLOW + "" + playerCounter + " Total Players Shown");
-                                p.sendMessage(ChatColor.YELLOW + "" + playerCount + " Total Players Checked");
-                            } else if (args[1].equalsIgnoreCase("stats")) {
-                                if (args.length > 2) {
-                                    String playerName = args[2];
-                                    if (Bukkit.getOfflinePlayer(playerName).getFirstPlayed() > 0L) {
-                                        p.sendMessage(ChatColor.YELLOW + playerName + ":");
-                                        p.sendMessage(ChatColor.YELLOW + "================");
-                                        long firstPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getFirstPlayed()) / 86400000L;
-                                        p.sendMessage(ChatColor.YELLOW + "First played " + firstPlayed + " days ago.");
-                                        long lastPlayed = (System.currentTimeMillis() - Bukkit.getOfflinePlayer(playerName).getLastPlayed()) / 86400000L;
-                                        p.sendMessage(ChatColor.YELLOW + "Last played " + lastPlayed + " days ago.");
-                                        String banMessage = "Not Banned";
-                                        if (Bukkit.getOfflinePlayer(playerName).isBanned()) {
-                                            banMessage = "Banned";
-                                        }
-                                        p.sendMessage(ChatColor.YELLOW + banMessage);
-                                        int count = 0;
-                                        try {
-                                            LocalPlayer thePlayer = null;
-                                            thePlayer = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[2]));
-                                            count = rgm.getRegionCountOfPlayer(thePlayer);
-                                        } catch (Exception localException1) {
-                                        }
-                                        p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
-                                        p.sendMessage(ChatColor.YELLOW + "================");
-                                    } else {
-                                        p.sendMessage(ChatColor.YELLOW + "Player name not found.");
-                                    }
-                                    return true;
-                                }
-                                p.sendMessage(ChatColor.YELLOW + "World:");
-                                p.sendMessage(ChatColor.YELLOW + "================");
-                                int count = 0;
-                                try {
-                                    count = rgm.size();
-                                } catch (Exception localException2) {
-                                }
-                                p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
-                                p.sendMessage(ChatColor.YELLOW + "================");
-                            }
-                        }
+                        return true;
                     }
+                    ArgAdmin.argumentAdmin(p, args);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("reclaim")) {
@@ -634,7 +283,7 @@ public class ProtectionStones extends JavaPlugin {
                                     } else if (it != null && StoneTypeData.RegionY(it.getType().toString()) == 0) {
                                         middleblock = it;
                                     } else {
-                                        middleblock = p.getWorld().getBlockAt((int)middle.getX(), (int)middle.getY(), (int)middle.getZ());
+                                        middleblock = p.getWorld().getBlockAt((int) middle.getX(), (int) middle.getY(), (int) middle.getZ());
                                     }
 
                                     if (!StoneTypeData.NoDrop(middleblock.getType().toString() + "-" + middleblock.getData()) && !StoneTypeData.NoDrop(middleblock.getType().toString())) {
@@ -678,7 +327,7 @@ public class ProtectionStones extends JavaPlugin {
                                         p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("This area is no longer protected.").toString());
                                     }
                                 } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("You are not the owner of this region.").toString());
+                                    p.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
                                 }
                             } else {
                                 p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("Not a ProtectionStones Region").toString());
@@ -731,7 +380,7 @@ public class ProtectionStones extends JavaPlugin {
                             UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                             DefaultDomain members = rgm.getRegion(id).getMembers();
                             members.addPlayer(playerName);
-                                members.addPlayer(uid);
+                            members.addPlayer(uid);
                             rgm.getRegion(id).setMembers(members);
                             try {
                                 rgm.save();
@@ -761,7 +410,7 @@ public class ProtectionStones extends JavaPlugin {
                         UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                         DefaultDomain members = rgm.getRegion(id).getMembers();
                         members.removePlayer(playerName);
-                            members.removePlayer(uid);
+                        members.removePlayer(uid);
                         rgm.getRegion(id).setMembers(members);
                         try {
                             rgm.save();
@@ -789,7 +438,7 @@ public class ProtectionStones extends JavaPlugin {
                             UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                             DefaultDomain owners = rgm.getRegion(id).getOwners();
                             owners.addPlayer(playerName);
-                                owners.addPlayer(uid);
+                            owners.addPlayer(uid);
                             rgm.getRegion(id).setOwners(owners);
                             try {
                                 rgm.save();
@@ -819,7 +468,7 @@ public class ProtectionStones extends JavaPlugin {
                         UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                         DefaultDomain owners = rgm.getRegion(id).getOwners();
                         owners.removePlayer(playerName);
-                            owners.removePlayer(uid);
+                        owners.removePlayer(uid);
                         rgm.getRegion(id).setOwners(owners);
                         try {
                             rgm.save();
@@ -1158,23 +807,23 @@ public class ProtectionStones extends JavaPlugin {
                                 for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
                                     if (rgm.getRegion(id).getFlag(flag) != null) {
                                         myFlagValue = rgm.getRegion(id).getFlag(flag).toString();
-                                        myFlag = (new StringBuilder(String.valueOf(myFlag))).append(flag.getName()).append(": ").append(myFlagValue).append(", ").toString();
+                                        myFlag = myFlag + flag.getName() + ": " + myFlagValue + ", ";
                                     }
                                 }
                                 if (myFlag.length() > 2) {
-                                    myFlag = (new StringBuilder(String.valueOf(myFlag.substring(0, myFlag.length() - 2)))).append(".").toString();
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Flags: ").append(ChatColor.YELLOW).append(myFlag).toString());
+                                    myFlag = myFlag.substring(0, myFlag.length() - 2) + ".";
+                                    p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.YELLOW + myFlag);
                                 } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Flags: ").append(ChatColor.RED).append("(none)").toString());
+                                    p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.RED + "(none)");
                                 }
                             } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Flags Commands").toString());
+                                p.sendMessage(ChatColor.RED + "You don't have permission to use Flags Commands");
                             }
                         } else {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps info members|owners|flags").toString());
+                            p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
                         }
                     } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps info members|owners|flags").toString());
+                        p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
                     }
                     return true;
                 } else {

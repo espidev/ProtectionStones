@@ -12,7 +12,7 @@ import java.util.Comparator;
 /**
  * @author Dragoboss
  */
-class PlayerComparator implements Comparator<OfflinePlayer> {
+public class PlayerComparator implements Comparator<OfflinePlayer> {
 
     @Override
     public int compare(OfflinePlayer o1, OfflinePlayer o2) {
