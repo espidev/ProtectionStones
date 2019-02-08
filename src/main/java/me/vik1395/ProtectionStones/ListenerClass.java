@@ -1,8 +1,7 @@
 package me.vik1395.ProtectionStones;
-
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -15,8 +14,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
-import org.bukkit.Bukkit;
+import java.math.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,8 +62,8 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
         Player p = e.getPlayer();
+        WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
         Block b = e.getBlock();
@@ -101,6 +99,20 @@ public class ListenerClass implements Listener {
             }
             if (wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
                 if (p.hasPermission("protectionstones.create")) {
+                    if ((e.getBlock().getLocation().getX() >= 9999999) || (e.getBlock().getLocation().getZ() >= 9999999) || (e.getBlock().getLocation().getX() <= -9999999) || (e.getBlock().getLocation().getZ() <= -9999999)) {
+                        p.sendMessage(ChatColor.RED + "Unable to claim area OutOfMapBounds");
+                        e.setCancelled(true);
+                        return;
+                    }
+                    //SpawnPoint
+                    if ((!Main.SPOX.isEmpty()) || (!Main.SPOY.isEmpty())) {
+                        //SpawnProtect
+                        if ((e.getBlock().getLocation().getX() >= Math.abs(Main.SPRX)) || (e.getBlock().getLocation().getZ() >= Math.abs(Main.SPRY))) {
+                            p.sendMessage(ChatColor.RED + "Unable to claim area OutOfMapBounds");
+                            e.setCancelled(true);
+                            return;
+                        }
+                    }
                     if (Main.toggleList != null) {
                         for (String temp : Main.toggleList) {
                             if (temp.equalsIgnoreCase(p.getName())) {
@@ -139,35 +151,35 @@ public class ListenerClass implements Listener {
                             }
                         }
                     }
-
                     double bx = b.getLocation().getX();
                     double by = b.getLocation().getY();
                     double bz = b.getLocation().getZ();
-                    Vector v1 = null, v2 = null;
+                    BlockVector3 v1 = null, v2 = null;
                     blocktypedata = b.getType().toString() + "-" + b.getData();
                     blocktype = b.getType().toString();
                     if (type == 1) {
                         if (StoneTypeData.RegionY(blocktypedata) == -1) {
-                            v1 = new Vector(bx - StoneTypeData.RegionX(blocktypedata), 0, bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = new Vector(bx + StoneTypeData.RegionX(blocktypedata), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktypedata));
+                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktypedata), 0, bz - StoneTypeData.RegionZ(blocktypedata));
+                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktypedata), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktypedata));
                         } else {
-                            v1 = new Vector(bx - StoneTypeData.RegionX(blocktypedata), by - StoneTypeData.RegionY(blocktypedata), bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = new Vector(bx + StoneTypeData.RegionX(blocktypedata), by + StoneTypeData.RegionY(blocktypedata), bz + StoneTypeData.RegionZ(blocktypedata));
+                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktypedata), by - StoneTypeData.RegionY(blocktypedata), bz - StoneTypeData.RegionZ(blocktypedata));
+                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktypedata), by + StoneTypeData.RegionY(blocktypedata), bz + StoneTypeData.RegionZ(blocktypedata));
                         }
                     } else {
                         if (StoneTypeData.RegionY(b.getType().toString()) == -1) {
-                            v1 = new Vector(bx - StoneTypeData.RegionX(blocktype), 0, bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = new Vector(bx + StoneTypeData.RegionX(blocktype), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktype));
+                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktype), 0, bz - StoneTypeData.RegionZ(blocktype));
+                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktype), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktype));
                         } else {
-                            v1 = new Vector(bx - StoneTypeData.RegionX(blocktype), by - StoneTypeData.RegionY(blocktype), bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = new Vector(bx + StoneTypeData.RegionX(blocktype), by + StoneTypeData.RegionY(blocktype), bz + StoneTypeData.RegionZ(blocktype));
+                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktype), by - StoneTypeData.RegionY(blocktype), bz - StoneTypeData.RegionZ(blocktype));
+                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktype), by + StoneTypeData.RegionY(blocktype), bz + StoneTypeData.RegionZ(blocktype));
                         }
                     }
-                    BlockVector min = v1.toBlockVector();
-                    BlockVector max = v2.toBlockVector();
+                    BlockVector3 min = v1;
+                    BlockVector3 max = v2;
                     String id = "ps" + (int) bx + "x" + (int) by + "y" + (int) bz + "z";
 
-                    ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+                    ProtectedRegion region;
+                    region = new ProtectedCuboidRegion(id, min, max);
                     region.getOwners().addPlayer(p.getName());
                     if (Main.uuid) {
                         region.getOwners().addPlayer(p.getUniqueId());
@@ -290,13 +302,16 @@ public class ListenerClass implements Listener {
         }
         if (type > 0) {
             RegionManager regionManager = rgm;
-            String psx = Double.toString(pb.getLocation().getX());
-            String psy = Double.toString(pb.getLocation().getY());
-            String psz = Double.toString(pb.getLocation().getZ());
+            Double psxa = pb.getLocation().getX();
+            String psx = new String(BigDecimal.valueOf(psxa).toPlainString());
+            Double psya = pb.getLocation().getY();
+            String psy = new String(BigDecimal.valueOf(psya).toPlainString());
+            Double psza = pb.getLocation().getZ();
+            String psz = new String(BigDecimal.valueOf(psza).toPlainString());
             String id = (new StringBuilder("ps")).append(psx.substring(0, psx.indexOf("."))).append("x").append(psy.substring(0, psy.indexOf("."))).append("y").append(psz.substring(0, psz.indexOf("."))).append("z").toString();
             if (wg.createProtectionQuery().testBlockBreak(player, pb)) {
                 if (player.hasPermission("protectionstones.destroy")) {
-                    if (type == 2) blocktypedata = pb.getType().toString();
+                    if (type == 2) {blocktypedata = pb.getType().toString();}
                     if (regionManager.getRegion(id) != null) {
                         LocalPlayer localPlayer = wg.wrapPlayer(player);
                         if (regionManager.getRegion(id).isOwner(localPlayer) || player.hasPermission("protectionstones.superowner")) {
@@ -450,7 +465,7 @@ public class ListenerClass implements Listener {
             }
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
-            Vector v = new Vector(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
+            BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
             if (rgm.getApplicableRegions(v) != null) {
                 ApplicableRegionSet regions = rgm.getApplicableRegions(v);
                 ApplicableRegionSet regionsFrom = rgm.getApplicableRegions(v);
@@ -501,7 +516,7 @@ public class ListenerClass implements Listener {
             }
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
-            Vector v = new Vector(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
+            BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
             if (rgm.getApplicableRegions(v) != null) {
                 ApplicableRegionSet region = rgm.getApplicableRegions(v);
                 ApplicableRegionSet regionFrom = rgm.getApplicableRegions(v);
