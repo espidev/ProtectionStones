@@ -4,7 +4,7 @@ description: A greif prevention plugin.
 author: Vik1395
 
 depend: [WorldGuard, WorldEdit]
-main: me.vik1395.ProtectionStones.Main
+main: me.vik1395.ProtectionStones.ProtectionStones
 
 commands:
   ps:

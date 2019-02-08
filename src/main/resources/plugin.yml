@@ -4,7 +4,7 @@ description: ${description}
 authors: [Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
-main: me.vik1395.ProtectionStones.Main
+main: me.vik1395.ProtectionStones.ProtectionStones
 api-version: 1.13
 
 commands:

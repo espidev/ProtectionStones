@@ -11,6 +11,8 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.vik1395.ProtectionStones.commands.ArgCount;
+import me.vik1395.ProtectionStones.commands.ArgRegion;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -34,7 +36,7 @@ import java.util.logging.Logger;
     /*
 
     Author: Vik1395,Dragoboss
-    updated by: Jerzean,Dylan-BukkitPlugins
+    updated by: Jerzean,Dylan-BukkitPlugins, EspiDev
     Project: ProtectionStones
 
     Copyright 2015
@@ -47,7 +49,7 @@ import java.util.logging.Logger;
     You may find an abridged version of the License at http://creativecommons.org/licenses/by-sa/4.0/
      */
 
-public class Main extends JavaPlugin {
+public class ProtectionStones extends JavaPlugin {
     public static Plugin plugin, wgd;
     public static File psStoneData;
     public static File conf;
@@ -57,7 +59,6 @@ public class Main extends JavaPlugin {
     public static List<String> allowedFlags = new ArrayList<>();
     public static List<String> deniedWorlds = new ArrayList<>();
     public static Collection<String> mats = new HashSet<>();
-    public static boolean uuid;
     public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
     public static Collection<UUID> pvpTPBypass = null;
@@ -65,6 +66,14 @@ public class Main extends JavaPlugin {
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
     public static String cooldownMessage = null;
+
+    public static Plugin getPlugin() {
+        return Bukkit.getPluginManager().getPlugin("ProtectionStones");
+    }
+
+    public static RegionManager getRegionManagerWithPlayer(Player p) {
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    }
 
     @Override
     public void onEnable() {
@@ -75,11 +84,12 @@ public class Main extends JavaPlugin {
         plugin = this;
         conf = new File(this.getDataFolder() + "/config.yml");
         psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
+
         if (!(psStoneData.exists())) {
             try {
-                Main.psStoneData.createNewFile();
+                ProtectionStones.psStoneData.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         getServer().getPluginManager().registerEvents(new ListenerClass(), this);
@@ -103,6 +113,7 @@ public class Main extends JavaPlugin {
                 mats.add(split[0].toUpperCase());
             }
         }
+
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
         deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
@@ -125,7 +136,7 @@ public class Main extends JavaPlugin {
         if (s instanceof Player) {
             Player p = (Player) s;
             if (cmd.getName().equalsIgnoreCase("ps")) {
-                WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+                WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
                     p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
@@ -149,22 +160,16 @@ public class Main extends JavaPlugin {
                 /*****************************************************************************************************/
                 // Find the id of the current region and get WorldGuard player object for use later
                 LocalPlayer localPlayer = wg.wrapPlayer(p);
-                double x = p.getLocation().getX();
-                double y = p.getLocation().getY();
-                double z = p.getLocation().getZ();
-                BlockVector3 v = BlockVector3.at(x, y, z);
-                String id = "";
-                RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+                BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
+                String id;
+                RegionManager rgm = getRegionManagerWithPlayer(p);
                 List<String> idList = rgm.getApplicableRegionsIDs(v);
                 if (idList.size() == 1) {
-                    id = idList.toString();
-                    id = id.substring(1, id.length() - 1);
+                    id = idList.toString().substring(1, idList.toString().length() - 1);
                 } else {
-                    double distanceToPS = 10000D;
-                    double tempToPS = 0.0D;
+                    double distanceToPS = 10000D, tempToPS;
                     String namePSID = "";
-                    for (Iterator<String> iterator4 = idList.iterator(); iterator4.hasNext(); ) {
-                        String currentID = (String) iterator4.next();
+                    for (String currentID : idList) {
                         if (currentID.substring(0, 2).equals("ps")) {
                             int indexX = currentID.indexOf("x");
                             int indexY = currentID.indexOf("y");
@@ -187,7 +192,6 @@ public class Main extends JavaPlugin {
                 /*****************************************************************************************************/
                 if (args[0].equalsIgnoreCase("toggle")) {
                     if (p.hasPermission("protectionstones.toggle")) {
-                        if (toggleList != null) {
                             if (!toggleList.contains(p.getName())) {
                                 toggleList.add(p.getName());
                                 p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
@@ -195,243 +199,18 @@ public class Main extends JavaPlugin {
                                 toggleList.remove(p.getName());
                                 p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
                             }
-                        } else {
-                            toggleList.add(p.getName());
-                            p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
-                        }
                     } else {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command");
+                        p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
                     }
                     return true;
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("count")) {
-                    int count = 0;
-                    String playerName = null;
-                    UUID playerid = null;
-
-                    if (args.length == 1) {
-                        if (p.hasPermission("protectionstones.count")) {
-                            playerName = p.getName();
-                            if (uuid) {
-                                playerid = p.getUniqueId();
-                            }
-                            try {
-                                Map<String, ProtectedRegion> regions = rgm.getRegions();
-                                for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
-                                    String selected = region.next();
-                                    if (uuid) {
-                                        if (regions.get(selected).getOwners().contains(playerid)) {
-                                            if (regions.get(selected).getId().startsWith("ps")) {
-                                                count++;
-                                            }
-                                        }
-                                    } else {
-                                        if (regions.get(selected).getOwners().contains(playerName)) {
-                                            if (regions.get(selected).getId().startsWith("ps")) {
-                                                count++;
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch (Exception e) {
-                            }
-                            p.sendMessage(ChatColor.YELLOW + "Your region count: " + count);
-                        } else {
-                            p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
-                        }
-                        return true;
-                    } else if (args.length == 2) {
-                        if (p.hasPermission("protectionstones.count.others")) {
-                            playerName = Bukkit.getOfflinePlayer(args[1]).getName();
-                            if (uuid) {
-                                playerid = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
-                            }
-                            try {
-                                Map<String, ProtectedRegion> regions = rgm.getRegions();
-                                for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
-                                    String selected = region.next();
-                                    if (uuid) {
-                                        if (regions.get(selected).getOwners().contains(playerid)) {
-                                            if (regions.get(selected).getId().startsWith("ps")) {
-                                                count++;
-                                            }
-                                        }
-                                    } else {
-                                        if (regions.get(selected).getOwners().contains(playerName)) {
-                                            if (regions.get(selected).getId().startsWith("ps")) {
-                                                count++;
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch (Exception e) {
-                            }
-                            p.sendMessage(ChatColor.YELLOW + args[1] + "'s region count: " + count);
-                        } else {
-                            p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
-                        }
-                        return true;
-                    } else {
-                        p.sendMessage(ChatColor.RED + "Usage: /ps count, /ps count [player]");
-                        return true;
-                    }
+                    return ArgCount.argumentCount(p, args);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("region")) {
-                    if (args.length >= 3) {
-                        if (p.hasPermission("protectionstones.region")) {
-                            OfflinePlayer p2 = Bukkit.getOfflinePlayer(args[2]);
-                            if (args[1].equalsIgnoreCase("count")) {
-                                String playerName = null;
-                                UUID playerId = null;
-                                int count = 0;
-                                try {
-                                    if (uuid) {
-                                        playerId = wg.wrapPlayer(p2.getPlayer()).getUniqueId();
-                                    } else {
-                                        playerName = wg.wrapPlayer(p2.getPlayer()).getName();
-                                    }
-                                    Map<String, ProtectedRegion> regions = rgm.getRegions();
-                                    for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
-                                        String selected = region.next();
-                                        if (uuid) {
-                                            if (regions.get(selected).getOwners().contains(playerId)) {
-                                                if (regions.get(selected).getId().startsWith("ps")) {
-                                                    count++;
-                                                }
-                                            }
-                                        } else {
-                                            if (regions.get(selected).getOwners().contains(playerName)) {
-                                                if (regions.get(selected).getId().startsWith("ps")) {
-                                                    count++;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    //count = rgm.getRegionCountOfPlayer(playerName);
-                                } catch (Exception e) {
-                                }
-                                p.sendMessage(ChatColor.YELLOW + args[2] + "'s region count: " + count);
-                                return true;
-                            }
-
-                            if (args[1].equalsIgnoreCase("list")) {
-                                String idname;
-                                Map<String, ProtectedRegion> regions = rgm.getRegions();
-                                String name = args[2].toLowerCase();
-                                UUID playerid = null;
-                                if (uuid) {
-                                    playerid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
-                                }
-                                int size = regions.size();
-                                String[] regionIDList = new String[size];
-                                String regionMessage = "";
-                                int index = 0;
-                                for (Iterator<String> playerCount = regions.keySet().iterator(); playerCount.hasNext(); ) {
-                                    idname = (String) playerCount.next();
-                                    try {
-                                        if (idname.startsWith("ps")) {
-                                            if (uuid) {
-                                                if (((ProtectedRegion) regions.get(idname)).getOwners().contains(playerid)) {
-                                                    regionIDList[index] = idname;
-                                                    regionMessage = regionMessage + regionIDList[index] + ", ";
-                                                    index++;
-                                                }
-                                            } else {
-                                                if (((ProtectedRegion) regions.get(idname)).getOwners().contains(name)) {
-                                                    regionIDList[index] = idname;
-                                                    regionMessage = regionMessage + regionIDList[index] + ", ";
-                                                    index++;
-                                                }
-                                            }
-                                        }
-                                    } catch (Exception localException6) {
-                                    }
-                                }
-                                if (index == 0) {
-                                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + name);
-                                } else {
-                                    regionMessage = regionMessage.substring(0, regionMessage.length() - 2) + ".";
-                                    p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions: " + regionMessage);
-                                }
-                                return true;
-                            }
-                            if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("regen")) || (args[1].equalsIgnoreCase("disown"))) {
-                                RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
-                                Map<String, ProtectedRegion> regions = mgr.getRegions();
-                                String name = args[2].toLowerCase();
-                                UUID playerid = null;
-                                if (uuid) {
-                                    playerid = Bukkit.getOfflinePlayer(name).getUniqueId();
-                                }
-                                int size = regions.size();
-                                String[] regionIDList = new String[size];
-                                int index = 0;
-                                for (String idname : regions.keySet()) {
-                                    try {
-                                        if (idname.startsWith("ps")) {
-                                            if (uuid) {
-                                                if (((ProtectedRegion) regions.get(idname)).getOwners().contains(playerid)) {
-                                                    regionIDList[index] = idname;
-                                                    index++;
-                                                }
-                                            } else {
-                                                if (((ProtectedRegion) regions.get(idname)).getOwners().getPlayers().contains(name)) {
-                                                    regionIDList[index] = idname;
-                                                    index++;
-                                                }
-                                            }
-                                        }
-                                    } catch (Exception localException7) {
-                                    }
-                                }
-                                if (index == 0) {
-                                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2]);
-                                } else {
-                                    for (int i = 0; i < index; i++) {
-                                        if (args[1].equalsIgnoreCase("disown")) {
-                                            DefaultDomain owners = rgm.getRegion(regionIDList[i]).getOwners();
-                                            owners.removePlayer(name);
-                                            if (uuid) {
-                                                owners.removePlayer(playerid);
-                                            }
-                                            rgm.getRegion(regionIDList[i]).setOwners(owners);
-                                        } else {
-                                            if (args[1].equalsIgnoreCase("regen")) {
-                                                if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-                                                    Bukkit.dispatchCommand(p, "region select " + regionIDList[i]);
-                                                    Bukkit.dispatchCommand(p, "/regen");
-                                                }
-                                            } else if (regionIDList[i].substring(0, 2).equals("ps")) {
-                                                int indexX = regionIDList[i].indexOf("x");
-                                                int indexY = regionIDList[i].indexOf("y");
-                                                int indexZ = regionIDList[i].length() - 1;
-                                                int psx = Integer.parseInt(regionIDList[i].substring(2, indexX));
-                                                int psy = Integer.parseInt(regionIDList[i].substring(indexX + 1, indexY));
-                                                int psz = Integer.parseInt(regionIDList[i].substring(indexY + 1, indexZ));
-                                                Block blockToRemove = p.getWorld().getBlockAt(psx, psy, psz);
-                                                blockToRemove.setType(Material.AIR);
-                                            }
-                                            mgr.removeRegion(regionIDList[i]);
-                                        }
-                                    }
-                                    p.sendMessage(ChatColor.YELLOW + name + "'s regions have been removed");
-                                    try {
-                                        rgm.save();
-                                    } catch (Exception e) {
-                                        System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                                    }
-                                }
-                                return true;
-                            }
-                        } else {
-                            p.sendMessage(ChatColor.RED + "You don't have permission to use Region Commands");
-                        }
-                    } else {
-                        p.sendMessage(ChatColor.YELLOW + "/ps region {count|list|remove|regen|disown} {playername}");
-                        return true;
-                    }
+                    return ArgRegion.argumentRegion(p, args);
                 }
                 /*****************************************************************************************************/
                 else if ((args[0].equalsIgnoreCase("tp") && p.hasPermission("protectionstones.tp")) || (args[0].equalsIgnoreCase("home") && p.hasPermission("protectionstones.home"))) {
@@ -455,25 +234,16 @@ public class Main extends JavaPlugin {
                         }
                         rgnum = Integer.parseInt(args[1]);
                     }
-                    if (uuid) {
                         playerid = p.getUniqueId();
-                    }
                     try {
                         Map<String, ProtectedRegion> regions = rgm.getRegions();
                         for (Iterator<String> region = regions.keySet().iterator(); region.hasNext(); ) {
                             selected = region.next();
                             if (selected.startsWith("ps")) {
-                                if (uuid) {
-                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(playerid)) {
+                                    if (regions.get(selected).getOwners().contains(playerid)) {
                                         index++;
                                         playerRegions.put(index, selected);
                                     }
-                                } else {
-                                    if (((ProtectedRegion) regions.get(selected)).getOwners().contains(name)) {
-                                        index++;
-                                        playerRegions.put(index, selected);
-                                    }
-                                }
                             }
                         }
                     } catch (Exception localException6) {
@@ -594,7 +364,7 @@ public class Main extends JavaPlugin {
                                         String subtype = null;
                                         if (args[1].equalsIgnoreCase("unhide")) {
                                             //if (blockToChange.getType() == Material.getMaterial(blockMaterial) || blockToChange.getType() == Material.LAVA || blockToChange.getType() == Material.WATER ) {
-                                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                                             blockMaterial = hideFile.getString(entry);
                                             if (blockMaterial != null && blockMaterial.contains("-")) {
                                                 String[] str = blockMaterial.split("-");
@@ -604,9 +374,9 @@ public class Main extends JavaPlugin {
                                             if (hideFile.contains(entry)) {
                                                 hideFile.set(entry, null);
                                                 try {
-                                                    hideFile.save(Main.psStoneData);
+                                                    hideFile.save(ProtectionStones.psStoneData);
                                                 } catch (IOException ex) {
-                                                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                    Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                                                 }
                                                 if (blockMaterial != null) {
                                                     blockToChange.setType(Material.getMaterial(blockMaterial));
@@ -617,13 +387,13 @@ public class Main extends JavaPlugin {
                                             //}
                                         } else if (args[1].equalsIgnoreCase("hide")) {
                                             if (blockToChange.getType() != Material.getMaterial(blockMaterial)) {
-                                                YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                                                YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                                                 if (!(hideFile.contains(entry))) {
                                                     hideFile.set(entry, blockToChange.getType().toString());
                                                     try {
-                                                        hideFile.save(Main.psStoneData);
+                                                        hideFile.save(ProtectionStones.psStoneData);
                                                     } catch (IOException ex) {
-                                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                                                     }
                                                 } else {
                                                     p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
@@ -632,7 +402,7 @@ public class Main extends JavaPlugin {
                                                 if (subtype != null && (blockToChange.getData() != (byte) (Integer.parseInt(subtype))))
                                                     ;
                                             }
-                                            if (Main.mats.contains(blockToChange.getType().toString()) || Main.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
+                                            if (ProtectionStones.mats.contains(blockToChange.getType().toString()) || ProtectionStones.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
                                                 blockToChange.setType(Material.getMaterial(blockMaterial));
                                             }
                                         }
@@ -815,7 +585,7 @@ public class Main extends JavaPlugin {
                                 String entry = null;
                                 String setmat = null;
                                 if (blockToUnhide.getType() == Material.AIR) {
-                                    YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                                    YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                                     entry = (int) blockToUnhide.getLocation().getX() + "x";
                                     entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
                                     entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
@@ -824,14 +594,14 @@ public class Main extends JavaPlugin {
                                     try {
                                         hideFile.save(psStoneData);
                                     } catch (IOException ex) {
-                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                 }
                                 int type = 0;
                                 String blocktypedata = blockToUnhide.getType().toString() + "-" + blockToUnhide.getData();
-                                if (Main.mats.contains(blocktypedata)) {
+                                if (ProtectionStones.mats.contains(blocktypedata)) {
                                     type = 1;
-                                } else if (Main.mats.contains(blockToUnhide.getType().toString())) {
+                                } else if (ProtectionStones.mats.contains(blockToUnhide.getType().toString())) {
                                     type = 2;
                                 }
                                 if (setmat != null) blockToUnhide.setType(Material.getMaterial(setmat));
@@ -961,9 +731,7 @@ public class Main extends JavaPlugin {
                             UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                             DefaultDomain members = rgm.getRegion(id).getMembers();
                             members.addPlayer(playerName);
-                            if (uuid) {
                                 members.addPlayer(uid);
-                            }
                             rgm.getRegion(id).setMembers(members);
                             try {
                                 rgm.save();
@@ -993,9 +761,7 @@ public class Main extends JavaPlugin {
                         UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                         DefaultDomain members = rgm.getRegion(id).getMembers();
                         members.removePlayer(playerName);
-                        if (uuid) {
                             members.removePlayer(uid);
-                        }
                         rgm.getRegion(id).setMembers(members);
                         try {
                             rgm.save();
@@ -1023,9 +789,7 @@ public class Main extends JavaPlugin {
                             UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                             DefaultDomain owners = rgm.getRegion(id).getOwners();
                             owners.addPlayer(playerName);
-                            if (uuid) {
                                 owners.addPlayer(uid);
-                            }
                             rgm.getRegion(id).setOwners(owners);
                             try {
                                 rgm.save();
@@ -1055,9 +819,7 @@ public class Main extends JavaPlugin {
                         UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
                         DefaultDomain owners = rgm.getRegion(id).getOwners();
                         owners.removePlayer(playerName);
-                        if (uuid) {
-                            owners.addPlayer(uid);
-                        }
+                            owners.removePlayer(uid);
                         rgm.getRegion(id).setOwners(owners);
                         try {
                             rgm.save();
@@ -1133,18 +895,18 @@ public class Main extends JavaPlugin {
                         /*  */
                         int taskID = getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
                             public void run() {
-                                Main.this.setBlock(theWorld, minX, playerY, minZ, bm1);
-                                Main.this.setBlock(theWorld, maxX, playerY, minZ, bm2);
-                                Main.this.setBlock(theWorld, minX, playerY, maxZ, bm3);
-                                Main.this.setBlock(theWorld, maxX, playerY, maxZ, bm4);
-                                Main.this.setBlock(theWorld, minX, maxY, minZ, bm5);
-                                Main.this.setBlock(theWorld, maxX, maxY, minZ, bm6);
-                                Main.this.setBlock(theWorld, minX, maxY, maxZ, bm7);
-                                Main.this.setBlock(theWorld, maxX, maxY, maxZ, bm8);
-                                Main.this.setBlock(theWorld, minX, minY, minZ, bm9);
-                                Main.this.setBlock(theWorld, maxX, minY, minZ, bm10);
-                                Main.this.setBlock(theWorld, minX, minY, maxZ, bm11);
-                                Main.this.setBlock(theWorld, maxX, minY, maxZ, bm12);
+                                ProtectionStones.this.setBlock(theWorld, minX, playerY, minZ, bm1);
+                                ProtectionStones.this.setBlock(theWorld, maxX, playerY, minZ, bm2);
+                                ProtectionStones.this.setBlock(theWorld, minX, playerY, maxZ, bm3);
+                                ProtectionStones.this.setBlock(theWorld, maxX, playerY, maxZ, bm4);
+                                ProtectionStones.this.setBlock(theWorld, minX, maxY, minZ, bm5);
+                                ProtectionStones.this.setBlock(theWorld, maxX, maxY, minZ, bm6);
+                                ProtectionStones.this.setBlock(theWorld, minX, maxY, maxZ, bm7);
+                                ProtectionStones.this.setBlock(theWorld, maxX, maxY, maxZ, bm8);
+                                ProtectionStones.this.setBlock(theWorld, minX, minY, minZ, bm9);
+                                ProtectionStones.this.setBlock(theWorld, maxX, minY, minZ, bm10);
+                                ProtectionStones.this.setBlock(theWorld, minX, minY, maxZ, bm11);
+                                ProtectionStones.this.setBlock(theWorld, maxX, minY, maxZ, bm12);
                             }
                         }, 600L);
                         this.viewTaskList.put(p, Integer.valueOf(taskID));
@@ -1168,14 +930,14 @@ public class Main extends JavaPlugin {
                             int psy = Integer.parseInt(id.substring(indexX + 1, indexY));
                             int psz = Integer.parseInt(id.substring(indexY + 1, indexZ));
                             Block blockToUnhide = p.getWorld().getBlockAt(psx, psy, psz);
-                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                             String entry = (int) blockToUnhide.getLocation().getX() + "x";
                             entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
                             entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
                             String setmat = hideFile.getString(entry);
                             String subtype = null;
                             Material currentType = blockToUnhide.getType();
-                            if (!Main.mats.contains(currentType.toString())) {
+                            if (!ProtectionStones.mats.contains(currentType.toString())) {
                                 if (setmat.contains("-")) {
                                     String[] str = setmat.split("-");
                                     setmat = str[0];
@@ -1186,7 +948,7 @@ public class Main extends JavaPlugin {
                                     try {
                                         hideFile.save(psStoneData);
                                     } catch (IOException ex) {
-                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                     blockToUnhide.setType(Material.getMaterial(setmat));
                                     if (subtype != null) {
@@ -1221,18 +983,18 @@ public class Main extends JavaPlugin {
                             int psy = Integer.parseInt(id.substring(indexX + 1, indexY));
                             int psz = Integer.parseInt(id.substring(indexY + 1, indexZ));
                             Block blockToHide = p.getWorld().getBlockAt(psx, psy, psz);
-                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                             String entry = (int) blockToHide.getLocation().getX() + "x";
                             entry = entry + (int) blockToHide.getLocation().getY() + "y";
                             entry = entry + (int) blockToHide.getLocation().getZ() + "z";
                             Material currentType = blockToHide.getType();
-                            if (Main.mats.contains(currentType.toString())) {
+                            if (ProtectionStones.mats.contains(currentType.toString())) {
                                 if (!(hideFile.contains(entry))) {
                                     hideFile.set(entry, currentType.toString() + "-" + blockToHide.getData());
                                     try {
                                         hideFile.save(psStoneData);
                                     } catch (IOException ex) {
-                                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                     blockToHide.setType(Material.AIR);
                                 } else {
@@ -1463,31 +1225,4 @@ public class Main extends JavaPlugin {
         return blockToReturn.getType();
     }
 
-    private void fixInitialHidden(Object block) {
-        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
-        System.out.print("Patching initial hiddenpstones.yml");
-        for (World world : Bukkit.getWorlds()) {
-            RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
-            Map<String, ProtectedRegion> regions = rgm.getRegions();
-            for (String selected : regions.keySet()) {
-                if (selected.startsWith("ps")) {
-                    Material mat = Material.valueOf(block.toString());
-                    String sub = null;
-                    if (block.toString().contains("-")) {
-                        sub = block.toString().split("-")[1];
-                    }
-                    if (sub != null) {
-                        hideFile.set(selected, mat.toString() + "-" + sub);
-                    } else {
-                        hideFile.set(selected, mat.toString() + "-0");
-                    }
-                }
-            }
-        }
-        try {
-            hideFile.save(psStoneData);
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

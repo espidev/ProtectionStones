@@ -61,35 +61,35 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         Player p = e.getPlayer();
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
         Block b = e.getBlock();
         LocalPlayer lp = wg.wrapPlayer(p);
         int count = rm.getRegionCountOfPlayer(lp);
-        if (Main.mats == null) {
+        if (ProtectionStones.mats == null) {
             e.setCancelled(false);
             return;
         }
         int type = 0;
         String blocktypedata = b.getType().toString() + "-" + b.getData();
         String blocktype = b.getType().toString();
-        if (Main.mats.contains(blocktypedata)) {
+        if (ProtectionStones.mats.contains(blocktypedata)) {
             type = 1;
-        } else if (Main.mats.contains(blocktype)) {
+        } else if (ProtectionStones.mats.contains(blocktype)) {
             type = 2;
         }
         if (type > 0) {
-            if (Main.isCooldownEnable) {
+            if (ProtectionStones.isCooldownEnable) {
                 double currentTime = System.currentTimeMillis();
                 if (this.lastProtectStonePlaced.containsKey(p)) {
-                    int cooldown = Main.cooldown;
+                    int cooldown = ProtectionStones.cooldown;
                     double lastPlace = this.lastProtectStonePlaced.get(p);
                     if (lastPlace + cooldown > currentTime) {
                         e.setCancelled(true);
-                        if (Main.cooldownMessage == null) return;
-                        String cooldownMessage = Main.cooldownMessage.replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000)));
+                        if (ProtectionStones.cooldownMessage == null) return;
+                        String cooldownMessage = ProtectionStones.cooldownMessage.replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000)));
                         p.sendMessage(ChatColor.translateAlternateColorCodes('&', cooldownMessage));
                         return;
                     }
@@ -98,8 +98,8 @@ public class ListenerClass implements Listener {
             }
             if (wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
                 if (p.hasPermission("protectionstones.create")) {
-                    if (Main.toggleList != null) {
-                        for (String temp : Main.toggleList) {
+                    if (ProtectionStones.toggleList != null) {
+                        for (String temp : ProtectionStones.toggleList) {
                             if (temp.equalsIgnoreCase(p.getName())) {
                                 e.setCancelled(false);
                                 return;
@@ -128,7 +128,7 @@ public class ListenerClass implements Listener {
                                 return;
                             }
                         }
-                        for (String world : Main.deniedWorlds) {
+                        for (String world : ProtectionStones.deniedWorlds) {
                             if (world.equals(p.getLocation().getWorld().getName())) {
                                 p.sendMessage(ChatColor.RED + "You can not create protections in this world");
                                 e.setCancelled(true);
@@ -165,11 +165,7 @@ public class ListenerClass implements Listener {
                     String id = "ps" + (int) bx + "x" + (int) by + "y" + (int) bz + "z";
 
                     ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
-                    region.getOwners().addPlayer(p.getName());
-                    if (Main.uuid) {
-                        region.getOwners().addPlayer(p.getUniqueId());
-
-                    }
+                    region.getOwners().addPlayer(p.getUniqueId());
 
                     rm.addRegion(region);
                     boolean overLap = rm.overlapsUnownedRegion(region, lp);
@@ -203,10 +199,10 @@ public class ListenerClass implements Listener {
 
                     HashMap<Flag<?>, Object> newFlags = new HashMap<Flag<?>, Object>();
                     for (Flag<?> iFlag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
-                        for (int j = 0; j < Main.flags.size(); j++) {
-                            String[] rawflag = Main.flags.get(j).split(" ");
+                        for (int j = 0; j < ProtectionStones.flags.size(); j++) {
+                            String[] rawflag = ProtectionStones.flags.get(j).split(" ");
                             String flag = rawflag[0];
-                            String setting = Main.flags.get(j).replace(flag + " ", "");
+                            String setting = ProtectionStones.flags.get(j).replace(flag + " ", "");
                             if (iFlag.getName().equalsIgnoreCase(flag)) {
                                 if ((iFlag.getName().equalsIgnoreCase("greeting")) || (iFlag.getName().equalsIgnoreCase("farewell"))) {
                                     String msg = setting.replaceAll("%player%", p.getName());
@@ -228,7 +224,7 @@ public class ListenerClass implements Listener {
                         }
                     }
                     region.setFlags(newFlags);
-                    region.setPriority(Main.priority);
+                    region.setPriority(ProtectionStones.priority);
                     p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
                     try {
                         rm.saveChanges();
@@ -242,16 +238,16 @@ public class ListenerClass implements Listener {
                         ore.setAmount(ore.getAmount() - 1);
                         p.setItemInHand(ore.getAmount() == 0 ? null : ore);
                         Block blockToHide = p.getWorld().getBlockAt((int) bx, (int) by, (int) bz);
-                        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
+                        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                         String entry = (int) blockToHide.getLocation().getX() + "x";
                         entry = entry + (int) blockToHide.getLocation().getY() + "y";
                         entry = entry + (int) blockToHide.getLocation().getZ() + "z";
                         hideFile.set(entry, blockToHide.getType().toString());
                         b.setType(Material.AIR);
                         try {
-                            hideFile.save(Main.psStoneData);
+                            hideFile.save(ProtectionStones.psStoneData);
                         } catch (IOException ex) {
-                            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } else {
@@ -267,22 +263,22 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         Player player = e.getPlayer();
         Block pb = e.getBlock();
 
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(player.getWorld()));
-        if (Main.mats == null) {
+        if (ProtectionStones.mats == null) {
             e.setCancelled(false);
             return;
         }
         int type = 0;
         String blocktypedata = pb.getType().toString() + "-" + pb.getData();
         String blocktype = pb.getType().toString();
-        if (Main.mats.contains(blocktypedata)) {
+        if (ProtectionStones.mats.contains(blocktypedata)) {
             type = 1;
-        } else if (Main.mats.contains(blocktype)) {
+        } else if (ProtectionStones.mats.contains(blocktype)) {
             type = 2;
         }
         if (type > 0) {
@@ -397,9 +393,9 @@ public class ListenerClass implements Listener {
                 Block b = it.next();
                 int type = 0;
                 String blocktypedata = b.getType().toString() + "-" + b.getData();
-                if (Main.mats.contains(blocktypedata)) {
+                if (ProtectionStones.mats.contains(blocktypedata)) {
                     type = 1;
-                } else if (Main.mats.contains(b.getType().toString())) {
+                } else if (ProtectionStones.mats.contains(b.getType().toString())) {
                     type = 2;
                 }
                 if (type == 2) blocktypedata = b.getType().toString();
@@ -421,9 +417,9 @@ public class ListenerClass implements Listener {
                 Block b = it.next();
                 int type = 0;
                 String blocktypedata = b.getType().toString() + "-" + b.getData();
-                if (Main.mats.contains(blocktypedata)) {
+                if (ProtectionStones.mats.contains(blocktypedata)) {
                     type = 1;
-                } else if (Main.mats.contains(b.getType().toString())) {
+                } else if (ProtectionStones.mats.contains(b.getType().toString())) {
                     type = 2;
                 }
                 if (type == 2) blocktypedata = b.getType().toString();
@@ -438,9 +434,9 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (Main.config.getBoolean("Teleport to PVP.Block Teleport") == true) {
+        if (ProtectionStones.config.getBoolean("Teleport to PVP.Block Teleport") == true) {
             Player p = event.getPlayer();
-            WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+            WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
 
             if (!wg.isEnabled()) {
                 return;
@@ -489,9 +485,9 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (Main.config.getBoolean("Teleport to PVP.Display Warning") == true) {
+        if (ProtectionStones.config.getBoolean("Teleport to PVP.Display Warning") == true) {
             Player p = event.getPlayer();
-            WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
+            WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
 
             if (!wg.isEnabled()) {
                 return;
