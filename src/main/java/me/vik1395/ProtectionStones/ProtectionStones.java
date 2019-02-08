@@ -15,7 +15,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -25,7 +24,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.BlockVector;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,7 +107,7 @@ public class Main extends JavaPlugin {
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
         deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
 
-        initConfig();
+        Config.initConfig();
 
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
@@ -1082,7 +1080,7 @@ public class Main extends JavaPlugin {
                         if (!this.viewTaskList.isEmpty()) {
                             int playerTask = 0;
                             try {
-                                playerTask = ((Integer) this.viewTaskList.get(p)).intValue();
+                                playerTask = this.viewTaskList.get(p).intValue();
                             } catch (Exception e) {
                                 playerTask = 0;
                             }
@@ -1465,35 +1463,8 @@ public class Main extends JavaPlugin {
         return blockToReturn.getType();
     }
 
-    private boolean initConfig() {
-        config = new YamlConfiguration();
-        try {
-            config.load(conf);
-        } catch (IOException | InvalidConfigurationException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.print("[ProtectionStones] Checking Configuration Version");
-        if (this.getConfig().get("ConfVer") == null) {
-            System.out.print("Config is outdated, this WILL generate errors, please refresh it!");
-        } else {
-            if (config.getInt("ConfVer") == 1) {
-                System.out.print("Config is correct version, continuing start-up");
-                return true;
-            } else if (config.getInt("ConfVer") > 1) {
-                System.out.print("Config version is higher than required version, this might cause trouble");
-                return true;
-            } else {
-                fixInitialHidden(config.get("Block"));
-                System.out.print("Config is outdated, this WILL generate errors, please refresh it!");
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void fixInitialHidden(Object block) {
         YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(Main.psStoneData);
-        WorldGuardPlugin wg = (WorldGuardPlugin) Main.wgd;
         System.out.print("Patching initial hiddenpstones.yml");
         for (World world : Bukkit.getWorlds()) {
             RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
