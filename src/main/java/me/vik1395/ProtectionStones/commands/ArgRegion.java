@@ -4,6 +4,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -84,10 +85,8 @@ public class ArgRegion {
                             break;
                         case "remove":
                             if (s.substring(0, 2).equals("ps")) {
-                                int psx = Integer.parseInt(s.substring(2, s.indexOf("x")));
-                                int psy = Integer.parseInt(s.substring(s.indexOf("x") + 1, s.indexOf("y")));
-                                int psz = Integer.parseInt(s.substring(s.indexOf("y") + 1, s.length() - 1));
-                                Block blockToRemove = p.getWorld().getBlockAt(psx, psy, psz);
+                                PSLocation psl = ProtectionStones.parsePSRegionToLocation(s);
+                                Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
                                 blockToRemove.setType(Material.AIR);
                             }
                             rgm.removeRegion(s);

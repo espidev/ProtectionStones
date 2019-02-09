@@ -10,10 +10,8 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.vik1395.ProtectionStones.commands.ArgAdmin;
 import me.vik1395.ProtectionStones.commands.ArgCount;
-import me.vik1395.ProtectionStones.commands.ArgHome;
 import me.vik1395.ProtectionStones.commands.ArgRegion;
 import me.vik1395.ProtectionStones.commands.ArgTp;
 import org.bukkit.*;
@@ -76,6 +74,13 @@ public class ProtectionStones extends JavaPlugin {
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    }
+
+    public static PSLocation parsePSRegionToLocation(String regionName) {
+        int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
+        int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
+        int psz = Integer.parseInt(regionName.substring(regionName.indexOf("y") + 1, regionName.length() - 1));
+        return new PSLocation(psx, psy, psz);
     }
 
     @Override

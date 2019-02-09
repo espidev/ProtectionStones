@@ -22,7 +22,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.vik1395.ProtectionStones.PlayerComparator;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminHide;
@@ -31,14 +30,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ArgAdmin {
     public static boolean argumentAdmin(Player p, String[] args) {
@@ -57,10 +52,10 @@ public class ArgAdmin {
                 p.sendMessage(ProtectionStones.getPlugin().getConfig().saveToString().split("\n"));
                 break;
             case "hide":
-                ArgAdminHide.argumentAdminHide(p, args);
+                return ArgAdminHide.argumentAdminHide(p, args);
                 break;
             case "unhide":
-                ArgAdminHide.argumentAdminHide(p, args);
+                return ArgAdminHide.argumentAdminHide(p, args);
                 break;
         }
 

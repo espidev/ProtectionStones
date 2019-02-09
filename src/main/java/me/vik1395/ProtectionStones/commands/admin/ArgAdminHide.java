@@ -21,6 +21,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -60,18 +61,11 @@ public class ArgAdminHide {
             return true;
         }
         for (String regionID : regionIDList) {
-            int indexX = regionID.indexOf("x");
-            int indexY = regionID.indexOf("y");
-            int indexZ = regionID.length() - 1;
-            int psx = Integer.parseInt(regionID.substring(2, indexX));
-            int psy = Integer.parseInt(regionID.substring(indexX + 1, indexY));
-            int psz = Integer.parseInt(regionID.substring(indexY + 1, indexZ));
-            Block blockToChange = p.getWorld().getBlockAt(psx, psy, psz);
+            PSLocation psl = ProtectionStones.parsePSRegionToLocation(regionID);
+            Block blockToChange = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
             String entry = (int) blockToChange.getLocation().getX() + "x" + (int) blockToChange.getLocation().getY() + "y" + (int) blockToChange.getLocation().getZ() + "z";
-
             String subtype = null;
             if (args[1].equalsIgnoreCase("unhide")) {
-                //if (blockToChange.getType() == Material.getMaterial(blockMaterial) || blockToChange.getType() == Material.LAVA || blockToChange.getType() == Material.WATER ) {
                 YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
                 blockMaterial = hideFile.getString(entry);
                 if (blockMaterial != null && blockMaterial.contains("-")) {
@@ -124,5 +118,6 @@ public class ArgAdminHide {
             hMessage = "unhidden";
         }
         p.sendMessage(ChatColor.YELLOW + "All ProtectionStones have been " + hMessage);
+        return true;
     }
 }
