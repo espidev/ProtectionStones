@@ -1,7 +1,7 @@
 A Updated source from the original developer which can be found here 
 
 Here is the compiled Plugin ready to drop into your plugins folder
-http://j.gs/CJ3I
+http://j.gs/CJKL
 this is updated on my free time please open a issue here on github if any errors arrive
         thanks
             -Jerzean

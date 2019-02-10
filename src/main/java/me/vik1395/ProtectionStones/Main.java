@@ -62,14 +62,16 @@ public class Main extends JavaPlugin {
     public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
     public static Collection<UUID> pvpTPBypass = null;
-    public static String SPOX = null;
-    public static String SPOY = null;
-    public static Double SPRX = null;
-    public static Double SPRY = null;
-    public static Double MCLX = null;
-    public static Double MCLNX = null;
-    public static Double MCLY = null;
-    public static Double MCLNY = null;
+
+// Work in progress may or may not be added in
+    //public static String SPOX = null;
+    //public static String SPOY = null;
+    //public static Double SPRX = null;
+    //public static Double SPRY = null;
+    //public static Double MCLX = null;
+    //public static Double MCLNX = null;
+    //public static Double MCLY = null;
+    //public static Double MCLNY = null;
 
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
@@ -112,8 +114,9 @@ public class Main extends JavaPlugin {
                 mats.add(split[0].toUpperCase());
             }
         }
-        SPOX = getConfig().getString("SpawnProtect.X");
-        SPOY = getConfig().getString("SpawnProtect.Y");
+        //under dev  read line 66
+        //SPOX = getConfig().getString("SpawnProtect.X");
+        //SPOY = getConfig().getString("SpawnProtect.Y");
 
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
@@ -324,7 +327,6 @@ public class Main extends JavaPlugin {
                                             }
                                         }
                                     }
-                                    //count = rgm.getRegionCountOfPlayer(playerName);
                                 } catch (Exception e) {
                                 }
                                 p.sendMessage(ChatColor.YELLOW + args[2] + "'s region count: " + count);
@@ -559,7 +561,9 @@ public class Main extends JavaPlugin {
                         if (args.length < 2) {
                             p.sendMessage(ChatColor.RED + "Correct usage: /ps admin { version | settings | hide | unhide |");
                             p.sendMessage(ChatColor.RED + "                          cleanup | lastlogon | lastlogons | stats }");
-                            p.sendMessage(ChatColor.RED + "                          setspawn | setspawnprotect | setmaxclaimdist");
+//                           Read line 66
+//                            p.sendMessage(ChatColor.RED + "                          setspawn | setspawnprotect | setmaxclaimdist");
+
                         } else if (args.length > 1) {
                             Block blockToChange;
                             if (args[1].equalsIgnoreCase("version")) {
@@ -813,13 +817,14 @@ public class Main extends JavaPlugin {
                                 p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
                                 p.sendMessage(ChatColor.YELLOW + "================");
                             }
-                            if (args[1].equalsIgnoreCase("setspawn") || args[1].equalsIgnoreCase("setmaxclaimdist") || args[1].equalsIgnoreCase("setspawnprotect")) {
-                                if (args[1].equalsIgnoreCase("setspawn")){
-                                    getConfig().set("SpawnPoint.X",p.getLocation().getX());
-                                    getConfig().set("SpawnPoint.Y",p.getLocation().getY());
-                                    saveConfig();
-                                }
-                            }
+// Under development Read note at line 66
+//                            if (args[1].equalsIgnoreCase("setspawn") || args[1].equalsIgnoreCase("setmaxclaimdist") || args[1].equalsIgnoreCase("setspawnprotect")) {
+//                                if (args[1].equalsIgnoreCase("setspawn")){
+//                                    getConfig().set("SpawnPoint.X",p.getLocation().getX());
+//                                    getConfig().set("SpawnPoint.Y",p.getLocation().getY());
+//                                    saveConfig();
+//                                }
+//                            }
                         }
                     }
                 }

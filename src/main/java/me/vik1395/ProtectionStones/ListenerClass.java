@@ -98,21 +98,23 @@ public class ListenerClass implements Listener {
                 this.lastProtectStonePlaced.put(p, currentTime);
             }
             if (wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
+                //ProtectionStones World claim fix
                 if (p.hasPermission("protectionstones.create")) {
                     if ((e.getBlock().getLocation().getX() >= 9999999) || (e.getBlock().getLocation().getZ() >= 9999999) || (e.getBlock().getLocation().getX() <= -9999999) || (e.getBlock().getLocation().getZ() <= -9999999)) {
                         p.sendMessage(ChatColor.RED + "Unable to claim area OutOfMapBounds");
                         e.setCancelled(true);
                         return;
                     }
+                    // Under Development - Jerz
                     //SpawnPoint
-                    if ((!Main.SPOX.isEmpty()) || (!Main.SPOY.isEmpty())) {
+                    //if ((!Main.SPOX.equals(null)) || (!Main.SPOY.equals(null))) {
                         //SpawnProtect
-                        if ((e.getBlock().getLocation().getX() >= Math.abs(Main.SPRX)) || (e.getBlock().getLocation().getZ() >= Math.abs(Main.SPRY))) {
-                            p.sendMessage(ChatColor.RED + "Unable to claim area OutOfMapBounds");
-                            e.setCancelled(true);
-                            return;
-                        }
-                    }
+                        //if ((e.getBlock().getLocation().getX() >= Math.abs(Main.SPRX)) || (e.getBlock().getLocation().getZ() >= Math.abs(Main.SPRY))) {
+                        //    p.sendMessage(ChatColor.RED + "Unable to claim area OutOfMapBounds");
+                        //    e.setCancelled(true);
+                        //    return;
+                        //}
+                    //}
                     if (Main.toggleList != null) {
                         for (String temp : Main.toggleList) {
                             if (temp.equalsIgnoreCase(p.getName())) {
