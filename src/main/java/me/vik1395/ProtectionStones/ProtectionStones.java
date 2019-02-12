@@ -83,6 +83,32 @@ public class ProtectionStones extends JavaPlugin {
         return new PSLocation(psx, psy, psz);
     }
 
+    // Helper method to either remove, disown or regen a player's ps region
+    // NOTE: be sure to save the region manager after
+    public static void removeDisownRegenPSRegion(UUID uuid, String arg, String region, RegionManager rgm, Player admin) {
+        ProtectedRegion r = rgm.getRegion(region);
+        switch (arg) {
+            case "disown":
+                DefaultDomain owners = r.getOwners();
+                owners.removePlayer(uuid);
+                r.setOwners(owners);
+                break;
+            case "regen":
+                Bukkit.dispatchCommand(admin, "region select " + region);
+                Bukkit.dispatchCommand(admin, "/regen");
+                rgm.removeRegion(region);
+                break;
+            case "remove":
+                if (region.substring(0, 2).equals("ps")) {
+                    PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
+                    Block blockToRemove = admin.getWorld().getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
+                    blockToRemove.setType(Material.AIR);
+                }
+                rgm.removeRegion(region);
+                break;
+        }
+    }
+
     @Override
     public void onEnable() {
         pvpTPBypass = Collections.EMPTY_LIST;
@@ -221,7 +247,7 @@ public class ProtectionStones extends JavaPlugin {
                         p.sendMessage(ChatColor.RED + "You do not have permission to use that command.");
                         return true;
                     }
-                    ArgAdmin.argumentAdmin(p, args);
+                    return ArgAdmin.argumentAdmin(p, args);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("reclaim")) {

@@ -37,9 +37,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ArgAdminHide {
+
+    // /ps admin hide
     public static boolean argumentAdminHide(Player p, String[] args) {
-        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager mgr = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
+        RegionManager mgr = ProtectionStones.getRegionManagerWithPlayer(p);
         Map<String, ProtectedRegion> regions = mgr.getRegions();
         if (regions.isEmpty()) {
             p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");

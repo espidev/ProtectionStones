@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ArgTp {
+
+    // /ps tp
     public static boolean argumentTp(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ArgCount {
+
+    // /ps count
     public static boolean argumentCount(Player p, String[] args) {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         int count;

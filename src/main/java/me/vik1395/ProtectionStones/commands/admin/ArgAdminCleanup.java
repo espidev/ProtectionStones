@@ -16,16 +16,12 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -33,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ArgAdminCleanup {
+
+    // /ps admin cleanup
     public static boolean argumentAdminCleanup(Player p, String[] args) {
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("regen") && !args[2].equalsIgnoreCase("disown"))) {
             p.sendMessage(ChatColor.YELLOW + "/ps admin cleanup {remove|regen|disown} {days}");
@@ -81,20 +79,7 @@ public class ArgAdminCleanup {
                 // remove regions
                 p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
                 for (String region : opRegions) {
-                    if (args[2].equalsIgnoreCase("disown")) { // disown arg
-                        DefaultDomain owners = rgm.getRegion(region).getOwners();
-                        owners.removePlayer(op.getUniqueId());
-                        rgm.getRegion(region).setOwners(owners);
-                    } else if (args[2].equalsIgnoreCase("regen")) { // regen arg
-                        Bukkit.dispatchCommand(p, "region select " + region);
-                        Bukkit.dispatchCommand(p, "/regen");
-                        rgm.removeRegion(region);
-                    } else if (region.substring(0, 2).equals("ps")) { // remove arg
-                        PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
-                        Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-                        blockToRemove.setType(Material.AIR);
-                        rgm.removeRegion(region);
-                    }
+                    ProtectionStones.removeDisownRegenPSRegion(op.getUniqueId(), args[2].toLowerCase(), region, rgm, p);
                 }
             }
 

@@ -1,15 +1,11 @@
 package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -18,6 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class ArgRegion {
+
+    // /ps region
     public static boolean argumentRegion(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
@@ -72,26 +70,7 @@ public class ArgRegion {
 
                 // Remove regions
                 for (String s : regionIDList) {
-                    switch (args[1].toLowerCase()) {
-                        case "disown":
-                            DefaultDomain owners = rgm.getRegion(s).getOwners();
-                            owners.removePlayer(playerid);
-                            rgm.getRegion(s).setOwners(owners);
-                            break;
-                        case "regen":
-                            Bukkit.dispatchCommand(p, "region select " + s);
-                            Bukkit.dispatchCommand(p, "/regen");
-                            rgm.removeRegion(s);
-                            break;
-                        case "remove":
-                            if (s.substring(0, 2).equals("ps")) {
-                                PSLocation psl = ProtectionStones.parsePSRegionToLocation(s);
-                                Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-                                blockToRemove.setType(Material.AIR);
-                            }
-                            rgm.removeRegion(s);
-                            break;
-                    }
+                    ProtectionStones.removeDisownRegenPSRegion(playerid, args[1].toLowerCase(), s, rgm, p);
                 }
                 p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions have been removed");
                 try {
