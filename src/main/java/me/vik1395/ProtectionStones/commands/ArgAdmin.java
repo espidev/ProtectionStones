@@ -16,24 +16,17 @@
 
 package me.vik1395.ProtectionStones.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PlayerComparator;
 import me.vik1395.ProtectionStones.ProtectionStones;
+import me.vik1395.ProtectionStones.commands.admin.ArgAdminCleanup;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminHide;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.Map;
 
 public class ArgAdmin {
     public static boolean argumentAdmin(Player p, String[] args) {
@@ -57,84 +50,14 @@ public class ArgAdmin {
             case "unhide":
                 return ArgAdminHide.argumentAdminHide(p, args);
                 break;
+            case "cleanup":
+                return ArgAdminCleanup.argumentAdminCleanup(p, args);
+                break;
         }
 
 
         if (args[1].equalsIgnoreCase("cleanup")) {
-            if (args.length >= 3) {
-                if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("regen")) || (args[2].equalsIgnoreCase("disown"))) {
-                    int days = 30;
-                    if (args.length > 3) {
-                        days = Integer.parseInt(args[3]);
-                    }
-                    p.sendMessage(ChatColor.YELLOW + "Cleanup " + args[2] + " " + days + " days");
-                    p.sendMessage(ChatColor.YELLOW + "================");
-                    RegionManager mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
-                    Map<String, ProtectedRegion> regions = mgr.getRegions();
-                    int size = regions.size();
-                    String name = "";
-                    int index = 0;
-                    String[] regionIDList = new String[size];
-                    OfflinePlayer[] offlinePlayerList = getServer().getOfflinePlayers();
-                    int playerCount = offlinePlayerList.length;
-                    for (int iii = 0; iii < playerCount; iii++) {
-                        long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
-                        if (lastPlayed >= days) {
-                            index = 0;
-                            name = offlinePlayerList[iii].getName().toLowerCase();
-                            for (String idname : regions.keySet()) {
-                                try {
-                                    if (((ProtectedRegion) regions.get(idname)).getOwners().getPlayers().contains(name)) {
-                                        regionIDList[index] = idname;
-                                        index++;
-                                    }
-                                } catch (Exception e) {
-                                }
-                            }
-                            if (index == 0) {
-                                p.sendMessage(ChatColor.YELLOW + "No regions found for " + name);
-                            } else {
-                                p.sendMessage(ChatColor.YELLOW + args[2] + ": " + name);
-                                for (int i = 0; i < index; i++) {
-                                    if (args[2].equalsIgnoreCase("disown")) {
-                                        DefaultDomain owners = rgm.getRegion(regionIDList[i]).getOwners();
-                                        owners.removePlayer(name);
-                                        rgm.getRegion(regionIDList[i]).setOwners(owners);
-                                    } else {
-                                        if (args[2].equalsIgnoreCase("regen")) {
-                                            if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-                                                Bukkit.dispatchCommand(p, "region select " + regionIDList[i]);
-                                                Bukkit.dispatchCommand(p, "/regen");
-                                            }
-                                        } else if (regionIDList[i].substring(0, 2).equals("ps")) {
-                                            int indexX = regionIDList[i].indexOf("x");
-                                            int indexY = regionIDList[i].indexOf("y");
-                                            int indexZ = regionIDList[i].length() - 1;
-                                            int psx = Integer.parseInt(regionIDList[i].substring(2, indexX));
-                                            int psy = Integer.parseInt(regionIDList[i].substring(indexX + 1, indexY));
-                                            int psz = Integer.parseInt(regionIDList[i].substring(indexY + 1, indexZ));
-                                            Block blockToRemove = p.getWorld().getBlockAt(psx, psy, psz);
-                                            blockToRemove.setType(Material.AIR);
-                                        }
-                                        mgr.removeRegion(regionIDList[i]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    try {
-                        rgm.save();
-                    } catch (Exception e) {
-                        System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                    }
-                    p.sendMessage(ChatColor.YELLOW + "================");
-                    p.sendMessage(ChatColor.YELLOW + "Completed " + args[2] + " cleanup");
-                    return true;
-                }
-            } else {
-                p.sendMessage(ChatColor.YELLOW + "/ps admin cleanup {remove|regen|disown} {days}");
-                return true;
-            }
+
         } else if (args[1].equalsIgnoreCase("lastlogon")) {
             if (args.length > 2) {
                 String playerName = args[2];
