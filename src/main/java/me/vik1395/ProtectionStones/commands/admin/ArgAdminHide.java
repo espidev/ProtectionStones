@@ -1,5 +1,5 @@
 /*
- * Copyright 2019
+ * Copyright 2019 ProtectionStones team and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.ChatColor;
@@ -56,7 +53,6 @@ public class ArgAdminHide {
             }
         }
 
-
         if (regionIDList.isEmpty()) {
             p.sendMessage(ChatColor.YELLOW + "No ProtectionStones Regions Found");
             return true;
@@ -64,7 +60,7 @@ public class ArgAdminHide {
         for (String regionID : regionIDList) {
             PSLocation psl = ProtectionStones.parsePSRegionToLocation(regionID);
             Block blockToChange = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-            String entry = (int) blockToChange.getLocation().getX() + "x" + (int) blockToChange.getLocation().getY() + "y" + (int) blockToChange.getLocation().getZ() + "z";
+            String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
             String subtype = null;
             if (args[1].equalsIgnoreCase("unhide")) {
                 YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);

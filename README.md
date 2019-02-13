@@ -125,4 +125,4 @@ The permissions are very similar to the old plugin.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.bypass - Access to the /ps bypass command.
 
-This plugin is licensed under **CC Attribution-NonCommercial-ShareAlike 4.0 International**. In very basic terms, Do whatever you want with the code of this plugin, as long as you give credits to the author and/or the plugin itself.
+This plugin is licensed under the **Apache 2.0 License**.

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 ProtectionStones team and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package me.vik1395.ProtectionStones;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -13,15 +29,15 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,23 +47,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-    /*
-
-    Author: Vik1395,Dragoboss
-    updated by: Jerzean,Dylan-BukkitPlugins, EspiDev
-    Project: ProtectionStones
-
-    Copyright 2015
-
-    Licensed under Creative CommonsAttribution-ShareAlike 4.0 International Public License (the "License");
-    You may not use this file except in compliance with the License.
-
-    You may obtain a copy of the License at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
-    You may find an abridged version of the License at http://creativecommons.org/licenses/by-sa/4.0/
-     */
-
-public class ProtectionStones extends JavaPlugin {
+    public class ProtectionStones extends JavaPlugin {
     public static Plugin plugin, wgd;
     public static File psStoneData;
     public static File conf;
@@ -251,106 +251,12 @@ public class ProtectionStones extends JavaPlugin {
                     return ArgAddRemove.template(p, args, currentPSID, "addowner");
                 } else if (args[0].equalsIgnoreCase("removeowner")) {
                     return ArgAddRemove.template(p, args, currentPSID, "removeowner");
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("view")) {
+                } else if (args[0].equalsIgnoreCase("view")) {
                     return ArgView.argumentView(p, args, currentPSID);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("unhide")) {
-                    if (p.hasPermission("protectionstones.unhide")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (id.substring(0, 2).equals("ps")) {
-                            int indexX = id.indexOf("x");
-                            int indexY = id.indexOf("y");
-                            int indexZ = id.length() - 1;
-                            int psx = Integer.parseInt(id.substring(2, indexX));
-                            int psy = Integer.parseInt(id.substring(indexX + 1, indexY));
-                            int psz = Integer.parseInt(id.substring(indexY + 1, indexZ));
-                            Block blockToUnhide = p.getWorld().getBlockAt(psx, psy, psz);
-                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-                            String entry = (int) blockToUnhide.getLocation().getX() + "x";
-                            entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
-                            entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
-                            String setmat = hideFile.getString(entry);
-                            String subtype = null;
-                            Material currentType = blockToUnhide.getType();
-                            if (!ProtectionStones.mats.contains(currentType.toString())) {
-                                if (setmat.contains("-")) {
-                                    String[] str = setmat.split("-");
-                                    setmat = str[0];
-                                    subtype = str[1];
-                                }
-                                if (hideFile.contains(entry)) {
-                                    hideFile.set(entry, null);
-                                    try {
-                                        hideFile.save(psStoneData);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                    blockToUnhide.setType(Material.getMaterial(setmat));
-                                    if (subtype != null) {
-                                        //TODO removed subtype support blockToUnhide.setData((byte) (Integer.parseInt(subtype)));
-                                    }
-                                } else {
-                                    p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
-                                }
-                            } else {
-                                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
-                            }
-                        } else {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("Not a ProtectionStones Region").toString());
-                        }
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use that command").toString());
-                    }
-                    return true;
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("hide")) {
-                    if (p.hasPermission("protectionstones.hide")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (id.substring(0, 2).equals("ps")) {
-                            int indexX = id.indexOf("x");
-                            int indexY = id.indexOf("y");
-                            int indexZ = id.length() - 1;
-                            int psx = Integer.parseInt(id.substring(2, indexX));
-                            int psy = Integer.parseInt(id.substring(indexX + 1, indexY));
-                            int psz = Integer.parseInt(id.substring(indexY + 1, indexZ));
-                            Block blockToHide = p.getWorld().getBlockAt(psx, psy, psz);
-                            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-                            String entry = (int) blockToHide.getLocation().getX() + "x";
-                            entry = entry + (int) blockToHide.getLocation().getY() + "y";
-                            entry = entry + (int) blockToHide.getLocation().getZ() + "z";
-                            Material currentType = blockToHide.getType();
-                            if (ProtectionStones.mats.contains(currentType.toString())) {
-                                if (!(hideFile.contains(entry))) {
-                                    hideFile.set(entry, currentType.toString() + "-" + blockToHide.getData());
-                                    try {
-                                        hideFile.save(psStoneData);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                    blockToHide.setType(Material.AIR);
-                                } else {
-                                    p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
-                                }
-                            } else {
-                                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
-                            }
-                        } else {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("Not a ProtectionStones Region").toString());
-                        }
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use that command").toString());
-                    }
-                    return true;
+                } else if (args[0].equalsIgnoreCase("unhide")) {
+                    return ArgHideUnhide.template(p, "unhide", currentPSID);
+                } else if (args[0].equalsIgnoreCase("hide")) {
+                    return ArgHideUnhide.template(p, "hide", currentPSID);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("priority")) {
@@ -553,16 +459,6 @@ public class ProtectionStones extends JavaPlugin {
             return null;
         }
         return null;
-    }
-
-    public static void setBlock(World theWorld, int x, int y, int z, Material mat) {
-        Block blockToChange = theWorld.getBlockAt(x, y, z);
-        blockToChange.setType(mat);
-    }
-
-    public static Material getBlock(World theWorld, int x, int y, int z) {
-        Block blockToReturn = theWorld.getBlockAt(x, y, z);
-        return blockToReturn.getType();
     }
 
 }

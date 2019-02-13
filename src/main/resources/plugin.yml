@@ -1,7 +1,7 @@
 name: ProtectionStones
 version: ${version}
 description: ${description}
-authors: [Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
+authors: [Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins,EspiDev]
 
 depend: [WorldGuard, WorldEdit]
 main: me.vik1395.ProtectionStones.ProtectionStones
@@ -9,6 +9,6 @@ api-version: 1.13
 
 commands:
   ps:
-    description: Teleports player to a random position within the world border.
+    description: Base command for protection stones.
     aliases: [protectionstone, protectionstones, pstone]
     usage: /ps help

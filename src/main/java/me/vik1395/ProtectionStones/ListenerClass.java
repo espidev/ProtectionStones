@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 ProtectionStones team and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package me.vik1395.ProtectionStones;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -39,21 +55,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-/*
-
-Author: Vik1395
-Project: VanishBungee
-
-Copyright 2015
-
-Licensed under Creative CommonsAttribution-ShareAlike 4.0 International Public License (the "License");
-You may not use this file except in compliance with the License.
-
-You may obtain a copy of the License at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
-You may find an abridged version of the License at http://creativecommons.org/licenses/by-sa/4.0/
- */
 
 public class ListenerClass implements Listener {
     StoneTypeData StoneTypeData = new StoneTypeData();
@@ -286,7 +287,7 @@ public class ListenerClass implements Listener {
             String psx = Double.toString(pb.getLocation().getX());
             String psy = Double.toString(pb.getLocation().getY());
             String psz = Double.toString(pb.getLocation().getZ());
-            String id = (new StringBuilder("ps")).append(psx.substring(0, psx.indexOf("."))).append("x").append(psy.substring(0, psy.indexOf("."))).append("y").append(psz.substring(0, psz.indexOf("."))).append("z").toString();
+            String id = (new StringBuilder("ps")).append(psx, 0, psx.indexOf(".")).append("x").append(psy, 0, psy.indexOf(".")).append("y").append(psz, 0, psz.indexOf(".")).append("z").toString();
             if (wg.createProtectionQuery().testBlockBreak(player, pb)) {
                 if (player.hasPermission("protectionstones.destroy")) {
                     if (type == 2) blocktypedata = pb.getType().toString();
@@ -446,7 +447,6 @@ public class ListenerClass implements Listener {
             BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
             if (rgm.getApplicableRegions(v) != null) {
                 ApplicableRegionSet regions = rgm.getApplicableRegions(v);
-                ApplicableRegionSet regionsFrom = rgm.getApplicableRegions(v);
 
                 if (event.getCause() == TeleportCause.ENDER_PEARL) return;
                 try {
