@@ -16,6 +16,7 @@
 
 package me.vik1395.ProtectionStones.commands;
 
+import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -25,30 +26,40 @@ import org.bukkit.metadata.MetadataValue;
 import java.util.List;
 
 public class ArgBypass {
-    public static boolean argumentBypass(Player p, String[] args) {
-        if (p.hasPermission("protectionstones.bypass")) {
-            if (args.length > 1) {
-                p = Bukkit.getPlayer(args[1]);
-            }
 
-            boolean bool = false;
-            if (!(p.hasMetadata("psBypass"))) {
-                p.setMetadata("psBypass", new FixedMetadataValue(this, true));
-            } else {
-                List<MetadataValue> values = p.getMetadata("psBypass");
-                for (MetadataValue value : values) {
-                    if (value.asBoolean() == true) {
-                        p.setMetadata("psBypass", new FixedMetadataValue(this, false));
-                    } else {
-                        p.setMetadata("psBypass", new FixedMetadataValue(this, true));
-                    }
-                    bool = value.asBoolean();
-                }
-            }
-            p.sendMessage(ChatColor.GREEN + "ProtectionStones PVP Teleport Bypass: " + ChatColor.DARK_GREEN + bool + " for " + p.getName());
+    // /ps bypass [player (optional)]
+    public static boolean argumentBypass(Player p, String[] args) {
+        if (!p.hasPermission("protectionstones.bypass")) {
+            p.sendMessage(ChatColor.RED + "You don't have permission to use the bypass command!");
             return true;
-        } else {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use the bypass command");
         }
+        // set p to other player if specified
+        if (args.length > 1) {
+            if (Bukkit.getPlayer(args[1]) == null) {
+                p.sendMessage(ChatColor.RED + "Invalid player name.");
+                return true;
+            }
+            p = Bukkit.getPlayer(args[1]);
+        }
+
+        boolean bool = false;
+        if (!p.hasMetadata("psBypass")) {
+            p.setMetadata("psBypass", new FixedMetadataValue(ProtectionStones.getPlugin(), true));
+        } else {
+            List<MetadataValue> values = p.getMetadata("psBypass");
+            for (MetadataValue value : values) {
+                if (value.asBoolean()) {
+                    p.setMetadata("psBypass", new FixedMetadataValue(ProtectionStones.getPlugin(), false));
+                } else {
+                    p.setMetadata("psBypass", new FixedMetadataValue(ProtectionStones.getPlugin(), true));
+                }
+                bool = value.asBoolean();
+            }
+        }
+
+        // TODO this command doesn't look finished, since there is no logic for using it...
+
+        p.sendMessage(ChatColor.GREEN + "ProtectionStones PVP Teleport Bypass: " + ChatColor.DARK_GREEN + bool + " for " + p.getName());
+        return true;
     }
 }

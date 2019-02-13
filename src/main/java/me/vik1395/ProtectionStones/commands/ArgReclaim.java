@@ -47,6 +47,10 @@ public class ArgReclaim {
             p.sendMessage(ChatColor.RED + "You don't have permission to use the Reclaim Command");
             return true;
         }
+        if (psID.equals("")) {
+            p.sendMessage(ChatColor.RED + "You are not in a protection stone region!");
+            return true;
+        }
         ProtectedRegion region = rgm.getRegion(psID);
 
         if (region == null) {

@@ -205,13 +205,8 @@ public class ProtectionStones extends JavaPlugin {
                     String namePSID = "";
                     for (String currentID : idList) {
                         if (currentID.substring(0, 2).equals("ps")) {
-                            int indexX = currentID.indexOf("x");
-                            int indexY = currentID.indexOf("y");
-                            int indexZ = currentID.length() - 1;
-                            double psx = Double.parseDouble(currentID.substring(2, indexX));
-                            double psy = Double.parseDouble(currentID.substring(indexX + 1, indexY));
-                            double psz = Double.parseDouble(currentID.substring(indexY + 1, indexZ));
-                            Location psLocation = new Location(p.getWorld(), psx, psy, psz);
+                            PSLocation psl = parsePSRegionToLocation(currentID);
+                            Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
                             tempToPS = p.getLocation().distance(psLocation);
                             if (tempToPS < distanceToPS) {
                                 distanceToPS = tempToPS;
@@ -221,7 +216,6 @@ public class ProtectionStones extends JavaPlugin {
                     }
                     currentPSID = namePSID;
                 }
-                ProtectedRegion rgn = rgm.getRegion(currentPSID);
 
                 if (args[0].equalsIgnoreCase("toggle")) {
                     if (p.hasPermission("protectionstones.toggle")) {
@@ -248,64 +242,12 @@ public class ProtectionStones extends JavaPlugin {
                     return ArgReclaim.argumentReclaim(p, args, currentPSID);
                 } else if (args[0].equalsIgnoreCase("bypass")) {
                     return ArgBypass.argumentBypass(p, args);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("add")) {
-                    if (p.hasPermission("protectionstones.members")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length < 2) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
-                            return true;
-                        } else {
-                            String playerName = args[1];
-                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-                            DefaultDomain members = rgm.getRegion(id).getMembers();
-                            members.addPlayer(playerName);
-                            members.addPlayer(uid);
-                            rgm.getRegion(id).setMembers(members);
-                            try {
-                                rgm.save();
-                            } catch (Exception e) {
-                                System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                            }
-                            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been added to your region.").toString());
-                            return true;
-                        }
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Members Commands").toString());
-                        return true;
-                    }
+                } else if (args[0].equalsIgnoreCase("add")) {
+                    return ArgAddRemove.argumentAdd(p, args, currentPSID);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("remove")) {
-                    if (p.hasPermission("protectionstones.members")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length < 2) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
-                            return true;
-                        }
-                        String playerName = args[1];
-                        UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-                        DefaultDomain members = rgm.getRegion(id).getMembers();
-                        members.removePlayer(playerName);
-                        members.removePlayer(uid);
-                        rgm.getRegion(id).setMembers(members);
-                        try {
-                            rgm.save();
-                        } catch (Exception e) {
-                            System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                        }
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been removed from region.").toString());
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Members Commands").toString());
-                    }
-                    return true;
+                    return ArgAddRemove.argumentRemove(p, args, currentPSID);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("addowner")) {
@@ -720,9 +662,8 @@ public class ProtectionStones extends JavaPlugin {
         return true;
     }
 
-    public boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        if (region == null) {
-            // Region is not valid
+    public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
+        if (region == null) { // Region is not valid
             return true;
         }
 
