@@ -216,6 +216,7 @@ public class ProtectionStones extends JavaPlugin {
                     }
                     currentPSID = namePSID;
                 }
+                ProtectedRegion rgn = rgm.getRegion(currentPSID);
 
                 if (args[0].equalsIgnoreCase("toggle")) {
                     if (p.hasPermission("protectionstones.toggle")) {
@@ -243,152 +244,17 @@ public class ProtectionStones extends JavaPlugin {
                 } else if (args[0].equalsIgnoreCase("bypass")) {
                     return ArgBypass.argumentBypass(p, args);
                 } else if (args[0].equalsIgnoreCase("add")) {
-                    return ArgAddRemove.argumentAdd(p, args, currentPSID);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("remove")) {
-                    return ArgAddRemove.argumentRemove(p, args, currentPSID);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("addowner")) {
-                    if (p.hasPermission("protectionstones.owners")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length < 2) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
-                            return true;
-                        } else {
-                            String playerName = args[1];
-                            UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-                            DefaultDomain owners = rgm.getRegion(id).getOwners();
-                            owners.addPlayer(playerName);
-                            owners.addPlayer(uid);
-                            rgm.getRegion(id).setOwners(owners);
-                            try {
-                                rgm.save();
-                            } catch (Exception e) {
-                                System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                            }
-                            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been added to your region.").toString());
-                            return true;
-                        }
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Owners Commands").toString());
-                        return true;
-                    }
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("removeowner")) {
-                    if (p.hasPermission("protectionstones.owners")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length < 2) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("This command requires a player name.").toString());
-                            return true;
-                        }
-                        String playerName = args[1];
-                        UUID uid = Bukkit.getOfflinePlayer(playerName).getUniqueId();
-                        DefaultDomain owners = rgm.getRegion(id).getOwners();
-                        owners.removePlayer(playerName);
-                        owners.removePlayer(uid);
-                        rgm.getRegion(id).setOwners(owners);
-                        try {
-                            rgm.save();
-                        } catch (Exception e) {
-                            System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                        }
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(playerName).append(" has been removed from region.").toString());
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Owners Commands").toString());
-                    }
-                    return true;
+                    return ArgAddRemove.template(p, args, currentPSID, "add");
+                } else if (args[0].equalsIgnoreCase("remove")) {
+                    return ArgAddRemove.template(p, args, currentPSID, "remove");
+                } else if (args[0].equalsIgnoreCase("addowner")) {
+                    return ArgAddRemove.template(p, args, currentPSID, "addowner");
+                } else if (args[0].equalsIgnoreCase("removeowner")) {
+                    return ArgAddRemove.template(p, args, currentPSID, "removeowner");
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("view")) {
-                    if (p.hasPermission("protectionstones.view")) {
-                        if (hasNoAccess(rgn, p, localPlayer, true)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (!this.viewTaskList.isEmpty()) {
-                            int playerTask = 0;
-                            try {
-                                playerTask = this.viewTaskList.get(p).intValue();
-                            } catch (Exception e) {
-                                playerTask = 0;
-                            }
-                            if ((playerTask != 0) && (Bukkit.getScheduler().isQueued(playerTask))) {
-                                return true;
-                            }
-                        }
-                        BlockVector3 minVector = rgm.getRegion(id).getMinimumPoint();
-                        BlockVector3 maxVector = rgm.getRegion(id).getMaximumPoint();
-                        final int minX = minVector.getBlockX();
-                        final int minY = minVector.getBlockY();
-                        final int minZ = minVector.getBlockZ();
-                        final int maxX = maxVector.getBlockX();
-                        final int maxY = maxVector.getBlockY();
-                        final int maxZ = maxVector.getBlockZ();
-                        double px = p.getLocation().getX();
-                        double py = p.getLocation().getY();
-                        double pz = p.getLocation().getZ();
-                        BlockVector3 playerVector = BlockVector3.at(px, py, pz);
-                        final int playerY = playerVector.getBlockY();
-                        final World theWorld = p.getWorld();
-                        /*  */
-                        final Material bm1 = getBlock(theWorld, minX, playerY, minZ);
-                        final Material bm2 = getBlock(theWorld, maxX, playerY, minZ);
-                        final Material bm3 = getBlock(theWorld, minX, playerY, maxZ);
-                        final Material bm4 = getBlock(theWorld, maxX, playerY, maxZ);
-                        final Material bm5 = getBlock(theWorld, minX, maxY, minZ);
-                        final Material bm6 = getBlock(theWorld, maxX, maxY, minZ);
-                        final Material bm7 = getBlock(theWorld, minX, maxY, maxZ);
-                        final Material bm8 = getBlock(theWorld, maxX, maxY, maxZ);
-                        final Material bm9 = getBlock(theWorld, minX, minY, minZ);
-                        final Material bm10 = getBlock(theWorld, maxX, minY, minZ);
-                        final Material bm11 = getBlock(theWorld, minX, minY, maxZ);
-                        final Material bm12 = getBlock(theWorld, maxX, minY, maxZ);
-                        /*  */
-                        setBlock(theWorld, minX, playerY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, playerY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, playerY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, playerY, maxZ, Material.GLASS);
-                        /*  */
-                        setBlock(theWorld, minX, maxY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, maxY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, maxY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, maxY, maxZ, Material.GLASS);
-                        /*  */
-                        setBlock(theWorld, minX, minY, minZ, Material.GLASS);
-                        setBlock(theWorld, maxX, minY, minZ, Material.GLASS);
-                        setBlock(theWorld, minX, minY, maxZ, Material.GLASS);
-                        setBlock(theWorld, maxX, minY, maxZ, Material.GLASS);
-                        /*  */
-                        int taskID = getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-                            public void run() {
-                                ProtectionStones.this.setBlock(theWorld, minX, playerY, minZ, bm1);
-                                ProtectionStones.this.setBlock(theWorld, maxX, playerY, minZ, bm2);
-                                ProtectionStones.this.setBlock(theWorld, minX, playerY, maxZ, bm3);
-                                ProtectionStones.this.setBlock(theWorld, maxX, playerY, maxZ, bm4);
-                                ProtectionStones.this.setBlock(theWorld, minX, maxY, minZ, bm5);
-                                ProtectionStones.this.setBlock(theWorld, maxX, maxY, minZ, bm6);
-                                ProtectionStones.this.setBlock(theWorld, minX, maxY, maxZ, bm7);
-                                ProtectionStones.this.setBlock(theWorld, maxX, maxY, maxZ, bm8);
-                                ProtectionStones.this.setBlock(theWorld, minX, minY, minZ, bm9);
-                                ProtectionStones.this.setBlock(theWorld, maxX, minY, minZ, bm10);
-                                ProtectionStones.this.setBlock(theWorld, minX, minY, maxZ, bm11);
-                                ProtectionStones.this.setBlock(theWorld, maxX, minY, maxZ, bm12);
-                            }
-                        }, 600L);
-                        this.viewTaskList.put(p, Integer.valueOf(taskID));
-                    } else {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
-                    }
-                    return true;
+                    return ArgView.argumentView(p, args, currentPSID);
                 }
                 /*****************************************************************************************************/
                 else if (args[0].equalsIgnoreCase("unhide")) {
@@ -689,12 +555,12 @@ public class ProtectionStones extends JavaPlugin {
         return null;
     }
 
-    protected void setBlock(World theWorld, int x, int y, int z, Material mat) {
+    public static void setBlock(World theWorld, int x, int y, int z, Material mat) {
         Block blockToChange = theWorld.getBlockAt(x, y, z);
         blockToChange.setType(mat);
     }
 
-    protected Material getBlock(World theWorld, int x, int y, int z) {
+    public static Material getBlock(World theWorld, int x, int y, int z) {
         Block blockToReturn = theWorld.getBlockAt(x, y, z);
         return blockToReturn.getType();
     }
