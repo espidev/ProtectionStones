@@ -20,12 +20,13 @@ public class ArgRegion {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
-        if (args.length < 3) {
-            p.sendMessage(ChatColor.YELLOW + "/ps region {count|list|remove|regen|disown} {playername}");
-            return true;
-        }
         if (!p.hasPermission("protectionstones.region")) {
             p.sendMessage(ChatColor.RED + "You don't have permission to use Region Commands");
+            return true;
+        }
+
+        if (args.length < 3) {
+            p.sendMessage(ChatColor.YELLOW + "/ps region {count|list|remove|regen|disown} {playername}");
             return true;
         }
 
@@ -69,9 +70,9 @@ public class ArgRegion {
             } else {
 
                 // Remove regions
-                for (String s : regionIDList) {
+                for (String s : regionIDList)
                     ProtectionStones.removeDisownRegenPSRegion(playerid, args[1].toLowerCase(), s, rgm, p);
-                }
+
                 p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions have been removed");
                 try {
                     rgm.save();

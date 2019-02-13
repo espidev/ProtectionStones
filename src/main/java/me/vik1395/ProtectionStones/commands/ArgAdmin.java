@@ -29,6 +29,11 @@ public class ArgAdmin {
 
     // /ps admin [arg]
     public static boolean argumentAdmin(Player p, String[] args) {
+        if (!p.hasPermission("protectionstones.admin")) {
+            p.sendMessage(ChatColor.RED + "You do not have permission to use that command.");
+            return true;
+        }
+
         if (args.length < 2) {
             p.sendMessage(ChatColor.RED + "Correct usage: /ps admin {version|settings|hide|unhide|");
             p.sendMessage(ChatColor.RED + "                          cleanup|lastlogon|lastlogons|stats}");
