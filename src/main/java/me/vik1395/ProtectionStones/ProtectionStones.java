@@ -20,9 +20,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-  import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
 import org.bukkit.Bukkit;
@@ -165,7 +164,6 @@ public class ProtectionStones extends JavaPlugin {
         if (s instanceof Player) {
             Player p = (Player) s;
             if (cmd.getName().equalsIgnoreCase("ps")) {
-                WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
                     p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\

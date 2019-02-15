@@ -20,49 +20,41 @@ package me.vik1395.ProtectionStones;
 public class StoneTypeData {
     public int RegionX(String StoneType) {
         String ConfigString = "Region." + StoneType + ".X Radius";
-        int xradius = ProtectionStones.plugin.getConfig().getInt(ConfigString);
-        return xradius;
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public int RegionY(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Y Radius";
-        int yradius = ProtectionStones.plugin.getConfig().getInt(ConfigString);
-        return yradius;   
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public int RegionZ(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Z Radius";
-        int zradius = ProtectionStones.plugin.getConfig().getInt(ConfigString);
-        return zradius;  
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public Boolean AutoHide(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Auto Hide";
-        boolean autohide = ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
-        return autohide;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean NoDrop(String StoneType) {
         String ConfigString = "Region." + StoneType + ".No Drop";
-        boolean nodrop = ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
-        return nodrop;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean BlockPiston(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Block Piston";
-        boolean blockpiston = ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
-        return blockpiston;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean SilkTouch(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Silk Touch";
-        boolean silktouch = ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
-        return silktouch;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public int DefaultPriority(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Priority";
-        int priority = ProtectionStones.plugin.getConfig().getInt(ConfigString);
-        return priority;
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 }
