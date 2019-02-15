@@ -27,7 +27,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class ArgTp {
 
@@ -36,7 +35,6 @@ public class ArgTp {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
-        UUID playerid = p.getUniqueId();
         int index = 0, rgnum; // index: index in playerRegions for selected region, rgnum: index specified by player to teleport to
         Map<Integer, String> playerRegions = new HashMap<>();
 
@@ -70,7 +68,7 @@ public class ArgTp {
         // find regions that the player has
         for (String region : rgm.getRegions().keySet()) {
             if (region.startsWith("ps")) {
-                if (rgm.getRegions().get(region).getOwners().contains(playerid)) {
+                if (rgm.getRegions().get(region).getOwners().contains(wg.wrapPlayer(p))) {
                     index++;
                     playerRegions.put(index, region);
                 }

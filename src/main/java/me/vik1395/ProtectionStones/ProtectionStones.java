@@ -16,10 +16,12 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -182,8 +184,8 @@ public class ProtectionStones extends JavaPlugin {
                     p.sendMessage(ChatColor.YELLOW + "/ps reclaim");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps admin {version|settings|hide|unhide|");//\\
-                    p.sendMessage(ChatColor.YELLOW + "           cleanup|lastlogon|lastlogons|stats}");//\\
+                    p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
+                    p.sendMessage(ChatColor.YELLOW + "           cleanup | lastlogon | lastlogons | stats }");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
                     return true;
                 }

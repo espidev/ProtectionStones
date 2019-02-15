@@ -35,7 +35,7 @@ public class ArgView {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
-        if (!p.hasPermission("protectionstones.view")) {
+        if (!p.hasPermission("protectionstones.view") && !p.hasPermission("protectionstones.view.others")) {
             p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
             return true;
         }
@@ -104,7 +104,7 @@ public class ArgView {
 
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
                 p.sendMessage(ChatColor.YELLOW + "Done! The border will disappear after 30 seconds!");
-            }, wait*1);
+            }, wait);
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> {
                 for (Block b : blocks) {

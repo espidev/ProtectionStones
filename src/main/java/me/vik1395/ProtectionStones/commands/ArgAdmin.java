@@ -16,6 +16,7 @@
 
 package me.vik1395.ProtectionStones.commands;
 
+import com.sk89q.worldedit.WorldEdit;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminCleanup;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminHide;
@@ -42,8 +43,11 @@ public class ArgAdmin {
 
         switch (args[1].toLowerCase()) {
             case "version":
-                p.sendMessage(ChatColor.YELLOW + "ProtectionStones " + ProtectionStones.getPlugin().getDescription().getVersion());
-                p.sendMessage(ChatColor.YELLOW + "CraftBukkit  " + Bukkit.getVersion());
+                p.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getPlugin().getDescription().getVersion());
+                p.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getPlugin().getDescription().getAuthors());
+                p.sendMessage(ChatColor.YELLOW + "Bukkit:  " + Bukkit.getVersion());
+                p.sendMessage(ChatColor.YELLOW + "WG: " + ProtectionStones.wgd.getDescription().getVersion());
+                p.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
                 break;
             case "settings":
                 p.sendMessage(ProtectionStones.getPlugin().getConfig().saveToString().split("\n"));
