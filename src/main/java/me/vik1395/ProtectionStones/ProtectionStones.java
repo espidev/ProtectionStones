@@ -22,11 +22,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.RegionGroup;
-import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
-import com.sk89q.worldguard.protection.flags.StateFlag;
-import com.sk89q.worldguard.protection.managers.RegionManager;
+  import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
 import org.bukkit.Bukkit;
@@ -47,7 +43,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-    public class ProtectionStones extends JavaPlugin {
+public class ProtectionStones extends JavaPlugin {
     public static Plugin plugin, wgd;
     public static File psStoneData;
     public static File conf;
@@ -164,7 +160,6 @@ import java.util.logging.Logger;
     }
 
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
         if (s instanceof Player) {
@@ -191,9 +186,7 @@ import java.util.logging.Logger;
                     return true;
                 }
 
-                /*****************************************************************************************************/
                 // Find the id of the current region the player is in and get WorldGuard player object for use later
-                LocalPlayer localPlayer = wg.wrapPlayer(p);
                 BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
                 String currentPSID;
                 RegionManager rgm = getRegionManagerWithPlayer(p);
@@ -216,216 +209,57 @@ import java.util.logging.Logger;
                     }
                     currentPSID = namePSID;
                 }
-                ProtectedRegion rgn = rgm.getRegion(currentPSID);
 
-                if (args[0].equalsIgnoreCase("toggle")) {
-                    if (p.hasPermission("protectionstones.toggle")) {
-                        if (!toggleList.contains(p.getName())) {
-                            toggleList.add(p.getName());
-                            p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
-                        } else {
-                            toggleList.remove(p.getName());
-                            p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
-                        }
-                    } else {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
-                    }
-                    return true;
-                } else if (args[0].equalsIgnoreCase("count")) {
-                    return ArgCount.argumentCount(p, args);
-                } else if (args[0].equalsIgnoreCase("region")) {
-                    return ArgRegion.argumentRegion(p, args);
-                } else if (args[0].equalsIgnoreCase("tp") || (args[0].equalsIgnoreCase("home"))) {
-                    return ArgTp.argumentTp(p, args);
-                } else if (args[0].equalsIgnoreCase("admin")) {
-                    return ArgAdmin.argumentAdmin(p, args);
-                } else if (args[0].equalsIgnoreCase("reclaim")) {
-                    return ArgReclaim.argumentReclaim(p, args, currentPSID);
-                } else if (args[0].equalsIgnoreCase("bypass")) {
-                    return ArgBypass.argumentBypass(p, args);
-                } else if (args[0].equalsIgnoreCase("add")) {
-                    return ArgAddRemove.template(p, args, currentPSID, "add");
-                } else if (args[0].equalsIgnoreCase("remove")) {
-                    return ArgAddRemove.template(p, args, currentPSID, "remove");
-                } else if (args[0].equalsIgnoreCase("addowner")) {
-                    return ArgAddRemove.template(p, args, currentPSID, "addowner");
-                } else if (args[0].equalsIgnoreCase("removeowner")) {
-                    return ArgAddRemove.template(p, args, currentPSID, "removeowner");
-                } else if (args[0].equalsIgnoreCase("view")) {
-                    return ArgView.argumentView(p, args, currentPSID);
-                } else if (args[0].equalsIgnoreCase("unhide")) {
-                    return ArgHideUnhide.template(p, "unhide", currentPSID);
-                } else if (args[0].equalsIgnoreCase("hide")) {
-                    return ArgHideUnhide.template(p, "hide", currentPSID);
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("priority")) {
-                    if (p.hasPermission("protectionstones.priority")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length < 2) {
-                            int priority = rgm.getRegion(id).getPriority();
-                            p.sendMessage(ChatColor.YELLOW + "Priority: " + priority);
-                            return true;
-                        }
-                        int priority = Integer.valueOf(Integer.parseInt(args[1])).intValue();
-                        rgm.getRegion(id).setPriority(priority);
-                        try {
-                            rgm.save();
-                        } catch (Exception e) {
-                            System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                        }
-                        p.sendMessage(ChatColor.YELLOW + "Priority has been set.");
-                    } else {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use Priority Commands");
-                    }
-                    return true;
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("flag")) {
-                    if (p.hasPermission("protectionstones.flags")) {
-                        if (hasNoAccess(rgn, p, localPlayer, false)) {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                            return true;
-                        }
-                        if (args.length >= 3) {
-                            if (allowedFlags.contains(args[1].toLowerCase()) || p.hasPermission("protectionstones.flag." + args[1].toLowerCase()) || p.hasPermission("protectionstones.flag.*")) {
-                                FlagHandler fh = new FlagHandler();
-                                fh.setFlag(args, rgm.getRegion(id), p);
+                switch (args[0].toLowerCase()) {
+                    case "toggle":
+                        if (p.hasPermission("protectionstones.toggle")) {
+                            if (!toggleList.contains(p.getName())) {
+                                toggleList.add(p.getName());
+                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
                             } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to set that flag").toString());
+                                toggleList.remove(p.getName());
+                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
                             }
                         } else {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Use:  /ps flag {flagname} {flagvalue}").toString());
+                            p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
                         }
-                    } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use flag commands").toString());
-                    }
-                    return true;
-                }
-                /*****************************************************************************************************/
-                else if (args[0].equalsIgnoreCase("info")) {
-                    if (hasNoAccess(rgn, p, localPlayer, true)) {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You are not allowed to do that here.").toString());
-                        return true;
-                    }
-                    if (args.length == 1) {
-                        if (p.hasPermission("protectionstones.info")) {
-                            if (id != "") {
-                                ProtectedRegion region = rgm.getRegion(id);
-                                if (region != null) {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.GRAY).append("================ PS Info ================").toString());
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Region:").append(ChatColor.YELLOW).append(id).append(ChatColor.BLUE).append(", Priority: ").append(ChatColor.YELLOW).append(rgm.getRegion(id).getPriority()).toString());
-                                    String myFlag = "";
-                                    String myFlagValue = "";
-                                    for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
-                                        if (region.getFlag(flag) != null) {
-                                            myFlagValue = region.getFlag(flag).toString();
-                                            RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
-                                            RegionGroup group = null;
-                                            if (groupFlag != null) {
-                                                group = region.getFlag(groupFlag);
-                                            }
-                                            if (group != null) {
-                                                myFlag = (new StringBuilder(String.valueOf(myFlag))).append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(myFlagValue).append(", ").toString();
-                                            } else {
-                                                myFlag = (new StringBuilder(String.valueOf(myFlag))).append(flag.getName()).append(": ").append(myFlagValue).append(", ").toString();
-                                            }
-                                        }
-                                    }
-
-                                    if (myFlag.length() > 2) {
-                                        myFlag = (new StringBuilder(String.valueOf(myFlag.substring(0, myFlag.length() - 2)))).append(".").toString();
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Flags: ").append(ChatColor.YELLOW).append(myFlag).toString());
-                                    } else {
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Flags: ").append(ChatColor.RED).append("(none)").toString());
-                                    }
-                                    DefaultDomain owners = region.getOwners();
-                                    String ownerNames = owners.getPlayers().toString();
-                                    if (ownerNames != "[]") {
-                                        ownerNames = ownerNames.substring(1, ownerNames.length() - 1);
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Owners: ").append(ChatColor.YELLOW).append(ownerNames).toString());
-                                    } else {
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Owners: ").append(ChatColor.RED).append("(no owners)").toString());
-                                    }
-                                    DefaultDomain members = region.getMembers();
-                                    String memberNames = members.getPlayers().toString();
-                                    if (memberNames != "[]") {
-                                        memberNames = memberNames.substring(1, memberNames.length() - 1);
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.YELLOW).append(memberNames).toString());
-                                    } else {
-                                        p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.RED).append("(no members)").toString());
-                                    }
-                                    BlockVector3 min = region.getMinimumPoint();
-                                    BlockVector3 max = region.getMaximumPoint();
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Bounds: ").append(ChatColor.YELLOW).append("(").append(min.getBlockX()).append(",").append(min.getBlockY()).append(",").append(min.getBlockZ()).append(") -> (").append(max.getBlockX()).append(",").append(max.getBlockY()).append(",").append(max.getBlockZ()).append(")").toString());
-                                    return true;
-                                }
-                                p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("Region does not exist").toString());
-                            } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("No region found").toString());
-                            }
-                        } else {
-                            p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use the region info command").toString());
-                        }
-                    } else if (args.length == 2) {
-                        if (args[1].equalsIgnoreCase("members")) {
-                            if (p.hasPermission("protectionstones.members")) {
-                                DefaultDomain members = rgm.getRegion(id).getMembers();
-                                String memberNames = members.getPlayers().toString();
-                                if (memberNames != "[]") {
-                                    memberNames = memberNames.substring(1, memberNames.length() - 1);
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.YELLOW).append(memberNames).toString());
-                                } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Members: ").append(ChatColor.RED).append("(no members)").toString());
-                                }
-                            } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Members Commands").toString());
-                            }
-                        } else if (args[1].equalsIgnoreCase("owners")) {
-                            if (p.hasPermission("protectionstones.owners")) {
-                                DefaultDomain owners = rgm.getRegion(id).getOwners();
-                                String ownerNames = owners.getPlayers().toString();
-                                if (ownerNames != "[]") {
-                                    ownerNames = ownerNames.substring(1, ownerNames.length() - 1);
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Owners: ").append(ChatColor.YELLOW).append(ownerNames).toString());
-                                } else {
-                                    p.sendMessage((new StringBuilder()).append(ChatColor.BLUE).append("Owners: ").append(ChatColor.RED).append("(no owners)").toString());
-                                }
-                            } else {
-                                p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have permission to use Owners Commands").toString());
-                            }
-                        } else if (args[1].equalsIgnoreCase("flags")) {
-                            if (p.hasPermission("protectionstones.flags")) {
-                                String myFlag = "";
-                                String myFlagValue = "";
-                                WorldGuard.getInstance().getFlagRegistry().getAll();
-                                for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
-                                    if (rgm.getRegion(id).getFlag(flag) != null) {
-                                        myFlagValue = rgm.getRegion(id).getFlag(flag).toString();
-                                        myFlag = myFlag + flag.getName() + ": " + myFlagValue + ", ";
-                                    }
-                                }
-                                if (myFlag.length() > 2) {
-                                    myFlag = myFlag.substring(0, myFlag.length() - 2) + ".";
-                                    p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.YELLOW + myFlag);
-                                } else {
-                                    p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.RED + "(none)");
-                                }
-                            } else {
-                                p.sendMessage(ChatColor.RED + "You don't have permission to use Flags Commands");
-                            }
-                        } else {
-                            p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
-                        }
-                    } else {
-                        p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
-                    }
-                    return true;
-                } else {
-                    p.sendMessage(ChatColor.RED + "No such command. please type /ps help for more info");
+                        break;
+                    case "count":
+                        return ArgCount.argumentCount(p, args);
+                    case "region":
+                        return ArgRegion.argumentRegion(p, args);
+                    case "tp":
+                        return ArgTp.argumentTp(p, args);
+                    case "home":
+                        return ArgTp.argumentTp(p, args);
+                    case "admin":
+                        return ArgAdmin.argumentAdmin(p, args);
+                    case "reclaim":
+                        return ArgReclaim.argumentReclaim(p, args, currentPSID);
+                    case "bypass":
+                        return ArgBypass.argumentBypass(p, args);
+                    case "add":
+                        return ArgAddRemove.template(p, args, currentPSID, "add");
+                    case "remove":
+                        return ArgAddRemove.template(p, args, currentPSID, "remove");
+                    case "addowner":
+                        return ArgAddRemove.template(p, args, currentPSID, "addowner");
+                    case "removeowner":
+                        return ArgAddRemove.template(p, args, currentPSID, "removeowner");
+                    case "view":
+                        return ArgView.argumentView(p, args, currentPSID);
+                    case "unhide":
+                        return ArgHideUnhide.template(p, "unhide", currentPSID);
+                    case "hide":
+                        return ArgHideUnhide.template(p, "hide", currentPSID);
+                    case "priority":
+                        return ArgPriority.argPriority(p, args, currentPSID);
+                    case "flag":
+                        return ArgFlag.argumentFlag(p, args, currentPSID);
+                    case "info":
+                        return ArgInfo.argumentInfo(p, args, currentPSID);
+                    default:
+                        p.sendMessage(ChatColor.RED + "No such command. please type /ps help for more info");
                 }
             }
         } else {
@@ -438,27 +272,7 @@ import java.util.logging.Logger;
         if (region == null) { // Region is not valid
             return true;
         }
-
-        if (p.hasPermission("protectionstones.superowner") || region.isOwner(lp) || (canBeMember && region.isMember(lp))) {
-            // Player has permission here
-            return false;
-        } else {
-            // No permissions
-            return true;
-        }
-    }
-
-    public static Object getFlagValue(Flag<?> flag, Object value) {
-        if (value == null) return null;
-
-        String valueString = value.toString().trim();
-
-        if ((flag instanceof StateFlag)) {
-            if (valueString.equalsIgnoreCase("allow")) return StateFlag.State.ALLOW;
-            if (valueString.equalsIgnoreCase("deny")) return StateFlag.State.DENY;
-            return null;
-        }
-        return null;
+        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
 }
