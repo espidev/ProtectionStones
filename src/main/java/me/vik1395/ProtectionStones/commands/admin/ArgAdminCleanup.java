@@ -16,6 +16,8 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.ProtectionStones;
@@ -32,6 +34,7 @@ public class ArgAdminCleanup {
 
     // /ps admin cleanup
     public static boolean argumentAdminCleanup(Player p, String[] args) {
+        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("regen") && !args[2].equalsIgnoreCase("disown"))) {
             p.sendMessage(ChatColor.YELLOW + "/ps admin cleanup {remove|regen|disown} {days}");
             return true;
@@ -57,12 +60,14 @@ public class ArgAdminCleanup {
                 long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                 if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
 
+                LocalPlayer lp = wg.wrapOfflinePlayer(op);
+
                 List<String> opRegions = new ArrayList<>();
                 // add player's owned regions to list
                 boolean found = false;
-                for (String idname : regions.keySet()) { // TODO convert to UUID ??
+                for (String idname : regions.keySet()) {
                     try {
-                        if (regions.get(idname).getOwners().getUniqueIds().contains(op.getUniqueId())) {
+                        if (regions.get(idname).getOwners().contains(lp)) {
                             opRegions.add(idname);
                             found = true;
                         }
@@ -79,7 +84,7 @@ public class ArgAdminCleanup {
                 // remove regions
                 p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
                 for (String region : opRegions) {
-                    ProtectionStones.removeDisownRegenPSRegion(op.getUniqueId(), args[2].toLowerCase(), region, rgm, p);
+                    ProtectionStones.removeDisownRegenPSRegion(lp, args[2].toLowerCase(), region, rgm, p);
                 }
             }
 

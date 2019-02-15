@@ -64,13 +64,15 @@ public class ArgAddRemove {
         if (op == null) return true;
 
         if (type.equals("add")) {
-            rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId()); // TODO check if works
+            rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId());
         } else if (type.equals("remove")) {
-            rgm.getRegion(psID).getMembers().removePlayer(op.getUniqueId()); // TODO check if works
+            rgm.getRegion(psID).getMembers().removePlayer(op.getUniqueId());
+            rgm.getRegion(psID).getMembers().removePlayer(op.getName());
         } else if (type.equals("addowner")) {
             rgm.getRegion(psID).getOwners().addPlayer(op.getUniqueId());
         } else if (type.equals("removeowner")) {
             rgm.getRegion(psID).getOwners().removePlayer(op.getUniqueId());
+            rgm.getRegion(psID).getOwners().removePlayer(op.getName());
         }
         try {
             rgm.save();

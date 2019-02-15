@@ -28,6 +28,8 @@ import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class ArgInfo {
     public static boolean argumentInfo(Player p, String[] args, String psID) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -125,23 +127,36 @@ public class ArgInfo {
 
     private static void displayOwners(Player p, ProtectedRegion region) {
         DefaultDomain owners = region.getOwners();
-        String ownerNames = owners.getPlayers().toString();
-        if (!ownerNames.equals("[]")) {
-            ownerNames = ownerNames.substring(1, ownerNames.length() - 1);
-            p.sendMessage(ChatColor.BLUE + "Owners: " + ChatColor.YELLOW + ownerNames);
+        StringBuilder send = new StringBuilder(ChatColor.BLUE + "Owners: ");
+        if (owners.size() == 0) {
+            send.append(ChatColor.RED + "(no owners)");
         } else {
-            p.sendMessage(ChatColor.BLUE + "Owners: " + ChatColor.RED + "(no owners)");
+            send.append(ChatColor.YELLOW);
+            for (UUID uuid : owners.getUniqueIds()) {
+                send.append(ProtectionStones.uuidToName.get(uuid)).append(", ");
+            }
+            for (String name : owners.getPlayers()) { // legacy purposes
+                send.append(name).append(", ");
+            }
+            send.substring(0, send.length()-2);
         }
+        p.sendMessage(send.toString());
     }
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
-        String memberNames = members.getPlayers().toString();
-        if (!memberNames.equals("[]")) {
-            memberNames = memberNames.substring(1, memberNames.length() - 1);
-            p.sendMessage(ChatColor.BLUE + "Members: " + ChatColor.YELLOW + memberNames);
+        StringBuilder send = new StringBuilder(ChatColor.BLUE + "Members: ");
+        if (members.size() == 0) {
+            send.append(ChatColor.RED).append("(no members)");
         } else {
-            p.sendMessage(ChatColor.BLUE + "Members: " + ChatColor.RED + "(no members)");
+            send.append(ChatColor.YELLOW);
+            for (UUID uuid : members.getUniqueIds()) {
+                send.append(ProtectionStones.uuidToName.get(uuid)).append(", ");
+            }
+            for (String name : members.getPlayers()) { // legacy purposes
+                send.append(name).append(", ");
+            }
+            send.substring(0, send.length()-2);
         }
+        p.sendMessage(send.toString());
     }
-
 }

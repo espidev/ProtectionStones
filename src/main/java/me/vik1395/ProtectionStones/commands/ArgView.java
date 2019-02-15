@@ -68,14 +68,16 @@ public class ArgView {
             for (int x : xs)
                 for (int y : ys)
                     for (int z : zs) {
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 0);
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 0, 0);
                     }
 
+            int wait = 0;
             // x lines
             for (int x = Math.max(xs[0], playerX - 40); x <= Math.min(xs[1], playerX + 40); x += 7) { // max radius of 40
                 for (int z : zs) {
                     for (int y : ys) {
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 50);
+                        wait++;
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait/2);
                     }
                 }
             }
@@ -84,7 +86,8 @@ public class ArgView {
             for (int z = Math.max(zs[0], playerZ - 40); z <= Math.min(zs[1], playerZ + 40); z += 7) { // max radius of 40
                 for (int x : xs) {
                     for (int y : ys) {
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 50);
+                        wait++;
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait/2);
                     }
                 }
             }
@@ -93,12 +96,15 @@ public class ArgView {
             for (int y = Math.max(ys[1], playerY - 40); y <= Math.min(ys[2], playerY + 40); y += 10) {
                 for (int x : xs) {
                     for (int z : zs) {
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 100);
+                        wait++;
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait);
                     }
                 }
             }
 
-            p.sendMessage(ChatColor.YELLOW + "Done! The border will disappear after 30 seconds!");
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+                p.sendMessage(ChatColor.YELLOW + "Done! The border will disappear after 30 seconds!");
+            }, wait*1);
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> {
                 for (Block b : blocks) {
@@ -114,13 +120,10 @@ public class ArgView {
         return true;
     }
 
-    public static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay) {
-        restore.add(p.getWorld().getBlockAt(x, y, z));
-        p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> {
+            restore.add(p.getWorld().getBlockAt(x, y, z));
+            p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
+        }, delay*multiplier);
     }
 }

@@ -43,6 +43,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -59,6 +60,11 @@ import java.util.logging.Logger;
 public class ListenerClass implements Listener {
     StoneTypeData StoneTypeData = new StoneTypeData();
     private HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        ProtectionStones.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+    }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
@@ -455,7 +461,7 @@ public class ListenerClass implements Listener {
                 }
                 boolean ownsAll = false;
                 for (ProtectedRegion r : regions) {
-                    if (r.getOwners().contains(p.getName())) {
+                    if (r.getOwners().contains(wg.wrapPlayer(p))) {
                         ownsAll = true;
                     }
                 }

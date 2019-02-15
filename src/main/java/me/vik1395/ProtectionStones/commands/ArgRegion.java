@@ -16,6 +16,7 @@
 
 package me.vik1395.ProtectionStones.commands;
 
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -46,17 +47,17 @@ public class ArgRegion {
             return true;
         }
 
-        UUID playerid = Bukkit.getOfflinePlayer(args[2]).getUniqueId();
+        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[2]));
 
         if (args[1].equalsIgnoreCase("count")) { // count player's regions
-            int count = ArgCount.countRegionsOfPlayer(wg.wrapPlayer(Bukkit.getOfflinePlayer(args[2]).getPlayer()).getUniqueId(), rgm); // TODO check if rgm needs to be p2's
+            int count = ArgCount.countRegionsOfPlayer(lp, rgm); // TODO check if rgm needs to be p2's
             p.sendMessage(ChatColor.YELLOW + args[2] + "'s region count: " + count);
 
         } else if (args[1].equalsIgnoreCase("list")) { // list player's regions
             StringBuilder regionMessage = new StringBuilder();
             boolean found = false;
             for (String s : rgm.getRegions().keySet()) {
-                if (s.startsWith("ps") && rgm.getRegions().get(s).getOwners().contains(playerid)) {
+                if (s.startsWith("ps") && rgm.getRegions().get(s).getOwners().contains(lp)) {
                     regionMessage.append(s).append(", ");
                     found = true;
                 }
@@ -76,7 +77,7 @@ public class ArgRegion {
             List<String> regionIDList = new ArrayList<>();
             int index = 0;
             for (String idname : regions.keySet()) {
-                if (idname.startsWith("ps") && regions.get(idname).getOwners().contains(playerid)) {
+                if (idname.startsWith("ps") && (regions.get(idname).getOwners().contains(lp))) {
                     regionIDList.add(idname);
                     index++;
                 }
@@ -87,7 +88,7 @@ public class ArgRegion {
 
                 // Remove regions
                 for (String s : regionIDList)
-                    ProtectionStones.removeDisownRegenPSRegion(playerid, args[1].toLowerCase(), s, rgm, p);
+                    ProtectionStones.removeDisownRegenPSRegion(lp, args[1].toLowerCase(), s, rgm, p);
 
                 p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions have been removed");
                 try {

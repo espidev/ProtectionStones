@@ -24,10 +24,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -43,6 +40,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
+    public static Map<UUID, String> uuidToName = new HashMap<>();
+
     public static Plugin plugin, wgd;
     public static File psStoneData;
     public static File conf;
@@ -80,12 +79,12 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownRegenPSRegion(UUID uuid, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownRegenPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
                 DefaultDomain owners = r.getOwners();
-                owners.removePlayer(uuid);
+                owners.removePlayer(lp);
                 r.setOwners(owners);
                 break;
             case "regen":
@@ -153,6 +152,11 @@ public class ProtectionStones extends JavaPlugin {
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
         cooldownMessage = getConfig().getString("cooldown.message");
+
+        getLogger().info("Building UUID cache...");
+        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+            uuidToName.put(op.getUniqueId(), op.getName());
+        }
 
         getLogger().info("ProtectionStones has successfully started!");
         getLogger().info("Created by Vik1395");
