@@ -104,6 +104,7 @@ public class ListenerClass implements Listener {
                 this.lastProtectStonePlaced.put(p, currentTime);
             }
             if (wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
+                //ProtectionStones World claim fix
                 if (p.hasPermission("protectionstones.create")) {
                     if (ProtectionStones.toggleList != null) {
                         for (String temp : ProtectionStones.toggleList) {
@@ -143,7 +144,6 @@ public class ListenerClass implements Listener {
                             }
                         }
                     }
-
                     double bx = b.getLocation().getX();
                     double by = b.getLocation().getY();
                     double bz = b.getLocation().getZ();
@@ -296,7 +296,7 @@ public class ListenerClass implements Listener {
             String id = (new StringBuilder("ps")).append(psx, 0, psx.indexOf(".")).append("x").append(psy, 0, psy.indexOf(".")).append("y").append(psz, 0, psz.indexOf(".")).append("z").toString();
             if (wg.createProtectionQuery().testBlockBreak(player, pb)) {
                 if (player.hasPermission("protectionstones.destroy")) {
-                    if (type == 2) blocktypedata = pb.getType().toString();
+                    if (type == 2) {blocktypedata = pb.getType().toString();}
                     if (regionManager.getRegion(id) != null) {
                         LocalPlayer localPlayer = wg.wrapPlayer(player);
                         if (regionManager.getRegion(id).isOwner(localPlayer) || player.hasPermission("protectionstones.superowner")) {
