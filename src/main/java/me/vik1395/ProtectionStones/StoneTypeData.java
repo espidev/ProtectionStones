@@ -1,59 +1,60 @@
+
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2019 ProtectionStones team and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package me.vik1395.ProtectionStones;
 
-/**
- * @author Dragoboss
- */
 public class StoneTypeData {
     public int RegionX(String StoneType) {
         String ConfigString = "Region." + StoneType + ".X Radius";
-        int xradius = Main.plugin.getConfig().getInt(ConfigString);
-        return xradius;
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public int RegionY(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Y Radius";
-        int yradius = Main.plugin.getConfig().getInt(ConfigString);
-        return yradius;   
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public int RegionZ(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Z Radius";
-        int zradius = Main.plugin.getConfig().getInt(ConfigString);
-        return zradius;  
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 
     public Boolean AutoHide(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Auto Hide";
-        boolean autohide = Main.plugin.getConfig().getBoolean(ConfigString);
-        return autohide;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean NoDrop(String StoneType) {
         String ConfigString = "Region." + StoneType + ".No Drop";
-        boolean nodrop = Main.plugin.getConfig().getBoolean(ConfigString);
-        return nodrop;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean BlockPiston(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Block Piston";
-        boolean blockpiston = Main.plugin.getConfig().getBoolean(ConfigString);
-        return blockpiston;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public boolean SilkTouch(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Silk Touch";
-        boolean silktouch = Main.plugin.getConfig().getBoolean(ConfigString);
-        return silktouch;
+        return ProtectionStones.plugin.getConfig().getBoolean(ConfigString);
     }
 
     public int DefaultPriority(String StoneType) {
         String ConfigString = "Region." + StoneType + ".Priority";
-        int priority = Main.plugin.getConfig().getInt(ConfigString);
-        return priority;
+        return ProtectionStones.plugin.getConfig().getInt(ConfigString);
     }
 }

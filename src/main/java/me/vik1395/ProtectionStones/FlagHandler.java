@@ -1,8 +1,23 @@
+/*
+ * Copyright 2019 ProtectionStones team and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package me.vik1395.ProtectionStones;
 
 import com.google.common.base.Joiner;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.ChatColor;
@@ -19,7 +34,7 @@ public class FlagHandler {
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
-                p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
             } else {
                 RegionGroup group = null;
                 if (Arrays.toString(args).contains("-g")) {
@@ -36,19 +51,19 @@ public class FlagHandler {
                         if (group != null) {
                             region.setFlag(flag.getRegionGroupFlag(), group);
                         }
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                        p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                 } else if (Arrays.toString(args).contains("deny")) {
                     region.setFlag(flag, StateFlag.State.DENY);
                     if (group != null) {
                         region.setFlag(flag.getRegionGroupFlag(), group);
                     }
-                    p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                    p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                 } else {
                     if (group != null) {
                         region.setFlag(flag.getRegionGroupFlag(), group);
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                        p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                     } else {
-                        p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has ").append(ChatColor.RED).append("not").append(ChatColor.YELLOW).append(" been set.").toString());
+                        p.sendMessage(ChatColor.YELLOW + args[1] + " flag has " + ChatColor.RED + "not" + ChatColor.YELLOW + " been set.");
                     }
                 }
             }
@@ -60,7 +75,7 @@ public class FlagHandler {
             } else {
                 region.setFlag(flag, Double.parseDouble(args[1]));
             }
-            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+            p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
         } else if (rawFlag instanceof IntegerFlag) {
             IntegerFlag flag = (IntegerFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
@@ -69,7 +84,7 @@ public class FlagHandler {
             } else {
                 region.setFlag(flag, Integer.parseInt(args[1]));
             }
-            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+            p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
         } else if (rawFlag instanceof StringFlag) {
             StringFlag flag = (StringFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
@@ -80,20 +95,20 @@ public class FlagHandler {
                 String msg = flagValue.replaceAll("%player%", p.getName());
                 region.setFlag(flag, msg);
             }
-            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+            p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
         } else if (rawFlag instanceof BooleanFlag) {
             BooleanFlag flag = (BooleanFlag) rawFlag;
             if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
-                p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
             } else {
                 if (args[2].equalsIgnoreCase("true")) {
                     region.setFlag(flag, true);
-                    p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                    p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                 } else if (args[2].equalsIgnoreCase("false")) {
                     region.setFlag(flag, false);
-                    p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
+                    p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                 }
             }
         }/* else if(rawFlag instanceof LocationFlag){ //

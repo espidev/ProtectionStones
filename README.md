@@ -1,23 +1,16 @@
-A Updated source from the original developer which can be found here 
-
-Here is the compiled Plugin ready to drop into your plugins folder
-http://j.gs/CJKL
-this is updated on my free time please open a issue here on github if any errors arrive
-        thanks
-            -Jerzean
--------------
-
-ProtectionStonesx is based off the original ProtectionStones plugin at Bukkit by AxelDios and was recoded by vik1395,Dragoboss. It works very similar to the original plugin and most of the code has been derived from it. The main reason I have made this is because the plugin is dead and and has been very glitchy in 1.8, especially with the release on worldguard and worldedit 6.0.
+ProtectionStones is a grief prevention and land claiming plugin.
 
 This plugin uses a specified type of minecraft block/blocks as a protection block. When a player placed a block of that type, they are able to protect a region around them. The size of the protected region is configurable in the plugins config file. You can also set which flags players can change and also the default flags to be set when a new region is created.
+
+This plugin is based off the original ProtectionStones plugin by AxelDios.
 
 The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 **Dependencies**
 -------------
 * ProtectionStones 1.6.0
-  * WorldGuard 7.0 (Beta 3)
-  * worldEdit 7.0 (Beta 5)
+  * WorldGuard 7.0+
+  * WorldEdit 7.0+
   
 **Configuration**
 -------------
@@ -130,6 +123,6 @@ The permissions are very similar to the old plugin.
     protectionstones.admin - This permission allows users to override all ProtectionStones regions.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
-    protectionstones.bypass - Acces to the /ps bypass command.
+    protectionstones.bypass - Access to the /ps bypass command.
 
-This plugin is licensed under **CC Attribution-NonCommercial-ShareAlike 4.0 International**. In very basic terms, Do whatever you want with the code of this plugin, as long as you give credits to the author and/or the plugin itself.
+This plugin is licensed under the **Apache 2.0 License**.

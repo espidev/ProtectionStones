@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ProtectionStones team and contributors
+ * Copyright 2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,11 @@
 
 package me.vik1395.ProtectionStones;
 
-import org.bukkit.OfflinePlayer;
-
-import java.util.Comparator;
-
-
-public class PlayerComparator implements Comparator<OfflinePlayer> {
-
-    @Override
-    public int compare(OfflinePlayer o1, OfflinePlayer o2) {
-        return o1.getName().compareTo(o2.getName());
+public class PSLocation {
+    public int x, y, z;
+    PSLocation(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
- }
+}
