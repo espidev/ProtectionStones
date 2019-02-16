@@ -4,7 +4,7 @@ This plugin uses a specified type of minecraft block/blocks as a protection bloc
 
 This plugin is based off the original ProtectionStones plugin by AxelDios.
 
-The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/protectionstones/
+The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 **Dependencies**
 -------------
@@ -15,54 +15,52 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
 **Configuration**
 -------------
 
-    ConfVer: 1
-    #Protection Stones Configuration Page
-    #Protection Stones for MC 1.10+ is brought to you by Dragoboss and Jerzean
-    #Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
+    ConfVer: 2
+    UUIDUpdated: true
     
-    #Specify the block you want to use to protect regions. Use names from https://goo.gl/EBM8w5
-    #You can specify multiple block types, divided by comma's (NO SPACES!)
-    #If you wish to have sub-block-types as pstones, you can use -#. # is the number of
-    #subtype similar to the number you'd use in a /give command. I.E. stone:2 --> STONE-2
-    Blocks: ENDER_STONE
-    #If you define multiple block types be sure to define their specs below
+    # Protection Stones Configuration Page
     
-    #Specify the default flags to be set when a new protected region is created..
+    # Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
+    # Also, do not change UUIDUpdated to false unless you want the plugin to upgrade old protection stone regions from names to UUIDs
+    
+    # Specify the block you want to use to protect regions. Use names from https://goo.gl/EBM8w5
+    # You can specify multiple block types, divided by comma's (NO SPACES!)
+    # If you wish to have sub-block-types as protection stones, you can use -#. # is the number of
+    # subtype similar to the number you'd use in a /give command. I.E. stone:2 --> STONE-2
+    Blocks: END_STONE
+    # If you define multiple block types be sure to define their specs below
+    
+    # Specify the default flags to be set when a new protected region is created..
     Flags:
-      - use deny
       - pvp deny
-      - greeting Entering %player%'s protected area
-      - farewell Leaving %player%'s protected area
+      - greeting &lEntering &b&l%player%'s &r&lprotected area
+      - farewell &lLeaving &b&l%player%'s &r&lprotected area
     
-    #List all the flags that can be set by region owners. Separate them with a comma, no space.
+    # List all the flags that can be set by region owners. Separate them with a comma, no space.
     Allowed Flags: use,pvp,greeting,farewell,mob-spawning
     
-    #Toggle UUID support for protected regions.
-    #NOTE: This does NOT convert existing PStones to UUID Format!!
-    UUID: true
-    
-    #Disable the use of pStones in certain worlds.
+    # Disable the use of protection stones in certain worlds.
     Worlds Denied:
         - exampleworld1
         - exampleworld2
     
-    #Protected Region Configuration, defined per block type (refer to list defined above)
+    # Protected Region Configuration, defined per block type (refer to list defined above)
     Region:
-      #Default block type
-      ENDER_STONE:
+      # Default block type
+      END_STONE:
         X Radius: 20
-        #Set Y to 0 if you want it to protect from sky to bedrock.
-        Y Radius: 0
+        # Set Y to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+        Y Radius: -1
         Z Radius: 20
-        #Hide pstone right away when placed?
+        # Hide pstone right away when placed?
         Auto Hide: false
-        #Disable returning the block when the pstone is removed/reclaimed?
+        # Disable returning the block when the pstone is removed/reclaimed?
         No Drop: false
-        #Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
-        Silk Touch: false
-        #Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
+        # Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
         Block Piston: true
-        #Default priority type for this block type pstone
+        # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
+        Silk Touch: false
+        # Default priority type for this block type pstone
         Priority: 0
       #STONE-1:    # the "-1" part would mean 'Granite' to be used as pstone, but not regular stone
         #X Radius: 10
@@ -71,14 +69,18 @@ The original ProtectionStones plugin: http://dev.bukkit.org/bukkit-plugins/prote
         #Auto Hide: false
         #No Drop: false
         #Block Piston: true
-        #Silk Touch: false
-        #Priority: 
+        #Priority: 1
     # Section for blocking/showing warning when people enter PVP flagged PStones
     Teleport to PVP:
-      #Display warning if they walk into PVP flagged PStone
-      Display Warning: false
-      #Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
-      Block Teleport: false
+        # Display warning if they walk into PVP flagged PStone
+        Display Warning: false
+        # Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
+        Block Teleport: false
+    
+    cooldown:
+      enable: false
+      cooldown: 10
+      message: "&6Warning: &7Please wait for %time% seconds before placing again!"
 
 Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
