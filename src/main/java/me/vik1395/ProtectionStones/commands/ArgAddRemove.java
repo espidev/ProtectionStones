@@ -43,7 +43,7 @@ public class ArgAddRemove {
             return null;
         }
         OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-        if (op == null) {
+        if (op == null || !op.hasPlayedBefore()) {
             p.sendMessage(ChatColor.RED + "Player not found. Are your sure they have joined the server before?");
             return null;
         }

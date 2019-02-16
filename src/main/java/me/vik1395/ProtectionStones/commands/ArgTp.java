@@ -104,6 +104,9 @@ public class ArgTp {
         // teleport player
         if (rgnum <= index) {
             String region = rgm.getRegion(playerRegions.get(rgnum)).getId();
+
+            
+
             String[] pos = region.split("x|y|z");
             if (pos.length == 3) {
                 pos[0] = pos[0].substring(2);

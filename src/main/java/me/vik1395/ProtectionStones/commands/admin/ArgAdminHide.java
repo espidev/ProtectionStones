@@ -114,7 +114,7 @@ public class ArgAdminHide {
         if (args[1].equalsIgnoreCase("unhide")) {
             hMessage = "unhidden";
         }
-        p.sendMessage(ChatColor.YELLOW + "All ProtectionStones have been " + hMessage);
+        p.sendMessage(ChatColor.YELLOW + "All ProtectionStones have been " + hMessage + " in this world.");
         return true;
     }
 }
