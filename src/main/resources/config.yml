@@ -16,8 +16,8 @@ Blocks: END_STONE
 # Specify the default flags to be set when a new protected region is created..
 Flags:
   - pvp deny
-  - greeting Entering %player%'s protected area
-  - farewell Leaving %player%'s protected area
+  - greeting &lEntering &b&l%player%'s &r&lprotected area
+  - farewell &lLeaving &b&l%player%'s &r&lprotected area
 
 # List all the flags that can be set by region owners. Separate them with a comma, no space.
 Allowed Flags: use,pvp,greeting,farewell,mob-spawning

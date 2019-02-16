@@ -65,15 +65,6 @@ public class ArgTp {
             return true;
         }
 
-        // find regions that the player has
-        for (String region : rgm.getRegions().keySet()) {
-            if (region.startsWith("ps")) {
-                if (rgm.getRegions().get(region).getOwners().contains(wg.wrapPlayer(p))) {
-                    index++;
-                    playerRegions.put(index, region);
-                }
-            }
-        }
 
         // region checks
         if (args[0].equalsIgnoreCase("tp")) {
@@ -84,19 +75,40 @@ public class ArgTp {
                 p.sendMessage(ChatColor.RED + "Error while searching for " + args[1] + "'s regions. Please make sure you have entered the correct name.");
                 return true;
             }
+
+            // find regions that the player has
+            for (String region : rgm.getRegions().keySet()) {
+                if (region.startsWith("ps")) {
+                    if (rgm.getRegions().get(region).getOwners().contains(lp)) {
+                        index++;
+                        playerRegions.put(index, region);
+                    }
+                }
+            }
+
             if (index <= 0) {
-                p.sendMessage(ChatColor.RED + lp.getName() + " doesn't own any protected regions!");
+                p.sendMessage(ChatColor.RED + lp.getName() + " doesn't own any protected regions in this world!");
                 return true;
             } else if (rgnum > index) {
-                p.sendMessage(ChatColor.RED + lp.getName() + " only has " + index + " protected regions!");
+                p.sendMessage(ChatColor.RED + lp.getName() + " only has " + index + " protected regions in this world!");
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("home")) {
+            // find regions that the player has
+            for (String region : rgm.getRegions().keySet()) {
+                if (region.startsWith("ps")) {
+                    if (rgm.getRegions().get(region).getOwners().contains(wg.wrapPlayer(p))) {
+                        index++;
+                        playerRegions.put(index, region);
+                    }
+                }
+            }
+
             if (index <= 0) {
-                p.sendMessage(ChatColor.RED + "You don't own any protected regions!");
+                p.sendMessage(ChatColor.RED + "You don't own any protected regions in this world!");
             }
             if (rgnum > index) {
-                p.sendMessage(ChatColor.RED + "You only have " + index + " total regions!");
+                p.sendMessage(ChatColor.RED + "You only have " + index + " total regions in this world!");
                 return true;
             }
         }
@@ -104,9 +116,6 @@ public class ArgTp {
         // teleport player
         if (rgnum <= index) {
             String region = rgm.getRegion(playerRegions.get(rgnum)).getId();
-
-            
-
             String[] pos = region.split("x|y|z");
             if (pos.length == 3) {
                 pos[0] = pos[0].substring(2);

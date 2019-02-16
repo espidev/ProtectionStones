@@ -51,7 +51,7 @@ public class ArgCount {
                     p.sendMessage(ChatColor.YELLOW + "Cannot find this player!");
                     return true;
                 }
-                count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1])), rgm);
+                count = countRegionsOfPlayer(wg.wrapOfflinePlayer(op), rgm);
                 p.sendMessage(ChatColor.YELLOW + args[1] + "'s region count: " + count);
             } else {
                 p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");

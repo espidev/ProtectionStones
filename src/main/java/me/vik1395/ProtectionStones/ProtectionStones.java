@@ -165,7 +165,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // check if they have been upgraded already
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
-        getLogger().info("" + getConfig().contains("UUIDUpdated", true));
+        //getLogger().info("" + getConfig().contains("UUIDUpdated", true));
 
         if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
             getLogger().info("Updating PS regions to UUIDs...");
