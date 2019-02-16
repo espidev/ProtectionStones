@@ -25,7 +25,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class ArgAddRemove {
-    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
+    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType, boolean checkPlayer) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             p.sendMessage(ChatColor.RED + "You don't have permission to use Members Commands");
             return null;
@@ -43,7 +43,7 @@ public class ArgAddRemove {
             return null;
         }
         OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-        if (op == null || !op.hasPlayedBefore()) {
+        if ((op == null || !op.hasPlayedBefore()) && checkPlayer) {
             p.sendMessage(ChatColor.RED + "Player not found. Are your sure they have joined the server before?");
             return null;
         }
@@ -60,19 +60,24 @@ public class ArgAddRemove {
     public static boolean template(Player p, String[] args, String psID, String type) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
+        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners", type.startsWith("add")); // validate permissions and stuff
         if (op == null) return true;
 
-        if (type.equals("add")) {
-            rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId());
-        } else if (type.equals("remove")) {
-            rgm.getRegion(psID).getMembers().removePlayer(op.getUniqueId());
-            rgm.getRegion(psID).getMembers().removePlayer(op.getName());
-        } else if (type.equals("addowner")) {
-            rgm.getRegion(psID).getOwners().addPlayer(op.getUniqueId());
-        } else if (type.equals("removeowner")) {
-            rgm.getRegion(psID).getOwners().removePlayer(op.getUniqueId());
-            rgm.getRegion(psID).getOwners().removePlayer(op.getName());
+        switch (type) {
+            case "add":
+                rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId());
+                break;
+            case "remove":
+                rgm.getRegion(psID).getMembers().removePlayer(op.getUniqueId());
+                rgm.getRegion(psID).getMembers().removePlayer(op.getName());
+                break;
+            case "addowner":
+                rgm.getRegion(psID).getOwners().addPlayer(op.getUniqueId());
+                break;
+            case "removeowner":
+                rgm.getRegion(psID).getOwners().removePlayer(op.getUniqueId());
+                rgm.getRegion(psID).getOwners().removePlayer(op.getName());
+                break;
         }
         try {
             rgm.save();

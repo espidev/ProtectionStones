@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.ProtectionStones;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -101,6 +102,7 @@ public class ArgInfo {
         }
         return true;
     }
+
     private static void displayFlags(Player p, ProtectedRegion region) {
         StringBuilder myFlag = new StringBuilder();
         String myFlagValue;
@@ -134,14 +136,17 @@ public class ArgInfo {
         } else {
             send.append(ChatColor.YELLOW);
             for (UUID uuid : owners.getUniqueIds()) {
-                send.append(ProtectionStones.uuidToName.get(uuid)).append(", ");
+                String name = ProtectionStones.uuidToName.get(uuid);
+                if (name == null) name = Bukkit.getOfflinePlayer(uuid).getName();
+                send.append(name).append(", ");
             }
             for (String name : owners.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            p.sendMessage(send.substring(0, send.length()-2));
+            p.sendMessage(send.substring(0, send.length() - 2));
         }
     }
+
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
         StringBuilder send = new StringBuilder(ChatColor.BLUE + "Members: ");
@@ -151,12 +156,14 @@ public class ArgInfo {
         } else {
             send.append(ChatColor.YELLOW);
             for (UUID uuid : members.getUniqueIds()) {
-                send.append(ProtectionStones.uuidToName.get(uuid)).append(", ");
+                String name = ProtectionStones.uuidToName.get(uuid);
+                if (name == null) name = uuid.toString();
+                send.append(name).append(", ");
             }
             for (String name : members.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            p.sendMessage(send.substring(0, send.length()-2));
+            p.sendMessage(send.substring(0, send.length() - 2));
         }
     }
 }
