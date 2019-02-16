@@ -130,6 +130,7 @@ public class ArgInfo {
         StringBuilder send = new StringBuilder(ChatColor.BLUE + "Owners: ");
         if (owners.size() == 0) {
             send.append(ChatColor.RED + "(no owners)");
+            p.sendMessage(send.toString());
         } else {
             send.append(ChatColor.YELLOW);
             for (UUID uuid : owners.getUniqueIds()) {
@@ -138,15 +139,15 @@ public class ArgInfo {
             for (String name : owners.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            send.substring(0, send.length()-2);
+            p.sendMessage(send.substring(0, send.length()-2));
         }
-        p.sendMessage(send.toString());
     }
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
         StringBuilder send = new StringBuilder(ChatColor.BLUE + "Members: ");
         if (members.size() == 0) {
             send.append(ChatColor.RED).append("(no members)");
+            p.sendMessage(send.toString());
         } else {
             send.append(ChatColor.YELLOW);
             for (UUID uuid : members.getUniqueIds()) {
@@ -155,8 +156,7 @@ public class ArgInfo {
             for (String name : members.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            send.substring(0, send.length()-2);
+            p.sendMessage(send.substring(0, send.length()-2));
         }
-        p.sendMessage(send.toString());
     }
 }

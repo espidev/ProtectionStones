@@ -77,7 +77,7 @@ public class ArgView {
                 for (int z : zs) {
                     for (int y : ys) {
                         wait++;
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait/2);
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait / 2);
                     }
                 }
             }
@@ -87,7 +87,7 @@ public class ArgView {
                 for (int x : xs) {
                     for (int y : ys) {
                         wait++;
-                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait/2);
+                        handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait / 2);
                     }
                 }
             }
@@ -102,17 +102,19 @@ public class ArgView {
                 }
             }
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
-                p.sendMessage(ChatColor.YELLOW + "Done! The border will disappear after 30 seconds!");
-            }, wait);
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> p.sendMessage(ChatColor.YELLOW + "Done! The border will disappear after 30 seconds!"), wait);
 
-            Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> {
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+                p.sendMessage(ChatColor.YELLOW + "Removing border...");
+                p.sendMessage(ChatColor.GREEN + "If you still see ghost blocks, relog!");
                 for (Block b : blocks) {
-                    p.sendBlockChange(b.getLocation(), b.getBlockData());
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (b.getWorld().isChunkLoaded(b.getLocation().getBlockX()/16, b.getLocation().getBlockZ()/16)) {
+                        p.sendBlockChange(b.getLocation(), b.getBlockData());
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }, 600L); // remove after 10 seconds
@@ -120,10 +122,12 @@ public class ArgView {
         return true;
     }
 
-    public static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> {
-            restore.add(p.getWorld().getBlockAt(x, y, z));
-            p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
-        }, delay*multiplier);
+    private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
+        Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+            if (p.getWorld().isChunkLoaded(x/16, z/16)) {
+                restore.add(p.getWorld().getBlockAt(x, y, z));
+                p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
+            }
+        }, delay * multiplier);
     }
 }
