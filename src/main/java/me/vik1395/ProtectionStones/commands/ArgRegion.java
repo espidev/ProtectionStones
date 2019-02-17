@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class ArgRegion {
 
@@ -64,10 +63,10 @@ public class ArgRegion {
             }
 
             if (!found) {
-                p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2]);
+                p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2] + " in this world.");
             } else {
                 regionMessage = new StringBuilder(regionMessage.substring(0, regionMessage.length() - 2) + ".");
-                p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions: " + regionMessage);
+                p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions in this world: " + regionMessage);
             }
 
         } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("regen")) || (args[1].equalsIgnoreCase("disown"))) {
@@ -83,14 +82,14 @@ public class ArgRegion {
                 }
             }
             if (index == 0) {
-                p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2]);
+                p.sendMessage(ChatColor.YELLOW + "No regions found for " + args[2] + " in this world.");
             } else {
 
                 // Remove regions
                 for (String s : regionIDList)
                     ProtectionStones.removeDisownRegenPSRegion(lp, args[1].toLowerCase(), s, rgm, p);
 
-                p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions have been removed");
+                p.sendMessage(ChatColor.YELLOW + args[2] + "'s regions have been removed in this world.");
                 try {
                     rgm.save();
                 } catch (Exception e) {

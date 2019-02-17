@@ -72,19 +72,31 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.sk89q.worldedit</groupId>
-      <artifactId>worldedit-bukkit</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/WorldEdit.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>com.sk89q.worldguard</groupId>
       <artifactId>worldguard-legacy</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/WorldGuard.jar</systemPath>
+      <version>7.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.sk89q.worldedit</groupId>-->
+      <!--<artifactId>worldedit-bukkit</artifactId>-->
+      <!--<version>1.0</version>-->
+      <!--<scope>system</scope>-->
+      <!--<systemPath>${project.basedir}/src/main/resources/WorldEdit.jar</systemPath>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>com.sk89q.worldguard</groupId>-->
+      <!--<artifactId>worldguard-legacy</artifactId>-->
+      <!--<version>1.0</version>-->
+      <!--<scope>system</scope>-->
+      <!--<systemPath>${project.basedir}/src/main/resources/WorldGuard.jar</systemPath>-->
+    <!--</dependency>-->
 
   </dependencies>
     <properties>

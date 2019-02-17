@@ -77,7 +77,7 @@ public class ArgAdminCleanup {
                 }
 
                 if (!found) {
-                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + op.getName());
+                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + op.getName() + " in this world.");
                     continue;
                 }
 
