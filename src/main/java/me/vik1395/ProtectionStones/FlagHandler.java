@@ -17,6 +17,7 @@
 package me.vik1395.ProtectionStones;
 
 import com.google.common.base.Joiner;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -24,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class FlagHandler {
 
@@ -111,19 +113,28 @@ public class FlagHandler {
                     p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
                 }
             }
-        }/* else if(rawFlag instanceof LocationFlag){ //
+        } /*else if(rawFlag instanceof LocationFlag){ //
             System.out.print("LocationFlag!!");
             // NOT PROPERLY IMPLEMENTED YET
-        } else if(rawFlag instanceof SetFlag){
+        }*/ else if(rawFlag instanceof SetFlag){
+
             SetFlag flag = (SetFlag) rawFlag;
-            if (args[2].equalsIgnoreCase("default")) {
+            if (args[1].equalsIgnoreCase("deny-spawn")) {
+                HashSet<EntityType> mobs = new HashSet<>();
+                String[] m = new String[args.length-2];
+                System.arraycopy(args, 2, m, 0, args.length - 2);
+                for (String str : m) {
+                    mobs.add(new EntityType(str.toLowerCase()));
+                }
+                region.setFlag(flag, mobs);
+            } else if (args[2].equalsIgnoreCase("default")) {
                 region.setFlag(flag, flag.getDefault());
                 region.setFlag(flag.getRegionGroupFlag(), null);
             } else {
                 region.setFlag(flag, args[2]);
-            }
-            p.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append(args[1]).append(" flag has been set.").toString());
-        }         NOT PROPERLY IMPLEMENTED YET      */
+            } // TODO NOT FULLY IMPLEMENTED YET
+            p.sendMessage(ChatColor.YELLOW + args[1] + " flag has been set.");
+        }
     }
 
     private RegionGroup getRegionGroup(String arg) {
