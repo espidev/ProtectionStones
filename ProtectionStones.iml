@@ -19,6 +19,7 @@
     </content>
     <orderEntry type="jdk" jdkName="8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
@@ -38,7 +39,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.bukkit:bukkit:1.13-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:commandbook:2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.sf.opencsv:opencsv:2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bstats:bstats-bukkit:1.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />

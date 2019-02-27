@@ -24,6 +24,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -47,6 +48,8 @@ public class ProtectionStones extends JavaPlugin {
     public static Plugin plugin, wgd;
     public static File psStoneData;
     public static File conf;
+
+    public static Metrics metrics;
 
     public static FileConfiguration config;
     public static List<String> flags = new ArrayList<>();
@@ -115,6 +118,10 @@ public class ProtectionStones extends JavaPlugin {
         conf = new File(this.getDataFolder() + "/config.yml");
         psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
 
+        // Metrics (bStats)
+        metrics = new Metrics(this);
+
+        // generate protection stones stored blocks file
         if (!psStoneData.exists()) {
             try {
                 ProtectionStones.psStoneData.createNewFile();
@@ -222,7 +229,6 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         getLogger().info("ProtectionStones has successfully started!");
-        getLogger().info("Created by Vik1395");
     }
 
     private static UUID nameToUUID(String name) {
@@ -265,6 +271,7 @@ public class ProtectionStones extends JavaPlugin {
                 if (idList.size() == 1) {
                     currentPSID = idList.toString().substring(1, idList.toString().length() - 1);
                 } else {
+                    // Get nearest protection stone if in overlapping region
                     double distanceToPS = 10000D, tempToPS;
                     String namePSID = "";
                     for (String currentID : idList) {
@@ -334,7 +341,7 @@ public class ProtectionStones extends JavaPlugin {
                 }
             }
         } else {
-            s.sendMessage(ChatColor.RED + "PS cannot be used from Console");
+            s.sendMessage(ChatColor.RED + "PS cannot be used from the console.");
         }
         return true;
     }

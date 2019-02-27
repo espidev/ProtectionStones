@@ -18,18 +18,18 @@ package me.vik1395.ProtectionStones;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -211,11 +211,17 @@ public class ListenerClass implements Listener {
                             String flag = rawflag[0];
                             String setting = ProtectionStones.flags.get(j).replace(flag + " ", "");
                             if (iFlag.getName().equalsIgnoreCase(flag)) {
-                                if ((iFlag.getName().equalsIgnoreCase("greeting")) || (iFlag.getName().equalsIgnoreCase("farewell"))) {
+                                if (iFlag.getName().equalsIgnoreCase("greeting") || iFlag.getName().equalsIgnoreCase("farewell")) {
                                     String msg = setting.replaceAll("%player%", p.getName());
                                     newFlags.put(iFlag, msg);
                                 } else {
-                                    if (setting.equalsIgnoreCase("allow")) {
+                                    if (iFlag.getName().equalsIgnoreCase("deny-spawn")) {
+                                        HashSet<EntityType> mobs = new HashSet<>();
+                                        for (String str : setting.split(", ")) {
+                                            mobs.add(new EntityType(str.toLowerCase()));
+                                        }
+                                        newFlags.put(iFlag, mobs);
+                                    } else if (setting.equalsIgnoreCase("allow")) {
                                         newFlags.put(iFlag, StateFlag.State.ALLOW);
                                     } else if (setting.equalsIgnoreCase("deny")) {
                                         newFlags.put(iFlag, StateFlag.State.DENY);
