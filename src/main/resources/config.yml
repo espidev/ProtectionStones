@@ -1,4 +1,4 @@
-ConfVer: 2
+ConfVer: 1
 UUIDUpdated: true
 
 # Protection Stones Configuration Page
@@ -44,14 +44,7 @@ Region:
     Silk Touch: false
     # Default priority type for this block type pstone
     Priority: 0
-  #STONE-1:    # the "-1" part would mean 'Granite' to be used as pstone, but not regular stone
-    #X Radius: 10
-    #Y Radius: 10
-    #Z Radius: 10
-    #Auto Hide: false
-    #No Drop: false
-    #Block Piston: true
-    #Priority: 1
+
 # Section for blocking/showing warning when people enter PVP flagged PStones
 Teleport to PVP:
     # Display warning if they walk into PVP flagged PStone
