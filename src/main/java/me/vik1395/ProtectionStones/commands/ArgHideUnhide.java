@@ -58,7 +58,6 @@ public class ArgHideUnhide {
         YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
         String setmat = hideFile.getString(entry);
-        String subtype = null;
         Material currentType = blockToEdit.getType();
 
         if (ProtectionStones.mats.contains(currentType.toString())) {
@@ -67,7 +66,7 @@ public class ArgHideUnhide {
                 return true;
             }
             if (!hideFile.contains(entry)) {
-                hideFile.set(entry, currentType.toString() + "-" + blockToEdit.getData());
+                hideFile.set(entry, currentType.toString());
                 try {
                     hideFile.save(ProtectionStones.psStoneData);
                 } catch (IOException ex) {
@@ -83,11 +82,6 @@ public class ArgHideUnhide {
                 return true;
             }
 
-            if (setmat.contains("-")) {
-                String[] str = setmat.split("-");
-                setmat = str[0];
-                subtype = str[1];
-            }
             if (hideFile.contains(entry)) {
                 hideFile.set(entry, null);
                 try {
@@ -96,9 +90,6 @@ public class ArgHideUnhide {
                     Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 blockToEdit.setType(Material.getMaterial(setmat));
-                if (subtype != null) {
-                    //TODO removed subtype support blockToUnhide.setData((byte) (Integer.parseInt(subtype)));
-                }
             } else {
                 p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
             }

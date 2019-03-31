@@ -6,10 +6,9 @@ UUIDUpdated: true
 # Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
 # Also, do not change UUIDUpdated to false unless you want the plugin to upgrade old protection stone regions from names to UUIDs
 
-# Specify the block you want to use to protect regions. Use names from https://goo.gl/EBM8w5
+# Specify the block you want to use to protect regions. Use names from https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 # You can specify multiple block types, divided by comma's (NO SPACES!)
-# If you wish to have sub-block-types as protection stones, you can use -#. # is the number of
-# subtype similar to the number you'd use in a /give command. I.E. stone:2 --> STONE-2
+# Be sure to also add the block to the Region section below!
 Blocks: END_STONE
 # If you define multiple block types be sure to define their specs below
 
@@ -37,9 +36,9 @@ Region:
     Z Radius: 20
     # Hide pstone right away when placed?
     Auto Hide: false
-    # Disable returning the block when the pstone is removed/reclaimed?
+    # Disable returning the block when the pstone is removed/unclaimed?
     No Drop: false
-    # Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
+    # Block Piston prevents pushing of pstones if true; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
     Block Piston: true
     # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
     Silk Touch: false

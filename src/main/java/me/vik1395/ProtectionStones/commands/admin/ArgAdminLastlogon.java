@@ -58,21 +58,20 @@ public class ArgAdminLastlogon {
             }
         }
         OfflinePlayer[] offlinePlayerList = Bukkit.getServer().getOfflinePlayers().clone();
-        int playerCount = offlinePlayerList.length;
         int playerCounter = 0;
         p.sendMessage(ChatColor.YELLOW + "" + days + " Days Plus:");
         p.sendMessage(ChatColor.YELLOW + "================");
         Arrays.sort(offlinePlayerList, new PlayerComparator());
-        for (int iii = 0; iii < playerCount; iii++) {
-            long lastPlayed = (System.currentTimeMillis() - offlinePlayerList[iii].getLastPlayed()) / 86400000L;
+        for (OfflinePlayer offlinePlayer : offlinePlayerList) {
+            long lastPlayed = (System.currentTimeMillis() - offlinePlayer.getLastPlayed()) / 86400000L;
             if (lastPlayed >= days) {
                 playerCounter++;
-                p.sendMessage(ChatColor.YELLOW + offlinePlayerList[iii].getName() + " " + lastPlayed + " days");
+                p.sendMessage(ChatColor.YELLOW + offlinePlayer.getName() + " " + lastPlayed + " days");
             }
         }
         p.sendMessage(ChatColor.YELLOW + "================");
         p.sendMessage(ChatColor.YELLOW + "" + playerCounter + " Total Players Shown");
-        p.sendMessage(ChatColor.YELLOW + "" + playerCount + " Total Players Checked");
+        p.sendMessage(ChatColor.YELLOW + "" + offlinePlayerList.length + " Total Players Checked");
         return true;
     }
 }

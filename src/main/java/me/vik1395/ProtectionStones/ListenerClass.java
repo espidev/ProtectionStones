@@ -57,7 +57,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ListenerClass implements Listener {
-    StoneTypeData StoneTypeData = new StoneTypeData();
     private HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
 
     @EventHandler
@@ -74,19 +73,13 @@ public class ListenerClass implements Listener {
         Block b = e.getBlock();
         LocalPlayer lp = wg.wrapPlayer(p);
         int count = rm.getRegionCountOfPlayer(lp);
-        if (ProtectionStones.mats == null) {
-            e.setCancelled(false);
-            return;
-        }
-        int type = 0;
-        String blocktypedata = b.getType().toString() + "-" + b.getData();
+
+        if (ProtectionStones.mats == null) return;
+
         String blocktype = b.getType().toString();
-        if (ProtectionStones.mats.contains(blocktypedata)) {
-            type = 1;
-        } else if (ProtectionStones.mats.contains(blocktype)) {
-            type = 2;
-        }
-        if (type > 0) {
+        ConfigProtectBlock blockOptions = ProtectionStones.getProtectStoneOptions(blocktype);
+
+        if (ProtectionStones.mats.contains(blocktype) && blockOptions != null) {
             if (ProtectionStones.isCooldownEnable) {
                 double currentTime = System.currentTimeMillis();
                 if (this.lastProtectStonePlaced.containsKey(p)) {
@@ -103,7 +96,7 @@ public class ListenerClass implements Listener {
                 this.lastProtectStonePlaced.put(p, currentTime);
             }
             if (wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
-                //ProtectionStones World claim fix
+                // ProtectionStones World claim fix
                 if (p.hasPermission("protectionstones.create")) {
                     if (ProtectionStones.toggleList != null) {
                         for (String temp : ProtectionStones.toggleList) {
@@ -147,24 +140,15 @@ public class ListenerClass implements Listener {
                     double by = b.getLocation().getY();
                     double bz = b.getLocation().getZ();
                     BlockVector3 v1, v2;
-                    blocktype = b.getType().toString();
-                    if (type == 1) {
-                        if (StoneTypeData.RegionY(blocktypedata) == -1) {
-                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktypedata), 0, bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktypedata), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktypedata));
-                        } else {
-                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktypedata), by - StoneTypeData.RegionY(blocktypedata), bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktypedata), by + StoneTypeData.RegionY(blocktypedata), bz + StoneTypeData.RegionZ(blocktypedata));
-                        }
+
+                    if (blockOptions.getRegionY() == -1) {
+                        v1 = BlockVector3.at(bx - blockOptions.getRegionX(), 0, bz - blockOptions.getRegionZ());
+                        v2 = BlockVector3.at(bx + blockOptions.getRegionX(), p.getWorld().getMaxHeight(), bz + blockOptions.getRegionZ());
                     } else {
-                        if (StoneTypeData.RegionY(b.getType().toString()) == -1) {
-                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktype), 0, bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktype), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktype));
-                        } else {
-                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktype), by - StoneTypeData.RegionY(blocktype), bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktype), by + StoneTypeData.RegionY(blocktype), bz + StoneTypeData.RegionZ(blocktype));
-                        }
+                        v1 = BlockVector3.at(bx - blockOptions.getRegionX(), by - blockOptions.getRegionY(), bz - blockOptions.getRegionZ());
+                        v2 = BlockVector3.at(bx + blockOptions.getRegionX(), by + blockOptions.getRegionY(), bz + blockOptions.getRegionZ());
                     }
+
                     BlockVector3 min = v1;
                     BlockVector3 max = v2;
                     String id = "ps" + (int) bx + "x" + (int) by + "y" + (int) bz + "z";
@@ -198,8 +182,6 @@ public class ListenerClass implements Listener {
                             return;
                             //}
                         }
-
-
                     }
 
                     HashMap<Flag<?>, Object> newFlags = new HashMap<Flag<?>, Object>();
@@ -234,6 +216,7 @@ public class ListenerClass implements Listener {
                             }
                         }
                     }
+
                     region.setFlags(newFlags);
                     region.setPriority(ProtectionStones.priority);
                     p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
@@ -243,8 +226,7 @@ public class ListenerClass implements Listener {
                     } catch (StorageException e1) {
                         e1.printStackTrace();
                     }
-                    if (type == 2) blocktypedata = b.getType().toString();
-                    if (StoneTypeData.AutoHide(blocktypedata)) {
+                    if (blockOptions.isAutoHide()) {
                         ItemStack ore = p.getItemInHand();
                         ore.setAmount(ore.getAmount() - 1);
                         p.setItemInHand(ore.getAmount() == 0 ? null : ore);
@@ -284,15 +266,11 @@ public class ListenerClass implements Listener {
             e.setCancelled(false);
             return;
         }
-        int type = 0;
-        String blocktypedata = pb.getType().toString() + "-" + pb.getData();
-        String blocktype = pb.getType().toString();
-        if (ProtectionStones.mats.contains(blocktypedata)) {
-            type = 1;
-        } else if (ProtectionStones.mats.contains(blocktype)) {
-            type = 2;
-        }
-        if (type > 0) {
+
+        String blockType = pb.getType().toString();
+        ConfigProtectBlock blockOptions = ProtectionStones.getProtectStoneOptions(blockType);
+
+        if (ProtectionStones.mats.contains(blockType)) {
             RegionManager regionManager = rgm;
             String psx = Double.toString(pb.getLocation().getX());
             String psy = Double.toString(pb.getLocation().getY());
@@ -300,15 +278,15 @@ public class ListenerClass implements Listener {
             String id = "ps" + psx.substring(0, psx.indexOf(".")) + "x" + psy.substring(0, psy.indexOf(".")) + "y" + psz.substring(0, psz.indexOf(".")) + "z";
             if (wg.createProtectionQuery().testBlockBreak(player, pb)) {
                 if (player.hasPermission("protectionstones.destroy")) {
-                    if (type == 2) {blocktypedata = pb.getType().toString();}
                     if (regionManager.getRegion(id) != null) {
                         LocalPlayer localPlayer = wg.wrapPlayer(player);
+
                         if (regionManager.getRegion(id).isOwner(localPlayer) || player.hasPermission("protectionstones.superowner")) {
-                            if (!StoneTypeData.NoDrop(blocktypedata)) {
+                            if (!blockOptions.noDrop()) {
                                 ItemStack oreblock = new ItemStack(pb.getType(), 1, pb.getData());
                                 int freeSpace = 0;
                                 for (ListIterator<ItemStack> iterator = player.getInventory().iterator(); iterator.hasNext(); ) {
-                                    ItemStack i = (ItemStack) iterator.next();
+                                    ItemStack i = iterator.next();
                                     if (i == null) {
                                         freeSpace += oreblock.getType().getMaxStackSize();
                                     } else if (i.getType() == oreblock.getType()) {
@@ -344,7 +322,7 @@ public class ListenerClass implements Listener {
                             player.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
                             e.setCancelled(true);
                         }
-                    } else if (StoneTypeData.SilkTouch(blocktypedata)) {
+                    } else if (blockOptions.denySilkTouch()) {
                         e.setCancelled(true);
                         ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
                         ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
@@ -352,7 +330,7 @@ public class ListenerClass implements Listener {
                         Collection<ItemStack> baseDrops;
                         if (left.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
                             baseDrops = pb.getDrops(left);
-                            if (!(baseDrops.isEmpty())) {
+                            if (!baseDrops.isEmpty()) {
                                 int fortuneLevel = left.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
                                 if (fortuneLevel > 5) fortuneLevel = 5;
                                 ItemStack stack = baseDrops.iterator().next();
@@ -363,7 +341,7 @@ public class ListenerClass implements Listener {
                             drops = baseDrops;
                         } else if (right.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
                             baseDrops = pb.getDrops(right);
-                            if (!(baseDrops.isEmpty())) {
+                            if (!baseDrops.isEmpty()) {
                                 int fortuneLevel = right.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
                                 if (fortuneLevel > 5) fortuneLevel = 5;
                                 ItemStack stack = baseDrops.iterator().next();
@@ -396,23 +374,9 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPistonExtend(BlockPistonExtendEvent e) {
         List<Block> pushedBlocks = e.getBlocks();
-        if (pushedBlocks != null) {
-            Iterator<Block> it = pushedBlocks.iterator();
-            while (it.hasNext()) {
-                Block b = it.next();
-                int type = 0;
-                String blocktypedata = b.getType().toString() + "-" + b.getData();
-                if (ProtectionStones.mats.contains(blocktypedata)) {
-                    type = 1;
-                } else if (ProtectionStones.mats.contains(b.getType().toString())) {
-                    type = 2;
-                }
-                if (type == 2) blocktypedata = b.getType().toString();
-                if (type > 0) {
-                    if (StoneTypeData.BlockPiston(blocktypedata)) {
-                        e.setCancelled(true);
-                    }
-                }
+        for (Block b : pushedBlocks) {
+            if (ProtectionStones.getProtectStoneOptions(b.getType().toString()).denyBlockPiston()) {
+                e.setCancelled(true);
             }
         }
     }
@@ -420,36 +384,21 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPistonRetract(BlockPistonRetractEvent e) {
         List<Block> retractedBlocks = e.getBlocks();
-        if (retractedBlocks != null) {
-            Iterator<Block> it = retractedBlocks.iterator();
-            while (it.hasNext()) {
-                Block b = it.next();
-                int type = 0;
-                String blocktypedata = b.getType().toString() + "-" + b.getData();
-                if (ProtectionStones.mats.contains(blocktypedata)) {
-                    type = 1;
-                } else if (ProtectionStones.mats.contains(b.getType().toString())) {
-                    type = 2;
-                }
-                if (type == 2) blocktypedata = b.getType().toString();
-                if (type > 0) {
-                    if (StoneTypeData.BlockPiston(blocktypedata)) {
-                        e.setCancelled(true);
-                    }
-                }
+        for (Block b : retractedBlocks) {
+            if (ProtectionStones.getProtectStoneOptions(b.getType().toString()).denyBlockPiston()) {
+                e.setCancelled(true);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (ProtectionStones.config.getBoolean("Teleport to PVP.Block Teleport") == true) {
+        if (ProtectionStones.config.getBoolean("Teleport to PVP.Block Teleport")) {
             Player p = event.getPlayer();
             WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
 
-            if (!wg.isEnabled()) {
-                return;
-            }
+            if (!wg.isEnabled()) return;
+
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
             BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
@@ -461,6 +410,7 @@ public class ListenerClass implements Listener {
                     if (event.getCause() == TeleportCause.CHORUS_FRUIT) return;
                 } catch (NoSuchFieldError e1) {
                 }
+
                 boolean ownsAll = false;
                 for (ProtectedRegion r : regions) {
                     if (r.getOwners().contains(wg.wrapPlayer(p))) {

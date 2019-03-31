@@ -72,7 +72,7 @@ public class ConfigProtectBlock {
         this.noDrop = noDrop;
     }
 
-    public boolean allowBlockPiston() {
+    public boolean denyBlockPiston() {
         return blockPiston;
     }
 

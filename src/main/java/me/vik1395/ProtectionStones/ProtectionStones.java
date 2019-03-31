@@ -258,7 +258,7 @@ public class ProtectionStones extends JavaPlugin {
                     p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps reclaim");//\\
+                    p.sendMessage(ChatColor.YELLOW + "/ps unclaim");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
@@ -316,8 +316,8 @@ public class ProtectionStones extends JavaPlugin {
                         return ArgTp.argumentTp(p, args);
                     case "admin":
                         return ArgAdmin.argumentAdmin(p, args);
-                    case "reclaim":
-                        return ArgDisown.argumentDisown(p, args, currentPSID);
+                    case "unclaim":
+                        return ArgUnclaim.argumentUnclaim(p, args, currentPSID);
                     case "bypass":
                         return ArgBypass.argumentBypass(p, args);
                     case "add":
