@@ -43,7 +43,7 @@ public class ArgReclaim {
     public static boolean argumentReclaim(Player p, String[] args, String psID) { // psID: id of the current region the player is in
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        if (!p.hasPermission("protectionstones.reclaim")) {
+        if (!p.hasPermission("protectionstones.disown")) {
             p.sendMessage(ChatColor.RED + "You don't have permission to use the Reclaim Command");
             return true;
         }

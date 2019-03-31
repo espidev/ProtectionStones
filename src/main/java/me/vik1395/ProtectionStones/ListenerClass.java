@@ -29,7 +29,6 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -91,7 +90,7 @@ public class ListenerClass implements Listener {
             if (ProtectionStones.isCooldownEnable) {
                 double currentTime = System.currentTimeMillis();
                 if (this.lastProtectStonePlaced.containsKey(p)) {
-                    int cooldown = ProtectionStones.cooldown;
+                    double cooldown = ProtectionStones.cooldown;
                     double lastPlace = this.lastProtectStonePlaced.get(p);
                     if (lastPlace + cooldown > currentTime) {
                         e.setCancelled(true);
@@ -148,23 +147,22 @@ public class ListenerClass implements Listener {
                     double by = b.getLocation().getY();
                     double bz = b.getLocation().getZ();
                     BlockVector3 v1, v2;
-                    blocktypedata = b.getType().toString() + "-" + b.getData();
                     blocktype = b.getType().toString();
                     if (type == 1) {
                         if (StoneTypeData.RegionY(blocktypedata) == -1) {
-                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktypedata), 0, bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktypedata), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktypedata));
+                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktypedata), 0, bz - StoneTypeData.RegionZ(blocktypedata));
+                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktypedata), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktypedata));
                         } else {
-                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktypedata), by - StoneTypeData.RegionY(blocktypedata), bz - StoneTypeData.RegionZ(blocktypedata));
-                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktypedata), by + StoneTypeData.RegionY(blocktypedata), bz + StoneTypeData.RegionZ(blocktypedata));
+                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktypedata), by - StoneTypeData.RegionY(blocktypedata), bz - StoneTypeData.RegionZ(blocktypedata));
+                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktypedata), by + StoneTypeData.RegionY(blocktypedata), bz + StoneTypeData.RegionZ(blocktypedata));
                         }
                     } else {
                         if (StoneTypeData.RegionY(b.getType().toString()) == -1) {
-                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktype), 0, bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktype), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktype));
+                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktype), 0, bz - StoneTypeData.RegionZ(blocktype));
+                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktype), p.getWorld().getMaxHeight(), bz + StoneTypeData.RegionZ(blocktype));
                         } else {
-                            v1 = BlockVector3.at(bx - StoneTypeData.RegionX(blocktype), by - StoneTypeData.RegionY(blocktype), bz - StoneTypeData.RegionZ(blocktype));
-                            v2 = BlockVector3.at(bx + StoneTypeData.RegionX(blocktype), by + StoneTypeData.RegionY(blocktype), bz + StoneTypeData.RegionZ(blocktype));
+                            v1 = BlockVector3.at(bx - StoneTypeData.getRegionX(blocktype), by - StoneTypeData.RegionY(blocktype), bz - StoneTypeData.RegionZ(blocktype));
+                            v2 = BlockVector3.at(bx + StoneTypeData.getRegionX(blocktype), by + StoneTypeData.RegionY(blocktype), bz + StoneTypeData.RegionZ(blocktype));
                         }
                     }
                     BlockVector3 min = v1;
@@ -217,8 +215,8 @@ public class ListenerClass implements Listener {
                                 } else {
                                     if (iFlag.getName().equalsIgnoreCase("deny-spawn")) {
                                         HashSet<EntityType> mobs = new HashSet<>();
-                                        for (String str : setting.split(", ")) {
-                                            mobs.add(new EntityType(str.toLowerCase()));
+                                        for (String str : setting.split(",")) {
+                                            mobs.add(new EntityType(str.toLowerCase().trim()));
                                         }
                                         newFlags.put(iFlag, mobs);
                                     } else if (setting.equalsIgnoreCase("allow")) {
@@ -299,7 +297,7 @@ public class ListenerClass implements Listener {
             String psx = Double.toString(pb.getLocation().getX());
             String psy = Double.toString(pb.getLocation().getY());
             String psz = Double.toString(pb.getLocation().getZ());
-            String id = (new StringBuilder("ps")).append(psx, 0, psx.indexOf(".")).append("x").append(psy, 0, psy.indexOf(".")).append("y").append(psz, 0, psz.indexOf(".")).append("z").toString();
+            String id = "ps" + psx.substring(0, psx.indexOf(".")) + "x" + psy.substring(0, psy.indexOf(".")) + "y" + psz.substring(0, psz.indexOf(".")) + "z";
             if (wg.createProtectionQuery().testBlockBreak(player, pb)) {
                 if (player.hasPermission("protectionstones.destroy")) {
                     if (type == 2) {blocktypedata = pb.getType().toString();}
@@ -319,9 +317,7 @@ public class ListenerClass implements Listener {
                                 }
                                 if (freeSpace >= 1) {
                                     PlayerInventory inventory = player.getInventory();
-                                    inventory.addItem(new ItemStack[]{
-                                            oreblock
-                                    });
+                                    inventory.addItem(oreblock);
                                     pb.setType(Material.AIR);
                                     regionManager.removeRegion(id);
                                     try {
@@ -329,9 +325,9 @@ public class ListenerClass implements Listener {
                                     } catch (Exception e1) {
                                         System.out.println("[ProtectionStones] WorldGuard Error [" + e1 + "] during Region File Save");
                                     }
-                                    player.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("This area is no longer protected.").toString());
+                                    player.sendMessage(ChatColor.YELLOW + "This area is no longer protected.");
                                 } else {
-                                    player.sendMessage((new StringBuilder()).append(ChatColor.RED).append("You don't have enough room in your inventory.").toString());
+                                    player.sendMessage(ChatColor.RED + "You don't have enough room in your inventory.");
                                 }
                             } else {
                                 pb.setType(Material.AIR);
@@ -341,19 +337,19 @@ public class ListenerClass implements Listener {
                                 } catch (Exception e1) {
                                     System.out.println("[ProtectionStones] WorldGuard Error [" + e1 + "] during Region File Save");
                                 }
-                                player.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("This area is no longer protected.").toString());
+                                player.sendMessage(ChatColor.YELLOW + "This area is no longer protected.");
                             }
                             e.setCancelled(true);
                         } else {
-                            player.sendMessage((new StringBuilder()).append(ChatColor.YELLOW).append("You are not the owner of this region.").toString());
+                            player.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
                             e.setCancelled(true);
                         }
                     } else if (StoneTypeData.SilkTouch(blocktypedata)) {
                         e.setCancelled(true);
                         ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
                         ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
-                        Collection<ItemStack> drops = null;
-                        Collection<ItemStack> baseDrops = null;
+                        Collection<ItemStack> drops;
+                        Collection<ItemStack> baseDrops;
                         if (left.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
                             baseDrops = pb.getDrops(left);
                             if (!(baseDrops.isEmpty())) {

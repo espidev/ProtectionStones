@@ -31,33 +31,50 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Config {
+class Config {
 
-
-    static boolean initConfig() {
+    static void initConfig() {
         ProtectionStones.config = new YamlConfiguration();
         try {
             ProtectionStones.config.load(ProtectionStones.conf);
         } catch (IOException | InvalidConfigurationException ex) {
             Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.print("[ProtectionStones] Checking Configuration Version");
+        ProtectionStones.getPlugin().getLogger().info("[ProtectionStones] Checking Configuration Version");
         if (ProtectionStones.getPlugin().getConfig().get("ConfVer") == null) {
-            System.out.print("Config is outdated, this WILL generate errors, please refresh it!");
+            ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
         } else {
             if (ProtectionStones.config.getInt("ConfVer") == 1) {
-                System.out.print("Config is correct version, continuing start-up");
-                return true;
+                ProtectionStones.getPlugin().getLogger().info("Config is correct version, continuing start-up");
             } else if (ProtectionStones.config.getInt("ConfVer") > 1) {
-                System.out.print("Config version is higher than required version, this might cause trouble");
-                return true;
+                ProtectionStones.getPlugin().getLogger().info("Config version is higher than required version, this might cause trouble");
             } else {
                 fixInitialHidden(ProtectionStones.config.get("Block"));
-                System.out.print("Config is outdated, this WILL generate errors, please refresh it!");
-                return true;
+                ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
             }
         }
-        return false;
+
+        // add protection stones to options map
+        if (ProtectionStones.config.get("Region") == null) {
+            ProtectionStones.getPlugin().getLogger().info("Region block not found! You do not have any protection blocks configured!");
+        } else {
+            for (String block : ProtectionStones.config.getConfigurationSection("Region").getKeys(false)) {
+                // code looks cleaner without constructor
+                ConfigProtectBlock b = new ConfigProtectBlock();
+                b.setRegionX(ProtectionStones.config.getInt("Region." + block + ".X Radius"));
+                b.setRegionY(ProtectionStones.config.getInt("Region." + block + ".Y Radius"));
+                b.setRegionZ(ProtectionStones.config.getInt("Region." + block + ".Z Radius"));
+
+                b.setAutoHide(ProtectionStones.config.getBoolean("Region." + block + ".Auto Hide"));
+                b.setBlockPiston(ProtectionStones.config.getBoolean("Region." + block + ".Block Piston"));
+                b.setNoDrop(ProtectionStones.config.getBoolean("Region." + block + ".No Drop"));
+                b.setSilkTouch(ProtectionStones.config.getBoolean("Region." + block + ".Silk Touch"));
+                b.setDefaultPriority(ProtectionStones.config.getInt("Region." + block + ".Priority"));
+
+                ProtectionStones.protectionStonesOptions.put(block, b);
+            }
+        }
+
     }
 
     private static void fixInitialHidden(Object block) {

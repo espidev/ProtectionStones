@@ -56,11 +56,10 @@ public class ProtectionStones extends JavaPlugin {
     public static List<String> toggleList = new ArrayList<>();
     public static List<String> allowedFlags = new ArrayList<>();
     public static List<String> deniedWorlds = new ArrayList<>();
+    public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
     public static Collection<String> mats = new HashSet<>();
     public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
-
-    public static StoneTypeData StoneTypeData = new StoneTypeData();
 
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
@@ -72,6 +71,12 @@ public class ProtectionStones extends JavaPlugin {
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    }
+
+    // Helper method to get the config options for a protection stone
+    // Makes code look cleaner
+    public static ConfigProtectBlock getProtectStoneOptions(String blockType) {
+        return protectionStonesOptions.get(blockType);
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z i think)
@@ -109,6 +114,8 @@ public class ProtectionStones extends JavaPlugin {
     }
 
 
+    // Plugin enable
+
     @Override
     public void onEnable() {
         viewTaskList = new HashMap<>();
@@ -144,7 +151,7 @@ public class ProtectionStones extends JavaPlugin {
         for (String material : this.getConfig().getString("Blocks").split(",")) {
             String[] split = material.split("-");
 
-            if (split.length > 1 && split.length < 3) {
+            if (split.length == 2) {
                 if (Material.getMaterial(split[0]) != null) {
                     mats.add(material.toUpperCase());
                 } else {
@@ -157,7 +164,7 @@ public class ProtectionStones extends JavaPlugin {
 
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
-        deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
+        deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied")).split(","));
 
         Config.initConfig();
 
@@ -232,10 +239,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     private static UUID nameToUUID(String name) {
-        if (Bukkit.getOfflinePlayer(name) != null) {
-            return Bukkit.getOfflinePlayer(name).getUniqueId();
-        }
-        return null;
+        return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
     @Override
@@ -313,7 +317,7 @@ public class ProtectionStones extends JavaPlugin {
                     case "admin":
                         return ArgAdmin.argumentAdmin(p, args);
                     case "reclaim":
-                        return ArgReclaim.argumentReclaim(p, args, currentPSID);
+                        return ArgDisown.argumentDisown(p, args, currentPSID);
                     case "bypass":
                         return ArgBypass.argumentBypass(p, args);
                     case "add":
@@ -347,9 +351,9 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        if (region == null) { // Region is not valid
-            return true;
-        }
+        // Region is not valid
+        if (region == null) return true;
+
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
