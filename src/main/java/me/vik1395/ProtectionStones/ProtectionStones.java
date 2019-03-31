@@ -114,8 +114,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
 
-    // Plugin enable
-
+    // plugin enable
     @Override
     public void onEnable() {
         viewTaskList = new HashMap<>();
@@ -148,39 +147,35 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
+        // add block types
         for (String material : this.getConfig().getString("Blocks").split(",")) {
-            String[] split = material.split("-");
-
-            if (split.length == 2) {
-                if (Material.getMaterial(split[0]) != null) {
-                    mats.add(material.toUpperCase());
-                } else {
-                    Bukkit.getLogger().info("Unrecognized block: " + split[0] + ". Please make sure you have updated your block name for 1.13!");
-                }
+            if (Material.getMaterial(material) == null) {
+                Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
             } else {
-                mats.add(split[0].toUpperCase());
+                mats.add(material.toUpperCase());
             }
         }
 
+        // init config
+        Config.initConfig();
+
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
-        deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied")).split(","));
-
-        Config.initConfig();
+        deniedWorlds = getConfig().getStringList("Worlds Denied");
 
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
         cooldownMessage = getConfig().getString("cooldown.message");
 
+        // uuid cache
         getLogger().info("Building UUID cache...");
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
         }
 
-        // check if they have been upgraded already
+        // check if uuids have been upgraded already
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
-        //getLogger().info("" + getConfig().contains("UUIDUpdated", true));
-
+        // Update to UUIDs
         if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
             getLogger().info("Updating PS regions to UUIDs...");
             for (World world : Bukkit.getWorlds()) {
@@ -199,19 +194,14 @@ public class ProtectionStones extends JavaPlugin {
                         // convert
                         for (String owner : owners) {
                             UUID uuid = nameToUUID(owner);
-                            if (uuid != null) {
-                                region.getOwners().removePlayer(owner);
-                                region.getOwners().addPlayer(uuid);
-                            }
+                            region.getOwners().removePlayer(owner);
+                            region.getOwners().addPlayer(uuid);
                         }
                         for (String member : members) {
                             UUID uuid = nameToUUID(member);
-                            if (uuid != null) {
-                                region.getMembers().removePlayer(member);
-                                region.getMembers().addPlayer(uuid);
-                            }
+                            region.getMembers().removePlayer(member);
+                            region.getMembers().addPlayer(uuid);
                         }
-
                     }
                 }
 
@@ -223,7 +213,6 @@ public class ProtectionStones extends JavaPlugin {
             }
 
             // update config to mark that uuid upgrade has been done
-
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
                 writer.write("\nUUIDUpdated: true");

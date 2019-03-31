@@ -22,6 +22,7 @@ Flags:
 Allowed Flags: use,pvp,greeting,farewell,mob-spawning
 
 # Disable the use of protection stones in certain worlds.
+# Can be overriden with the permission protectionstones.admin
 Worlds Denied:
     - exampleworld1
     - exampleworld2

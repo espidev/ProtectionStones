@@ -8,7 +8,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 
 **Dependencies**
 -------------
-* ProtectionStones 1.6.2
+* ProtectionStones 1.6.3
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   
@@ -90,13 +90,10 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps region count|list|remove|regen|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
-    /ps bypass
     
 
 **Permissions**
 -----------
-
-The permissions are very similar to the old plugin.
 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions.
@@ -117,5 +114,6 @@ The permissions are very similar to the old plugin.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.bypass - Access to the /ps bypass command.
+    protectionstones.superowner - Allows players to override region permissions.
 
 This plugin is licensed under the **Apache 2.0 License**.
