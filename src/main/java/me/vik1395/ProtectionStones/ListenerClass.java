@@ -123,14 +123,14 @@ public class ListenerClass implements Listener {
                         }
                         if (count >= max) {
                             if (max != 0) {
-                                p.sendMessage(ChatColor.RED + "You can not create any more protected regions");
+                                p.sendMessage(ChatColor.RED + "You can not create any more protected regions.");
                                 e.setCancelled(true);
                                 return;
                             }
                         }
                         for (String world : ProtectionStones.deniedWorlds) {
                             if (world.equals(p.getLocation().getWorld().getName())) {
-                                p.sendMessage(ChatColor.RED + "You can not create protections in this world");
+                                p.sendMessage(ChatColor.RED + "You can not create protections in this world.");
                                 e.setCancelled(true);
                                 return;
                             }

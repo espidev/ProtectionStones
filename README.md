@@ -39,6 +39,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     Allowed Flags: use,pvp,greeting,farewell,mob-spawning
     
     # Disable the use of protection stones in certain worlds.
+    # Can be overriden with the permission protectionstones.admin
     Worlds Denied:
         - exampleworld1
         - exampleworld2
@@ -61,6 +62,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         Silk Touch: false
         # Default priority type for this block type pstone
         Priority: 0
+    
     # Section for blocking/showing warning when people enter PVP flagged PStones
     Teleport to PVP:
         # Display warning if they walk into PVP flagged PStone

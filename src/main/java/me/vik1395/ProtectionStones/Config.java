@@ -40,19 +40,22 @@ class Config {
         } catch (IOException | InvalidConfigurationException ex) {
             Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
-        ProtectionStones.getPlugin().getLogger().info("[ProtectionStones] Checking Configuration Version");
-        if (ProtectionStones.getPlugin().getConfig().get("ConfVer") == null) {
-            ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
-        } else {
-            if (ProtectionStones.config.getInt("ConfVer") == 1) {
-                ProtectionStones.getPlugin().getLogger().info("Config is correct version, continuing start-up");
-            } else if (ProtectionStones.config.getInt("ConfVer") > 1) {
-                ProtectionStones.getPlugin().getLogger().info("Config version is higher than required version, this might cause trouble");
-            } else {
-                fixInitialHidden(ProtectionStones.config.get("Block"));
-                ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
-            }
-        }
+
+        // not necessary for now
+//        ProtectionStones.getPlugin().getLogger().info("[ProtectionStones] Checking Configuration Version");
+//
+//        if (ProtectionStones.getPlugin().getConfig().get("ConfVer") == null) {
+//            ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
+//        } else {
+//            if (ProtectionStones.config.getInt("ConfVer") == 1) {
+//                ProtectionStones.getPlugin().getLogger().info("Config is correct version, continuing start-up");
+//            } else if (ProtectionStones.config.getInt("ConfVer") > 1) {
+//                ProtectionStones.getPlugin().getLogger().info("Config version is higher than required version, this might cause trouble");
+//            } else {
+//                fixInitialHidden(ProtectionStones.config.get("Block"));
+//                ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
+//            }
+//        }
 
         // add protection stones to options map
         if (ProtectionStones.config.get("Region") == null) {
@@ -79,7 +82,7 @@ class Config {
 
     private static void fixInitialHidden(Object block) {
         YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-        System.out.print("Patching initial hiddenpstones.yml");
+        Bukkit.getLogger().info("Patching initial hiddenpstones.yml");
         for (World world : Bukkit.getWorlds()) {
             RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
             Map<String, ProtectedRegion> regions = rgm.getRegions();

@@ -159,6 +159,9 @@ public class ProtectionStones extends JavaPlugin {
         // init config
         Config.initConfig();
 
+        // init messages
+        PSL.loadConfig();
+
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
         deniedWorlds = getConfig().getStringList("Worlds Denied");
@@ -330,7 +333,7 @@ public class ProtectionStones extends JavaPlugin {
                     case "info":
                         return ArgInfo.argumentInfo(p, args, currentPSID);
                     default:
-                        p.sendMessage(ChatColor.RED + "No such command. please type /ps help for more info");
+                        p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
             }
         } else {
