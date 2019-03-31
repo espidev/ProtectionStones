@@ -57,7 +57,7 @@ public class ArgBypass {
             }
         }
 
-        // TODO this command doesn't look finished, since there is no logic for using it...
+        // TODO this command doesn't look finished, since there is no logic for using it... ~ EspiDev
 
         p.sendMessage(ChatColor.GREEN + "ProtectionStones PVP Teleport Bypass: " + ChatColor.DARK_GREEN + bool + " for " + p.getName());
         return true;
