@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ArgDisown {
-    // /ps reclaim
+public class ArgUnclaim {
+    // /ps unclaim
     public static boolean argumentUnclaim(Player p, String[] args, String psID) { // psID: id of the current region the player is in
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
