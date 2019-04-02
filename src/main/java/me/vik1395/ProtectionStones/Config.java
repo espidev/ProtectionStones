@@ -61,7 +61,9 @@ class Config {
         if (ProtectionStones.config.get("Region") == null) {
             ProtectionStones.getPlugin().getLogger().info("Region block not found! You do not have any protection blocks configured!");
         } else {
+            ProtectionStones.getPlugin().getLogger().info("Protection Stone Blocks:");
             for (String block : ProtectionStones.config.getConfigurationSection("Region").getKeys(false)) {
+                ProtectionStones.getPlugin().getLogger().info("- " + block);
                 // code looks cleaner without constructor
                 ConfigProtectBlock b = new ConfigProtectBlock();
                 b.setRegionX(ProtectionStones.config.getInt("Region." + block + ".X Radius"));

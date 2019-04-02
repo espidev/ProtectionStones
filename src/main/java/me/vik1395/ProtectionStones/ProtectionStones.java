@@ -166,6 +166,11 @@ public class ProtectionStones extends JavaPlugin {
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
         deniedWorlds = getConfig().getStringList("Worlds Denied");
 
+        getLogger().info("Placing of Protection Stones is disabled in the following worlds (override with protectionstones.admin): ");
+        for (String world : deniedWorlds) {
+            getLogger().info("- " + world);
+        }
+
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
         cooldownMessage = getConfig().getString("cooldown.message");

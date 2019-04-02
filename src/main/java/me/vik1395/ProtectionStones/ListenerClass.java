@@ -129,13 +129,14 @@ public class ListenerClass implements Listener {
                             }
                         }
                         for (String world : ProtectionStones.deniedWorlds) {
-                            if (world.equals(p.getLocation().getWorld().getName())) {
+                            if (world.trim().equals(p.getLocation().getWorld().getName())) {
                                 p.sendMessage(ChatColor.RED + "You can not create protections in this world.");
                                 e.setCancelled(true);
                                 return;
                             }
                         }
                     }
+
                     double bx = b.getLocation().getX();
                     double by = b.getLocation().getY();
                     double bz = b.getLocation().getZ();

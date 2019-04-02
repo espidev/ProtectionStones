@@ -98,8 +98,8 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
 -----------
 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
-    protectionstones.destroy - Allow players to remove their own protected regions.
-    protectionstones.unclaim - Allow players to unclaim their region.
+    protectionstones.destroy - Allow players to remove their own protected regions (block break).
+    protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
     protectionstones.view - Allows players the use of /ps view command.
     protectionstones.info - Allows players use of /ps info command.
     protectionstones.hide - Allow players to hide their ProtectionStones block.
