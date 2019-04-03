@@ -64,17 +64,25 @@ public class ArgUnclaim {
         }
 
         // check if block is hidden first
-
         PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-        String entry;
+
+        String type = blockToUnhide.getType().toString();
 
         // Retrieve stored block data if air from file and delete from file
         if (blockToUnhide.getType() == Material.AIR) {
             YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-            entry = (int) blockToUnhide.getLocation().getX() + "x";
+            String entry = (int) blockToUnhide.getLocation().getX() + "x";
             entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
             entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
+
+            type = hideFile.getString(entry);
+            if (type == null) {
+                p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
+                return true;
+            }
+
+            blockToUnhide.setType(Material.getMaterial(type));
             hideFile.set(entry, null);
             try {
                 hideFile.save(ProtectionStones.psStoneData);
@@ -84,7 +92,11 @@ public class ArgUnclaim {
         }
 
         // Return and remove protection stone
-        String type = blockToUnhide.getType().toString();
+        if (ProtectionStones.getProtectStoneOptions(type) == null) {
+            p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
+            return true;
+        }
+
         if (!ProtectionStones.getProtectStoneOptions(type).noDrop()) {
 
             boolean freeSpace = false;

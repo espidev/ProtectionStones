@@ -198,9 +198,9 @@ public class ProtectionStones extends JavaPlugin {
                         ProtectedRegion region = rm.getRegion(regionName);
 
                         // convert owners with player names to UUIDs
-                        List<String> owners = new ArrayList<>(), members = new ArrayList<>();
-                        owners.addAll(region.getOwners().getPlayers());
-                        members.addAll(region.getMembers().getPlayers());
+                        List<String> owners, members;
+                        owners = new ArrayList<>(region.getOwners().getPlayers());
+                        members = new ArrayList<>(region.getMembers().getPlayers());
 
                         // convert
                         for (String owner : owners) {

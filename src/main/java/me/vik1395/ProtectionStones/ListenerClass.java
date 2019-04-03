@@ -77,7 +77,7 @@ public class ListenerClass implements Listener {
         ConfigProtectBlock blockOptions = ProtectionStones.getProtectStoneOptions(blockType);
 
         // check if the block is a protection stone
-        if (!ProtectionStones.protectBlocks.contains(blockType) || blockOptions != null) return;
+        if (!ProtectionStones.protectBlocks.contains(blockType) || blockOptions == null) return;
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getName())) return;
@@ -201,7 +201,7 @@ public class ListenerClass implements Listener {
                 } catch (StorageException e1) {
                     e1.printStackTrace();
                 }
-                p.sendMessage(ChatColor.YELLOW + "You can not place a protection here as it overlaps another region");
+                p.sendMessage(ChatColor.YELLOW + "You can not place a protection here as it overlaps another region.");
                 e.setCancelled(true);
                 return;
             }
@@ -236,9 +236,6 @@ public class ListenerClass implements Listener {
 
         // hide block if auto hide is enabled
         if (blockOptions.isAutoHide()) {
-            ItemStack ore = p.getItemInHand();
-            ore.setAmount(ore.getAmount() - 1);
-            p.setItemInHand(ore.getAmount() == 0 ? null : ore);
             Block blockToHide = p.getWorld().getBlockAt((int) bx, (int) by, (int) bz);
             YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
             String entry = (int) blockToHide.getLocation().getX() + "x";
@@ -258,8 +255,6 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        if (ProtectionStones.protectBlocks == null) return;
-
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
@@ -275,7 +270,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
 
         // check if player can actually break block
-        if (wg.createProtectionQuery().testBlockBreak(p, pb)) {
+        if (!wg.createProtectionQuery().testBlockBreak(p, pb)) {
             e.setCancelled(true);
             return;
         }
@@ -344,9 +339,9 @@ public class ListenerClass implements Listener {
             }
         }
 
+        // remove block
         pb.setType(Material.AIR);
         rgm.removeRegion(id);
-        p.sendMessage(ChatColor.YELLOW + "This area is no longer protected.");
 
         try {
             rgm.save();
@@ -422,7 +417,7 @@ public class ListenerClass implements Listener {
                     if (p.hasMetadata("psBypass")) {
                         List<MetadataValue> values = p.getMetadata("psBypass");
                         for (MetadataValue value : values) {
-                            if (value.asBoolean() == true) {
+                            if (value.asBoolean()) {
                                 return;
                             } else {
                                 if (regions.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
@@ -444,13 +439,11 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (ProtectionStones.config.getBoolean("Teleport to PVP.Display Warning") == true) {
+        if (ProtectionStones.config.getBoolean("Teleport to PVP.Display Warning")) {
             Player p = event.getPlayer();
             WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
 
-            if (!wg.isEnabled()) {
-                return;
-            }
+            if (!wg.isEnabled()) return;
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
             BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());

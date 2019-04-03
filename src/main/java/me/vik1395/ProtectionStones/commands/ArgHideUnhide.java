@@ -58,7 +58,6 @@ public class ArgHideUnhide {
 
         YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
-        String setmat = hideFile.getString(entry);
         Material currentType = blockToEdit.getType();
 
         if (ProtectionStones.protectBlocks.contains(currentType.toString())) {
@@ -84,6 +83,7 @@ public class ArgHideUnhide {
             }
 
             if (hideFile.contains(entry)) {
+                String setmat = hideFile.getString(entry);
                 hideFile.set(entry, null);
                 try {
                     hideFile.save(ProtectionStones.psStoneData);
