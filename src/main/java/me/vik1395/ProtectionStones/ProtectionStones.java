@@ -57,7 +57,7 @@ public class ProtectionStones extends JavaPlugin {
     public static List<String> allowedFlags = new ArrayList<>();
     public static List<String> deniedWorlds = new ArrayList<>();
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
-    public static Collection<String> mats = new HashSet<>();
+    public static Collection<String> protectBlocks = new HashSet<>();
     public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
 
@@ -152,7 +152,7 @@ public class ProtectionStones extends JavaPlugin {
             if (Material.getMaterial(material) == null) {
                 Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
             } else {
-                mats.add(material.toUpperCase());
+                protectBlocks.add(material.toUpperCase());
             }
         }
 
@@ -180,6 +180,9 @@ public class ProtectionStones extends JavaPlugin {
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
         }
+
+        // initialize flags
+        FlagHandler.initFlags();
 
         // check if uuids have been upgraded already
         getLogger().info("Checking if PS regions have been updated to UUIDs...");

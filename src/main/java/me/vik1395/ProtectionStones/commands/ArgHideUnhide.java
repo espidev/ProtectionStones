@@ -52,6 +52,7 @@ public class ArgHideUnhide {
             p.sendMessage(ChatColor.YELLOW + "Not a ProtectionStones Region");
             return true;
         }
+
         PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
         Block blockToEdit = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
@@ -60,7 +61,7 @@ public class ArgHideUnhide {
         String setmat = hideFile.getString(entry);
         Material currentType = blockToEdit.getType();
 
-        if (ProtectionStones.mats.contains(currentType.toString())) {
+        if (ProtectionStones.protectBlocks.contains(currentType.toString())) {
             if (arg.equals("unhide")) {
                 p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
                 return true;
