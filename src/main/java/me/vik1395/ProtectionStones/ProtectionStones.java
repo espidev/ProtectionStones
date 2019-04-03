@@ -58,7 +58,6 @@ public class ProtectionStones extends JavaPlugin {
     public static List<String> deniedWorlds = new ArrayList<>();
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
     public static Collection<String> protectBlocks = new HashSet<>();
-    public static int priority;
     public Map<CommandSender, Integer> viewTaskList;
 
     public static boolean isCooldownEnable = false;

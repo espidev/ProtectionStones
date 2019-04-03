@@ -27,7 +27,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,33 +79,5 @@ class Config {
             }
         }
 
-    }
-
-    private static void fixInitialHidden(Object block) {
-        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-        Bukkit.getLogger().info("Patching initial hiddenpstones.yml");
-        for (World world : Bukkit.getWorlds()) {
-            RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
-            Map<String, ProtectedRegion> regions = rgm.getRegions();
-            for (String selected : regions.keySet()) {
-                if (selected.startsWith("ps")) {
-                    Material mat = Material.valueOf(block.toString());
-                    String sub = null;
-                    if (block.toString().contains("-")) {
-                        sub = block.toString().split("-")[1];
-                    }
-                    if (sub != null) {
-                        hideFile.set(selected, mat.toString() + "-" + sub);
-                    } else {
-                        hideFile.set(selected, mat.toString() + "-0");
-                    }
-                }
-            }
-        }
-        try {
-            hideFile.save(ProtectionStones.psStoneData);
-        } catch (IOException ex) {
-            Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

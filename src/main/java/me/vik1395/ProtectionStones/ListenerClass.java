@@ -223,7 +223,7 @@ public class ListenerClass implements Listener {
 
         // set flags
         region.setFlags(flags);
-        region.setPriority(ProtectionStones.priority);
+        region.setPriority(blockOptions.getDefaultPriority());
         p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
 
         // save
