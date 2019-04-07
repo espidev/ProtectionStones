@@ -371,7 +371,8 @@ public class ListenerClass implements Listener {
     public void onPistonExtend(BlockPistonExtendEvent e) {
         List<Block> pushedBlocks = e.getBlocks();
         for (Block b : pushedBlocks) {
-            if (ProtectionStones.getProtectStoneOptions(b.getType().toString()).denyBlockPiston()) {
+            ConfigProtectBlock cpb = ProtectionStones.getProtectStoneOptions(b.getType().toString());
+            if (ProtectionStones.protectBlocks.contains(b.getType().toString()) && cpb != null && cpb.denyBlockPiston()) {
                 e.setCancelled(true);
             }
         }
@@ -381,7 +382,8 @@ public class ListenerClass implements Listener {
     public void onPistonRetract(BlockPistonRetractEvent e) {
         List<Block> retractedBlocks = e.getBlocks();
         for (Block b : retractedBlocks) {
-            if (ProtectionStones.getProtectStoneOptions(b.getType().toString()).denyBlockPiston()) {
+            ConfigProtectBlock cpb = ProtectionStones.getProtectStoneOptions(b.getType().toString());
+            if (ProtectionStones.protectBlocks.contains(b.getType().toString()) && cpb != null && cpb.denyBlockPiston()) {
                 e.setCancelled(true);
             }
         }
