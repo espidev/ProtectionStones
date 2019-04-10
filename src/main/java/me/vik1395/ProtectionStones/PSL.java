@@ -26,7 +26,15 @@ import java.util.HashMap;
 public enum PSL {
     // messages.yml
 
-    NO_SUCH_COMMAND("NO_SUCH_COMMAND", ChatColor.RED + "No such command. please type /ps help for more info");
+    NO_SUCH_COMMAND("NO_SUCH_COMMAND", ChatColor.RED + "No such command. please type /ps help for more info"),
+
+    COMMAND_TOGGLE_ON("COMMAND_TOGGLE_ON", ChatColor.YELLOW + "Protection stones placement turned on."),
+    COMMAND_TOGGLE_OFF("COMMAND_TOGGLE_OFF", ChatColor.YELLOW + "Protection stones placement turned off."),
+
+    NO_PERMISSION_CREATE("NO_PERMISSION_CREATE", ChatColor.RED + "You don't have permission to place a protection stone."),
+    NO_PERMISSION_DESTROY("NO_PERMISSION_DESTROY", ChatColor.RED + "You don't have permission to destroy a protection stone."),
+    NO_PERMISSION_MEMBERS("NO_PERMISSION_MEMBERS", ChatColor.RED + "You don't have permission to use member commands."),
+    NO_PERMISSION_OWNERS("NO_PERMISSION_OWNERS", ChatColor.RED + "You don't have permission to use owner commands.");
 
     private final String key;
     private String msg;

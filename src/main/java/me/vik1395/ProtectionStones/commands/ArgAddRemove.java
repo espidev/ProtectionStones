@@ -18,7 +18,7 @@ package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import me.vik1395.ProtectionStones.ProtectionStones;
+import me.vik1395.ProtectionStones.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -27,10 +27,10 @@ import org.bukkit.entity.Player;
 public class ArgAddRemove {
     private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType, boolean checkPlayer) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use Members Commands");
+            p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
         } else if (permType.equals("owners") && !p.hasPermission("protectionstones.owners")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use Owners Commands");
+            p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
             return null;
         } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
             p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");

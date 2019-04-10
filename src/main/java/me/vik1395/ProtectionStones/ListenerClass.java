@@ -84,7 +84,7 @@ public class ListenerClass implements Listener {
 
         // check permission
         if (!p.hasPermission("protectionstones.create")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to place a ProtectionStone.");
+            p.sendMessage(PSL.NO_PERMISSION_CREATE.msg());
             e.setCancelled(true);
             return;
         }
@@ -308,7 +308,7 @@ public class ListenerClass implements Listener {
         // check for destroy permission
         if (!p.hasPermission("protectionstones.destroy")) {
             e.setCancelled(true);
-            p.sendMessage(ChatColor.RED + "You do not have permissions to break protection stones.");
+            p.sendMessage(PSL.NO_PERMISSION_DESTROY.msg());
             return;
         }
 

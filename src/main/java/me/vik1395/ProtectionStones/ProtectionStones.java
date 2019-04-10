@@ -296,10 +296,10 @@ public class ProtectionStones extends JavaPlugin {
                         if (p.hasPermission("protectionstones.toggle")) {
                             if (!toggleList.contains(p.getName())) {
                                 toggleList.add(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
+                                p.sendMessage(PSL.COMMAND_TOGGLE_OFF.msg());
                             } else {
                                 toggleList.remove(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
+                                p.sendMessage(PSL.COMMAND_TOGGLE_ON.msg());
                             }
                         } else {
                             p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
