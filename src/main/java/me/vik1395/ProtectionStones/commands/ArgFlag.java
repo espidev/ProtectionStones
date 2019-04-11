@@ -19,8 +19,8 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.vik1395.ProtectionStones.FlagHandler;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class ArgFlag {
@@ -29,22 +29,22 @@ public class ArgFlag {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.flags")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use flag commands");
+            p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
         }
 
         if (args.length < 3) {
-            p.sendMessage(ChatColor.RED + "Use:  /ps flag {flagname} {flagvalue}");
+            p.sendMessage(PSL.FLAG_HELP.msg());
         } else {
             if (ProtectionStones.allowedFlags.contains(args[1].toLowerCase()) || p.hasPermission("protectionstones.flag." + args[1].toLowerCase()) || p.hasPermission("protectionstones.flag.*")) {
                 FlagHandler fh = new FlagHandler();
                 fh.setFlag(args, rgm.getRegion(psID), p);
             } else {
-                p.sendMessage(ChatColor.RED + "You don't have permission to set that flag");
+                p.sendMessage(PSL.NO_PERMISSION_PER_FLAG.msg());
             }
         }
         return true;

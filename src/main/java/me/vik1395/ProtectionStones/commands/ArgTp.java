@@ -19,6 +19,7 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,20 +42,19 @@ public class ArgTp {
         // preliminary checks
         if (args[0].equalsIgnoreCase("tp")) { // argument tp
             if (!p.hasPermission("protectionstones.tp")) {
-                p.sendMessage(ChatColor.RED + "You do not have permission to execute this command!");
+                p.sendMessage(PSL.NO_PERMISSION_TP.msg());
                 return true;
             } else if (args.length != 3) {
-                p.sendMessage(ChatColor.RED + "Usage: /ps tp [player] [num]");
+                p.sendMessage(PSL.TP_HELP.msg());
                 return true;
             }
             rgnum = Integer.parseInt(args[2]);
         } else { // argument home
             if (!p.hasPermission("protectionstones.home")) {
-                p.sendMessage(ChatColor.RED + "You do not have permission to execute this command!");
+                p.sendMessage(PSL.NO_PERMISSION_HOME.msg());
                 return true;
             } else if (args.length != 2) {
-                p.sendMessage(ChatColor.RED + "Usage: /ps home [num]");
-                p.sendMessage(ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps");
+                p.sendMessage(PSL.HOME_HELP.msg());
                 return true;
             }
             rgnum = Integer.parseInt(args[1]);
@@ -64,7 +64,6 @@ public class ArgTp {
             p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
             return true;
         }
-
 
         // region checks
         if (args[0].equalsIgnoreCase("tp")) {

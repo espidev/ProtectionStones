@@ -296,13 +296,13 @@ public class ProtectionStones extends JavaPlugin {
                         if (p.hasPermission("protectionstones.toggle")) {
                             if (!toggleList.contains(p.getName())) {
                                 toggleList.add(p.getName());
-                                p.sendMessage(PSL.COMMAND_TOGGLE_OFF.msg());
+                                p.sendMessage(PSL.TOGGLE_OFF.msg());
                             } else {
                                 toggleList.remove(p.getName());
-                                p.sendMessage(PSL.COMMAND_TOGGLE_ON.msg());
+                                p.sendMessage(PSL.TOGGLE_ON.msg());
                             }
                         } else {
-                            p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
+                            p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
                         }
                         break;
                     case "count":

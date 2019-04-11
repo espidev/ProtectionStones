@@ -18,9 +18,9 @@ package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,19 +37,19 @@ public class ArgHideUnhide {
 
         // preliminary checks
         if (arg.equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
+            p.sendMessage(PSL.NO_PERMISSION_UNHIDE.msg());
             return true;
         }
         if (arg.equals("hide") && !p.hasPermission("protectionstones.hide")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
+            p.sendMessage(PSL.NO_PERMISSION_HIDE.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
         }
         if (!psID.substring(0, 2).equals("ps")) {
-            p.sendMessage(ChatColor.YELLOW + "Not a ProtectionStones Region");
+            p.sendMessage(PSL.NOT_PS_REGION.msg());
             return true;
         }
 
@@ -62,7 +62,7 @@ public class ArgHideUnhide {
 
         if (ProtectionStones.protectBlocks.contains(currentType.toString())) {
             if (arg.equals("unhide")) {
-                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
+                p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
             }
             if (!hideFile.contains(entry)) {
@@ -74,11 +74,11 @@ public class ArgHideUnhide {
                 }
                 blockToEdit.setType(Material.AIR);
             } else {
-                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
+                p.sendMessage(PSL.ALREADY_HIDDEN.msg());
             }
         } else {
             if (arg.equals("hide")) {
-                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
+                p.sendMessage(PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
 
@@ -92,7 +92,7 @@ public class ArgHideUnhide {
                 }
                 blockToEdit.setType(Material.getMaterial(setmat));
             } else {
-                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
+                p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
             }
         }
         return true;

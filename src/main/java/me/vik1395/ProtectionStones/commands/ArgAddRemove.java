@@ -20,7 +20,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.vik1395.ProtectionStones.*;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -33,18 +32,18 @@ public class ArgAddRemove {
             p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
             return null;
         } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return null;
         } else if (args.length < 2) {
-            p.sendMessage(ChatColor.RED + "This command requires a player name.");
+            p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return null;
         } else if (psID.equals("")) {
-            p.sendMessage(ChatColor.RED + "You are not in a protection stone region!");
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return null;
         }
         OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-        if ((op == null || !op.hasPlayedBefore()) && checkPlayer) {
-            p.sendMessage(ChatColor.RED + "Player not found. Are your sure they have joined the server before?");
+        if (!op.hasPlayedBefore() && checkPlayer) {
+            p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
             return null;
         }
         return op;
@@ -86,9 +85,9 @@ public class ArgAddRemove {
         }
 
         if (type.equals("add") || type.equals("addowner")) {
-            p.sendMessage(ChatColor.YELLOW + op.getName() + " has been added to your region.");
+            p.sendMessage(PSL.ADDED_TO_REGION.msg().replace("%player%", op.getName()));
         } else if (type.equals("remove") || type.equals("removeowner")) {
-            p.sendMessage(ChatColor.YELLOW + op.getName() + " has been removed from region.");
+            p.sendMessage(PSL.REMOVED_FROM_REGION.msg().replace("%player%", op.getName()));
         }
         return true;
     }

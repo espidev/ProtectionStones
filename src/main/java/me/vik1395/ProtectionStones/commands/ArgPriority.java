@@ -18,9 +18,9 @@ package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class ArgPriority {
@@ -29,16 +29,16 @@ public class ArgPriority {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.priority")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use Priority Commands");
+            p.sendMessage(PSL.NO_PERMISSION_PRIORITY.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
         }
         if (args.length < 2) {
             int priority = rgm.getRegion(psID).getPriority();
-            p.sendMessage(ChatColor.YELLOW + "Priority: " + priority);
+            p.sendMessage(PSL.PRIORITY_INFO.msg().replace("%priority%", "" + priority));
             return true;
         }
 
@@ -50,9 +50,9 @@ public class ArgPriority {
             } catch (Exception e) {
                 Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
             }
-            p.sendMessage(ChatColor.YELLOW + "Priority has been set.");
+            p.sendMessage(PSL.PRIORITY_SET.msg());
         } catch (Exception e) {
-            p.sendMessage("Error parsing input, check it again?");
+            p.sendMessage(PSL.PRIORITY_ERROR.msg());
         }
         return true;
     }
