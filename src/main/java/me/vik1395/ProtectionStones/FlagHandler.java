@@ -25,9 +25,46 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class FlagHandler {
+
+    public static HashMap<Flag<?>, Object> defaultFlags = new HashMap<>();
+
+    public static void initFlags() {
+        for (Flag<?> iFlag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
+            for (int j = 0; j < ProtectionStones.flags.size(); j++) {
+                String[] rawflag = ProtectionStones.flags.get(j).split(" ");
+                String flag = rawflag[0];
+                String setting = ProtectionStones.flags.get(j).replace(flag + " ", "");
+                if (iFlag.getName().equalsIgnoreCase(flag)) {
+                    if (iFlag.getName().equalsIgnoreCase("greeting") || iFlag.getName().equalsIgnoreCase("farewell")) {
+                        //String msg = setting.replaceAll("%player%", p.getName());
+                        defaultFlags.put(iFlag, setting);
+                    } else {
+                        if (iFlag.getName().equalsIgnoreCase("deny-spawn")) {
+                            HashSet<EntityType> mobs = new HashSet<>();
+                            for (String str : setting.split(",")) {
+                                mobs.add(new EntityType(str.toLowerCase().trim()));
+                            }
+                            defaultFlags.put(iFlag, mobs);
+                        } else if (setting.equalsIgnoreCase("allow")) {
+                            defaultFlags.put(iFlag, StateFlag.State.ALLOW);
+                        } else if (setting.equalsIgnoreCase("deny")) {
+                            defaultFlags.put(iFlag, StateFlag.State.DENY);
+                        } else if (setting.equalsIgnoreCase("true")) {
+                            defaultFlags.put(iFlag, true);
+                        } else if (setting.equalsIgnoreCase("false")) {
+                            defaultFlags.put(iFlag, false);
+                        } else {
+                            defaultFlags.put(iFlag, setting);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
         Flag<?> rawFlag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[1]);
@@ -162,4 +199,5 @@ public class FlagHandler {
         
         return null;
     }
+
 }

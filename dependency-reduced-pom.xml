@@ -4,7 +4,7 @@
   <groupId>me.vik1395</groupId>
   <artifactId>ProtectionStones</artifactId>
   <name>ProtectionStones</name>
-  <version>1.6.1</version>
+  <version>1.7.0</version>
   <description>A grief prevention plugin.</description>
   <build>
     <resources>
@@ -108,12 +108,12 @@
           <groupId>com.google.code.gson</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>snakeyaml</artifactId>
-          <groupId>org.yaml</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>bungeecord-chat</artifactId>
           <groupId>net.md-5</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>snakeyaml</artifactId>
+          <groupId>org.yaml</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -154,6 +154,10 @@
         <exclusion>
           <artifactId>paperlib</artifactId>
           <groupId>io.papermc</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>slf4j-jdk14</artifactId>
+          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
           <artifactId>bukkit</artifactId>

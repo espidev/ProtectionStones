@@ -101,7 +101,7 @@ public class ArgAdminHide {
                     if (subtype != null && (blockToChange.getData() != (byte) (Integer.parseInt(subtype))))
                         ;
                 }
-                if (ProtectionStones.mats.contains(blockToChange.getType().toString()) || ProtectionStones.mats.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
+                if (ProtectionStones.protectBlocks.contains(blockToChange.getType().toString()) || ProtectionStones.protectBlocks.contains(blockToChange.getType().toString() + "-" + blockToChange.getData())) {
                     blockToChange.setType(Material.getMaterial(blockMaterial));
                 }
             }

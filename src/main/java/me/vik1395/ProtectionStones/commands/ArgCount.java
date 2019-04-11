@@ -20,9 +20,9 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -39,26 +39,29 @@ public class ArgCount {
         if (args.length == 1) {
             if (p.hasPermission("protectionstones.count")) {
                 count = countRegionsOfPlayer(wg.wrapPlayer(p), rgm);
-                p.sendMessage(ChatColor.YELLOW + "Your region count in this world: " + count);
+                p.sendMessage(PSL.PERSONAL_REGION_COUNT.msg()
+                        .replace("%num%", ""+count));
             } else {
-                p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+                p.sendMessage(PSL.NO_PERMISSION_COUNT.msg());
             }
             return true;
         } else if (args.length == 2) {
             if (p.hasPermission("protectionstones.count.others")) {
                 OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-                if (op == null || !op.hasPlayedBefore()) {
-                    p.sendMessage(ChatColor.YELLOW + "Cannot find this player!");
+                if (!op.hasPlayedBefore()) {
+                    p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
                     return true;
                 }
                 count = countRegionsOfPlayer(wg.wrapOfflinePlayer(op), rgm);
-                p.sendMessage(ChatColor.YELLOW + args[1] + "'s region count: " + count);
+                p.sendMessage(PSL.OTHER_REGION_COUNT.msg()
+                        .replace("%player%", args[1])
+                        .replace("%num%", ""+count));
             } else {
-                p.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+                p.sendMessage(PSL.NO_PERMISSION_COUNT_OTHERS.msg());
             }
             return true;
         } else {
-            p.sendMessage(ChatColor.RED + "Usage: /ps count, /ps count [player]");
+            p.sendMessage(PSL.COUNT_HELP.msg());
             return true;
         }
     }

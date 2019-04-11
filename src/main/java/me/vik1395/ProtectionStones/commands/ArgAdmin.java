@@ -17,6 +17,7 @@
 package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldedit.WorldEdit;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminCleanup;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminHide;
@@ -31,13 +32,13 @@ public class ArgAdmin {
     // /ps admin [arg]
     public static boolean argumentAdmin(Player p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
-            p.sendMessage(ChatColor.RED + "You do not have permission to use that command.");
+            p.sendMessage(PSL.NO_PERMISSION_ADMIN.msg());
             return true;
         }
 
         if (args.length < 2) {
-            p.sendMessage(ChatColor.RED + "Correct usage: /ps admin {version|settings|hide|unhide|");
-            p.sendMessage(ChatColor.RED + "                          cleanup|lastlogon|lastlogons|stats}");
+            p.sendMessage(ChatColor.RED + "/ps admin {version|settings|hide|unhide|");
+            p.sendMessage(ChatColor.RED + "           cleanup|lastlogon|lastlogons|stats}");
             return true;
         }
 

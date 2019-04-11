@@ -56,11 +56,9 @@ public class ProtectionStones extends JavaPlugin {
     public static List<String> toggleList = new ArrayList<>();
     public static List<String> allowedFlags = new ArrayList<>();
     public static List<String> deniedWorlds = new ArrayList<>();
-    public static Collection<String> mats = new HashSet<>();
-    public static int priority;
+    public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
+    public static Collection<String> protectBlocks = new HashSet<>();
     public Map<CommandSender, Integer> viewTaskList;
-
-    public static StoneTypeData StoneTypeData = new StoneTypeData();
 
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
@@ -72,6 +70,12 @@ public class ProtectionStones extends JavaPlugin {
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    }
+
+    // Helper method to get the config options for a protection stone
+    // Makes code look cleaner
+    public static ConfigProtectBlock getProtectStoneOptions(String blockType) {
+        return protectionStonesOptions.get(blockType);
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z i think)
@@ -109,6 +113,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
 
+    // plugin enable
     @Override
     public void onEnable() {
         viewTaskList = new HashMap<>();
@@ -141,39 +146,46 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
+        // add block types
         for (String material : this.getConfig().getString("Blocks").split(",")) {
-            String[] split = material.split("-");
-
-            if (split.length > 1 && split.length < 3) {
-                if (Material.getMaterial(split[0]) != null) {
-                    mats.add(material.toUpperCase());
-                } else {
-                    Bukkit.getLogger().info("Unrecognized block: " + split[0] + ". Please make sure you have updated your block name for 1.13!");
-                }
+            if (Material.getMaterial(material) == null) {
+                Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
             } else {
-                mats.add(split[0].toUpperCase());
+                protectBlocks.add(material.toUpperCase());
             }
         }
 
+        // init config
+        Config.initConfig();
+
+        // init messages
+        PSL.loadConfig();
+
         flags = getConfig().getStringList("Flags");
         allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
-        deniedWorlds = Arrays.asList((getConfig().getString("Worlds Denied").toLowerCase()).split(","));
+        deniedWorlds = getConfig().getStringList("Worlds Denied");
 
-        Config.initConfig();
+        getLogger().info("Placing of Protection Stones is disabled in the following worlds (override with protectionstones.admin): ");
+        for (String world : deniedWorlds) {
+            getLogger().info("- " + world);
+        }
 
         isCooldownEnable = getConfig().getBoolean("cooldown.enable");
         cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
         cooldownMessage = getConfig().getString("cooldown.message");
 
+        // uuid cache
         getLogger().info("Building UUID cache...");
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
         }
 
-        // check if they have been upgraded already
-        getLogger().info("Checking if PS regions have been updated to UUIDs...");
-        //getLogger().info("" + getConfig().contains("UUIDUpdated", true));
+        // initialize flags
+        FlagHandler.initFlags();
 
+        // check if uuids have been upgraded already
+        getLogger().info("Checking if PS regions have been updated to UUIDs...");
+        // Update to UUIDs
         if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
             getLogger().info("Updating PS regions to UUIDs...");
             for (World world : Bukkit.getWorlds()) {
@@ -185,26 +197,21 @@ public class ProtectionStones extends JavaPlugin {
                         ProtectedRegion region = rm.getRegion(regionName);
 
                         // convert owners with player names to UUIDs
-                        List<String> owners = new ArrayList<>(), members = new ArrayList<>();
-                        owners.addAll(region.getOwners().getPlayers());
-                        members.addAll(region.getMembers().getPlayers());
+                        List<String> owners, members;
+                        owners = new ArrayList<>(region.getOwners().getPlayers());
+                        members = new ArrayList<>(region.getMembers().getPlayers());
 
                         // convert
                         for (String owner : owners) {
                             UUID uuid = nameToUUID(owner);
-                            if (uuid != null) {
-                                region.getOwners().removePlayer(owner);
-                                region.getOwners().addPlayer(uuid);
-                            }
+                            region.getOwners().removePlayer(owner);
+                            region.getOwners().addPlayer(uuid);
                         }
                         for (String member : members) {
                             UUID uuid = nameToUUID(member);
-                            if (uuid != null) {
-                                region.getMembers().removePlayer(member);
-                                region.getMembers().addPlayer(uuid);
-                            }
+                            region.getMembers().removePlayer(member);
+                            region.getMembers().addPlayer(uuid);
                         }
-
                     }
                 }
 
@@ -216,7 +223,6 @@ public class ProtectionStones extends JavaPlugin {
             }
 
             // update config to mark that uuid upgrade has been done
-
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
                 writer.write("\nUUIDUpdated: true");
@@ -232,10 +238,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     private static UUID nameToUUID(String name) {
-        if (Bukkit.getOfflinePlayer(name) != null) {
-            return Bukkit.getOfflinePlayer(name).getUniqueId();
-        }
-        return null;
+        return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
     @Override
@@ -254,7 +257,7 @@ public class ProtectionStones extends JavaPlugin {
                     p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps reclaim");//\\
+                    p.sendMessage(ChatColor.YELLOW + "/ps unclaim");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
@@ -293,13 +296,13 @@ public class ProtectionStones extends JavaPlugin {
                         if (p.hasPermission("protectionstones.toggle")) {
                             if (!toggleList.contains(p.getName())) {
                                 toggleList.add(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned off");
+                                p.sendMessage(PSL.TOGGLE_OFF.msg());
                             } else {
                                 toggleList.remove(p.getName());
-                                p.sendMessage(ChatColor.YELLOW + "ProtectionStone placement turned on");
+                                p.sendMessage(PSL.TOGGLE_ON.msg());
                             }
                         } else {
-                            p.sendMessage(ChatColor.RED + "You don't have permission to use the toggle command.");
+                            p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
                         }
                         break;
                     case "count":
@@ -312,8 +315,8 @@ public class ProtectionStones extends JavaPlugin {
                         return ArgTp.argumentTp(p, args);
                     case "admin":
                         return ArgAdmin.argumentAdmin(p, args);
-                    case "reclaim":
-                        return ArgReclaim.argumentReclaim(p, args, currentPSID);
+                    case "unclaim":
+                        return ArgUnclaim.argumentUnclaim(p, args, currentPSID);
                     case "bypass":
                         return ArgBypass.argumentBypass(p, args);
                     case "add":
@@ -337,7 +340,7 @@ public class ProtectionStones extends JavaPlugin {
                     case "info":
                         return ArgInfo.argumentInfo(p, args, currentPSID);
                     default:
-                        p.sendMessage(ChatColor.RED + "No such command. please type /ps help for more info");
+                        p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
             }
         } else {
@@ -347,9 +350,9 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        if (region == null) { // Region is not valid
-            return true;
-        }
+        // Region is not valid
+        if (region == null) return true;
+
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 

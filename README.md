@@ -8,14 +8,14 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 
 **Dependencies**
 -------------
-* ProtectionStones 1.6.0
+* ProtectionStones 1.7.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   
 **Configuration**
 -------------
 
-    ConfVer: 2
+    ConfVer: 1
     UUIDUpdated: true
     
     # Protection Stones Configuration Page
@@ -23,10 +23,9 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
     # Also, do not change UUIDUpdated to false unless you want the plugin to upgrade old protection stone regions from names to UUIDs
     
-    # Specify the block you want to use to protect regions. Use names from https://goo.gl/EBM8w5
+    # Specify the block you want to use to protect regions. Use names from https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
     # You can specify multiple block types, divided by comma's (NO SPACES!)
-    # If you wish to have sub-block-types as protection stones, you can use -#. # is the number of
-    # subtype similar to the number you'd use in a /give command. I.E. stone:2 --> STONE-2
+    # Be sure to also add the block to the Region section below!
     Blocks: END_STONE
     # If you define multiple block types be sure to define their specs below
     
@@ -40,6 +39,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     Allowed Flags: use,pvp,greeting,farewell,mob-spawning
     
     # Disable the use of protection stones in certain worlds.
+    # Can be overriden with the permission protectionstones.admin
     Worlds Denied:
         - exampleworld1
         - exampleworld2
@@ -54,22 +54,15 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         Z Radius: 20
         # Hide pstone right away when placed?
         Auto Hide: false
-        # Disable returning the block when the pstone is removed/reclaimed?
+        # Disable returning the block when the pstone is removed/unclaimed?
         No Drop: false
-        # Block Piston pushing of pstones by default; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
+        # Block Piston prevents pushing of pstones if true; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
         Block Piston: true
         # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
         Silk Touch: false
         # Default priority type for this block type pstone
         Priority: 0
-      #STONE-1:    # the "-1" part would mean 'Granite' to be used as pstone, but not regular stone
-        #X Radius: 10
-        #Y Radius: 10
-        #Z Radius: 10
-        #Auto Hide: false
-        #No Drop: false
-        #Block Piston: true
-        #Priority: 1
+    
     # Section for blocking/showing warning when people enter PVP flagged PStones
     Teleport to PVP:
         # Display warning if they walk into PVP flagged PStone
@@ -94,22 +87,19 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps tp {player} {num} - Teleports you to one of a given player's regions.
     /ps toggle - Use this command to turn on or off ProtectionStones blocks.
     /ps view - Use this command to view the borders of your protected region.
-    /ps reclaim - Use this command to pickup a placed ProtectionStone and remove the region.
+    /ps unclaim - Use this command to pickup a placed ProtectionStone and remove the region.
     /ps priority {number|null} - Use this command to set your region's priority.
     /ps region count|list|remove|regen|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
-    /ps bypass
     
 
 **Permissions**
 -----------
 
-The permissions are very similar to the old plugin.
-
     protectionstones.create - Protect a region by placing a ProtectionStones block.
-    protectionstones.destroy - Allow players to remove their own protected regions.
-    protectionstones.reclaim - Allow players to reclaim their stones and remove their regions.
+    protectionstones.destroy - Allow players to remove their own protected regions (block break).
+    protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
     protectionstones.view - Allows players the use of /ps view command.
     protectionstones.info - Allows players use of /ps info command.
     protectionstones.hide - Allow players to hide their ProtectionStones block.
@@ -126,5 +116,6 @@ The permissions are very similar to the old plugin.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.bypass - Access to the /ps bypass command.
+    protectionstones.superowner - Allows players to override region permissions.
 
 This plugin is licensed under the **Apache 2.0 License**.

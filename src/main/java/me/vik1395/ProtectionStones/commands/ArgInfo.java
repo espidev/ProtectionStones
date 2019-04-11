@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,27 +38,27 @@ public class ArgInfo {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
         }
 
         if (args.length == 1) { // info of current region player is in
             if (!p.hasPermission("protectionstones.info")) {
-                p.sendMessage(ChatColor.RED + "You don't have permission to use the region info command");
+                p.sendMessage(PSL.NO_PERMISSION_INFO.msg());
                 return true;
             }
 
             if (psID.equals("")) {
-                p.sendMessage(ChatColor.YELLOW + "No region found");
+                p.sendMessage(PSL.NOT_IN_REGION.msg());
                 return true;
             }
             ProtectedRegion region = rgm.getRegion(psID);
             if (region == null) {
-                p.sendMessage(ChatColor.YELLOW + "Region does not exist");
+                p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
                 return true;
             }
 
-            p.sendMessage(ChatColor.GRAY + "================ PS Info ================");
+            p.sendMessage(PSL.INFO_HEADER.msg());
             p.sendMessage(ChatColor.BLUE + "Region:" + ChatColor.YELLOW + psID + ChatColor.BLUE + ", Priority: " + ChatColor.YELLOW + rgm.getRegion(psID).getPriority());
 
 
@@ -74,31 +75,31 @@ public class ArgInfo {
             switch (args[1].toLowerCase()) {
                 case "members":
                     if (!p.hasPermission("protectionstones.members")) {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use Members Commands");
+                        p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
                         return true;
                     }
                     displayMembers(p, rgm.getRegion(psID));
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners")) {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use Owners Commands");
+                        p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
                         return true;
                     }
                     displayOwners(p, rgm.getRegion(psID));
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags")) {
-                        p.sendMessage(ChatColor.RED + "You don't have permission to use Flags Commands");
+                        p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
                     displayFlags(p, rgm.getRegion(psID));
                     break;
                 default:
-                    p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
+                    p.sendMessage(PSL.INFO_HELP.msg());
                     break;
             }
         } else {
-            p.sendMessage(ChatColor.RED + "Use:  /ps info members|owners|flags");
+            p.sendMessage(PSL.INFO_HELP.msg());
         }
         return true;
     }
@@ -121,17 +122,17 @@ public class ArgInfo {
 
         if (myFlag.length() > 2) {
             myFlag = new StringBuilder(myFlag.substring(0, myFlag.length() - 2) + ".");
-            p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.YELLOW + myFlag);
+            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.YELLOW + myFlag);
         } else {
-            p.sendMessage(ChatColor.BLUE + "Flags: " + ChatColor.RED + "(none)");
+            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.RED + "(none)");
         }
     }
 
     private static void displayOwners(Player p, ProtectedRegion region) {
         DefaultDomain owners = region.getOwners();
-        StringBuilder send = new StringBuilder(ChatColor.BLUE + "Owners: ");
+        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg() + " ");
         if (owners.size() == 0) {
-            send.append(ChatColor.RED + "(no owners)");
+            send.append(PSL.INFO_NO_OWNERS.msg());
             p.sendMessage(send.toString());
         } else {
             send.append(ChatColor.YELLOW);
@@ -149,9 +150,9 @@ public class ArgInfo {
 
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
-        StringBuilder send = new StringBuilder(ChatColor.BLUE + "Members: ");
+        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg() + " ");
         if (members.size() == 0) {
-            send.append(ChatColor.RED).append("(no members)");
+            send.append(PSL.INFO_NO_MEMBERS.msg());
             p.sendMessage(send.toString());
         } else {
             send.append(ChatColor.YELLOW);

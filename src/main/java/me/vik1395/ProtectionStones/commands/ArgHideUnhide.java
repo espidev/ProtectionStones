@@ -18,9 +18,9 @@ package me.vik1395.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,37 +37,36 @@ public class ArgHideUnhide {
 
         // preliminary checks
         if (arg.equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
+            p.sendMessage(PSL.NO_PERMISSION_UNHIDE.msg());
             return true;
         }
         if (arg.equals("hide") && !p.hasPermission("protectionstones.hide")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use that command");
+            p.sendMessage(PSL.NO_PERMISSION_HIDE.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(ChatColor.RED + "You are not allowed to do that here.");
+            p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
         }
         if (!psID.substring(0, 2).equals("ps")) {
-            p.sendMessage(ChatColor.YELLOW + "Not a ProtectionStones Region");
+            p.sendMessage(PSL.NOT_PS_REGION.msg());
             return true;
         }
+
         PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
         Block blockToEdit = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
         YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
-        String setmat = hideFile.getString(entry);
-        String subtype = null;
         Material currentType = blockToEdit.getType();
 
-        if (ProtectionStones.mats.contains(currentType.toString())) {
+        if (ProtectionStones.protectBlocks.contains(currentType.toString())) {
             if (arg.equals("unhide")) {
-                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
+                p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
             }
             if (!hideFile.contains(entry)) {
-                hideFile.set(entry, currentType.toString() + "-" + blockToEdit.getData());
+                hideFile.set(entry, currentType.toString());
                 try {
                     hideFile.save(ProtectionStones.psStoneData);
                 } catch (IOException ex) {
@@ -75,20 +74,16 @@ public class ArgHideUnhide {
                 }
                 blockToEdit.setType(Material.AIR);
             } else {
-                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
+                p.sendMessage(PSL.ALREADY_HIDDEN.msg());
             }
         } else {
             if (arg.equals("hide")) {
-                p.sendMessage(ChatColor.YELLOW + "This PStone appears to already be hidden...");
+                p.sendMessage(PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
 
-            if (setmat.contains("-")) {
-                String[] str = setmat.split("-");
-                setmat = str[0];
-                subtype = str[1];
-            }
             if (hideFile.contains(entry)) {
+                String setmat = hideFile.getString(entry);
                 hideFile.set(entry, null);
                 try {
                     hideFile.save(ProtectionStones.psStoneData);
@@ -96,11 +91,8 @@ public class ArgHideUnhide {
                     Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 blockToEdit.setType(Material.getMaterial(setmat));
-                if (subtype != null) {
-                    //TODO removed subtype support blockToUnhide.setData((byte) (Integer.parseInt(subtype)));
-                }
             } else {
-                p.sendMessage(ChatColor.YELLOW + "This PStone doesn't appear hidden...");
+                p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
             }
         }
         return true;

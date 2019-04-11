@@ -16,7 +16,6 @@
 
 package me.vik1395.ProtectionStones.commands;
 
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -24,7 +23,6 @@ import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,17 +31,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ArgReclaim {
-    // /ps reclaim
-    public static boolean argumentReclaim(Player p, String[] args, String psID) { // psID: id of the current region the player is in
+public class ArgUnclaim {
+    // /ps unclaim
+    public static boolean argumentUnclaim(Player p, String[] args, String psID) { // psID: id of the current region the player is in
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        if (!p.hasPermission("protectionstones.reclaim")) {
+        if (!p.hasPermission("protectionstones.unclaim")) {
             p.sendMessage(ChatColor.RED + "You don't have permission to use the Reclaim Command");
             return true;
         }
@@ -62,18 +58,31 @@ public class ArgReclaim {
             return true;
         }
 
+        if (!region.isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
+            p.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
+            return true;
+        }
+
+        // check if block is hidden first
         PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-        String entry;
-        String setmat = null;
+
+        String type = blockToUnhide.getType().toString();
 
         // Retrieve stored block data if air from file and delete from file
         if (blockToUnhide.getType() == Material.AIR) {
             YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-            entry = (int) blockToUnhide.getLocation().getX() + "x";
+            String entry = (int) blockToUnhide.getLocation().getX() + "x";
             entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
             entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
-            setmat = hideFile.getString(entry);
+
+            type = hideFile.getString(entry);
+            if (type == null) {
+                p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
+                return true;
+            }
+
+            blockToUnhide.setType(Material.getMaterial(type));
             hideFile.set(entry, null);
             try {
                 hideFile.save(ProtectionStones.psStoneData);
@@ -82,61 +91,15 @@ public class ArgReclaim {
             }
         }
 
-        // set block data
-        int type = 0;
-        String blocktypedata = blockToUnhide.getType().toString() + "-" + blockToUnhide.getData();
-        if (ProtectionStones.mats.contains(blocktypedata)) {
-            type = 1;
-        } else if (ProtectionStones.mats.contains(blockToUnhide.getType().toString())) {
-            type = 2;
-        }
-
-        if (setmat != null) blockToUnhide.setType(Material.getMaterial(setmat));
-
-        BlockVector3 max = region.getMaximumPoint();
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 middle = max.add(min).divide(2);
-
-        Collection<Block> blocks = new HashSet<>();
-        if (type == 2) blocktypedata = blockToUnhide.getType().toString();
-        if (ProtectionStones.StoneTypeData.RegionY(blocktypedata) == 0) {
-            double xx = middle.getX();
-            double zz = middle.getZ();
-            for (double yy = 0; yy <= p.getWorld().getMaxHeight(); yy++) {
-                Block block = new Location(p.getWorld(), xx, yy, zz).getBlock();
-                if (ProtectionStones.mats.contains(block.getType().toString() + "-" + block.getData())) {
-                    blocks.add(new Location(p.getWorld(), xx, yy, zz).getBlock());
-                } else if (ProtectionStones.mats.contains(block.getType().toString())) {
-                    blocks.add(new Location(p.getWorld(), xx, yy, zz).getBlock());
-                }
-            }
-        }
-
-
-        if (!region.isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
-            p.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
+        // Return and remove protection stone
+        if (ProtectionStones.getProtectStoneOptions(type) == null) {
+            p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
             return true;
         }
 
-        // Find centre of protection stone
-        Block middleblock;
-        Block it = null;
-        if (!(blocks.isEmpty())) {
-            it = blocks.iterator().next();
-        }
-        if (it != null && ProtectionStones.StoneTypeData.RegionY(it.getType().toString() + "-" + it.getData()) == 0) {
-            middleblock = it;
-        } else if (it != null && ProtectionStones.StoneTypeData.RegionY(it.getType().toString()) == 0) {
-            middleblock = it;
-        } else {
-            middleblock = p.getWorld().getBlockAt(middle.getX(), middle.getY(), middle.getZ());
-        }
+        if (!ProtectionStones.getProtectStoneOptions(type).noDrop()) {
 
-        // Return and remove protection stone
-        if (!ProtectionStones.StoneTypeData.NoDrop(middleblock.getType().toString() + "-" + middleblock.getData()) && !ProtectionStones.StoneTypeData.NoDrop(middleblock.getType().toString())) {
-            ItemStack oreblock = new ItemStack(middleblock.getType(), 1, middleblock.getData());
             boolean freeSpace = false;
-
             for (ItemStack is : p.getInventory().getContents()) {
                 if (is == null) {
                     freeSpace = true;
@@ -147,7 +110,7 @@ public class ArgReclaim {
             // return protection stone
             if (freeSpace) {
                 PlayerInventory inventory = p.getInventory();
-                inventory.addItem(oreblock);
+                inventory.addItem(new ItemStack(blockToUnhide.getType()));
             } else {
                 p.sendMessage(ChatColor.RED + "You don't have enough room in your inventory.");
                 return true;
@@ -155,7 +118,7 @@ public class ArgReclaim {
         }
 
         // remove region
-        middleblock.setType(Material.AIR);
+        blockToUnhide.setType(Material.AIR);
         rgm.removeRegion(psID);
         try {
             rgm.save();
