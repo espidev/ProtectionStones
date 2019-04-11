@@ -55,6 +55,8 @@ public enum PSL {
     PLAYER_NOT_FOUND("psregion.player_not_found", ChatColor.RED + "Player not found."),
     NOT_PS_REGION("psregion.not_ps_region", ChatColor.RED + "Not a protection stones region."),
     REGION_DOES_NOT_EXIST("psregion.region_does_not_exist", ChatColor.RED + "Region does not exist."),
+    NO_REGIONS_OWNED("psregion.no_regions_owned", ChatColor.RED + "You don't own any protected regions in this world!"),
+
 
     // ps toggle
     TOGGLE_ON("toggle.toggle_on", ChatColor.YELLOW + "Protection stones placement turned on."),
@@ -91,13 +93,15 @@ public enum PSL {
     REGION_NOT_FOUND_FOR_PLAYER("region.not_found_for_player", ChatColor.YELLOW + "No regions found for %player% in this world."),
     REGION_LIST("region.list", ChatColor.YELLOW + "%player%'s regions in this world: %regions%"),
     REGION_REMOVE("region.remove", ChatColor.YELLOW + "%player%'s regions have been removed in this world."),
+    REGION_ERROR_SEARCH("region.error_search", ChatColor.RED + "Error while searching for %player%'s regions. Please make sure you have entered the correct name."),
 
     // ps tp
     TP_HELP("tp.help", ChatColor.RED + "Usage: /ps tp [player] [num]"),
+    NUMBER_ABOVE_ZERO("tp.number_above_zero", ChatColor.RED + "Please enter a number above 0."),
+    ONLY_HAS_REGIONS("tp.only_has_regions", ChatColor.RED + "%player% only has %num% protected regions in this world!"),
 
-    // ps home
-    HOME_HELP("home.help", ChatColor.RED + "Usage: /ps home [num]\n" + ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps"),
-
+    // ps home,
+    HOME_HELP("home.help", ChatColor.RED + "Usage: /ps home [num]\n" + ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps")
 
     ;
 

@@ -61,7 +61,7 @@ public class ArgTp {
         }
 
         if (rgnum <= 0) {
-            p.sendMessage(ChatColor.RED + "Please enter a number above 0.");
+            p.sendMessage(PSL.NUMBER_ABOVE_ZERO.msg());
             return true;
         }
 
@@ -71,7 +71,7 @@ public class ArgTp {
             try {
                 lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
             } catch (Exception e) {
-                p.sendMessage(ChatColor.RED + "Error while searching for " + args[1] + "'s regions. Please make sure you have entered the correct name.");
+                p.sendMessage(PSL.REGION_ERROR_SEARCH.msg().replace("%player%", args[1]));
                 return true;
             }
 
@@ -86,10 +86,13 @@ public class ArgTp {
             }
 
             if (index <= 0) {
-                p.sendMessage(ChatColor.RED + lp.getName() + " doesn't own any protected regions in this world!");
+                p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                        .replace("%player%", lp.getName()));
                 return true;
             } else if (rgnum > index) {
-                p.sendMessage(ChatColor.RED + lp.getName() + " only has " + index + " protected regions in this world!");
+                p.sendMessage(PSL.ONLY_HAS_REGIONS.msg()
+                        .replace("%player%", lp.getName())
+                        .replace("%num%", "" + index));
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("home")) {
