@@ -26,8 +26,10 @@ import java.util.HashMap;
 public enum PSL {
     // messages.yml
 
+    COOLDOWN("cooldown", ChatColor.GOLD + "Warning: " + ChatColor.GRAY + "Please wait for %time% seconds before placing again!"),
     NO_SUCH_COMMAND("no_such_command", ChatColor.RED + "No such command. please type /ps help for more info"),
     NO_ACCESS("no_access", ChatColor.RED + "You are not allowed to do that here."),
+    NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
 
     COMMAND_REQUIRES_PLAYER_NAME("command_requires_player_name", ChatColor.RED + "This command requires a player name."),
 
@@ -48,6 +50,8 @@ public enum PSL {
     NO_PERMISSION_REGION("no_permission_region", ChatColor.RED + "You do not have permission to use region commands."),
     NO_PERMISSION_TP("no_permission_tp", ChatColor.RED + "You do not have permission to teleport to other players' protection stones."),
     NO_PERMISSION_HOME("no_permission_home", ChatColor.RED + "You do not have permission to teleport to your protection stones."),
+    NO_PERMISSION_UNCLAIM("no_permission_unclaim", ChatColor.RED + "You do not have permission to use the unclaim command."),
+    NO_PERMISSION_VIEW("no_permission_view", ChatColor.RED + "You do not have permission to use the view command."),
 
     ADDED_TO_REGION("psregion.added_to_region", ChatColor.YELLOW + "%player% has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.YELLOW + "%player% has been removed from region."),
@@ -56,7 +60,13 @@ public enum PSL {
     NOT_PS_REGION("psregion.not_ps_region", ChatColor.RED + "Not a protection stones region."),
     REGION_DOES_NOT_EXIST("psregion.region_does_not_exist", ChatColor.RED + "Region does not exist."),
     NO_REGIONS_OWNED("psregion.no_regions_owned", ChatColor.RED + "You don't own any protected regions in this world!"),
-
+    NO_REGION_PERMISSION("psregion.no_region_permission", ChatColor.RED + "You do not have permission to do this in this region."),
+    PROTECTED("psregion.protected", ChatColor.AQUA + "This area is now protected."),
+    NO_LONGER_PROTECTED("psregion.no_longer_protected", ChatColor.YELLOW + "This area is no longer protected."),
+    CANT_PROTECT_THAT("psregion.cant_protect_that", ChatColor.RED + "You can't protect that area."),
+    REACHED_REGION_LIMIT("psregion.reached_region_limit", ChatColor.RED + "You can not create any more protected regions."),
+    WORLD_DENIED_CREATE("psregion.world_denied_create", ChatColor.RED + "You can not create protections in this world."),
+    REGION_OVERLAP("psregion.region_overlap", ChatColor.RED + "You can not place a protection here as it overlaps another region."),
 
     // ps toggle
     TOGGLE_ON("toggle.toggle_on", ChatColor.YELLOW + "Protection stones placement turned on."),
@@ -69,6 +79,8 @@ public enum PSL {
 
     // ps flag
     FLAG_HELP("flag.flag_help", ChatColor.RED + "/ps flag [flag name] [flag value]"),
+    FLAG_SET("flag.flag_set", ChatColor.YELLOW + "%flag% flag has been set."),
+    FLAG_NOT_SET("flag.flag_not_set", ChatColor.YELLOW + "%flag% flag has " + ChatColor.RED + "not" + ChatColor.YELLOW + " been set."),
 
     // ps hide/unhide
     ALREADY_NOT_HIDDEN("visibility.already_not_hidden", ChatColor.YELLOW + "The protection stone doesn't appear hidden..."),
@@ -81,7 +93,7 @@ public enum PSL {
     INFO_NO_MEMBERS("info.info_no_members", ChatColor.RED + "(no members)"),
     INFO_OWNERS("info.info_owners", ChatColor.BLUE + "Owners:"),
     INFO_NO_OWNERS("info.info_no_owners", ChatColor.RED + "(no owners)"),
-    INFO_FLAGS("info.info_flags", ChatColor.BLUE + "Flags:"),
+    INFO_FLAGS("info.info_flags", ChatColor.BLUE + "Flags: " + ChatColor.YELLOW),
 
     // ps priority
     PRIORITY_INFO("priority.priority_info", ChatColor.YELLOW + "Priority: %priority%"),
@@ -99,9 +111,37 @@ public enum PSL {
     TP_HELP("tp.help", ChatColor.RED + "Usage: /ps tp [player] [num]"),
     NUMBER_ABOVE_ZERO("tp.number_above_zero", ChatColor.RED + "Please enter a number above 0."),
     ONLY_HAS_REGIONS("tp.only_has_regions", ChatColor.RED + "%player% only has %num% protected regions in this world!"),
+    TPING("tp.tping", ChatColor.GREEN + "Teleporting..."),
+    TP_ERROR_NAME("tp.error_name", ChatColor.RED + "Error in teleporting to protected region! (parsing WG region name error)"),
+    TP_ERROR_TP("tp.error_tp", ChatColor.RED + "Error in finding the region to teleport to!"),
 
     // ps home,
-    HOME_HELP("home.help", ChatColor.RED + "Usage: /ps home [num]\n" + ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps")
+    HOME_HELP("home.help", ChatColor.RED + "Usage: /ps home [num]\n" + ChatColor.YELLOW + "To see your ps count, type /ps count. Use any number within the range to teleport to that ps"),
+    HOME_ONLY("home.only", ChatColor.RED + "You only have %num% total regions in this world!"),
+
+    // ps unclaim
+    UNCLAIM_CANT_FIND("unclaim.cant_find", ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually."),
+
+    // ps view
+    VIEW_GENERATING("view.generating", ChatColor.YELLOW + "Generating border..."),
+    VIEW_GENERATE_DONE("view.generate_done", ChatColor.GREEN + "Done! The border will disappear after 30 seconds!"),
+    VIEW_REMOVING("view.removing", ChatColor.YELLOW + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
+
+    // ps admin
+    ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.YELLOW + "/ps admin cleanup [remove|regen|disown] [days]"),
+    ADMIN_CLEANUP_HEADER("admin.cleanup_header", ChatColor.YELLOW + "Cleanup %arg% %days% days\n================"),
+    ADMIN_CLEANUP_FOOTER("admin.cleanup_footer", ChatColor.YELLOW + "================\nCompleted %arg% cleanup."),
+    ADMIN_HIDE_TOGGLED("admin.hide_toggled", ChatColor.YELLOW + "All protection stones have been %message% in this world."),
+    ADMIN_LAST_LOGON("admin.last_logon", ChatColor.YELLOW + "%player% last played %days% days ago."),
+    ADMIN_IS_BANNED("admin.is_banned", ChatColor.YELLOW + "%player% is banned."),
+    ADMIN_ERROR_PARSING("admin.error_parsing", ChatColor.RED + "Error parsing days, are you sure it is a number?"),
+    ADMIN_LASTLOGONS_HEADER("admin.lastlogons_header", ChatColor.YELLOW + "%days% Days Plus:\n================"),
+    ADMIN_LASTLOGONS_LINE("admin.lastlogons_line", ChatColor.YELLOW + "%player% %time% days"),
+    ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),
+
+    // ps reload
+    RELOAD_START("reload.start", ChatColor.AQUA + "Reloading config..."),
+    RELOAD_COMPLETE("reload.complete", ChatColor.AQUA + "Completed config reload!"),
 
     ;
 

@@ -56,4 +56,3 @@ Teleport to PVP:
 cooldown:
   enable: false
   cooldown: 10
-  message: "&6Warning: &7Please wait for %time% seconds before placing again!"

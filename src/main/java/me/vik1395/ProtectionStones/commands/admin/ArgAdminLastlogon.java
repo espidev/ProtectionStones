@@ -16,6 +16,7 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PlayerComparator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,19 +29,21 @@ public class ArgAdminLastlogon {
     // /ps admin lastlogon
     public static boolean argumentAdminLastLogon(Player p, String[] args) {
         if (args.length < 3) {
-            p.sendMessage(ChatColor.YELLOW + "A player name is required.");
+            p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return true;
         }
         OfflinePlayer op = Bukkit.getOfflinePlayer(args[2]);
-        if (op == null) {
-            p.sendMessage(ChatColor.YELLOW + "A player name is required (must have joined the server before).");
-        }
 
         String playerName = args[2];
         long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
-        p.sendMessage(ChatColor.YELLOW + playerName + " last played " + lastPlayed + " days ago.");
+
+        p.sendMessage(PSL.ADMIN_LAST_LOGON.msg()
+                .replace("%player%", playerName)
+                .replace("%days%", "" +lastPlayed));
+
         if (op.isBanned()) {
-            p.sendMessage(ChatColor.YELLOW + playerName + " is banned.");
+            p.sendMessage(PSL.ADMIN_IS_BANNED.msg()
+                    .replace("%player%", playerName));
         }
 
         return true;
@@ -53,25 +56,30 @@ public class ArgAdminLastlogon {
             try {
                 days = Integer.parseInt(args[2]);
             } catch (Exception e) {
-                p.sendMessage(ChatColor.YELLOW + "Error parsing days, are you sure it is a number?");
+                p.sendMessage(PSL.ADMIN_ERROR_PARSING.msg());
                 return true;
             }
         }
         OfflinePlayer[] offlinePlayerList = Bukkit.getServer().getOfflinePlayers().clone();
         int playerCounter = 0;
-        p.sendMessage(ChatColor.YELLOW + "" + days + " Days Plus:");
-        p.sendMessage(ChatColor.YELLOW + "================");
+        p.sendMessage(PSL.ADMIN_LASTLOGONS_HEADER.msg()
+                .replace("%days%", "" + days));
+
         Arrays.sort(offlinePlayerList, new PlayerComparator());
         for (OfflinePlayer offlinePlayer : offlinePlayerList) {
             long lastPlayed = (System.currentTimeMillis() - offlinePlayer.getLastPlayed()) / 86400000L;
             if (lastPlayed >= days) {
                 playerCounter++;
-                p.sendMessage(ChatColor.YELLOW + offlinePlayer.getName() + " " + lastPlayed + " days");
+                p.sendMessage(PSL.ADMIN_LASTLOGONS_LINE.msg()
+                        .replace("%player%", offlinePlayer.getName())
+                        .replace("%time%", "" + lastPlayed));
             }
         }
-        p.sendMessage(ChatColor.YELLOW + "================");
-        p.sendMessage(ChatColor.YELLOW + "" + playerCounter + " Total Players Shown");
-        p.sendMessage(ChatColor.YELLOW + "" + offlinePlayerList.length + " Total Players Checked");
+
+        p.sendMessage(PSL.ADMIN_LASTLOGONS_FOOTER.msg()
+                .replace("%count%", "" + playerCounter)
+                .replace("%checked%", "" + offlinePlayerList.length));
+
         return true;
     }
 }

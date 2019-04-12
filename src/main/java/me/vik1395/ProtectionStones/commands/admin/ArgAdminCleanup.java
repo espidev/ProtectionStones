@@ -20,6 +20,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,24 +37,19 @@ public class ArgAdminCleanup {
     public static boolean argumentAdminCleanup(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("regen") && !args[2].equalsIgnoreCase("disown"))) {
-            p.sendMessage(ChatColor.YELLOW + "/ps admin cleanup {remove|regen|disown} {days}");
+            p.sendMessage(PSL.ADMIN_CLEANUP_HELP.msg());
             return true;
         }
 
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
-        try {
-            Integer.parseInt(args[3]);
-        } catch (Exception e) {
-            p.sendMessage(ChatColor.YELLOW + "Error parsing days.");
-            return true;
-        }
-
         if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("regen")) || (args[2].equalsIgnoreCase("disown"))) {
             int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
-            p.sendMessage(ChatColor.YELLOW + "Cleanup " + args[2] + " " + days + " days");
-            p.sendMessage(ChatColor.YELLOW + "================");
+
+            p.sendMessage(PSL.ADMIN_CLEANUP_HEADER.msg()
+                    .replace("%arg%", args[2])
+                    .replace("%days%", "" + days));
 
             // loop over offline players to delete old data
             for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
@@ -77,7 +73,10 @@ public class ArgAdminCleanup {
                 }
 
                 if (!found) {
-                    p.sendMessage(ChatColor.YELLOW + "No regions found for " + op.getName() + " in this world.");
+
+                    p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                            .replace("%player%", op.getName()));
+
                     continue;
                 }
 
@@ -93,8 +92,8 @@ public class ArgAdminCleanup {
             } catch (Exception e) {
                 Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
             }
-            p.sendMessage(ChatColor.YELLOW + "================");
-            p.sendMessage(ChatColor.YELLOW + "Completed " + args[2] + " cleanup");
+            p.sendMessage(PSL.ADMIN_CLEANUP_FOOTER.msg()
+                    .replace("%arg%", args[2]));
         }
         return true;
     }

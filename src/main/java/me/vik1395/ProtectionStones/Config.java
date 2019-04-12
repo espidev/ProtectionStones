@@ -16,23 +16,19 @@
 
 package me.vik1395.ProtectionStones;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class Config {
+public class Config {
 
-    static void initConfig() {
+    public static void initConfig() {
         ProtectionStones.config = new YamlConfiguration();
         try {
             ProtectionStones.config.load(ProtectionStones.conf);
@@ -56,13 +52,38 @@ class Config {
 //            }
 //        }
 
+        // keep in mind that there is /ps admin reload, so clear arrays before adding config options!
+
+        ProtectionStones.flags = ProtectionStones.getPlugin().getConfig().getStringList("Flags");
+        ProtectionStones.allowedFlags = Arrays.asList((ProtectionStones.getPlugin().getConfig().getString("Allowed Flags").toLowerCase()).split(","));
+        ProtectionStones.deniedWorlds = ProtectionStones.getPlugin().getConfig().getStringList("Worlds Denied");
+        ProtectionStones.isCooldownEnable = ProtectionStones.getPlugin().getConfig().getBoolean("cooldown.enable");
+        ProtectionStones.cooldown = ProtectionStones.getPlugin().getConfig().getInt("cooldown.cooldown") * 1000;
+
+        ProtectionStones.protectBlocks.clear();
+        ProtectionStones.protectionStonesOptions.clear();
+
+        Bukkit.getLogger().info("Placing of Protection Stones is disabled in the following worlds (override with protectionstones.admin): ");
+        for (String world : ProtectionStones.deniedWorlds) {
+            Bukkit.getLogger().info("- " + world);
+        }
+
+        // add block types
+        for (String material : ProtectionStones.getPlugin().getConfig().getString("Blocks").split(",")) {
+            if (Material.getMaterial(material) == null) {
+                Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
+            } else {
+                ProtectionStones.protectBlocks.add(material.toUpperCase());
+            }
+        }
+
         // add protection stones to options map
         if (ProtectionStones.config.get("Region") == null) {
-            ProtectionStones.getPlugin().getLogger().info("Region block not found! You do not have any protection blocks configured!");
+            Bukkit.getLogger().info("Region block not found! You do not have any protection blocks configured!");
         } else {
-            ProtectionStones.getPlugin().getLogger().info("Protection Stone Blocks:");
+            Bukkit.getLogger().info("Protection Stone Blocks:");
             for (String block : ProtectionStones.config.getConfigurationSection("Region").getKeys(false)) {
-                ProtectionStones.getPlugin().getLogger().info("- " + block);
+                Bukkit.getLogger().info("- " + block);
                 // code looks cleaner without constructor
                 ConfigProtectBlock b = new ConfigProtectBlock();
                 b.setRegionX(ProtectionStones.config.getInt("Region." + block + ".X Radius"));

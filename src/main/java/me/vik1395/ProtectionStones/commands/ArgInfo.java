@@ -122,9 +122,9 @@ public class ArgInfo {
 
         if (myFlag.length() > 2) {
             myFlag = new StringBuilder(myFlag.substring(0, myFlag.length() - 2) + ".");
-            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.YELLOW + myFlag);
+            p.sendMessage(PSL.INFO_FLAGS.msg() + myFlag);
         } else {
-            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.RED + "(none)");
+            p.sendMessage(PSL.INFO_FLAGS.msg() + "(none)");
         }
     }
 

@@ -33,28 +33,24 @@ public class ArgAdminStats {
 
         if (args.length > 2) {
             String playerName = args[2];
-            if (Bukkit.getOfflinePlayer(playerName) != null) {
-                OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
-                p.sendMessage(ChatColor.YELLOW + playerName + ":");
-                p.sendMessage(ChatColor.YELLOW + "================");
-                long firstPlayed = (System.currentTimeMillis() - op.getFirstPlayed()) / 86400000L;
-                p.sendMessage(ChatColor.YELLOW + "First played " + firstPlayed + " days ago.");
-                long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
-                p.sendMessage(ChatColor.YELLOW + "Last played " + lastPlayed + " days ago.");
+            OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
+            p.sendMessage(ChatColor.YELLOW + playerName + ":");
+            p.sendMessage(ChatColor.YELLOW + "================");
+            long firstPlayed = (System.currentTimeMillis() - op.getFirstPlayed()) / 86400000L;
+            p.sendMessage(ChatColor.YELLOW + "First played " + firstPlayed + " days ago.");
+            long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
+            p.sendMessage(ChatColor.YELLOW + "Last played " + lastPlayed + " days ago.");
 
-                String banMessage = (op.isBanned()) ? "Banned" : "Not Banned";
-                p.sendMessage(ChatColor.YELLOW + banMessage);
+            String banMessage = (op.isBanned()) ? "Banned" : "Not Banned";
+            p.sendMessage(ChatColor.YELLOW + banMessage);
 
-                int count = 0;
-                try {
-                    count = rgm.getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
-                } catch (Exception localException1) {
-                }
-                p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
-                p.sendMessage(ChatColor.YELLOW + "================");
-            } else {
-                p.sendMessage(ChatColor.YELLOW + "Player name not found.");
+            int count = 0;
+            try {
+                count = rgm.getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
+            } catch (Exception localException1) {
             }
+            p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
+            p.sendMessage(ChatColor.YELLOW + "================");
             return true;
         }
 

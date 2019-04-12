@@ -38,7 +38,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # List all the flags that can be set by region owners. Separate them with a comma, no space.
     Allowed Flags: use,pvp,greeting,farewell,mob-spawning
     
-    # Disable the use of protection stones in certain worlds.
+    # Disable the use of ALL protection stones in certain worlds.
     # Can be overriden with the permission protectionstones.admin
     Worlds Denied:
         - exampleworld1
@@ -73,7 +73,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     cooldown:
       enable: false
       cooldown: 10
-      message: "&6Warning: &7Please wait for %time% seconds before placing again!"
+
 
 Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
@@ -85,14 +85,14 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.
     /ps home {num} - Teleports you to one of your protected regions.
     /ps tp {player} {num} - Teleports you to one of a given player's regions.
-    /ps toggle - Use this command to turn on or off ProtectionStones blocks.
+    /ps toggle - Use this command to turn on or off placement of protection stones blocks.
     /ps view - Use this command to view the borders of your protected region.
-    /ps unclaim - Use this command to pickup a placed ProtectionStone and remove the region.
+    /ps unclaim - Use this command to pickup a placed protection stone and remove the region.
     /ps priority {number|null} - Use this command to set your region's priority.
     /ps region count|list|remove|regen|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
-    
+    /ps reload - Reload settings from the config.
 
 **Permissions**
 -----------
@@ -112,7 +112,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.flags - Allows players to set their region flags.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
-    protectionstones.admin - This permission allows users to override all ProtectionStones regions.
+    protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.bypass - Access to the /ps bypass command.
