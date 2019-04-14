@@ -75,7 +75,7 @@ public class ArgRegion {
                         .replace("%regions%", regionMessage));
             }
 
-        } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("regen")) || (args[1].equalsIgnoreCase("disown"))) {
+        } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("disown"))) {
 
             // Find regions
             Map<String, ProtectedRegion> regions = rgm.getRegions();
@@ -102,6 +102,8 @@ public class ArgRegion {
                     System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
                 }
             }
+        } else {
+            p.sendMessage(PSL.REGION_HELP.msg());
         }
         return true;
     }

@@ -95,11 +95,6 @@ public class ProtectionStones extends JavaPlugin {
                 owners.removePlayer(lp);
                 r.setOwners(owners);
                 break;
-            case "regen":
-                Bukkit.dispatchCommand(admin, "region select " + region);
-                Bukkit.dispatchCommand(admin, "/regen");
-                rgm.removeRegion(region);
-                break;
             case "remove":
                 if (region.substring(0, 2).equals("ps")) {
                     PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
@@ -151,14 +146,14 @@ public class ProtectionStones extends JavaPlugin {
         // init messages
         PSL.loadConfig();
 
+        // initialize flags
+        FlagHandler.initFlags();
+
         // uuid cache
         getServer().getConsoleSender().sendMessage("Building UUID cache...");
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
         }
-
-        // initialize flags
-        FlagHandler.initFlags();
 
         // check if uuids have been upgraded already
         getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
@@ -185,19 +180,19 @@ public class ProtectionStones extends JavaPlugin {
         if (s instanceof Player) {
             Player p = (Player) s;
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-                    p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps count [player]");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps home {num} - " + ChatColor.GREEN + "{num} has to be within the number of protected regions you own. Use /ps count to check");
+                    p.sendMessage(PSL.INFO_HELP.msg());//\\
+                    p.sendMessage(PSL.ADDREMOVE_HELP.msg());//\\
+                    p.sendMessage(PSL.ADDREMOVE_OWNER_HELP.msg());//\\
+                    p.sendMessage(PSL.COUNT_HELP.msg());//\\
+                    p.sendMessage(PSL.FLAG_HELP.msg());//\\
+                    p.sendMessage(PSL.HOME_HELP.msg());
                     p.sendMessage(ChatColor.YELLOW + "/ps tp {player} {num}");
                     p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps unclaim");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
+                    p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|disown {playername}");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
                     p.sendMessage(ChatColor.YELLOW + "          cleanup | lastlogon | lastlogons | stats }");//\\
                     p.sendMessage(ChatColor.YELLOW + "/ps reload");

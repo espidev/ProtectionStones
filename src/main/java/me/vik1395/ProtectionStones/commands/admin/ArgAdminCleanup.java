@@ -36,7 +36,7 @@ public class ArgAdminCleanup {
     // /ps admin cleanup
     public static boolean argumentAdminCleanup(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("regen") && !args[2].equalsIgnoreCase("disown"))) {
+        if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             p.sendMessage(PSL.ADMIN_CLEANUP_HELP.msg());
             return true;
         }
@@ -44,7 +44,7 @@ public class ArgAdminCleanup {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
-        if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("regen")) || (args[2].equalsIgnoreCase("disown"))) {
+        if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("disown"))) {
             int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
 
             p.sendMessage(PSL.ADMIN_CLEANUP_HEADER.msg()
