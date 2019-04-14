@@ -170,6 +170,10 @@ public class ProtectionStones extends JavaPlugin {
         return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
+    private static void sendWithPerm(Player p, String permission, String msg) {
+        if (p.hasPermission(permission)) p.sendMessage(msg);
+    }
+
     @Override
     public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
 
@@ -186,17 +190,15 @@ public class ProtectionStones extends JavaPlugin {
                     p.sendMessage(PSL.COUNT_HELP.msg());//\\
                     p.sendMessage(PSL.FLAG_HELP.msg());//\\
                     p.sendMessage(PSL.HOME_HELP.msg());
-                    p.sendMessage(ChatColor.YELLOW + "/ps tp {player} {num}");
-                    p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps unclaim");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|disown {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
-                    p.sendMessage(ChatColor.YELLOW + "          cleanup | lastlogon | lastlogons | stats }");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps reload");
-                    p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
+                    p.sendMessage(PSL.TP_HELP.msg());
+                    p.sendMessage(PSL.VISIBILITY_HELP.msg());//\\
+                    p.sendMessage(PSL.TOGGLE_HELP.msg());//\\
+                    p.sendMessage(PSL.VIEW_HELP.msg());//\\
+                    p.sendMessage(PSL.UNCLAIM_HELP.msg());//\\
+                    p.sendMessage(PSL.PRIORITY_HELP.msg());//\\
+                    p.sendMessage(PSL.REGION_HELP.msg());//\\
+                    p.sendMessage(PSL.ADMIN_HELP.msg());//\\
+                    p.sendMessage(PSL.RELOAD_HELP.msg());
                     return true;
                 }
 

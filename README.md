@@ -89,7 +89,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps view - Use this command to view the borders of your protected region.
     /ps unclaim - Use this command to pickup a placed protection stone and remove the region.
     /ps priority {number|null} - Use this command to set your region's priority.
-    /ps region count|list|remove|regen|disown {playername} - Use this command to find
+    /ps region count|list|remove|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.

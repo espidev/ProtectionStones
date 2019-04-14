@@ -37,6 +37,16 @@ public class ArgInfo {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
+        if (psID.equals("")) {
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            return true;
+        }
+        ProtectedRegion region = rgm.getRegion(psID);
+        if (region == null) {
+            p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
+            return true;
+        }
+
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
             p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
@@ -48,18 +58,8 @@ public class ArgInfo {
                 return true;
             }
 
-            if (psID.equals("")) {
-                p.sendMessage(PSL.NOT_IN_REGION.msg());
-                return true;
-            }
-            ProtectedRegion region = rgm.getRegion(psID);
-            if (region == null) {
-                p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
-                return true;
-            }
-
             p.sendMessage(PSL.INFO_HEADER.msg());
-            p.sendMessage(ChatColor.BLUE + "Region:" + ChatColor.YELLOW + psID + ChatColor.BLUE + ", Priority: " + ChatColor.YELLOW + rgm.getRegion(psID).getPriority());
+            p.sendMessage(ChatColor.BLUE + "Region: " + ChatColor.YELLOW + psID + ChatColor.BLUE + ", Priority: " + ChatColor.YELLOW + rgm.getRegion(psID).getPriority());
 
 
             displayFlags(p, region);
@@ -78,21 +78,21 @@ public class ArgInfo {
                         p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
                         return true;
                     }
-                    displayMembers(p, rgm.getRegion(psID));
+                    displayMembers(p, region);
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners")) {
                         p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
                         return true;
                     }
-                    displayOwners(p, rgm.getRegion(psID));
+                    displayOwners(p, region);
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags")) {
                         p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
-                    displayFlags(p, rgm.getRegion(psID));
+                    displayFlags(p, region);
                     break;
                 default:
                     p.sendMessage(PSL.INFO_HELP.msg());

@@ -444,7 +444,7 @@ public class ListenerClass implements Listener {
             ApplicableRegionSet region = rgm.getApplicableRegions(v);
             ApplicableRegionSet regionFrom = rgm.getApplicableRegions(v);
 
-            if (!(regionFrom.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP))) {
+            if (!regionFrom.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
                 if (region.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
                     p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cWarning! &eThis area is a &cPVP &earea! You may &cdie &eand &close stuff&e!"));
                 }
