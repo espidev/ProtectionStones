@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class ArgTp {
 
-    // /ps tp
+    // /ps tp, /ps home
     public static boolean argumentTp(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);

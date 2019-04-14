@@ -35,7 +35,7 @@ public class ArgView {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
-        if (!p.hasPermission("protectionstones.view") && !p.hasPermission("protectionstones.view.others")) {
+        if (!p.hasPermission("protectionstones.view")) {
             p.sendMessage(PSL.NO_PERMISSION_VIEW.msg());
             return true;
         }

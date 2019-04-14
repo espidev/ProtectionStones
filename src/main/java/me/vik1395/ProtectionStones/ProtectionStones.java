@@ -24,6 +24,10 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -39,6 +43,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -170,8 +175,16 @@ public class ProtectionStones extends JavaPlugin {
         return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
-    private static void sendWithPerm(Player p, String permission, String msg) {
-        if (p.hasPermission(permission)) p.sendMessage(msg);
+    private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
+        for (String perm : permission) {
+            if (p.hasPermission(perm)) {
+                TextComponent m = new TextComponent(msg);
+                m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
+                m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
+                p.spigot().sendMessage(m);
+                break;
+            }
+        }
     }
 
     @Override
@@ -184,21 +197,23 @@ public class ProtectionStones extends JavaPlugin {
         if (s instanceof Player) {
             Player p = (Player) s;
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-                    p.sendMessage(PSL.INFO_HELP.msg());//\\
-                    p.sendMessage(PSL.ADDREMOVE_HELP.msg());//\\
-                    p.sendMessage(PSL.ADDREMOVE_OWNER_HELP.msg());//\\
-                    p.sendMessage(PSL.COUNT_HELP.msg());//\\
-                    p.sendMessage(PSL.FLAG_HELP.msg());//\\
-                    p.sendMessage(PSL.HOME_HELP.msg());
-                    p.sendMessage(PSL.TP_HELP.msg());
-                    p.sendMessage(PSL.VISIBILITY_HELP.msg());//\\
-                    p.sendMessage(PSL.TOGGLE_HELP.msg());//\\
-                    p.sendMessage(PSL.VIEW_HELP.msg());//\\
-                    p.sendMessage(PSL.UNCLAIM_HELP.msg());//\\
-                    p.sendMessage(PSL.PRIORITY_HELP.msg());//\\
-                    p.sendMessage(PSL.REGION_HELP.msg());//\\
-                    p.sendMessage(PSL.ADMIN_HELP.msg());//\\
-                    p.sendMessage(PSL.RELOAD_HELP.msg());
+                    p.sendMessage(PSL.HELP.msg());
+                    sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info","protectionstones.info");
+                    sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps","protectionstones.members");
+                    sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
+                    sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
+                    sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
+                    sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
+                    sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
+                    sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
+                    sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
+                    sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), "/ps toggle","protectionstones.toggle");
+                    sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), "/ps view","protectionstones.view");
+                    sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), "/ps unclaim", "protectionstones.unclaim");
+                    sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), "/ps priority","protectionstones.priority");
+                    sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), "/ps region", "protectionstones.region");
+                    sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), "/ps admin", "protectionstones.admin");
+                    sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), "/ps reload", "protectionstones.admin");
                     return true;
                 }
 

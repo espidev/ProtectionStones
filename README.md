@@ -86,11 +86,12 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps home {num} - Teleports you to one of your protected regions.
     /ps tp {player} {num} - Teleports you to one of a given player's regions.
     /ps toggle - Use this command to turn on or off placement of protection stones blocks.
-    /ps view - Use this command to view the borders of your protected region.
+    /ps view - Use this command to view the borders of a protected region.
     /ps unclaim - Use this command to pickup a placed protection stone and remove the region.
     /ps priority {number|null} - Use this command to set your region's priority.
     /ps region count|list|remove|disown {playername} - Use this command to find
     information or edit other players' (or your own) protected regions.
+    /ps count [playername (optional)] - Count the number of regions you own or another player.
     /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
@@ -100,8 +101,10 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions (block break).
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
-    protectionstones.view - Allows players the use of /ps view command.
-    protectionstones.info - Allows players use of /ps info command.
+    protectionstones.view - Allows players the use of /ps view.
+    protectionstones.info - Allows players the use of /ps info.
+    protectionstones.count - Allows players the use of /ps count.
+    protectionstones.count.others - Allows players the use of /ps count [player].
     protectionstones.hide - Allow players to hide their ProtectionStones block.
     protectionstones.unhide - Allow players to unhide their ProtectionStones block.
     protectionstones.home - Access to the /ps home command.
