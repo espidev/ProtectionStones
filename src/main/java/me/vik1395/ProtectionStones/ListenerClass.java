@@ -316,18 +316,8 @@ public class ListenerClass implements Listener {
 
         // return protection stone if no drop option is off
         if (!blockOptions.noDrop()) {
-            ItemStack oreblock = new ItemStack(pb.getType(), 1, pb.getData());
-            int freeSpace = 0;
-            for (ItemStack i : p.getInventory()) {
-                if (i == null) {
-                    freeSpace += oreblock.getType().getMaxStackSize();
-                } else if (i.getType() == oreblock.getType()) {
-                    freeSpace += i.getType().getMaxStackSize() - i.getAmount();
-                }
-            }
-            if (freeSpace >= 1) {
-                p.getInventory().addItem(oreblock);
-            } else {
+            if (!p.getInventory().addItem(new ItemStack(pb.getType(), 1)).isEmpty()) {
+                // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 e.setCancelled(true);
                 return;

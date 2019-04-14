@@ -59,7 +59,7 @@ public class ArgInfo {
             }
 
             p.sendMessage(PSL.INFO_HEADER.msg());
-            p.sendMessage(ChatColor.BLUE + "Region: " + ChatColor.YELLOW + psID + ChatColor.BLUE + ", Priority: " + ChatColor.YELLOW + rgm.getRegion(psID).getPriority());
+            p.sendMessage(PSL.INFO_REGION.msg() + psID + ", " + PSL.INFO_PRIORITY.msg() + rgm.getRegion(psID).getPriority());
 
 
             displayFlags(p, region);
@@ -68,7 +68,7 @@ public class ArgInfo {
 
             BlockVector3 min = region.getMinimumPoint();
             BlockVector3 max = region.getMaximumPoint();
-            p.sendMessage(ChatColor.BLUE + "Bounds: " + ChatColor.YELLOW + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
+            p.sendMessage(PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
 
         } else if (args.length == 2) { // get specific information on current region
 
@@ -130,12 +130,11 @@ public class ArgInfo {
 
     private static void displayOwners(Player p, ProtectedRegion region) {
         DefaultDomain owners = region.getOwners();
-        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg() + " ");
+        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg());
         if (owners.size() == 0) {
             send.append(PSL.INFO_NO_OWNERS.msg());
             p.sendMessage(send.toString());
         } else {
-            send.append(ChatColor.YELLOW);
             for (UUID uuid : owners.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
                 if (name == null) name = Bukkit.getOfflinePlayer(uuid).getName();
@@ -150,12 +149,11 @@ public class ArgInfo {
 
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
-        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg() + " ");
+        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg());
         if (members.size() == 0) {
             send.append(PSL.INFO_NO_MEMBERS.msg());
             p.sendMessage(send.toString());
         } else {
-            send.append(ChatColor.YELLOW);
             for (UUID uuid : members.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
                 if (name == null) name = uuid.toString();

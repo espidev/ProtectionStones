@@ -99,19 +99,9 @@ public class ArgUnclaim {
 
         if (!ProtectionStones.getProtectStoneOptions(type).noDrop()) {
 
-            boolean freeSpace = false;
-            for (ItemStack is : p.getInventory().getContents()) {
-                if (is == null) {
-                    freeSpace = true;
-                    break;
-                }
-            }
-
             // return protection stone
-            if (freeSpace) {
-                PlayerInventory inventory = p.getInventory();
-                inventory.addItem(new ItemStack(blockToUnhide.getType()));
-            } else {
+            if (!p.getInventory().addItem(new ItemStack(blockToUnhide.getType())).isEmpty()) {
+                // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
             }
