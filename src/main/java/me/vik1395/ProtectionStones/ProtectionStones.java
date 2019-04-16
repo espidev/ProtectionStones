@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
     public static Map<UUID, String> uuidToName = new HashMap<>();
+    public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
     public static File psStoneData;
@@ -93,7 +94,7 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownRegenPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
@@ -181,6 +182,7 @@ public class ProtectionStones extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Building UUID cache...");
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
+            nameToUUID.put(op.getName(), op.getUniqueId());
         }
 
         // check if uuids have been upgraded already

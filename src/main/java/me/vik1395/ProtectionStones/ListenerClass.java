@@ -60,7 +60,10 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+        ProtectionStones.uuidToName.remove(e.getPlayer().getUniqueId());
         ProtectionStones.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        ProtectionStones.nameToUUID.remove(e.getPlayer().getName());
+        ProtectionStones.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
     }
 
     @EventHandler

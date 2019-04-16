@@ -56,6 +56,8 @@ public class FlagHandler {
                             defaultFlags.put(iFlag, true);
                         } else if (setting.equalsIgnoreCase("false")) {
                             defaultFlags.put(iFlag, false);
+                        } else if (setting.equalsIgnoreCase("")) {
+                            defaultFlags.put(iFlag, Integer.parseInt(setting));
                         } else {
                             defaultFlags.put(iFlag, setting);
                         }

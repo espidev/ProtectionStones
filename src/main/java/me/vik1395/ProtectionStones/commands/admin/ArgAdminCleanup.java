@@ -83,7 +83,7 @@ public class ArgAdminCleanup {
                 // remove regions
                 p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
                 for (String region : opRegions) {
-                    ProtectionStones.removeDisownRegenPSRegion(lp, args[2].toLowerCase(), region, rgm, p);
+                    ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, p);
                 }
             }
 
