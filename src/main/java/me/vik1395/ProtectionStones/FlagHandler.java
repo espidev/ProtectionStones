@@ -56,7 +56,7 @@ public class FlagHandler {
                             defaultFlags.put(iFlag, true);
                         } else if (setting.equalsIgnoreCase("false")) {
                             defaultFlags.put(iFlag, false);
-                        } else if (setting.equalsIgnoreCase("")) {
+                        } else if (setting.equalsIgnoreCase("heal-delay")) {
                             defaultFlags.put(iFlag, Integer.parseInt(setting));
                         } else {
                             defaultFlags.put(iFlag, setting);
