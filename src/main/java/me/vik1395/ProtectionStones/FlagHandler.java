@@ -41,7 +41,6 @@ public class FlagHandler {
             settings = settings.trim();
 
             Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
-            System.out.printf("Set flag %s to %s\n", flag.getName(), settings);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
                 defaultFlags.put(flag, flag.parseInput(fc));

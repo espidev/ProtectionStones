@@ -28,8 +28,6 @@ import java.util.logging.Logger;
 
 public class Config {
 
-
-
     public static void initConfig() {
         ProtectionStones.config = new YamlConfiguration();
         try {
