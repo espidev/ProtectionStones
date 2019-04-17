@@ -18,9 +18,13 @@ package me.vik1395.ProtectionStones;
 
 import com.google.common.base.Joiner;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -32,6 +36,63 @@ public class FlagHandler {
     public static HashMap<Flag<?>, Object> defaultFlags = new HashMap<>();
 
     public static void initFlags() {
+        defaultFlags.clear();
+
+        for (String flagraw : ProtectionStones.flags) {
+            String[] split = flagraw.split(" ");
+            StringBuilder setting = new StringBuilder();
+            for (int i = 1; i < split.length; i++) setting.append(split[i]);
+            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
+
+            try {
+                FlagContext fc = FlagContext.create().setInput(setting.toString()).build();
+
+                if (flag instanceof DoubleFlag) {
+                    DoubleFlag f = (DoubleFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof IntegerFlag) {
+                    IntegerFlag f = (IntegerFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof BooleanFlag) {
+                    BooleanFlag f = (BooleanFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof StringFlag) {
+                    StringFlag f = (StringFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof StateFlag) {
+                    StateFlag f = (StateFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof LocationFlag) {
+                    LocationFlag f = (LocationFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof CommandStringFlag) {
+                    CommandStringFlag f = (CommandStringFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof EntityTypeFlag) {
+                    EntityTypeFlag f = (EntityTypeFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof GameModeTypeFlag) {
+                    GameModeTypeFlag f = (GameModeTypeFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof WeatherTypeFlag) {
+                    WeatherTypeFlag f = (WeatherTypeFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof EnumFlag) {
+                    EnumFlag f = (EnumFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof MapFlag) {
+                    MapFlag f = (MapFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                } else if (flag instanceof SetFlag) {
+                    SetFlag f = (SetFlag) flag;
+                    defaultFlags.put(f, f.parseInput(fc));
+                }
+            } catch (Exception e) {
+                Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
+                e.printStackTrace();
+            }
+        }
+
         for (Flag<?> iFlag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
             for (int j = 0; j < ProtectionStones.flags.size(); j++) {
                 String[] rawflag = ProtectionStones.flags.get(j).split(" ");
