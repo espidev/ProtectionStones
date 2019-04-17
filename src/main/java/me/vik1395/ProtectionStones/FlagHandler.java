@@ -37,8 +37,11 @@ public class FlagHandler {
         for (String flagraw : ProtectionStones.flags) {
             String[] split = flagraw.split(" ");
             String settings = "";
-            for (int i = 1; i < split.length; i++) settings += split[i];
+            for (int i = 1; i < split.length; i++) settings += split[i] + " ";
+            settings = settings.trim();
+
             Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
+            System.out.printf("Set flag %s to %s\n", flag.getName(), settings);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
                 defaultFlags.put(flag, flag.parseInput(fc));
@@ -65,9 +68,9 @@ public class FlagHandler {
         } else {
             String settings = "";
             if (args[1].equalsIgnoreCase("-g")) {
-                for (int i = 4; i < args.length; i++) settings += args[i];
+                for (int i = 4; i < args.length; i++) settings += args[i] + " ";
             } else {
-                for (int i = 2; i < args.length; i++) settings += args[i];
+                for (int i = 2; i < args.length; i++) settings += args[i] + " ";
             }
 
             FlagContext fc = FlagContext.create().setInput(settings.trim()).build();
