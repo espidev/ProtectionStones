@@ -52,7 +52,7 @@ public class Config {
 //            }
 //        }
 
-        // keep in mind that there is /ps admin reload, so clear arrays before adding config options!
+        // keep in mind that there is /ps reload, so clear arrays before adding config options!
 
         ProtectionStones.flags = ProtectionStones.getPlugin().getConfig().getStringList("Flags");
         ProtectionStones.allowedFlags = Arrays.asList((ProtectionStones.getPlugin().getConfig().getString("Allowed Flags").toLowerCase()).split(","));

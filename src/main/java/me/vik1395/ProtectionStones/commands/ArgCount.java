@@ -38,21 +38,27 @@ public class ArgCount {
 
         if (args.length == 1) {
             if (p.hasPermission("protectionstones.count")) {
+
                 count = countRegionsOfPlayer(wg.wrapPlayer(p), rgm);
                 p.sendMessage(PSL.PERSONAL_REGION_COUNT.msg()
                         .replace("%num%", ""+count));
+
             } else {
                 p.sendMessage(PSL.NO_PERMISSION_COUNT.msg());
             }
+
             return true;
         } else if (args.length == 2) {
+
             if (p.hasPermission("protectionstones.count.others")) {
-                OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-                if (!op.hasPlayedBefore()) {
+
+                if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
                     p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
                     return true;
                 }
-                count = countRegionsOfPlayer(wg.wrapOfflinePlayer(op), rgm);
+
+                count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]))), rgm);
+
                 p.sendMessage(PSL.OTHER_REGION_COUNT.msg()
                         .replace("%player%", args[1])
                         .replace("%num%", ""+count));

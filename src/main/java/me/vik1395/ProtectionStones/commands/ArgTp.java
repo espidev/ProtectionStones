@@ -66,9 +66,15 @@ public class ArgTp {
 
         // region checks
         if (args[0].equalsIgnoreCase("tp")) {
+
+            if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+                p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+                return true;
+            }
+
             LocalPlayer lp;
             try {
-                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
+                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1])));
             } catch (Exception e) {
                 p.sendMessage(PSL.REGION_ERROR_SEARCH.msg()
                         .replace("%player%", args[1]));

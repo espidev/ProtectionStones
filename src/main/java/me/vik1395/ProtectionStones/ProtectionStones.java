@@ -35,6 +35,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,6 +50,7 @@ import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
     public static Map<UUID, String> uuidToName = new HashMap<>();
+    public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
     public static File psStoneData;
@@ -92,7 +94,7 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownRegenPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
@@ -154,10 +156,33 @@ public class ProtectionStones extends JavaPlugin {
         // initialize flags
         FlagHandler.initFlags();
 
+        // register permissions
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.destroy"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unclaim"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.view"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.info"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count.others"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.hide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.priority"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.owners"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.members"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.toggle"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.region"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.admin"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.bypass"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.superowner"));
+
         // uuid cache
         getServer().getConsoleSender().sendMessage("Building UUID cache...");
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             uuidToName.put(op.getUniqueId(), op.getName());
+            nameToUUID.put(op.getName(), op.getUniqueId());
         }
 
         // check if uuids have been upgraded already
