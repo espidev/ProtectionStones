@@ -22,7 +22,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -31,7 +30,7 @@ import java.util.Map;
 
 public class ArgTp {
 
-    // /ps tp
+    // /ps tp, /ps home
     public static boolean argumentTp(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
@@ -67,11 +66,18 @@ public class ArgTp {
 
         // region checks
         if (args[0].equalsIgnoreCase("tp")) {
+
+            if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+                p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+                return true;
+            }
+
             LocalPlayer lp;
             try {
-                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[1]));
+                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1])));
             } catch (Exception e) {
-                p.sendMessage(PSL.REGION_ERROR_SEARCH.msg().replace("%player%", args[1]));
+                p.sendMessage(PSL.REGION_ERROR_SEARCH.msg()
+                        .replace("%player%", args[1]));
                 return true;
             }
 
@@ -107,10 +113,10 @@ public class ArgTp {
             }
 
             if (index <= 0) {
-                p.sendMessage(ChatColor.RED + "You don't own any protected regions in this world!");
+                p.sendMessage(PSL.NO_REGIONS_OWNED.msg());
             }
             if (rgnum > index) {
-                p.sendMessage(ChatColor.RED + "You only have " + index + " total regions in this world!");
+                p.sendMessage(PSL.HOME_ONLY.msg().replace("%num%", "" + index));
                 return true;
             }
         }
@@ -121,14 +127,14 @@ public class ArgTp {
             String[] pos = region.split("x|y|z");
             if (pos.length == 3) {
                 pos[0] = pos[0].substring(2);
-                p.sendMessage(ChatColor.GREEN + "Teleporting...");
+                p.sendMessage(PSL.TPING.msg());
                 Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
                 p.teleport(tploc);
             } else {
-                p.sendMessage(ChatColor.RED + "Error in teleporting to protected region! (parsing WG region name error)");
+                p.sendMessage(PSL.TP_ERROR_NAME.msg());
             }
         } else {
-            p.sendMessage(ChatColor.RED + "Error in finding the region to teleport to!");
+            p.sendMessage(PSL.TP_ERROR_TP.msg());
         }
 
         return true;

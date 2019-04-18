@@ -16,9 +16,14 @@
 
 package me.vik1395.ProtectionStones;
 
+import java.util.List;
+
 public class ConfigProtectBlock {
     private int regionX, regionY, regionZ, defaultPriority;
-    boolean autoHide, noDrop, blockPiston, silkTouch;
+    private boolean autoHide, noDrop, blockPiston, silkTouch, worldListOption;
+
+    private List<String> worlds;
+
 
     /*
      * Object to represent a protection block as defined in config ("Region" section)

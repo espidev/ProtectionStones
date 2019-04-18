@@ -39,10 +39,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -63,7 +60,10 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+        ProtectionStones.uuidToName.remove(e.getPlayer().getUniqueId());
         ProtectionStones.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        ProtectionStones.nameToUUID.remove(e.getPlayer().getName());
+        ProtectionStones.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -97,7 +97,7 @@ public class ListenerClass implements Listener {
 
         // check if player can place block in that area
         if (!wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
-            p.sendMessage(ChatColor.RED + "You can't protect that area.");
+            p.sendMessage(PSL.CANT_PROTECT_THAT.msg());
             e.setCancelled(true);
             return;
         }
@@ -111,9 +111,7 @@ public class ListenerClass implements Listener {
 
                 if (lastPlace + cooldown > currentTime) { // if cooldown has not been finished
                     e.setCancelled(true);
-                    if (ProtectionStones.cooldownMessage == null) return;
-                    String cooldownMessage = ProtectionStones.cooldownMessage.replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000)));
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', cooldownMessage));
+                    p.sendMessage(PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000))));
                     return;
                 }
 
@@ -144,7 +142,7 @@ public class ListenerClass implements Listener {
             // check if player has passed region limit
             if (rm.getRegionCountOfPlayer(lp) >= max) {
                 if (max != 0) {
-                    p.sendMessage(ChatColor.RED + "You can not create any more protected regions.");
+                    p.sendMessage(PSL.REACHED_REGION_LIMIT.msg());
                     e.setCancelled(true);
                     return;
                 }
@@ -152,7 +150,7 @@ public class ListenerClass implements Listener {
             // check if in denied world
             for (String world : ProtectionStones.deniedWorlds) {
                 if (world.trim().equals(p.getLocation().getWorld().getName())) {
-                    p.sendMessage(ChatColor.RED + "You can not create protections in this world.");
+                    p.sendMessage(PSL.WORLD_DENIED_CREATE.msg());
                     e.setCancelled(true);
                     return;
                 }
@@ -201,7 +199,7 @@ public class ListenerClass implements Listener {
                 } catch (StorageException e1) {
                     e1.printStackTrace();
                 }
-                p.sendMessage(ChatColor.YELLOW + "You can not place a protection here as it overlaps another region.");
+                p.sendMessage(PSL.REGION_OVERLAP.msg());
                 e.setCancelled(true);
                 return;
             }
@@ -224,7 +222,7 @@ public class ListenerClass implements Listener {
         // set flags
         region.setFlags(flags);
         region.setPriority(blockOptions.getDefaultPriority());
-        p.sendMessage(ChatColor.YELLOW + "This area is now protected.");
+        p.sendMessage(PSL.PROTECTED.msg());
 
         // save
         try {
@@ -314,26 +312,16 @@ public class ListenerClass implements Listener {
 
         // check if player is owner of region
         if (!rgm.getRegion(id).isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
-            p.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
+            p.sendMessage(PSL.NO_REGION_PERMISSION.msg());
             e.setCancelled(true);
             return;
         }
 
         // return protection stone if no drop option is off
         if (!blockOptions.noDrop()) {
-            ItemStack oreblock = new ItemStack(pb.getType(), 1, pb.getData());
-            int freeSpace = 0;
-            for (ItemStack i : p.getInventory()) {
-                if (i == null) {
-                    freeSpace += oreblock.getType().getMaxStackSize();
-                } else if (i.getType() == oreblock.getType()) {
-                    freeSpace += i.getType().getMaxStackSize() - i.getAmount();
-                }
-            }
-            if (freeSpace >= 1) {
-                p.getInventory().addItem(oreblock);
-            } else {
-                p.sendMessage(ChatColor.RED + "You don't have enough room in your inventory.");
+            if (!p.getInventory().addItem(new ItemStack(pb.getType(), 1)).isEmpty()) {
+                // method will return not empty if item couldn't be added
+                p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 e.setCancelled(true);
                 return;
             }
@@ -348,7 +336,7 @@ public class ListenerClass implements Listener {
         } catch (Exception e1) {
             ProtectionStones.getPlugin().getLogger().severe("WorldGuard Error [" + e1 + "] during Region File Save");
         }
-        p.sendMessage(ChatColor.YELLOW + "This area is no longer protected.");
+        p.sendMessage(PSL.NO_LONGER_PROTECTED.msg());
 
         e.setDropItems(false);
         e.setExpToDrop(0);
@@ -367,9 +355,7 @@ public class ListenerClass implements Listener {
         return baseDrops;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPistonExtend(BlockPistonExtendEvent e) {
-        List<Block> pushedBlocks = e.getBlocks();
+    private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
         for (Block b : pushedBlocks) {
             ConfigProtectBlock cpb = ProtectionStones.getProtectStoneOptions(b.getType().toString());
             if (ProtectionStones.protectBlocks.contains(b.getType().toString()) && cpb != null && cpb.denyBlockPiston()) {
@@ -379,14 +365,13 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
+    public void onPistonExtend(BlockPistonExtendEvent e) {
+        pistonUtil(e.getBlocks(), e);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPistonRetract(BlockPistonRetractEvent e) {
-        List<Block> retractedBlocks = e.getBlocks();
-        for (Block b : retractedBlocks) {
-            ConfigProtectBlock cpb = ProtectionStones.getProtectStoneOptions(b.getType().toString());
-            if (ProtectionStones.protectBlocks.contains(b.getType().toString()) && cpb != null && cpb.denyBlockPiston()) {
-                e.setCancelled(true);
-            }
-        }
+        pistonUtil(e.getBlocks(), e);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -449,15 +434,12 @@ public class ListenerClass implements Listener {
             RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
             RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
             BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
-            if (rgm.getApplicableRegions(v) != null) {
-                ApplicableRegionSet region = rgm.getApplicableRegions(v);
-                ApplicableRegionSet regionFrom = rgm.getApplicableRegions(v);
-                if (regionFrom != null) {
-                    if (!(regionFrom.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP))) {
-                        if (region.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
-                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cWarning! &eThis area is a &cPVP &earea! You may &cdie &eand &close stuff&e!"));
-                        }
-                    }
+            ApplicableRegionSet region = rgm.getApplicableRegions(v);
+            ApplicableRegionSet regionFrom = rgm.getApplicableRegions(v);
+
+            if (!regionFrom.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
+                if (region.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cWarning! &eThis area is a &cPVP &earea! You may &cdie &eand &close stuff&e!"));
                 }
             }
         }

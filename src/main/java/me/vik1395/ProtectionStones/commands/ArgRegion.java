@@ -23,7 +23,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -47,7 +46,12 @@ public class ArgRegion {
             return true;
         }
 
-        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(args[2]));
+        if (!ProtectionStones.nameToUUID.containsKey(args[2])) {
+            p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+            return true;
+        }
+
+        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[2])));
 
         if (args[1].equalsIgnoreCase("count")) { // count player's regions
             int count = ArgCount.countRegionsOfPlayer(lp, rgm); // TODO check if rgm needs to be p2's
@@ -76,33 +80,34 @@ public class ArgRegion {
                         .replace("%regions%", regionMessage));
             }
 
-        } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("regen")) || (args[1].equalsIgnoreCase("disown"))) {
+        } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("disown"))) {
 
             // Find regions
             Map<String, ProtectedRegion> regions = rgm.getRegions();
             List<String> regionIDList = new ArrayList<>();
-            int index = 0;
+            boolean found = false;
             for (String idname : regions.keySet()) {
                 if (idname.startsWith("ps") && (regions.get(idname).getOwners().contains(lp))) {
                     regionIDList.add(idname);
-                    index++;
+                    found = true;
                 }
             }
-            if (index == 0) {
+            if (!found) {
                 p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg().replace("%player%", args[2]));
-            } else {
-
-                // Remove regions
-                for (String s : regionIDList)
-                    ProtectionStones.removeDisownRegenPSRegion(lp, args[1].toLowerCase(), s, rgm, p);
-
-                p.sendMessage(PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
-                try {
-                    rgm.save();
-                } catch (Exception e) {
-                    System.out.println("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                }
+                return true;
             }
+
+            // Remove regions
+            for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p);
+
+            p.sendMessage(PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
+            try {
+                rgm.save();
+            } catch (Exception e) {
+                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+            }
+        } else {
+            p.sendMessage(PSL.REGION_HELP.msg());
         }
         return true;
     }

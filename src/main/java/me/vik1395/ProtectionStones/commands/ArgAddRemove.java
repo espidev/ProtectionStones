@@ -41,12 +41,11 @@ public class ArgAddRemove {
             p.sendMessage(PSL.NOT_IN_REGION.msg());
             return null;
         }
-        OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
-        if (!op.hasPlayedBefore() && checkPlayer) {
+        if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
             p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
             return null;
         }
-        return op;
+        return Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]));
     }
 
     // Handles adding and removing players to region, both as members and owners
@@ -57,11 +56,11 @@ public class ArgAddRemove {
     //   removeowner: remove owner
 
     public static boolean template(Player p, String[] args, String psID, String type) {
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners", type.startsWith("add")); // validate permissions and stuff
         if (op == null) return true;
-
         switch (type) {
             case "add":
                 rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId());

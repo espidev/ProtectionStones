@@ -19,10 +19,10 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,26 +40,26 @@ public class ArgUnclaim {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.unclaim")) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to use the Reclaim Command");
+            p.sendMessage(PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
         if (psID.equals("")) {
-            p.sendMessage(ChatColor.RED + "You are not in a protection stone region!");
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return true;
         }
         ProtectedRegion region = rgm.getRegion(psID);
 
         if (region == null) {
-            p.sendMessage(ChatColor.YELLOW + "You are currently not in a region.");
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return true;
         }
         if (!psID.substring(0, 2).equals("ps")) {
-            p.sendMessage(ChatColor.YELLOW + "You are currently not in a protection stones region.");
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return true;
         }
 
         if (!region.isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
-            p.sendMessage(ChatColor.YELLOW + "You are not the owner of this region.");
+            p.sendMessage(PSL.NO_REGION_PERMISSION.msg());
             return true;
         }
 
@@ -78,7 +78,7 @@ public class ArgUnclaim {
 
             type = hideFile.getString(entry);
             if (type == null) {
-                p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
+                p.sendMessage(PSL.UNCLAIM_CANT_FIND.msg());
                 return true;
             }
 
@@ -93,26 +93,16 @@ public class ArgUnclaim {
 
         // Return and remove protection stone
         if (ProtectionStones.getProtectStoneOptions(type) == null) {
-            p.sendMessage(ChatColor.RED + "We can't seem to find the protection stone! Please ask an admin to remove the region manually.");
+            p.sendMessage(PSL.UNCLAIM_CANT_FIND.msg());
             return true;
         }
 
         if (!ProtectionStones.getProtectStoneOptions(type).noDrop()) {
 
-            boolean freeSpace = false;
-            for (ItemStack is : p.getInventory().getContents()) {
-                if (is == null) {
-                    freeSpace = true;
-                    break;
-                }
-            }
-
             // return protection stone
-            if (freeSpace) {
-                PlayerInventory inventory = p.getInventory();
-                inventory.addItem(new ItemStack(blockToUnhide.getType()));
-            } else {
-                p.sendMessage(ChatColor.RED + "You don't have enough room in your inventory.");
+            if (!p.getInventory().addItem(new ItemStack(blockToUnhide.getType())).isEmpty()) {
+                // method will return not empty if item couldn't be added
+                p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
             }
         }
@@ -125,7 +115,7 @@ public class ArgUnclaim {
         } catch (Exception e1) {
             Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e1 + "] during Region File Save");
         }
-        p.sendMessage(ChatColor.YELLOW + "This area is no longer protected.");
+        p.sendMessage(PSL.NO_LONGER_PROTECTED.msg());
 
         return true;
     }

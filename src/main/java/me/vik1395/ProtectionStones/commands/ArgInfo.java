@@ -37,6 +37,16 @@ public class ArgInfo {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
+        if (psID.equals("")) {
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            return true;
+        }
+        ProtectedRegion region = rgm.getRegion(psID);
+        if (region == null) {
+            p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
+            return true;
+        }
+
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
             p.sendMessage(PSL.NO_ACCESS.msg());
             return true;
@@ -48,18 +58,8 @@ public class ArgInfo {
                 return true;
             }
 
-            if (psID.equals("")) {
-                p.sendMessage(PSL.NOT_IN_REGION.msg());
-                return true;
-            }
-            ProtectedRegion region = rgm.getRegion(psID);
-            if (region == null) {
-                p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
-                return true;
-            }
-
             p.sendMessage(PSL.INFO_HEADER.msg());
-            p.sendMessage(ChatColor.BLUE + "Region:" + ChatColor.YELLOW + psID + ChatColor.BLUE + ", Priority: " + ChatColor.YELLOW + rgm.getRegion(psID).getPriority());
+            p.sendMessage(PSL.INFO_REGION.msg() + psID + ", " + PSL.INFO_PRIORITY.msg() + rgm.getRegion(psID).getPriority());
 
 
             displayFlags(p, region);
@@ -68,7 +68,7 @@ public class ArgInfo {
 
             BlockVector3 min = region.getMinimumPoint();
             BlockVector3 max = region.getMaximumPoint();
-            p.sendMessage(ChatColor.BLUE + "Bounds: " + ChatColor.YELLOW + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
+            p.sendMessage(PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
 
         } else if (args.length == 2) { // get specific information on current region
 
@@ -78,21 +78,21 @@ public class ArgInfo {
                         p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
                         return true;
                     }
-                    displayMembers(p, rgm.getRegion(psID));
+                    displayMembers(p, region);
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners")) {
                         p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
                         return true;
                     }
-                    displayOwners(p, rgm.getRegion(psID));
+                    displayOwners(p, region);
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags")) {
                         p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
-                    displayFlags(p, rgm.getRegion(psID));
+                    displayFlags(p, region);
                     break;
                 default:
                     p.sendMessage(PSL.INFO_HELP.msg());
@@ -122,20 +122,19 @@ public class ArgInfo {
 
         if (myFlag.length() > 2) {
             myFlag = new StringBuilder(myFlag.substring(0, myFlag.length() - 2) + ".");
-            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.YELLOW + myFlag);
+            p.sendMessage(PSL.INFO_FLAGS.msg() + myFlag);
         } else {
-            p.sendMessage(PSL.INFO_FLAGS.msg() + " " + ChatColor.RED + "(none)");
+            p.sendMessage(PSL.INFO_FLAGS.msg() + "(none)");
         }
     }
 
     private static void displayOwners(Player p, ProtectedRegion region) {
         DefaultDomain owners = region.getOwners();
-        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg() + " ");
+        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg());
         if (owners.size() == 0) {
             send.append(PSL.INFO_NO_OWNERS.msg());
             p.sendMessage(send.toString());
         } else {
-            send.append(ChatColor.YELLOW);
             for (UUID uuid : owners.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
                 if (name == null) name = Bukkit.getOfflinePlayer(uuid).getName();
@@ -150,12 +149,11 @@ public class ArgInfo {
 
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
-        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg() + " ");
+        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg());
         if (members.size() == 0) {
             send.append(PSL.INFO_NO_MEMBERS.msg());
             p.sendMessage(send.toString());
         } else {
-            send.append(ChatColor.YELLOW);
             for (UUID uuid : members.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
                 if (name == null) name = uuid.toString();

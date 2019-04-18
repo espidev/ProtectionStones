@@ -37,8 +37,7 @@ public class ArgAdmin {
         }
 
         if (args.length < 2) {
-            p.sendMessage(ChatColor.RED + "/ps admin {version|settings|hide|unhide|");
-            p.sendMessage(ChatColor.RED + "           cleanup|lastlogon|lastlogons|stats}");
+            p.sendMessage(PSL.ADMIN_HELP.msg());
             return true;
         }
 

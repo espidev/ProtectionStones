@@ -24,6 +24,10 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.commands.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -31,6 +35,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,11 +44,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
     public static Map<UUID, String> uuidToName = new HashMap<>();
+    public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
     public static File psStoneData;
@@ -62,7 +69,6 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isCooldownEnable = false;
     public static int cooldown = 0;
-    public static String cooldownMessage = null;
 
     public static Plugin getPlugin() {
         return plugin;
@@ -88,18 +94,13 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownRegenPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
                 DefaultDomain owners = r.getOwners();
                 owners.removePlayer(lp);
                 r.setOwners(owners);
-                break;
-            case "regen":
-                Bukkit.dispatchCommand(admin, "region select " + region);
-                Bukkit.dispatchCommand(admin, "/regen");
-                rgm.removeRegion(region);
                 break;
             case "remove":
                 if (region.substring(0, 2).equals("ps")) {
@@ -142,17 +143,8 @@ public class ProtectionStones extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
             wgd = getServer().getPluginManager().getPlugin("WorldGuard");
         } else {
-            getLogger().info("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
+            getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
-        }
-
-        // add block types
-        for (String material : this.getConfig().getString("Blocks").split(",")) {
-            if (Material.getMaterial(material) == null) {
-                Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
-            } else {
-                protectBlocks.add(material.toUpperCase());
-            }
         }
 
         // init config
@@ -161,108 +153,92 @@ public class ProtectionStones extends JavaPlugin {
         // init messages
         PSL.loadConfig();
 
-        flags = getConfig().getStringList("Flags");
-        allowedFlags = Arrays.asList((getConfig().getString("Allowed Flags").toLowerCase()).split(","));
-        deniedWorlds = getConfig().getStringList("Worlds Denied");
-
-        getLogger().info("Placing of Protection Stones is disabled in the following worlds (override with protectionstones.admin): ");
-        for (String world : deniedWorlds) {
-            getLogger().info("- " + world);
-        }
-
-        isCooldownEnable = getConfig().getBoolean("cooldown.enable");
-        cooldown = getConfig().getInt("cooldown.cooldown") * 1000;
-        cooldownMessage = getConfig().getString("cooldown.message");
-
-        // uuid cache
-        getLogger().info("Building UUID cache...");
-        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-            uuidToName.put(op.getUniqueId(), op.getName());
-        }
-
         // initialize flags
         FlagHandler.initFlags();
 
-        // check if uuids have been upgraded already
-        getLogger().info("Checking if PS regions have been updated to UUIDs...");
-        // Update to UUIDs
-        if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
-            getLogger().info("Updating PS regions to UUIDs...");
-            for (World world : Bukkit.getWorlds()) {
-                RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+        // register permissions
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.destroy"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unclaim"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.view"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.info"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count.others"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.hide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.priority"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.owners"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.members"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.toggle"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.region"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.admin"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.bypass"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.superowner"));
 
-                // iterate over regions in world
-                for (String regionName : rm.getRegions().keySet()) {
-                    if (regionName.startsWith("ps")) {
-                        ProtectedRegion region = rm.getRegion(regionName);
-
-                        // convert owners with player names to UUIDs
-                        List<String> owners, members;
-                        owners = new ArrayList<>(region.getOwners().getPlayers());
-                        members = new ArrayList<>(region.getMembers().getPlayers());
-
-                        // convert
-                        for (String owner : owners) {
-                            UUID uuid = nameToUUID(owner);
-                            region.getOwners().removePlayer(owner);
-                            region.getOwners().addPlayer(uuid);
-                        }
-                        for (String member : members) {
-                            UUID uuid = nameToUUID(member);
-                            region.getMembers().removePlayer(member);
-                            region.getMembers().addPlayer(uuid);
-                        }
-                    }
-                }
-
-                try {
-                    rm.save();
-                } catch (Exception e) {
-                    Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-                }
-            }
-
-            // update config to mark that uuid upgrade has been done
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
-                writer.write("\nUUIDUpdated: true");
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            getLogger().info("Done!");
+        // uuid cache
+        getServer().getConsoleSender().sendMessage("Building UUID cache...");
+        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+            uuidToName.put(op.getUniqueId(), op.getName());
+            nameToUUID.put(op.getName(), op.getUniqueId());
         }
 
-        getLogger().info("ProtectionStones has successfully started!");
+        // check if uuids have been upgraded already
+        getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
+
+        // Update to UUIDs
+        if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
+            convertToUUID();
+        }
+
+        getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
     }
 
     private static UUID nameToUUID(String name) {
         return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
+    private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
+        for (String perm : permission) {
+            if (p.hasPermission(perm)) {
+                TextComponent m = new TextComponent(msg);
+                m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
+                m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
+                p.spigot().sendMessage(m);
+                break;
+            }
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+            return ArgReload.argumentReload(s, args);
+        }
+
         if (s instanceof Player) {
             Player p = (Player) s;
-            if (cmd.getName().equalsIgnoreCase("ps")) {
                 if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-                    p.sendMessage(ChatColor.YELLOW + "/ps info members|owners|flags");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps add|remove {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps addowner|removeowner {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps count [player]");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps flag {flagname} {setting|null}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps home {num} - " + ChatColor.GREEN + "{num} has to be within the number of protected regions you own. Use /ps count to check");
-                    p.sendMessage(ChatColor.YELLOW + "/ps tp {player} {num}");
-                    p.sendMessage(ChatColor.YELLOW + "/ps hide|unhide");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps toggle");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps view");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps unclaim");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps priority {number|null}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps region count|list|remove|regen|disown {playername}");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps admin { version | settings | hide | unhide |");//\\
-                    p.sendMessage(ChatColor.YELLOW + "           cleanup | lastlogon | lastlogons | stats }");//\\
-                    p.sendMessage(ChatColor.YELLOW + "/ps bypass");//\\
+                    p.sendMessage(PSL.HELP.msg());
+                    sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info","protectionstones.info");
+                    sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps","protectionstones.members");
+                    sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
+                    sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
+                    sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
+                    sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
+                    sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
+                    sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
+                    sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
+                    sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), "/ps toggle","protectionstones.toggle");
+                    sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), "/ps view","protectionstones.view");
+                    sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), "/ps unclaim", "protectionstones.unclaim");
+                    sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), "/ps priority","protectionstones.priority");
+                    sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), "/ps region", "protectionstones.region");
+                    sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), "/ps admin", "protectionstones.admin");
+                    sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), "/ps reload", "protectionstones.admin");
                     return true;
                 }
 
@@ -342,7 +318,6 @@ public class ProtectionStones extends JavaPlugin {
                     default:
                         p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
-            }
         } else {
             s.sendMessage(ChatColor.RED + "PS cannot be used from the console.");
         }
@@ -354,6 +329,54 @@ public class ProtectionStones extends JavaPlugin {
         if (region == null) return true;
 
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
+    }
+
+    public static void convertToUUID() {
+        Bukkit.getLogger().info("Updating PS regions to UUIDs...");
+        for (World world : Bukkit.getWorlds()) {
+            RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+
+            // iterate over regions in world
+            for (String regionName : rm.getRegions().keySet()) {
+                if (regionName.startsWith("ps")) {
+                    ProtectedRegion region = rm.getRegion(regionName);
+
+                    // convert owners with player names to UUIDs
+                    List<String> owners, members;
+                    owners = new ArrayList<>(region.getOwners().getPlayers());
+                    members = new ArrayList<>(region.getMembers().getPlayers());
+
+                    // convert
+                    for (String owner : owners) {
+                        UUID uuid = nameToUUID(owner);
+                        region.getOwners().removePlayer(owner);
+                        region.getOwners().addPlayer(uuid);
+                    }
+                    for (String member : members) {
+                        UUID uuid = nameToUUID(member);
+                        region.getMembers().removePlayer(member);
+                        region.getMembers().addPlayer(uuid);
+                    }
+                }
+            }
+
+            try {
+                rm.save();
+            } catch (Exception e) {
+                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+            }
+        }
+
+        // update config to mark that uuid upgrade has been done
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
+            writer.write("\nUUIDUpdated: true");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Bukkit.getLogger().info("Done!");
     }
 
 }
