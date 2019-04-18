@@ -1,0 +1,117 @@
+config_version = 3
+uuidupdated = true
+
+# ---------------------------------------------------------------------------------------
+# Protection Stones Config
+# Do not use tabs, you must use spaces when indenting in this file.
+# ---------------------------------------------------------------------------------------
+
+# Please do not change the config version unless you know what you are doing!
+
+# Cooldown between placing protection blocks (in seconds). -1 to disable.
+placing_cooldown = -1
+
+# Whether or not to allow the use of /ps admin cleanup|disown, etc.
+# You should only enable this when you need
+allow_dangerous_commands = false
+
+# **************************************************************************************************************
+
+# Define your protection blocks below
+# Use block names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+# In order to use settings from the "Defaults" section, simply write "default" in any field or simply remove it
+
+# *************** More advanced example ***************************
+[[block]]
+
+    type = "GOLD_ORE"
+
+    # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give.
+    # Other ways to obtain this block (ex. mining) will not work as a protection stone.
+    # Useful to allow the protection block to only be obtained from a shop or command.
+    # Set to "false" if you want to allow players to obtain a protection stone naturally
+    restrict_obtaining = true
+
+    # Enable or disable the use of this protection stone in specific worlds
+    # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
+    # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
+    world_list_type = "blacklist"
+    worlds = [
+           "exampleworld1",
+           "exampleworld2"
+    ]
+
+    [block.region]
+        # Protection radius of block
+        # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+        x_radius = 64
+        y_radius = -1
+        z_radius = 64
+
+        # How many blocks to offset the default location of /ps home from the protection block
+        home_x_offset = 0
+        home_y_offset = 1
+        home_z_offset = 0
+
+        # Specify the default flags to be set when a new protected region is created.
+        Flags = [
+            "pvp deny",
+            "greeting &lEntering &b&l%player%'s &r&lprotected area",
+            "farewell &lLeaving &b&l%player%'s &r&lprotected area"
+        ]
+
+        # List all the flags that can be set by region owners. Separate them with a comma, no space.
+        allowed_flags = [
+            "use",
+            "pvp",
+            "greeting",
+            "farewell",
+            "mob-spawning",
+        ]
+
+        # Default priority type for this block type protection stone
+        priority = 0
+
+    [block.block_data]
+        # Name given to protection block when obtained with /ps give or /ps get
+        # Leave as '' for no name
+        display_name = "&a&m<---&r&6 64x64 Protection Stone &r&a&m--->"
+
+        # Lore given to protection block when obtained with /ps give or /ps get
+        # Leave as [] for no lore
+        lore = [
+            "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"
+        ]
+
+        # Add price when using /ps get
+        # Must have compatible economy plugin (anything that uses Vault, ie. Essentials)
+        Price = 0.0
+
+    [block.behaviour]
+        # Hide protection stone right away when placed?
+        auto_hide = false
+
+        # Disable returning the block when removed/unclaimed?
+        no_drop = false
+
+        # Prevents piston pushing of the block. Recommended to keep as true.
+        prevent_piston_push = true
+
+        # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
+        # This was the old behaviour to prevent natural obtaining of the protection stone.
+        # Recommended to keep false if "Restrict Obtaining" (the new way) is true
+        silk_touch = false
+
+    [block.player]
+        # Whether or not to prevent any sort of teleporting into the protected region
+        prevent_teleport_in = false
+
+        # Can't move for x seconds before teleporting with /ps home or /ps tp. Can be disabled with 0.
+        # Option to teleport only if player stands still.
+        # Can override with permission protectionstones.tp.bypasswait
+        no_moving_when_tp_waiting = true
+        tp_waiting_seconds = 0
+
+        # Extra permission required to place protection block (you still need protectionstones.create)
+        # '' for no extra permission
+        permission = 'protectionstones.create.gold'

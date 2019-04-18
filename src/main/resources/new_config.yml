@@ -76,16 +76,16 @@ Blocks:
         Block Data:
             # Name given to protection block when obtained with /ps give or /ps get
             # Leave as '' for no name
-            Display Name: '&a&m<---&r&6 64x64 Protection Stone &r&a&m--->'
+            Display Name: "&a&m<---&r&6 64x64 Protection Stone &r&a&m--->"
 
             # Lore given to protection block when obtained with /ps give or /ps get
             # Leave as [] for no lore
             Lore:
-                - '&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!'
+                - "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"
 
             # Add price when using /ps get
             # Must have compatible economy plugin (anything that uses Vault, ie. Essentials)
-            Price: 0
+            Price: 0.0
 
         Behaviour:
             # Hide protection stone right away when placed?

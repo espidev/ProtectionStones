@@ -16,9 +16,8 @@
 
 package me.vik1395.ProtectionStones.commands;
 
-import me.vik1395.ProtectionStones.Config;
-import me.vik1395.ProtectionStones.FlagHandler;
 import me.vik1395.ProtectionStones.PSL;
+import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.command.CommandSender;
 
 public class ArgReload {
@@ -28,12 +27,7 @@ public class ArgReload {
             return true;
         }
         p.sendMessage(PSL.RELOAD_START.msg());
-        // init config
-        Config.initConfig();
-        // init messages
-        PSL.loadConfig();
-        // initialize flags
-        FlagHandler.initFlags();
+        ProtectionStones.loadConfig();
         p.sendMessage(PSL.RELOAD_COMPLETE.msg());
         return true;
     }

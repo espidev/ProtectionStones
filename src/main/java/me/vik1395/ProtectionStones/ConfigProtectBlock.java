@@ -16,80 +16,40 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.sk89q.worldguard.protection.flags.Flag;
+
+import java.util.HashMap;
 import java.util.List;
 
 public class ConfigProtectBlock {
-    private int regionX, regionY, regionZ, defaultPriority;
-    private boolean autoHide, noDrop, blockPiston, silkTouch, worldListOption;
-
-    private List<String> worlds;
-
 
     /*
-     * Object to represent a protection block as defined in config ("Region" section)
+     * Object to represent a protection block as defined in config ("Blocks" section)
      */
 
-    public int getRegionX() {
-        return regionX;
-    }
+    // main section
+    public boolean restrictObtaining;
+    public String worldListType;
+    public List<String> worlds;
 
-    public void setRegionX(int regionX) {
-        this.regionX = regionX;
-    }
+    // region section
+    public int xRadius, yRadius, zRadius;
+    public int homeXOffset, homeYOffset, homeZOffset;
+    public HashMap<Flag<?>, Object> flags = new HashMap<>();
+    public List<String> allowedFlags;
+    public int priority;
 
-    public int getRegionY() {
-        return regionY;
-    }
+    // block data section
+    public String displayName;
+    public List<String> lore;
+    public double price;
 
-    public void setRegionY(int regionY) {
-        this.regionY = regionY;
-    }
+    // behaviour section
+    public boolean autoHide, noDrop, preventPistonPush, silkTouch;
 
-    public int getRegionZ() {
-        return regionZ;
-    }
+    // player section
+    public boolean preventTeleportIn, noMovingWhenTeleportWaiting;
+    public int tpWaitingSeconds;
+    public String permission;
 
-    public void setRegionZ(int regionZ) {
-        this.regionZ = regionZ;
-    }
-
-    public int getDefaultPriority() {
-        return defaultPriority;
-    }
-
-    public void setDefaultPriority(int defaultPriority) {
-        this.defaultPriority = defaultPriority;
-    }
-
-    public boolean isAutoHide() {
-        return autoHide;
-    }
-
-    public void setAutoHide(boolean autoHide) {
-        this.autoHide = autoHide;
-    }
-
-    public boolean noDrop() {
-        return noDrop;
-    }
-
-    public void setNoDrop(boolean noDrop) {
-        this.noDrop = noDrop;
-    }
-
-    public boolean denyBlockPiston() {
-        return blockPiston;
-    }
-
-    public void setBlockPiston(boolean blockPiston) {
-        this.blockPiston = blockPiston;
-    }
-
-    public boolean denySilkTouch() {
-        return silkTouch;
-    }
-
-    public void setSilkTouch(boolean silkTouch) {
-        this.silkTouch = silkTouch;
-    }
 }

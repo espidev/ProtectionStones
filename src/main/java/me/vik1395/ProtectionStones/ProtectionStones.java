@@ -16,6 +16,8 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -33,7 +35,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
@@ -54,21 +55,18 @@ public class ProtectionStones extends JavaPlugin {
 
     public static Plugin plugin, wgd;
     public static File psStoneData;
-    public static File conf;
+    public static File configLocation;
 
     public static Metrics metrics;
 
-    public static FileConfiguration config;
-    public static List<String> flags = new ArrayList<>();
+    public static FileConfig config;
     public static List<String> toggleList = new ArrayList<>();
-    public static List<String> allowedFlags = new ArrayList<>();
-    public static List<String> deniedWorlds = new ArrayList<>();
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
-    public static Collection<String> protectBlocks = new HashSet<>();
     public Map<CommandSender, Integer> viewTaskList;
 
-    public static boolean isCooldownEnable = false;
-    public static int cooldown = 0;
+    // Settings from Configuration
+    public static boolean allowDangerousCommands;
+    public static int placingCooldown;
 
     public static Plugin getPlugin() {
         return plugin;
@@ -114,14 +112,26 @@ public class ProtectionStones extends JavaPlugin {
     }
 
 
+    // called on first start, and /ps reload
+    public static void loadConfig() {
+        // init config
+        Config.initConfig();
+
+        // init messages
+        PSL.loadConfig();
+
+        // initialize flags
+        FlagHandler.initFlags();
+    }
+
     // plugin enable
     @Override
     public void onEnable() {
+        TomlFormat.instance();
+
         viewTaskList = new HashMap<>();
-        saveDefaultConfig();
-        getConfig().options().copyDefaults(true);
         plugin = this;
-        conf = new File(this.getDataFolder() + "/config.yml");
+        configLocation = new File(this.getDataFolder() + "/config.yml");
         psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
 
         // Metrics (bStats)
@@ -147,14 +157,8 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        // init config
-        Config.initConfig();
-
-        // init messages
-        PSL.loadConfig();
-
-        // initialize flags
-        FlagHandler.initFlags();
+        // Load configuration
+        loadConfig();
 
         // register permissions
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));
@@ -369,7 +373,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // update config to mark that uuid upgrade has been done
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(configLocation, true));
             writer.write("\nUUIDUpdated: true");
             writer.flush();
             writer.close();

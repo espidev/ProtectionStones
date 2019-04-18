@@ -132,6 +132,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.electronwill.night-config</groupId>
+            <artifactId>toml</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+
         <!--<dependency> LOCAL DEPENDENCIES-->
         <!--<groupId>com.sk89q.worldedit</groupId>-->
         <!--<artifactId>worldedit-bukkit</artifactId>-->
