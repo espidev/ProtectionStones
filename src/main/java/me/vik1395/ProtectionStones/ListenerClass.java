@@ -424,25 +424,4 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if (ProtectionStones.config.getBoolean("Teleport to PVP.Display Warning")) {
-            Player p = event.getPlayer();
-            WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-
-            if (!wg.isEnabled()) return;
-            RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
-            BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
-            ApplicableRegionSet region = rgm.getApplicableRegions(v);
-            ApplicableRegionSet regionFrom = rgm.getApplicableRegions(v);
-
-            if (!regionFrom.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
-                if (region.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cWarning! &eThis area is a &cPVP &earea! You may &cdie &eand &close stuff&e!"));
-                }
-            }
-        }
-    }
-
 }

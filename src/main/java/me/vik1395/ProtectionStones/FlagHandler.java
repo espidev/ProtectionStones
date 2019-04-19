@@ -25,16 +25,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-
 public class FlagHandler {
 
-    public static HashMap<Flag<?>, Object> defaultFlags = new HashMap<>();
-
-    public static void initFlags() {
-        defaultFlags.clear();
-
-        for (String flagraw : ProtectionStones.flags) {
+    public static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
+        for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
             String settings = "";
             for (int i = 1; i < split.length; i++) settings += split[i] + " ";
@@ -43,7 +37,7 @@ public class FlagHandler {
             Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
-                defaultFlags.put(flag, flag.parseInput(fc));
+                b.regionFlags.put(flag, flag.parseInput(fc));
             } catch (Exception e) {
                 Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
                 e.printStackTrace();

@@ -59,14 +59,13 @@ public class ProtectionStones extends JavaPlugin {
 
     public static Metrics metrics;
 
+    // all configuration file options are stored in here
+    public static Config configOptions;
     public static FileConfig config;
-    public static List<String> toggleList = new ArrayList<>();
+    // block options
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
-    public Map<CommandSender, Integer> viewTaskList;
 
-    // Settings from Configuration
-    public static boolean allowDangerousCommands;
-    public static int placingCooldown;
+    public static List<String> toggleList = new ArrayList<>();
 
     public static Plugin getPlugin() {
         return plugin;
@@ -78,11 +77,16 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to get the config options for a protection stone
     // Makes code look cleaner
-    public static ConfigProtectBlock getProtectStoneOptions(String blockType) {
+    public static ConfigProtectBlock getBlockOptions(String blockType) {
         return protectionStonesOptions.get(blockType);
     }
 
-    // Turn WG region name into a location (ex. ps138x35y358z i think)
+    // Check if block material name is valid protection block
+    public static boolean isProtectBlock(String material) {
+        return protectionStonesOptions.containsKey(material);
+    }
+
+    // Turn WG region name into a location (ex. ps138x35y358z)
     public static PSLocation parsePSRegionToLocation(String regionName) {
         int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
         int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
@@ -119,9 +123,6 @@ public class ProtectionStones extends JavaPlugin {
 
         // init messages
         PSL.loadConfig();
-
-        // initialize flags
-        FlagHandler.initFlags();
     }
 
     // plugin enable
@@ -129,7 +130,6 @@ public class ProtectionStones extends JavaPlugin {
     public void onEnable() {
         TomlFormat.instance();
 
-        viewTaskList = new HashMap<>();
         plugin = this;
         configLocation = new File(this.getDataFolder() + "/config.yml");
         psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");

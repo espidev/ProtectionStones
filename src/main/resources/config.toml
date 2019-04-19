@@ -54,7 +54,7 @@ allow_dangerous_commands = false
         home_z_offset = 0
 
         # Specify the default flags to be set when a new protected region is created.
-        Flags = [
+        flags = [
             "pvp deny",
             "greeting &lEntering &b&l%player%'s &r&lprotected area",
             "farewell &lLeaving &b&l%player%'s &r&lprotected area"
@@ -85,7 +85,7 @@ allow_dangerous_commands = false
 
         # Add price when using /ps get
         # Must have compatible economy plugin (anything that uses Vault, ie. Essentials)
-        Price = 0.0
+        price = 0.0
 
     [block.behaviour]
         # Hide protection stone right away when placed?

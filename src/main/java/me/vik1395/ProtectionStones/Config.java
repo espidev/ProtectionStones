@@ -16,7 +16,7 @@
 
 package me.vik1395.ProtectionStones;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
@@ -25,8 +25,10 @@ import java.util.List;
 
 public class Config {
 
+    // config options
+    // config.toml will be loaded into these fields
     @Path("config_version")
-    String configVersion;
+    int configVersion;
     @Path("uuidupdated")
     Boolean uuidupdated;
     @Path("placing_cooldown")
@@ -36,40 +38,32 @@ public class Config {
     @Path("block")
     List<ConfigProtectBlock> blocks;
 
+
     public static void initConfig() {
+        // clear data (for /ps reload)
+        ProtectionStones.protectionStonesOptions.clear();
 
         if (ProtectionStones.config == null) {
             ProtectionStones.config = FileConfig.of(ProtectionStones.configLocation);
         }
         ProtectionStones.config.load();
 
-        // not necessary for now
         // TODO UPGRADE FROM OLD CONFIG
 
         // keep in mind that there is /ps reload, so clear arrays before adding config options!
 
-        ProtectionStones.protectionStonesOptions.clear();
+        // load config into configOptions object
+        ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
 
         // add protection stones to options map
-        if (ProtectionStones.config.get("block") == null) {
+        if (ProtectionStones.configOptions.blocks.isEmpty()) {
             Bukkit.getLogger().info("Region block not found! You do not have any protection blocks configured!");
         } else {
             Bukkit.getLogger().info("Protection Stone Blocks:");
-            for (CommentedConfig block : ProtectionStones.config.getConfigurationSection("Blocks").getKeys(false)) {
-                Bukkit.getLogger().info("- " + block);
-                // code looks cleaner without constructor
-                ConfigProtectBlock b = new ConfigProtectBlock();
-                b.setRegionX(ProtectionStones.config.getInt("Region." + block + ".X Radius"));
-                b.setRegionY(ProtectionStones.config.getInt("Region." + block + ".Y Radius"));
-                b.setRegionZ(ProtectionStones.config.getInt("Region." + block + ".Z Radius"));
-
-                b.setAutoHide(ProtectionStones.config.getBoolean("Region." + block + ".Auto Hide"));
-                b.setBlockPiston(ProtectionStones.config.getBoolean("Region." + block + ".Block Piston"));
-                b.setNoDrop(ProtectionStones.config.getBoolean("Region." + block + ".No Drop"));
-                b.setSilkTouch(ProtectionStones.config.getBoolean("Region." + block + ".Silk Touch"));
-                b.setDefaultPriority(ProtectionStones.config.getInt("Region." + block + ".Priority"));
-
-                ProtectionStones.protectionStonesOptions.put(block, b);
+            for (ConfigProtectBlock b : ProtectionStones.configOptions.blocks) {
+                Bukkit.getLogger().info("- " + b.type);
+                FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
+                ProtectionStones.protectionStonesOptions.put(b.type, b); // init block
             }
         }
 
