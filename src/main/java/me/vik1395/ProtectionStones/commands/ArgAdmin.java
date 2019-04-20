@@ -65,9 +65,11 @@ public class ArgAdmin {
             case "lastlogons":
                 return ArgAdminLastlogon.argumentAdminLastLogons(p, args);
             case "fixregions":
-                p.sendMessage(ChatColor.YELLOW + "Fixing...");
-                ProtectionStones.upgradeRegions();
-                p.sendMessage(ChatColor.YELLOW + "Done!");
+                Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+                    p.sendMessage(ChatColor.YELLOW + "Fixing...");
+                    ProtectionStones.upgradeRegions();
+                    p.sendMessage(ChatColor.YELLOW + "Done!");
+                });
                 break;
         }
         return true;
