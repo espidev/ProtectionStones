@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -40,6 +41,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
+import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.HashMap;
@@ -72,6 +75,12 @@ public class ListenerClass implements Listener {
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getName())) return;
+
+        // check if the item was created by protection stones (stored in custom tag)
+        // block must have restrictObtaining enabled for blocking place
+        CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
+        String tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+        if (blockOptions.restrictObtaining && (tag == null || !tag.equalsIgnoreCase("true"))) return;
 
         // check permission
         if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
@@ -305,7 +314,7 @@ public class ListenerClass implements Listener {
 
         // return protection stone if no drop option is off
         if (!blockOptions.noDrop) {
-            if (!p.getInventory().addItem(new ItemStack(pb.getType(), 1)).isEmpty()) {
+            if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(blockOptions)).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 e.setCancelled(true);

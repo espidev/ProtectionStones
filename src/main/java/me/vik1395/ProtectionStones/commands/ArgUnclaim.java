@@ -19,10 +19,7 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.vik1395.ProtectionStones.FlagHandler;
-import me.vik1395.ProtectionStones.PSL;
-import me.vik1395.ProtectionStones.PSLocation;
-import me.vik1395.ProtectionStones.ProtectionStones;
+import me.vik1395.ProtectionStones.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -63,11 +60,11 @@ public class ArgUnclaim {
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
         String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+        ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(type);
 
-        if (!ProtectionStones.getBlockOptions(type).noDrop) {
-
+        if (!cpb.noDrop) {
             // return protection stone
-            if (!p.getInventory().addItem(new ItemStack(Material.getMaterial(type))).isEmpty()) {
+            if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;

@@ -157,7 +157,8 @@ public class Config {
                 b.set("region.flags", flags);
                 b.set("region.allowed_flags",  allowedFlags);
                 b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
-                b.set("block_data.display_name", "&a&m<---&r&6 Protection Stone &r&a&m--->");
+                b.set("block_data.display_name", "");
+                b.set("block_data.lore", Arrays.asList());
                 b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
                 b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
                 b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));

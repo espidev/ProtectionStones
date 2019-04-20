@@ -30,6 +30,7 @@ public enum PSL {
     NO_SUCH_COMMAND("no_such_command", ChatColor.RED + "No such command. please type /ps help for more info"),
     NO_ACCESS("no_access", ChatColor.RED + "You are not allowed to do that here."),
     NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
+    INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -54,6 +55,9 @@ public enum PSL {
     NO_PERMISSION_HOME("no_permission_home", ChatColor.RED + "You do not have permission to teleport to your protection blocks."),
     NO_PERMISSION_UNCLAIM("no_permission_unclaim", ChatColor.RED + "You do not have permission to use the unclaim command."),
     NO_PERMISSION_VIEW("no_permission_view", ChatColor.RED + "You do not have permission to use the view command."),
+    NO_PERMISSION_GIVE("no_permission_give", ChatColor.RED + "You do not have permission to use the give command."),
+    NO_PERMISSION_GET("no_permission_get", ChatColor.RED + "You do not have permission to use the get command."),
+    NO_PERMISSION_SETHOME("no_permission_sethome", ChatColor.RED + "You do not have permission to use the sethome command."),
 
     ADDED_TO_REGION("psregion.added_to_region",  ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
@@ -142,7 +146,6 @@ public enum PSL {
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),
     UNCLAIM_HELP_DESC("unclaim.help_desc", "Use this command to pickup a placed protection stone and remove the region."),
-    UNCLAIM_CANT_FIND("unclaim.cant_find", ChatColor.RED + "We can't seem to find the protection block! Please ask an admin to remove the region manually."),
 
     // ps view
     VIEW_HELP("view.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps view"),
@@ -176,6 +179,18 @@ public enum PSL {
     ADDREMOVE_HELP_DESC("addremove.help_desc", "Use this command to add or remove a member of your protected region."),
     ADDREMOVE_OWNER_HELP("addremove.owner_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps addowner|removeowner [playername]"),
     ADDREMOVE_OWNER_HELP_DESC("addremove.owner_help_desc", "Use this command to add or remove an owner of your protected region."),
+
+    // ps get
+    GET_HELP("get.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps get [block]"),
+    GET_HELP_DESC("get.help_desc", "Use this command to get or purchase a protection block."),
+
+    // ps give
+    GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player]"),
+    GIVE_HELP_DESC("give.help_desc", "Use this command to give a player a protection block."),
+
+    // ps sethome
+    SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),
+    SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
 
     ;
 

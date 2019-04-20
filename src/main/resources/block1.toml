@@ -4,6 +4,7 @@ type = "EMERALD_ORE"
 
 # Another way to refer to the protection stone
 # Can be used for /ps give and /ps get
+# Must be one word (no spaces)
 alias = "64"
 
 # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give.

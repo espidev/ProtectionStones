@@ -37,6 +37,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -79,6 +82,25 @@ public class ProtectionStones extends JavaPlugin {
     // Check if block material name is valid protection block
     public static boolean isProtectBlock(String material) {
         return protectionStonesOptions.containsKey(material);
+    }
+
+    // Create protection stone item (for /ps get and /ps give, and unclaiming)
+    public static ItemStack createProtectBlockItem(ConfigProtectBlock b) {
+        ItemStack is = new ItemStack(Material.getMaterial(b.type));
+        ItemMeta im = is.getItemMeta();
+
+        if (!b.displayName.equals("")) {
+            im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
+        }
+        List<String> lore = new ArrayList<>();
+        for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+        im.setLore(lore);
+
+        // add identifier for protection stone created items
+        im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.STRING, "true");
+
+        is.setItemMeta(im);
+        return is;
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z)
@@ -158,10 +180,13 @@ public class ProtectionStones extends JavaPlugin {
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unclaim"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.view"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.info"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.get"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.give"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count.others"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.hide"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.sethome"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypassprevent"));
@@ -220,9 +245,12 @@ public class ProtectionStones extends JavaPlugin {
                     sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info","protectionstones.info");
                     sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps","protectionstones.members");
                     sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
+                    sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), "/ps get", "protectionstones.get");
+                    sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), "/ps give", "protectionstones.give");
                     sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
                     sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
                     sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
+                    sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), "/ps sethome", "protectionstones.sethome");
                     sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
                     sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
                     sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
