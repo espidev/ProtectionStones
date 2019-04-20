@@ -8,9 +8,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 
 **Dependencies**
 -------------
-* ProtectionStones 1.7.1
+* ProtectionStones 2.0.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
+  * Vault (Optional)
   
 **Configuration**
 -------------

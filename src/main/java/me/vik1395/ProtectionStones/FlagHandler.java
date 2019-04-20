@@ -25,6 +25,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+
 public class FlagHandler {
 
     // Custom WorldGuard Flags used by ProtectionStones
@@ -56,6 +58,7 @@ public class FlagHandler {
 
     // Initializes user defined default flags for block
     public static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
+        b.regionFlags = new HashMap<>();
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
             String settings = "";

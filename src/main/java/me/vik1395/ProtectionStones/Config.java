@@ -55,7 +55,7 @@ public class Config {
             }
             if (!ProtectionStones.blockDataFolder.exists()) {
                 ProtectionStones.blockDataFolder.mkdir();
-                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(ProtectionStones.configLocation.getAbsolutePath() + "/block1.toml"), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(ProtectionStones.blockDataFolder.getAbsolutePath() + "/block1.toml"), StandardCopyOption.REPLACE_EXISTING);
             }
             if (!ProtectionStones.configLocation.exists()) {
                 Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
@@ -89,8 +89,13 @@ public class Config {
 
             // iterate over block files and load into map
             for (File file : ProtectionStones.blockDataFolder.listFiles()) {
+                Bukkit.getLogger().info(file.getAbsolutePath());
+
+                FileConfig c = FileConfig.of(file);
+                c.load();
+
                 // convert toml data into object
-                ConfigProtectBlock b = new ObjectConverter().toObject(FileConfig.of(file), ConfigProtectBlock::new);
+                ConfigProtectBlock b = new ObjectConverter().toObject(c, ConfigProtectBlock::new);
 
                 if (Material.getMaterial(b.type) == null) {
                     Bukkit.getLogger().info("Unrecognized material: " + b.type);

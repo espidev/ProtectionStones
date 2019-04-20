@@ -45,7 +45,7 @@ public class ConfigProtectBlock {
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int xRadius;
     @Path("region.y_radius")
-    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    @SpecIntInRange(min = -1, max = Integer.MAX_VALUE)
     public int yRadius;
     @Path("region.z_radius")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)

@@ -122,6 +122,12 @@ public class ProtectionStones extends JavaPlugin {
         PSL.loadConfig();
     }
 
+    @Override
+    public void onLoad() {
+        // register flags
+        FlagHandler.registerFlags();
+    }
+
     // plugin enable
     @Override
     public void onEnable() {
@@ -145,9 +151,6 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
         }
-
-        // register flags
-        FlagHandler.registerFlags();
 
         // Load configuration
         loadConfig();
