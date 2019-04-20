@@ -28,10 +28,8 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,11 +42,8 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ListenerClass implements Listener {
     private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
@@ -247,20 +242,7 @@ public class ListenerClass implements Listener {
 
         // hide block if auto hide is enabled
         if (blockOptions.autoHide) {
-            Block blockToHide = p.getWorld().getBlockAt((int) bx, (int) by, (int) bz);
-            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-            String entry = (int) blockToHide.getLocation().getX() + "x";
-            entry = entry + (int) blockToHide.getLocation().getY() + "y";
-            entry = entry + (int) blockToHide.getLocation().getZ() + "z";
-            hideFile.set(entry, blockToHide.getType().toString());
             b.setType(Material.AIR);
-            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
-                try {
-                    hideFile.save(ProtectionStones.psStoneData);
-                } catch (IOException ex) {
-                    Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            });
         }
     }
 

@@ -17,19 +17,16 @@
 package me.vik1395.ProtectionStones.commands.admin;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.FlagHandler;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ArgAdminHide {
 
@@ -45,37 +42,19 @@ public class ArgAdminHide {
             }
         }
 
-        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-
         // loop through regions that are protection stones and hide or unhide the block
         for (String regionID : regionIDList) {
             PSLocation psl = ProtectionStones.parsePSRegionToLocation(regionID);
             Block blockToChange = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-            String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
 
             if (args[1].equalsIgnoreCase("unhide")) {
-                String blockMaterial = hideFile.getString(entry);
-
-                if (hideFile.contains(entry)) {
-                    hideFile.set(entry, null);
-                    if (blockMaterial != null) {
-                        blockToChange.setType(Material.getMaterial(blockMaterial));
-                    }
-                }
-
+                blockToChange.setType(Material.getMaterial(mgr.getRegion(regionID).getFlag(FlagHandler.PS_BLOCK_MATERIAL)));
             } else if (args[1].equalsIgnoreCase("hide")) {
-                if (ProtectionStones.isProtectBlock(blockToChange.getType().toString()) && !hideFile.contains(entry)) {
-                    hideFile.set(entry, blockToChange.getType().toString());
+                if (ProtectionStones.isProtectBlock(blockToChange.getType().toString())) {
                     blockToChange.setType(Material.AIR);
                 }
             }
 
-        }
-
-        try {
-            hideFile.save(ProtectionStones.psStoneData);
-        } catch (IOException ex) {
-            Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";

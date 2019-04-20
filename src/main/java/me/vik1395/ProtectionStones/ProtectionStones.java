@@ -50,7 +50,7 @@ public class ProtectionStones extends JavaPlugin {
     public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
-    public static File psStoneData, configLocation, blockDataFolder;
+    public static File configLocation, blockDataFolder;
 
     public static Metrics metrics;
 
@@ -133,7 +133,6 @@ public class ProtectionStones extends JavaPlugin {
 
         plugin = this;
         configLocation = new File(this.getDataFolder() + "/config.toml");
-        psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
         blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
         // Metrics (bStats)
@@ -310,6 +309,12 @@ public class ProtectionStones extends JavaPlugin {
                         return ArgFlag.argumentFlag(p, args, currentPSID);
                     case "info":
                         return ArgInfo.argumentInfo(p, args, currentPSID);
+                    case "get":
+                        return ArgGet.argumentGet(p, args);
+                    case "give":
+                        return ArgGive.argumentGive(p, args);
+                    case "sethome":
+                        return ArgSethome.argumentSethome(p, args, currentPSID);
                     default:
                         p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
@@ -329,7 +334,10 @@ public class ProtectionStones extends JavaPlugin {
     // check that all of the PS custom flags are in ps regions and upgrade if not
     public static void upgradeRegions() {
 
-        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
+        YamlConfiguration hideFile = null;
+        if (new File(plugin.getDataFolder() + "/hiddenpstones.yml").exists()) {
+            hideFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + "/hiddenpstones.yml"));
+        }
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
             for (String regionName : rm.getRegions().keySet()) {
@@ -340,7 +348,7 @@ public class ProtectionStones extends JavaPlugin {
 
                         // get material of ps
                         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z", material;
-                        if (hideFile.contains(entry)) {
+                        if (hideFile != null && hideFile.contains(entry)) {
                             material = hideFile.getString(entry);
                         } else {
                             material = world.getBlockAt(psl.x, psl.y, psl.z).getType().toString();
@@ -372,6 +380,7 @@ public class ProtectionStones extends JavaPlugin {
         }
     }
 
+    // convert regions to use UUIDs instead of player names
     public static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {

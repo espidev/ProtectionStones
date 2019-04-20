@@ -19,19 +19,15 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.FlagHandler;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ArgUnclaim {
     // /ps unclaim
@@ -66,48 +62,24 @@ public class ArgUnclaim {
         PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
-        String type = blockToUnhide.getType().toString();
-
-        // Retrieve stored block data if air from file and delete from file
-        if (blockToUnhide.getType() == Material.AIR) {
-            YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
-            String entry = (int) blockToUnhide.getLocation().getX() + "x";
-            entry = entry + (int) blockToUnhide.getLocation().getY() + "y";
-            entry = entry + (int) blockToUnhide.getLocation().getZ() + "z";
-
-            type = hideFile.getString(entry);
-            if (type == null) {
-                p.sendMessage(PSL.UNCLAIM_CANT_FIND.msg());
-                return true;
-            }
-
-            blockToUnhide.setType(Material.getMaterial(type));
-            hideFile.set(entry, null);
-            try {
-                hideFile.save(ProtectionStones.psStoneData);
-            } catch (IOException ex) {
-                Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        // Return and remove protection stone
-        if (!ProtectionStones.isProtectBlock(type)) {
-            p.sendMessage(PSL.UNCLAIM_CANT_FIND.msg());
-            return true;
-        }
+        String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
 
         if (!ProtectionStones.getBlockOptions(type).noDrop) {
 
             // return protection stone
-            if (!p.getInventory().addItem(new ItemStack(blockToUnhide.getType())).isEmpty()) {
+            if (!p.getInventory().addItem(new ItemStack(Material.getMaterial(type))).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
             }
         }
 
+        // remove block if ps is unhidden
+        if (region.getFlag(FlagHandler.PS_BLOCK_MATERIAL).equalsIgnoreCase(blockToUnhide.getType().toString())) {
+            blockToUnhide.setType(Material.AIR);
+        }
+
         // remove region
-        blockToUnhide.setType(Material.AIR);
         rgm.removeRegion(psID);
         try {
             rgm.save();
