@@ -40,10 +40,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -188,7 +185,7 @@ public class ProtectionStones extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
 
         // Update to UUIDs
-        if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
+        if (config.get("uuidupdated") == null || !(boolean) config.get("uuidupdated")) {
             convertToUUID();
         }
 
@@ -367,14 +364,8 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // update config to mark that uuid upgrade has been done
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(configLocation, true));
-            writer.write("\nUUIDUpdated: true");
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        config.set("uuidupdated", true);
+        config.save();
         Bukkit.getLogger().info("Done!");
     }
 

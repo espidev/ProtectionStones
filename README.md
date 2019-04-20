@@ -79,21 +79,24 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
 
+    /ps get [block] - Get a protection stone. Can be charged with currency set in the config (requires Vault)
+    /ps give [block] [player] - Give a protection stone to another player as admin (free).
     /ps info members|owners|flags - Use this command inside a ps region to see more information about it.
-    /ps add|remove {playername} - Use this command to add or remove a member of your protected region.
-    /ps addowner|removeowner {playername} - Use this command to add or remove an owner of your protected region.
-    /ps flag {flagname} {setting|null} - Use this command to set a flag in your protected region.
+    /ps add|remove [playername] - Use this command to add or remove a member of your protected region.
+    /ps addowner|removeowner [playername] - Use this command to add or remove an owner of your protected region.
+    /ps flag [flagname] [setting|default] - Use this command to set a flag in your protected region.
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.
-    /ps home {num} - Teleports you to one of your protected regions.
-    /ps tp {player} {num} - Teleports you to one of a given player's regions.
+    /ps home [num] - Teleports you to one of your protected regions.
+    /ps sethome - Set the home location of an owned region.
+    /ps tp [player] [num] - Teleports you to one of a given player's regions.
     /ps toggle - Use this command to turn on or off placement of protection stones blocks.
     /ps view - Use this command to view the borders of a protected region.
     /ps unclaim - Use this command to pickup a placed protection stone and remove the region.
-    /ps priority {number|null} - Use this command to set your region's priority.
-    /ps region count|list|remove|disown {playername} - Use this command to find
+    /ps priority [number|null] - Use this command to set your region's priority.
+    /ps region count|list|remove|disown [playername] - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
-    /ps admin {version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats} - This is an admin command showing different stats and allowing to override other player's regions.
+    /ps admin [version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
 **Permissions**
@@ -102,6 +105,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions (block break).
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
+    protectionstones.get - Allows players the use of /ps get.
     protectionstones.view - Allows players the use of /ps view.
     protectionstones.info - Allows players the use of /ps info.
     protectionstones.count - Allows players the use of /ps count.
@@ -109,13 +113,17 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.hide - Allow players to hide their ProtectionStones block.
     protectionstones.unhide - Allow players to unhide their ProtectionStones block.
     protectionstones.home - Access to the /ps home command.
+    protectionstones.sethome - Access to /ps sethome.
     protectionstones.tp - Access to /ps tp command.
+    protectionstones.tp.bypasswait - Bypass the wait time set in the config for /ps home
+    protectionstones.tp.bypassprevent - Bypass prevent_teleport_in option in config
     protectionstones.priority - Allows players to set their region's priority.
     protectionstones.owners - Allows players to add or remove region owners. Allows players to use /ps info owners command.
     protectionstones.members - Allows players to add or remove region members. Allows players to use /ps info members command.
     protectionstones.flags - Allows players to set their region flags.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
+    protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.

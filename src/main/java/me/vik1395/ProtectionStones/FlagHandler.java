@@ -48,8 +48,8 @@ public class FlagHandler {
     // Add the correct flags for the ps region
     public static void initCustomFlagsForPS(ProtectedRegion region, Block block, ConfigProtectBlock cpb) {
 
-        String home = block.getLocation().getBlockX() + cpb.homeXOffset + "|";
-        home += (block.getLocation().getBlockY() + cpb.homeYOffset) + "|";
+        String home = block.getLocation().getBlockX() + cpb.homeXOffset + " ";
+        home += (block.getLocation().getBlockY() + cpb.homeYOffset) + " ";
         home += (block.getLocation().getBlockZ() + cpb.homeZOffset);
         region.setFlag(PS_HOME, home);
 
@@ -105,7 +105,7 @@ public class FlagHandler {
                     region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(args[2]));
                 }
             } catch (InvalidFlagFormat invalidFlagFormat) {
-                invalidFlagFormat.printStackTrace();
+                //invalidFlagFormat.printStackTrace();
                 p.sendMessage(PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
                 return;
             }

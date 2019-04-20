@@ -32,10 +32,10 @@ public class ConfigProtectBlock {
     // Annotations are for types that have names that aren't the same as the config name
 
     // main section
-    public String type;
+    public String type, alias;
     @Path("restrict_obtaining")
     public boolean restrictObtaining;
-    @Path("word_list_type")
+    @Path("world_list_type")
     public String worldListType;
     @Path("worlds")
     public List<String> worlds;

@@ -370,6 +370,8 @@ public class ListenerClass implements Listener {
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
+        if (event.getPlayer().hasPermission("protectionstones.tp.bypasswait")) return;
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
@@ -384,7 +386,7 @@ public class ListenerClass implements Listener {
             if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
         }
 
-        if (!foundNoTeleport) {
+        if (foundNoTeleport) {
             event.getPlayer().sendMessage(PSL.REGION_CANT_TELEPORT.msg());
             event.setCancelled(true);
         }

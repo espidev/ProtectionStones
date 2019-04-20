@@ -19,9 +19,8 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import me.vik1395.ProtectionStones.FlagHandler;
-import me.vik1395.ProtectionStones.PSL;
-import me.vik1395.ProtectionStones.ProtectionStones;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.vik1395.ProtectionStones.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -124,9 +123,20 @@ public class ArgTp {
 
         // teleport player
         if (rgnum <= index) {
-            String[] pos = rgm.getRegion(playerRegions.get(rgnum)).getFlag(FlagHandler.PS_HOME).split("|");
+            ProtectedRegion r = rgm.getRegion(playerRegions.get(rgnum));
+
+            // if the region does not have the ps-home flag, add it
+            if (r.getFlag(FlagHandler.PS_HOME) == null) {
+                PSLocation psl = ProtectionStones.parsePSRegionToLocation(r.getId());
+                ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
+                String home = psl.x + cpb.homeXOffset + " ";
+                home += (psl.y + cpb.homeYOffset) + " ";
+                home += (psl.z + cpb.homeZOffset);
+                r.setFlag(FlagHandler.PS_HOME, home);
+            }
+
+            String[] pos = r.getFlag(FlagHandler.PS_HOME).split(" ");
             if (pos.length == 3) {
-                pos[0] = pos[0].substring(2);
                 p.sendMessage(PSL.TPING.msg());
                 Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
                 p.teleport(tploc);

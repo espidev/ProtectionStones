@@ -2,6 +2,10 @@
 # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 type = "EMERALD_ORE"
 
+# Another way to refer to the protection stone
+# Can be used for /ps give and /ps get
+alias = "64"
+
 # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give.
 # Other ways to obtain this block (ex. mining) will not work as a protection stone.
 # Useful to allow the protection block to only be obtained from a shop or command.
@@ -61,7 +65,7 @@ worlds = [
     ]
 
     # Add price when using /ps get
-    # Must have compatible economy plugin (anything that uses Vault, ie. Essentials)
+    # Must have compatible economy plugin (requires Vault, ie. Essentials)
     price = 0.0
 
 [behaviour]
