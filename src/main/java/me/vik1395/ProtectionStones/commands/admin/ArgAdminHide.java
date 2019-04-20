@@ -17,11 +17,9 @@
 package me.vik1395.ProtectionStones.commands.admin;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -66,7 +64,7 @@ public class ArgAdminHide {
                 }
 
             } else if (args[1].equalsIgnoreCase("hide")) {
-                if (ProtectionStones.protectBlocks.contains(blockToChange.getType().toString()) && !hideFile.contains(entry)) {
+                if (ProtectionStones.isProtectBlock(blockToChange.getType().toString()) && !hideFile.contains(entry)) {
                     hideFile.set(entry, blockToChange.getType().toString());
                     blockToChange.setType(Material.AIR);
                 }

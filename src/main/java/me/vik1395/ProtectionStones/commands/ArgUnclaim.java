@@ -91,12 +91,12 @@ public class ArgUnclaim {
         }
 
         // Return and remove protection stone
-        if (ProtectionStones.getProtectStoneOptions(type) == null) {
+        if (!ProtectionStones.isProtectBlock(type)) {
             p.sendMessage(PSL.UNCLAIM_CANT_FIND.msg());
             return true;
         }
 
-        if (!ProtectionStones.getProtectStoneOptions(type).noDrop()) {
+        if (!ProtectionStones.getBlockOptions(type).noDrop) {
 
             // return protection stone
             if (!p.getInventory().addItem(new ItemStack(blockToUnhide.getType())).isEmpty()) {

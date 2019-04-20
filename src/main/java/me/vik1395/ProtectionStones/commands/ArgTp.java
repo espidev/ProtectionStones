@@ -19,6 +19,7 @@ package me.vik1395.ProtectionStones.commands;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import me.vik1395.ProtectionStones.FlagHandler;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
@@ -123,8 +124,7 @@ public class ArgTp {
 
         // teleport player
         if (rgnum <= index) {
-            String region = rgm.getRegion(playerRegions.get(rgnum)).getId();
-            String[] pos = region.split("x|y|z");
+            String[] pos = rgm.getRegion(playerRegions.get(rgnum)).getFlag(FlagHandler.PS_HOME).split("|");
             if (pos.length == 3) {
                 pos[0] = pos[0].substring(2);
                 p.sendMessage(PSL.TPING.msg());

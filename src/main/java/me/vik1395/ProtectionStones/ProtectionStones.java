@@ -46,16 +46,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
     public static Map<UUID, String> uuidToName = new HashMap<>();
     public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
-    public static File psStoneData;
-    public static File configLocation;
+    public static File psStoneData, configLocation, blockDataFolder;
 
     public static Metrics metrics;
 
@@ -131,20 +128,12 @@ public class ProtectionStones extends JavaPlugin {
         TomlFormat.instance();
 
         plugin = this;
-        configLocation = new File(this.getDataFolder() + "/config.yml");
+        configLocation = new File(this.getDataFolder() + "/config.toml");
         psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
+        blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
         // Metrics (bStats)
         metrics = new Metrics(this);
-
-        // generate protection stones stored blocks file
-        if (!psStoneData.exists()) {
-            try {
-                ProtectionStones.psStoneData.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
 
         // register event listeners
         getServer().getPluginManager().registerEvents(new ListenerClass(), this);
@@ -156,6 +145,9 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
         }
+
+        // register flags
+        FlagHandler.registerFlags();
 
         // Load configuration
         loadConfig();

@@ -40,7 +40,8 @@ public class ArgFlag {
         if (args.length < 3) {
             p.sendMessage(PSL.FLAG_HELP.msg());
         } else {
-            if (ProtectionStones.allowedFlags.contains(args[1].toLowerCase()) || p.hasPermission("protectionstones.flag." + args[1].toLowerCase()) || p.hasPermission("protectionstones.flag.*")) {
+            String blockType = rgm.getRegion(psID).getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+            if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains(args[1].toLowerCase())) {
                 FlagHandler fh = new FlagHandler();
                 fh.setFlag(args, rgm.getRegion(psID), p);
             } else {

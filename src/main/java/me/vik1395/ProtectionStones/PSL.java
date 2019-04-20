@@ -69,6 +69,7 @@ public enum PSL {
     REACHED_REGION_LIMIT("psregion.reached_region_limit", ChatColor.RED + "You can not create any more protected regions."),
     WORLD_DENIED_CREATE("psregion.world_denied_create", ChatColor.RED + "You can not create protections in this world."),
     REGION_OVERLAP("psregion.region_overlap", ChatColor.RED + "You can not place a protection block here as it overlaps another region."),
+    REGION_CANT_TELEPORT("psregion.cant_teleport", ChatColor.RED + "Your teleportation was blocked by a protection region!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),

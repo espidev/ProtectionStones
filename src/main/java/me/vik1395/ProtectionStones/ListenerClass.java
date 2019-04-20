@@ -23,14 +23,12 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -41,11 +39,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.io.IOException;
@@ -71,13 +67,14 @@ public class ListenerClass implements Listener {
         Player p = e.getPlayer();
         Block b = e.getBlock();
 
-        if (ProtectionStones.protectBlocks == null) return;
-
         String blockType = b.getType().toString();
-        ConfigProtectBlock blockOptions = ProtectionStones.getProtectStoneOptions(blockType);
 
         // check if the block is a protection stone
-        if (!ProtectionStones.protectBlocks.contains(blockType) || blockOptions == null) return;
+        if (!ProtectionStones.isProtectBlock(blockType)) {
+            return;
+        }
+
+        ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getName())) return;
@@ -103,10 +100,10 @@ public class ListenerClass implements Listener {
         }
 
         // check cooldown
-        if (ProtectionStones.isCooldownEnable) {
+        if (ProtectionStones.configOptions.placingCooldown != -1) {
             double currentTime = System.currentTimeMillis();
             if (lastProtectStonePlaced.containsKey(p)) {
-                double cooldown = ProtectionStones.cooldown;
+                double cooldown = ProtectionStones.configOptions.placingCooldown;
                 double lastPlace = lastProtectStonePlaced.get(p);
 
                 if (lastPlace + cooldown > currentTime) { // if cooldown has not been finished
@@ -147,15 +144,30 @@ public class ListenerClass implements Listener {
                     return;
                 }
             }
-            // check if in denied world
-            for (String world : ProtectionStones.deniedWorlds) {
-                if (world.trim().equals(p.getLocation().getWorld().getName())) {
+            // check if in world blacklist or not in world whitelist
+            if (blockOptions.worldListType.equalsIgnoreCase("blacklist")) {
+                for (String world : blockOptions.worlds) {
+                    if (world.trim().equals(p.getLocation().getWorld().getName())) {
+                        p.sendMessage(PSL.WORLD_DENIED_CREATE.msg());
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            } else if (blockOptions.worldListType.equalsIgnoreCase("whitelist")) {
+                boolean found = false;
+                for (String world : blockOptions.worlds) {
+                    if (world.trim().equals(p.getLocation().getWorld().getName())) {
+                        found = true;
+                    }
+                }
+                if (!found) {
                     p.sendMessage(PSL.WORLD_DENIED_CREATE.msg());
                     e.setCancelled(true);
                     return;
                 }
             }
-        }
+
+        } // end of non-admin checks
 
         // create region
         double bx = b.getLocation().getX();
@@ -163,12 +175,12 @@ public class ListenerClass implements Listener {
         double bz = b.getLocation().getZ();
         BlockVector3 v1, v2;
 
-        if (blockOptions.getRegionY() == -1) {
-            v1 = BlockVector3.at(bx - blockOptions.getRegionX(), 0, bz - blockOptions.getRegionZ());
-            v2 = BlockVector3.at(bx + blockOptions.getRegionX(), p.getWorld().getMaxHeight(), bz + blockOptions.getRegionZ());
+        if (blockOptions.yRadius == -1) {
+            v1 = BlockVector3.at(bx - blockOptions.xRadius, 0, bz - blockOptions.zRadius);
+            v2 = BlockVector3.at(bx + blockOptions.xRadius, p.getWorld().getMaxHeight(), bz + blockOptions.zRadius);
         } else {
-            v1 = BlockVector3.at(bx - blockOptions.getRegionX(), by - blockOptions.getRegionY(), bz - blockOptions.getRegionZ());
-            v2 = BlockVector3.at(bx + blockOptions.getRegionX(), by + blockOptions.getRegionY(), bz + blockOptions.getRegionZ());
+            v1 = BlockVector3.at(bx - blockOptions.xRadius, by - blockOptions.yRadius, bz - blockOptions.zRadius);
+            v2 = BlockVector3.at(bx + blockOptions.xRadius, by + blockOptions.yRadius, bz + blockOptions.zRadius);
         }
 
         BlockVector3 min = v1;
@@ -205,8 +217,8 @@ public class ListenerClass implements Listener {
             }
         }
 
-        // add corresponding flags to new region
-        HashMap<Flag<?>, Object> flags = new HashMap<>(FlagHandler.defaultFlags);
+        // add corresponding flags to new region by cloning blockOptions default flags
+        HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
 
         // replace greeting and farewell messages with player name
         Flag<?> greeting = WorldGuard.getInstance().getFlagRegistry().get("greeting");
@@ -221,7 +233,9 @@ public class ListenerClass implements Listener {
 
         // set flags
         region.setFlags(flags);
-        region.setPriority(blockOptions.getDefaultPriority());
+        FlagHandler.initCustomFlagsForPS(region, b, blockOptions);
+
+        region.setPriority(blockOptions.priority);
         p.sendMessage(PSL.PROTECTED.msg());
 
         // save
@@ -233,7 +247,7 @@ public class ListenerClass implements Listener {
         }
 
         // hide block if auto hide is enabled
-        if (blockOptions.isAutoHide()) {
+        if (blockOptions.autoHide) {
             Block blockToHide = p.getWorld().getBlockAt((int) bx, (int) by, (int) bz);
             YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
             String entry = (int) blockToHide.getLocation().getX() + "x";
@@ -257,7 +271,7 @@ public class ListenerClass implements Listener {
         Block pb = e.getBlock();
 
         String blockType = pb.getType().toString();
-        ConfigProtectBlock blockOptions = ProtectionStones.getProtectStoneOptions(blockType);
+        ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
         // check if block broken is protection stone
         if (blockOptions == null) return;
@@ -281,8 +295,8 @@ public class ListenerClass implements Listener {
         // check if that is actually a protection stone block (owns a region)
         if (rgm.getRegion(id) == null) {
 
-            // prevent silk touching of protection stone blocks (but non region)
-            if (blockOptions.denySilkTouch()) {
+            // prevent silk touching of protection stone blocks (that aren't holding a region)
+            if (blockOptions.preventSilkTouch) {
                 e.setCancelled(true);
                 ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
                 ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
@@ -318,7 +332,7 @@ public class ListenerClass implements Listener {
         }
 
         // return protection stone if no drop option is off
-        if (!blockOptions.noDrop()) {
+        if (!blockOptions.noDrop) {
             if (!p.getInventory().addItem(new ItemStack(pb.getType(), 1)).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
@@ -357,8 +371,8 @@ public class ListenerClass implements Listener {
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
         for (Block b : pushedBlocks) {
-            ConfigProtectBlock cpb = ProtectionStones.getProtectStoneOptions(b.getType().toString());
-            if (ProtectionStones.protectBlocks.contains(b.getType().toString()) && cpb != null && cpb.denyBlockPiston()) {
+            ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
+            if (cpb != null && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -376,51 +390,25 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (ProtectionStones.config.getBoolean("Teleport to PVP.Block Teleport")) {
-            Player p = event.getPlayer();
-            WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
-            if (!wg.isEnabled()) return;
+        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
-            RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-            RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(event.getFrom().getWorld()));
-            BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
-            if (rgm.getApplicableRegions(v) != null) {
-                ApplicableRegionSet regions = rgm.getApplicableRegions(v);
+        // check if player can teleport into region (no region with preventTeleportIn = true)
+        ApplicableRegionSet regions = rgm.getApplicableRegions(v);
+        if (regions.getRegions().isEmpty()) return;
+        boolean foundNoTeleport = false;
+        for (ProtectedRegion r : regions) {
+            String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+            if (f != null && ProtectionStones.getBlockOptions(f).preventTeleportIn) foundNoTeleport = true;
+            if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
+        }
 
-                if (event.getCause() == TeleportCause.ENDER_PEARL) return;
-                try {
-                    if (event.getCause() == TeleportCause.CHORUS_FRUIT) return;
-                } catch (NoSuchFieldError e1) {
-                }
-
-                boolean ownsAll = false;
-                for (ProtectedRegion r : regions) {
-                    if (r.getOwners().contains(wg.wrapPlayer(p))) {
-                        ownsAll = true;
-                    }
-                }
-                if (!ownsAll) {
-                    if (p.hasMetadata("psBypass")) {
-                        List<MetadataValue> values = p.getMetadata("psBypass");
-                        for (MetadataValue value : values) {
-                            if (value.asBoolean()) {
-                                return;
-                            } else {
-                                if (regions.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
-                                    event.setCancelled(true);
-                                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cTeleportation blocked! &eDestination was a &cPVP &earea and cannot be teleported to."));
-                                }
-                            }
-                        }
-                    } else {
-                        if (regions.testState(WorldGuardPlugin.inst().wrapPlayer(p), Flags.PVP)) {
-                            event.setCancelled(true);
-                            p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cTeleportation blocked! &eDestination was a &cPVP &earea and cannot be teleported to."));
-                        }
-                    }
-                }
-            }
+        if (!foundNoTeleport) {
+            event.getPlayer().sendMessage(PSL.REGION_CANT_TELEPORT.msg());
+            event.setCancelled(true);
         }
     }
 

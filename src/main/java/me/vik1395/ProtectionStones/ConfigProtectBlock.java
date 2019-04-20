@@ -81,8 +81,8 @@ public class ConfigProtectBlock {
     public boolean noDrop;
     @Path("behaviour.prevent_piston_push")
     public boolean preventPistonPush;
-    @Path("behaviour.silk_touch")
-    public boolean silkTouch;
+    @Path("behaviour.prevent_silk_touch")
+    public boolean preventSilkTouch;
 
     // player section
     @Path("player.prevent_teleport_in")

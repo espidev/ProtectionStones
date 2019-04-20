@@ -20,8 +20,15 @@ import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Config {
 
@@ -35,11 +42,29 @@ public class Config {
     int placingCooldown;
     @Path("allow_dangerous_commands")
     Boolean allowDangerousCommands;
-    @Path("block")
-    List<ConfigProtectBlock> blocks;
+    @Path("base_command")
+    String baseCommand;
 
 
     public static void initConfig() {
+
+        // check if config files exist
+        try {
+            if (!ProtectionStones.psStoneData.exists()) {
+                ProtectionStones.psStoneData.createNewFile();
+            }
+            if (!ProtectionStones.blockDataFolder.exists()) {
+                ProtectionStones.blockDataFolder.mkdir();
+                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(ProtectionStones.configLocation.getAbsolutePath() + "/block1.toml"), StandardCopyOption.REPLACE_EXISTING);
+            }
+            if (!ProtectionStones.configLocation.exists()) {
+                Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
         // clear data (for /ps reload)
         ProtectionStones.protectionStonesOptions.clear();
 
@@ -49,6 +74,7 @@ public class Config {
         ProtectionStones.config.load();
 
         // TODO UPGRADE FROM OLD CONFIG
+        // TODO RUN INITCUSTOMFLAGSFORPS for ps
 
         // keep in mind that there is /ps reload, so clear arrays before adding config options!
 
@@ -56,14 +82,25 @@ public class Config {
         ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
 
         // add protection stones to options map
-        if (ProtectionStones.configOptions.blocks.isEmpty()) {
-            Bukkit.getLogger().info("Region block not found! You do not have any protection blocks configured!");
+        if (ProtectionStones.blockDataFolder.listFiles().length == 0) {
+            Bukkit.getLogger().info("The blocks folder is empty! You do not have any protection blocks configured!");
         } else {
             Bukkit.getLogger().info("Protection Stone Blocks:");
-            for (ConfigProtectBlock b : ProtectionStones.configOptions.blocks) {
+
+            // iterate over block files and load into map
+            for (File file : ProtectionStones.blockDataFolder.listFiles()) {
+                // convert toml data into object
+                ConfigProtectBlock b = new ObjectConverter().toObject(FileConfig.of(file), ConfigProtectBlock::new);
+
+                if (Material.getMaterial(b.type) == null) {
+                    Bukkit.getLogger().info("Unrecognized material: " + b.type);
+                    Bukkit.getLogger().info("Block will not be added. Please fix this in your config.");
+                    continue;
+                }
+
                 Bukkit.getLogger().info("- " + b.type);
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
-                ProtectionStones.protectionStonesOptions.put(b.type, b); // init block
+                ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
             }
         }
 

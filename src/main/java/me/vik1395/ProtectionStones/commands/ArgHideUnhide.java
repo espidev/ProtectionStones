@@ -60,7 +60,7 @@ public class ArgHideUnhide {
         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z";
         Material currentType = blockToEdit.getType();
 
-        if (ProtectionStones.protectBlocks.contains(currentType.toString())) {
+        if (ProtectionStones.isProtectBlock(currentType.toString())) {
             if (arg.equals("unhide")) {
                 p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
