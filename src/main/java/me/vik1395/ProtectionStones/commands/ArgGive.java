@@ -32,7 +32,7 @@ public class ArgGive {
             return true;
         }
 
-        p.sendMessage(PSL.GIVE_GIVEN.msg());
+        p.sendMessage(PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", p.getDisplayName()));
 
         return true;
     }
