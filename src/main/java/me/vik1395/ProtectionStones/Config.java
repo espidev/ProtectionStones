@@ -131,7 +131,8 @@ public class Config {
             FileConfig fc = FileConfig.of(ProtectionStones.configLocation);
             fc.load();
 
-            YamlConfiguration yml = YamlConfiguration.loadConfiguration(new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml"));
+            File oldConfig = new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml");
+            YamlConfiguration yml = YamlConfiguration.loadConfiguration(oldConfig);
 
             fc.set("uuidupdated", (yml.get("UUIDUpdated") != null) && yml.getBoolean("UUIDUpdated"));
             fc.set("placing_cooldown", (yml.getBoolean("cooldown.enable")) ? yml.getInt("cooldown.cooldown") : -1);
@@ -172,12 +173,18 @@ public class Config {
 
             fc.save();
             fc.close();
+
+            oldConfig.renameTo(new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml.old"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
         Bukkit.getLogger().info(ChatColor.GREEN + "Please be sure to double check your configs with the new options!");
 
-        
+        Bukkit.getLogger().info(ChatColor.AQUA + "Updating PS Regions to new format...");
+        ProtectionStones.upgradeRegions();
+        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
     }
 }

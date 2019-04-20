@@ -35,6 +35,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
@@ -328,6 +329,47 @@ public class ProtectionStones extends JavaPlugin {
     // check that all of the PS custom flags are in ps regions and upgrade if not
     public static void upgradeRegions() {
 
+        YamlConfiguration hideFile = YamlConfiguration.loadConfiguration(ProtectionStones.psStoneData);
+        for (World world : Bukkit.getWorlds()) {
+            RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            for (String regionName : rm.getRegions().keySet()) {
+                if (regionName.startsWith("ps")) {
+                    try {
+                        PSLocation psl = parsePSRegionToLocation(regionName);
+                        ProtectedRegion r = rm.getRegion(regionName);
+
+                        // get material of ps
+                        String entry = psl.x + "x" + psl.y + "y" + psl.z + "z", material;
+                        if (hideFile.contains(entry)) {
+                            material = hideFile.getString(entry);
+                        } else {
+                            material = world.getBlockAt(psl.x, psl.y, psl.z).getType().toString();
+                        }
+
+                        if (r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) == null) {
+                            r.setFlag(FlagHandler.PS_BLOCK_MATERIAL, material);
+                        }
+
+                        if (r.getFlag(FlagHandler.PS_HOME) == null) {
+                            if (ProtectionStones.isProtectBlock(material)) {
+                                ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(material);
+                                r.setFlag(FlagHandler.PS_HOME, (psl.x + cpb.homeXOffset) + " " + (psl.y + cpb.homeYOffset) + " " + (psl.z + cpb.homeZOffset));
+                            } else {
+                                r.setFlag(FlagHandler.PS_HOME, psl.x + " " + psl.y + " " + psl.z);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
+            }
+            try {
+                rm.save();
+            } catch (Exception e) {
+                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+            }
+        }
     }
 
     public static void convertToUUID() {
