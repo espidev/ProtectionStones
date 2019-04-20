@@ -13,16 +13,9 @@ public class ArgGet {
             return true;
         }
 
-        boolean found = false;
-        ConfigProtectBlock cp = null;
-        for (ConfigProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
-            if (cpb.alias.equalsIgnoreCase(args[1]) || cpb.type.equalsIgnoreCase(args[1])) {
-                found = true;
-                cp = cpb;
-                break;
-            }
-        }
-        if (!found) {
+        // check if argument is valid block
+        ConfigProtectBlock cp = ProtectionStones.getProtectBlockFromName(args[1]);
+        if (cp == null) {
             p.sendMessage(PSL.INVALID_BLOCK.msg());
             return true;
         }
@@ -47,6 +40,8 @@ public class ArgGet {
             p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
             return true;
         }
+
+        p.sendMessage(PSL.GET_GOTTEN.msg());
 
         return true;
     }

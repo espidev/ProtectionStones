@@ -184,10 +184,12 @@ public enum PSL {
     // ps get
     GET_HELP("get.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps get [block]"),
     GET_HELP_DESC("get.help_desc", "Use this command to get or purchase a protection block."),
+    GET_GOTTEN("get.gotten", ChatColor.AQUA + "Added protection block to inventory!"),
 
     // ps give
     GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player]"),
     GIVE_HELP_DESC("give.help_desc", "Use this command to give a player a protection block."),
+    GIVE_GIVEN("give.given", ChatColor.GRAY + "Gave " + ChatColor.AQUA + "%block%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
 
     // ps sethome
     SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),

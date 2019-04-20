@@ -90,6 +90,16 @@ public class ProtectionStones extends JavaPlugin {
         return protectionStonesOptions.containsKey(material);
     }
 
+    // Get block from name (including aliases)
+    public static ConfigProtectBlock getProtectBlockFromName(String name) {
+        for (ConfigProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
+            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) {
+                return cpb;
+            }
+        }
+        return null;
+    }
+
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(ConfigProtectBlock b) {
         ItemStack is = new ItemStack(Material.getMaterial(b.type));
