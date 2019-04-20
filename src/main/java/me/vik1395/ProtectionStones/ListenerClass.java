@@ -297,23 +297,14 @@ public class ListenerClass implements Listener {
 
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
-                e.setCancelled(true);
                 ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
                 ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
-                Collection<ItemStack> drops;
-                if (left.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
-                    drops = getItemStacks(pb, left);
-                } else if (right.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
-                    drops = getItemStacks(pb, right);
-                } else {
-                    pb.breakNaturally();
+                if (!left.containsEnchantment(Enchantment.SILK_TOUCH) && !right.containsEnchantment(Enchantment.SILK_TOUCH)) {
                     return;
                 }
-                for (ItemStack drop : drops) {
-                    pb.getWorld().dropItem(pb.getLocation(), drop);
-                }
-                pb.setType(Material.AIR);
+                e.setDropItems(false);
             }
+
             return;
         }
 
@@ -354,19 +345,6 @@ public class ListenerClass implements Listener {
 
         e.setDropItems(false);
         e.setExpToDrop(0);
-    }
-
-    private Collection<ItemStack> getItemStacks(Block pb, ItemStack left) {
-        Collection<ItemStack> baseDrops = pb.getDrops(left);
-        if (!baseDrops.isEmpty()) {
-            int fortuneLevel = left.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
-            if (fortuneLevel > 5) fortuneLevel = 5;
-            ItemStack stack = baseDrops.iterator().next();
-            double amount = stack.getAmount();
-            amount = Math.random() * amount * fortuneLevel + 2;
-            stack.setAmount((int) amount);
-        }
-        return baseDrops;
     }
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
