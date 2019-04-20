@@ -45,7 +45,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -80,7 +79,7 @@ public class ListenerClass implements Listener {
         if (ProtectionStones.toggleList.contains(p.getName())) return;
 
         // check permission
-        if (!p.hasPermission("protectionstones.create")) {
+        if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
             p.sendMessage(PSL.NO_PERMISSION_CREATE.msg());
             e.setCancelled(true);
             return;

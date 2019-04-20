@@ -96,7 +96,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps region count|list|remove|disown [playername] - Use this command to find
     information or edit other players' (or your own) protected regions.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
-    /ps admin [version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats] - This is an admin command showing different stats and allowing to override other player's regions.
+    /ps admin [version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
 **Permissions**
@@ -127,7 +127,6 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
-    protectionstones.bypass - Access to the /ps bypass command.
     protectionstones.superowner - Allows players to override region permissions.
 
 This plugin is licensed under the **Apache 2.0 License**.

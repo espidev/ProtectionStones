@@ -64,6 +64,11 @@ public class ArgAdmin {
                 return ArgAdminLastlogon.argumentAdminLastLogon(p, args);
             case "lastlogons":
                 return ArgAdminLastlogon.argumentAdminLastLogons(p, args);
+            case "fixregions":
+                p.sendMessage(ChatColor.YELLOW + "Fixing...");
+                ProtectionStones.upgradeRegions();
+                p.sendMessage(ChatColor.YELLOW + "Done!");
+                break;
         }
         return true;
     }

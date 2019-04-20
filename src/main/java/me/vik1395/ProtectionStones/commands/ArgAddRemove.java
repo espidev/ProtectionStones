@@ -24,7 +24,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class ArgAddRemove {
-    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType, boolean checkPlayer) {
+    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
@@ -59,7 +59,7 @@ public class ArgAddRemove {
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners", type.startsWith("add")); // validate permissions and stuff
+        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
         if (op == null) return true;
         switch (type) {
             case "add":

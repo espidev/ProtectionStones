@@ -152,7 +152,7 @@ public enum PSL {
     VIEW_REMOVING("view.removing", ChatColor.AQUA + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
 
     // ps admin
-    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | settings | hide | unhide |\n" + ChatColor.GRAY + "         cleanup | lastlogon | lastlogons | stats }"),
+    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | settings | hide | unhide |\n" + ChatColor.GRAY + "         cleanup | lastlogon | lastlogons | stats | fixregions}"),
     ADMIN_HELP_DESC("admin.help_desc", "This is an admin command showing different stats and allowing to override other player's regions."),
     ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days]"),
     ADMIN_CLEANUP_HEADER("admin.cleanup_header", ChatColor.YELLOW + "Cleanup %arg% %days% days\n================"),

@@ -20,13 +20,18 @@ import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +53,11 @@ public class Config {
 
     public static void initConfig() {
 
+        // check if using config v1 or v2 (config.yml -> config.toml)
+        if (new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml").exists() && !ProtectionStones.configLocation.exists()) {
+            upgradeFromV1V2();
+        }
+
         // check if config files exist
         try {
             if (!ProtectionStones.psStoneData.exists()) {
@@ -63,7 +73,6 @@ public class Config {
         } catch (IOException ex) {
             Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
-
 
         // clear data (for /ps reload)
         ProtectionStones.protectionStonesOptions.clear();
@@ -109,5 +118,66 @@ public class Config {
             }
         }
 
+    }
+
+    // upgrade from config < v2.0.0
+    public static void upgradeFromV1V2() {
+        Bukkit.getLogger().info(ChatColor.AQUA + "Upgrading configs from v1.x to v2.0+...");
+
+        try {
+            ProtectionStones.blockDataFolder.mkdir();
+            Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
+
+            FileConfig fc = FileConfig.of(ProtectionStones.configLocation);
+            fc.load();
+
+            YamlConfiguration yml = YamlConfiguration.loadConfiguration(new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml"));
+
+            fc.set("uuidupdated", (yml.get("UUIDUpdated") != null) && yml.getBoolean("UUIDUpdated"));
+            fc.set("placing_cooldown", (yml.getBoolean("cooldown.enable")) ? yml.getInt("cooldown.cooldown") : -1);
+
+            // options from global scope
+            List<String> worldsDenied = yml.getStringList("Worlds Denied");
+            List<String> flags = yml.getStringList("Flags");
+            List<String> allowedFlags = new ArrayList<>(Arrays.asList(yml.getString("Allowed Flags").split(",")));
+
+            // upgrade blocks
+            for (String type : yml.getConfigurationSection("Region").getKeys(false)) {
+                File file = new File(ProtectionStones.blockDataFolder.getAbsolutePath() + "/" + type + ".toml");
+                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(file.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                FileConfig b = FileConfig.of(file);
+                b.load();
+
+                b.set("type", type);
+                b.set("alias", type);
+                b.set("restrict_obtaining", false);
+                b.set("world_list_type", "blacklist");
+                b.set("worlds", worldsDenied);
+                b.set("region.x_radius", yml.getInt("Region." + type + ".X Radius"));
+                b.set("region.y_radius", yml.getInt("Region." + type + ".Y Radius"));
+                b.set("region.z_radius", yml.getInt("Region." + type + ".Z Radius"));
+                b.set("region.flags", flags);
+                b.set("region.allowed_flags",  allowedFlags);
+                b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
+                b.set("block_data.display_name", "&a&m<---&r&6 Protection Stone &r&a&m--->");
+                b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
+                b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
+                b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));
+                // ignore silk touch option
+                b.set("player.prevent_teleport_in", yml.getBoolean("Teleport To PVP.Block Teleport"));
+
+                b.save();
+                b.close();
+            }
+
+            fc.save();
+            fc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
+        Bukkit.getLogger().info(ChatColor.GREEN + "Please be sure to double check your configs with the new options!");
+
+        
     }
 }

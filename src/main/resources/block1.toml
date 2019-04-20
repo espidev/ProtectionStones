@@ -93,6 +93,6 @@ worlds = [
     no_moving_when_tp_waiting = true
     tp_waiting_seconds = 0
 
-    # Extra permission required to place protection block (you still need protectionstones.create)
+    # Extra permission required to place this specific protection block (you still need protectionstones.create)
     # '' for no extra permission
-    permission = 'protectionstones.create.gold'
+    permission = ''

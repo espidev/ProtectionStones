@@ -164,6 +164,8 @@ public class ProtectionStones extends JavaPlugin {
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypassprevent"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypasswait"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.priority"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.owners"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.members"));
@@ -190,10 +192,6 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
-    }
-
-    private static UUID nameToUUID(String name) {
-        return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
     private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
@@ -327,6 +325,11 @@ public class ProtectionStones extends JavaPlugin {
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
+    // check that all of the PS custom flags are in ps regions and upgrade if not
+    public static void upgradeRegions() {
+
+    }
+
     public static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
@@ -344,12 +347,12 @@ public class ProtectionStones extends JavaPlugin {
 
                     // convert
                     for (String owner : owners) {
-                        UUID uuid = nameToUUID(owner);
+                        UUID uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
                         region.getOwners().removePlayer(owner);
                         region.getOwners().addPlayer(uuid);
                     }
                     for (String member : members) {
-                        UUID uuid = nameToUUID(member);
+                        UUID uuid = Bukkit.getOfflinePlayer(member).getUniqueId();
                         region.getMembers().removePlayer(member);
                         region.getMembers().addPlayer(uuid);
                     }
