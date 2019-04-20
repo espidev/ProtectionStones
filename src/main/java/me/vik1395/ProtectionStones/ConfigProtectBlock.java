@@ -17,6 +17,7 @@
 package me.vik1395.ProtectionStones;
 
 import com.electronwill.nightconfig.core.conversion.Path;
+import com.electronwill.nightconfig.core.conversion.SpecDoubleInRange;
 import com.electronwill.nightconfig.core.conversion.SpecIntInRange;
 import com.sk89q.worldguard.protection.flags.Flag;
 
@@ -72,6 +73,7 @@ public class ConfigProtectBlock {
     @Path("block_data.lore")
     public List<String> lore;
     @Path("block_data.price")
+    @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
     public double price;
 
     // behaviour section

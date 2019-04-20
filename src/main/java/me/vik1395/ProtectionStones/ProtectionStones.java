@@ -30,6 +30,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -42,6 +43,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -57,11 +59,15 @@ public class ProtectionStones extends JavaPlugin {
 
     public static Metrics metrics;
 
+    public static FileConfig config;
     // all configuration file options are stored in here
     public static Config configOptions;
-    public static FileConfig config;
     // block options
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
+
+    // vault economy integration
+    public static boolean isVaultEnabled = false;
+    public static Economy vaultEconomy;
 
     public static List<String> toggleList = new ArrayList<>();
 
@@ -169,6 +175,19 @@ public class ProtectionStones extends JavaPlugin {
         } else {
             getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
+        }
+
+        // check if Vault is enabled (for economy support)_
+        if (getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
+            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            if (econ == null) {
+                getServer().getLogger().info("No economy plugin found by Vault! There will be no economy support!");
+            } else {
+                vaultEconomy = econ.getProvider();
+                isVaultEnabled = true;
+            }
+        } else {
+            getServer().getLogger().info("Vault not enabled! There will be no economy support!");
         }
 
         // Load configuration
