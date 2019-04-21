@@ -155,17 +155,19 @@ public class ArgTp {
         // teleport player
         Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
 
-        if (cpb.tpWaitingSeconds == 0) { // no delay
+        if (cpb.tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) { // no delay
             p.sendMessage(PSL.TPING.msg());
             p.teleport(tploc);
         } else if (!cpb.noMovingWhenTeleportWaiting) { // delay
 
+            p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
                 p.sendMessage(PSL.TPING.msg());
                 p.teleport(tploc);
             }, 20 * cpb.tpWaitingSeconds);
 
         } else {// delay and not allowed to move
+            p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
             Location l = p.getLocation().clone();
             UUID uuid = p.getUniqueId();
 
@@ -183,27 +185,27 @@ public class ArgTp {
                             taskCounter.get(uuid).cancel();
                             waitCounter.remove(uuid);
                             taskCounter.remove(uuid);
+                            return;
                         }
 
                         Player pl = Bukkit.getPlayer(uuid);
                         // increment seconds
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
                         // if the player moved cancel it
-                        if (l.getX() != pl.getLocation().getX() ||  l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
+                        if (l.getX() != pl.getLocation().getX() || l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
                             pl.sendMessage(PSL.TP_CANCELLED_MOVED.msg());
                             taskCounter.get(uuid).cancel();
                             waitCounter.remove(uuid);
                             taskCounter.remove(uuid);
-                        }
-                        // if the timer has passed, teleport and cancel
-                        if (waitCounter.get(uuid) == cpb.tpWaitingSeconds) {
+                        } else if (waitCounter.get(uuid) == cpb.tpWaitingSeconds*4) { // * 4 since this loops 4 times a second
+                            // if the timer has passed, teleport and cancel
                             pl.sendMessage(PSL.TPING.msg());
                             pl.teleport(tploc);
                             taskCounter.get(uuid).cancel();
                             waitCounter.remove(uuid);
                             taskCounter.remove(uuid);
                         }
-                    }, 20, 20)
+                    }, 5, 5) // loop 4 times a second
             );
         }
         return true;

@@ -60,6 +60,9 @@ public class Config {
 
         // check if config files exist
         try {
+            if (!ProtectionStones.getPlugin().getDataFolder().exists()) {
+                ProtectionStones.getPlugin().getDataFolder().mkdir();
+            }
             if (!ProtectionStones.blockDataFolder.exists()) {
                 ProtectionStones.blockDataFolder.mkdir();
                 Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(ProtectionStones.blockDataFolder.getAbsolutePath() + "/block1.toml"), StandardCopyOption.REPLACE_EXISTING);

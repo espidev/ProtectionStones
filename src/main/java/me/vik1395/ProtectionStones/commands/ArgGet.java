@@ -21,7 +21,7 @@ public class ArgGet {
         }
 
         // check if player has enough money
-        if (ProtectionStones.isVaultEnabled && ProtectionStones.vaultEconomy.has(p, cp.price)) {
+        if (ProtectionStones.isVaultEnabled && !ProtectionStones.vaultEconomy.has(p, cp.price)) {
             p.sendMessage(PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
             return true;
         }
@@ -33,6 +33,7 @@ public class ArgGet {
                 p.sendMessage(er.errorMessage);
                 return true;
             }
+            p.sendMessage(er.amount + " " + er.balance + " " + er.type + " " + er.errorMessage);
         }
 
         // check if item was able to be added (inventory not full)

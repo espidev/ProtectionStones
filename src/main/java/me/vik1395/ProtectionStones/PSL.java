@@ -31,7 +31,7 @@ public enum PSL {
     NO_ACCESS("no_access", ChatColor.RED + "You are not allowed to do that here."),
     NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
     INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
-    NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%,"),
+    NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -138,6 +138,7 @@ public enum PSL {
     TPING("tp.tping", ChatColor.GREEN + "Teleporting..."),
     TP_ERROR_NAME("tp.error_name", ChatColor.RED + "Error in teleporting to protected region! (parsing WG region name error)"),
     TP_ERROR_TP("tp.error_tp", ChatColor.RED + "Error in finding the region to teleport to!"),
+    TP_IN_SECONDS("tp.in_seconds", ChatColor.GRAY + "Teleporting in " + ChatColor.AQUA + "%seconds%" + ChatColor.GRAY + " seconds."),
     TP_CANCELLED_MOVED("tp.cancelled_moved", ChatColor.RED + "Teleport cancelled. You moved!"),
 
     // ps home,

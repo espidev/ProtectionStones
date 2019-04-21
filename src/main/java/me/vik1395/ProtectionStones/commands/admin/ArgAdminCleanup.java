@@ -84,7 +84,7 @@ public class ArgAdminCleanup {
                     // remove regions
                     p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
                     for (String region : opRegions) {
-                        ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, p);
+                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()-> ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, p));
                     }
                 }
 

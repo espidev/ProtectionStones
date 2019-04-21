@@ -57,7 +57,7 @@ worlds = [
 [block_data]
     # Name given to protection block when obtained with /ps give or /ps get
     # Leave as '' for no name
-    display_name = "&a&m<---&r&6 64x64 Protection Stone &r&a&m--->"
+    display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
 
     # Lore given to protection block when obtained with /ps give or /ps get
     # Leave as [] for no lore
