@@ -26,6 +26,11 @@ public class ArgGet {
             return true;
         }
 
+        if (!cp.permission.equals("") && !p.hasPermission(cp.permission)) {
+            p.sendMessage(PSL.NO_PERMISSION_GET.msg());
+            return true;
+        }
+
         // check if player has enough money
         if (ProtectionStones.isVaultEnabled && !ProtectionStones.vaultEconomy.has(p, cp.price)) {
             p.sendMessage(PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));

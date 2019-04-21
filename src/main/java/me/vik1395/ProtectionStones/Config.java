@@ -45,10 +45,10 @@ public class Config {
     Boolean uuidupdated;
     @Path("placing_cooldown")
     int placingCooldown;
-    @Path("allow_dangerous_commands")
-    Boolean allowDangerousCommands;
-    @Path("base_command")
-    String baseCommand;
+    //@Path("allow_dangerous_commands")
+    //Boolean allowDangerousCommands;
+    //@Path("base_command")
+    //String baseCommand;
 
 
     public static void initConfig() {

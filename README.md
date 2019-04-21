@@ -115,7 +115,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.home - Access to the /ps home command.
     protectionstones.sethome - Access to /ps sethome.
     protectionstones.tp - Access to /ps tp command.
-    protectionstones.tp.bypasswait - Bypass the wait time set in the config for /ps home
+    protectionstones.tp.bypasswait - Bypass the wait time set in the config for /ps home and /ps tp
     protectionstones.tp.bypassprevent - Bypass prevent_teleport_in option in config
     protectionstones.priority - Allows players to set their region's priority.
     protectionstones.owners - Allows players to add or remove region owners. Allows players to use /ps info owners command.

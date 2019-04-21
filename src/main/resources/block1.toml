@@ -86,6 +86,7 @@ worlds = [
 
 [player]
     # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
+    # Bypass with protectionstones.tp.bypasstp
     prevent_teleport_in = false
 
     # Can't move for x seconds before teleporting with /ps home or /ps tp. Can be disabled with 0.
