@@ -14,6 +14,11 @@ public class ArgGet {
             return true;
         }
 
+        if (args.length != 2) {
+            p.sendMessage(PSL.GET_HELP.msg());
+            return true;
+        }
+
         // check if argument is valid block
         ConfigProtectBlock cp = ProtectionStones.getProtectBlockFromName(args[1]);
         if (cp == null) {

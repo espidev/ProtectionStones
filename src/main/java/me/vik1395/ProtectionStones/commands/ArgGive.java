@@ -13,6 +13,11 @@ public class ArgGive {
             return true;
         }
 
+        if (args.length != 3) {
+            p.sendMessage(PSL.GIVE_HELP.msg());
+            return true;
+        }
+
         // check if argument is valid block
         ConfigProtectBlock cp = ProtectionStones.getProtectBlockFromName(args[1]);
         if (cp == null) {
