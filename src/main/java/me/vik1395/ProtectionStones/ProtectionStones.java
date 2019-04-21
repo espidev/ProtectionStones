@@ -241,7 +241,7 @@ public class ProtectionStones extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
 
         // Update to UUIDs
-        if (config.get("uuidupdated") == null || !(boolean) config.get("uuidupdated")) {
+        if (configOptions.uuidupdated == null || !configOptions.uuidupdated) {
             convertToUUID();
         }
 
