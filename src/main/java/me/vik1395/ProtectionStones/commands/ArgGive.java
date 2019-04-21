@@ -28,7 +28,7 @@ public class ArgGive {
 
         // check if item was able to be added (inventory not full)
         if (!Bukkit.getPlayer(args[2]).getInventory().addItem(ProtectionStones.createProtectBlockItem(cp)).isEmpty()) {
-            p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
+            p.sendMessage(PSL.GIVE_NO_INVENTORY_ROOM.msg());
             return true;
         }
 

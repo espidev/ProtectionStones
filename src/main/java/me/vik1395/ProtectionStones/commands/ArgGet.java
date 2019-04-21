@@ -4,6 +4,7 @@ import me.vik1395.ProtectionStones.ConfigProtectBlock;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ArgGet {
@@ -24,6 +25,11 @@ public class ArgGet {
         if (ProtectionStones.isVaultEnabled && !ProtectionStones.vaultEconomy.has(p, cp.price)) {
             p.sendMessage(PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
             return true;
+        }
+
+        // debug message
+        if (!ProtectionStones.isVaultEnabled && cp.price != 0) {
+            Bukkit.getLogger().info("Vault is not enabled but there is a price set on the protection stone! It will not work!");
         }
 
         // take money

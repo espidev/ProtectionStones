@@ -106,12 +106,12 @@ public class ListenerClass implements Listener {
         if (ProtectionStones.configOptions.placingCooldown != -1) {
             double currentTime = System.currentTimeMillis();
             if (lastProtectStonePlaced.containsKey(p)) {
-                double cooldown = ProtectionStones.configOptions.placingCooldown;
-                double lastPlace = lastProtectStonePlaced.get(p);
+                double cooldown = ProtectionStones.configOptions.placingCooldown; // seconds
+                double lastPlace = lastProtectStonePlaced.get(p); // milliseconds
 
-                if (lastPlace + cooldown > currentTime) { // if cooldown has not been finished
+                if (lastPlace + cooldown*1000 > currentTime) { // if cooldown has not been finished
                     e.setCancelled(true);
-                    p.sendMessage(PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", (cooldown / 1000) - ((currentTime - lastPlace) / 1000))));
+                    p.sendMessage(PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000))));
                     return;
                 }
 
@@ -338,9 +338,11 @@ public class ListenerClass implements Listener {
     }
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
+        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
             ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
-            if (cpb != null && cpb.preventPistonPush) {
+            if (cpb != null && rgm.getRegion("ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z") != null && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }

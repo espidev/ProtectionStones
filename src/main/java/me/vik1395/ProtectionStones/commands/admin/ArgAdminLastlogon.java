@@ -19,7 +19,6 @@ package me.vik1395.ProtectionStones.commands.admin;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PlayerComparator;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 

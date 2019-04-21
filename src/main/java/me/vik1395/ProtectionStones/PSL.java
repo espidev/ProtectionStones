@@ -192,11 +192,12 @@ public enum PSL {
     GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player]"),
     GIVE_HELP_DESC("give.help_desc", "Use this command to give a player a protection block."),
     GIVE_GIVEN("give.given", ChatColor.GRAY + "Gave " + ChatColor.AQUA + "%block%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+    GIVE_NO_INVENTORY_ROOM("give.no_inventory_room", ChatColor.RED + "The player does not have enough inventory room."),
 
     // ps sethome
     SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),
     SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
-    SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for %psid% has been set to your location."),
+    SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for " + ChatColor.AQUA + "%psid%" + ChatColor.GRAY + " has been set to your location."),
 
     ;
 

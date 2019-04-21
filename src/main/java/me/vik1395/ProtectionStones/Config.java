@@ -82,9 +82,6 @@ public class Config {
         }
         ProtectionStones.config.load();
 
-        // TODO UPGRADE FROM OLD CONFIG
-        // TODO RUN INITCUSTOMFLAGSFORPS for ps
-
         // keep in mind that there is /ps reload, so clear arrays before adding config options!
 
         // load config into configOptions object
@@ -98,8 +95,6 @@ public class Config {
 
             // iterate over block files and load into map
             for (File file : ProtectionStones.blockDataFolder.listFiles()) {
-                Bukkit.getLogger().info(file.getAbsolutePath());
-
                 FileConfig c = FileConfig.of(file);
                 c.load();
 
@@ -128,7 +123,7 @@ public class Config {
             ProtectionStones.blockDataFolder.mkdir();
             Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
 
-            FileConfig fc = FileConfig.of(ProtectionStones.configLocation);
+            FileConfig fc = FileConfig.builder(ProtectionStones.configLocation).build();
             fc.load();
 
             File oldConfig = new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml");
@@ -146,7 +141,7 @@ public class Config {
             for (String type : yml.getConfigurationSection("Region").getKeys(false)) {
                 File file = new File(ProtectionStones.blockDataFolder.getAbsolutePath() + "/" + type + ".toml");
                 Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(file.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                FileConfig b = FileConfig.of(file);
+                FileConfig b = FileConfig.builder(file).build();
                 b.load();
 
                 b.set("type", type);
