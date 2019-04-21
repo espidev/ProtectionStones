@@ -6,77 +6,134 @@ This plugin is based off the original ProtectionStones plugin by AxelDios.
 
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
-**Dependencies**
--------------
+## Dependencies
 * ProtectionStones 2.0.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
   
-**Configuration**
--------------
+## Default Configuration (config.toml)
 
-    ConfVer: 1
-    UUIDUpdated: true
+    config_version = 3
+    uuidupdated = true
+    # Please do not change the config version unless you know what you are doing!
     
-    # Protection Stones Configuration Page
+    # ---------------------------------------------------------------------------------------
+    # Protection Stones Config
+    # Block configs have been moved to the blocks folder.
+    # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones-Minecraft/tree/master/src/main/resources
+    # ---------------------------------------------------------------------------------------
     
-    # Please do not edit the ConfVer number unless told to do so in update message on spigotmc.org
-    # Also, do not change UUIDUpdated to false unless you want the plugin to upgrade old protection stone regions from names to UUIDs
     
-    # Specify the block you want to use to protect regions. Use names from https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-    # You can specify multiple block types, divided by comma's (NO SPACES!)
-    # Be sure to also add the block to the Region section below!
-    Blocks: END_STONE
-    # If you define multiple block types be sure to define their specs below
+    # Cooldown between placing protection blocks (in seconds). -1 to disable.
+    placing_cooldown = -1
+
+## Default Configuration (block1.toml)
+
+    # Define your protection block below
+    # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    type = "EMERALD_ORE"
     
-    # Specify the default flags to be set when a new protected region is created..
-    Flags:
-      - pvp deny
-      - greeting &lEntering &b&l%player%'s &r&lprotected area
-      - farewell &lLeaving &b&l%player%'s &r&lprotected area
+    # Another way to refer to the protection stone
+    # Can be used for /ps give and /ps get
+    # Must be one word (no spaces)
+    alias = "64"
     
-    # List all the flags that can be set by region owners. Separate them with a comma, no space.
-    Allowed Flags: use,pvp,greeting,farewell,mob-spawning
+    # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give.
+    # Other ways to obtain this block (ex. mining) will not work as a protection stone.
+    # Useful to allow the protection block to only be obtained from a shop or command.
+    # Set to "false" if you want to allow players to obtain a protection stone naturally
+    restrict_obtaining = true
     
-    # Disable the use of ALL protection stones in certain worlds.
-    # Can be overriden with the permission protectionstones.admin
-    Worlds Denied:
-        - exampleworld1
-        - exampleworld2
+    # Enable or disable the use of this protection stone in specific worlds
+    # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
+    # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
+    # Can override with protectionstones.admin permission
+    world_list_type = "blacklist"
+    worlds = [
+        "exampleworld1",
+        "exampleworld2"
+    ]
     
-    # Protected Region Configuration, defined per block type (refer to list defined above)
-    Region:
-      # Default block type
-      END_STONE:
-        X Radius: 20
-        # Set Y to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
-        Y Radius: -1
-        Z Radius: 20
-        # Hide pstone right away when placed?
-        Auto Hide: false
-        # Disable returning the block when the pstone is removed/unclaimed?
-        No Drop: false
-        # Block Piston prevents pushing of pstones if true; recommend to set to true if "No Drop" is false, as it can be abused to gain more pstones.
-        Block Piston: true
+    [region]
+        # Protection radius of block
+        # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+        x_radius = 64
+        y_radius = -1
+        z_radius = 64
+    
+        # How many blocks to offset the default location of /ps home from the protection block
+        home_x_offset = 0
+        home_y_offset = 1
+        home_z_offset = 0
+    
+        # Specify the default flags to be set when a new protected region is created.
+        flags = [
+            "pvp deny",
+            "greeting &lEntering &b&l%player%'s &r&lprotected area",
+            "farewell &lLeaving &b&l%player%'s &r&lprotected area"
+        ]
+    
+        # List all the flags that can be set by region owners. Separate them with a comma, no space.
+        allowed_flags = [
+            "use",
+            "pvp",
+            "greeting",
+            "farewell",
+            "mob-spawning",
+        ]
+    
+        # Default priority type for this block type protection stone
+        priority = 0
+    
+    [block_data]
+        # Name given to protection block when obtained with /ps give or /ps get
+        # Leave as '' for no name
+        display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
+    
+        # Lore given to protection block when obtained with /ps give or /ps get
+        # Leave as [] for no lore
+        lore = [
+            "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"
+        ]
+    
+        # Add price when using /ps get
+        # Must have compatible economy plugin (requires Vault, ie. Essentials)
+        price = 0.0
+    
+    [behaviour]
+        # Hide protection stone right away when placed?
+        auto_hide = false
+    
+        # Disable returning the block when removed/unclaimed?
+        no_drop = false
+    
+        # Prevents piston pushing of the block. Recommended to keep as true.
+        prevent_piston_push = true
+    
         # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
-        Silk Touch: false
-        # Default priority type for this block type pstone
-        Priority: 0
+        # This was the old behaviour to prevent natural obtaining of the protection stone.
+        # Recommended to keep false if "Restrict Obtaining" (the new way) is true
+        prevent_silk_touch = false
     
-    # Section for blocking/showing warning when people enter PVP flagged PStones
-    Teleport to PVP:
-        # Display warning if they walk into PVP flagged PStone
-        Display Warning: false
-        # Block teleport if they tp to PVP flagged PStone (can bypass with /ps bypass)
-        Block Teleport: false
+    [player]
+        # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
+        # Bypass with protectionstones.tp.bypasstp
+        prevent_teleport_in = false
     
-    cooldown:
-      enable: false
-      cooldown: 10
+        # Can't move for x seconds before teleporting with /ps home or /ps tp. Can be disabled with 0.
+        # Option to teleport only if player stands still.
+        # Can override with permission protectionstones.tp.bypasswait
+        no_moving_when_tp_waiting = true
+        tp_waiting_seconds = 0
+    
+        # Extra permission required to place this specific protection block (you still need protectionstones.create)
+        # '' for no extra permission
+        permission = ''
 
 
-Commands
+
+## Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
 
     /ps get [block] - Get a protection stone. Can be charged with currency set in the config (requires Vault)
@@ -99,8 +156,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps admin [version|settings|hide|unhide|cleanup|lastlogon|lastlogons|stats|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
-**Permissions**
------------
+## Permissions
 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions (block break).

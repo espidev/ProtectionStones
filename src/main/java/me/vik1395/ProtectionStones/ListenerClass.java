@@ -374,7 +374,7 @@ public class ListenerClass implements Listener {
         boolean foundNoTeleport = false;
         for (ProtectedRegion r : regions) {
             String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-            if (f != null && ProtectionStones.getBlockOptions(f).preventTeleportIn) foundNoTeleport = true;
+            if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn) foundNoTeleport = true;
             if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
         }
 
