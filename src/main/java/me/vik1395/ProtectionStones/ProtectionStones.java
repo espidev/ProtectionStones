@@ -127,6 +127,32 @@ public class ProtectionStones extends JavaPlugin {
         return new PSLocation(psx, psy, psz);
     }
 
+    // Find the id of the current region the player is in and get WorldGuard player object for use later
+    public static String playerToPSID(Player p) {
+        BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
+        String currentPSID = "";
+        RegionManager rgm = getRegionManagerWithPlayer(p);
+        List<String> idList = rgm.getApplicableRegionsIDs(v);
+        if (idList.size() == 1) {
+            if (idList.get(0).startsWith("ps")) currentPSID = idList.get(0);
+        } else {
+            // Get nearest protection stone if in overlapping region
+            double distanceToPS = 10000D, tempToPS;
+            for (String currentID : idList) {
+                if (currentID.substring(0, 2).equals("ps")) {
+                    PSLocation psl = parsePSRegionToLocation(currentID);
+                    Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
+                    tempToPS = p.getLocation().distance(psLocation);
+                    if (tempToPS < distanceToPS) {
+                        distanceToPS = tempToPS;
+                        currentPSID = currentID;
+                    }
+                }
+            }
+        }
+        return currentPSID;
+    }
+
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
     public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
@@ -293,31 +319,6 @@ public class ProtectionStones extends JavaPlugin {
                     return true;
                 }
 
-                // Find the id of the current region the player is in and get WorldGuard player object for use later
-                BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
-                String currentPSID;
-                RegionManager rgm = getRegionManagerWithPlayer(p);
-                List<String> idList = rgm.getApplicableRegionsIDs(v);
-                if (idList.size() == 1) {
-                    currentPSID = idList.toString().substring(1, idList.toString().length() - 1);
-                } else {
-                    // Get nearest protection stone if in overlapping region
-                    double distanceToPS = 10000D, tempToPS;
-                    String namePSID = "";
-                    for (String currentID : idList) {
-                        if (currentID.substring(0, 2).equals("ps")) {
-                            PSLocation psl = parsePSRegionToLocation(currentID);
-                            Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
-                            tempToPS = p.getLocation().distance(psLocation);
-                            if (tempToPS < distanceToPS) {
-                                distanceToPS = tempToPS;
-                                namePSID = currentID;
-                            }
-                        }
-                    }
-                    currentPSID = namePSID;
-                }
-
                 switch (args[0].toLowerCase()) {
                     case "toggle":
                         if (p.hasPermission("protectionstones.toggle")) {
@@ -343,35 +344,35 @@ public class ProtectionStones extends JavaPlugin {
                     case "admin":
                         return ArgAdmin.argumentAdmin(p, args);
                     case "unclaim":
-                        return ArgUnclaim.argumentUnclaim(p, args, currentPSID);
+                        return ArgUnclaim.argumentUnclaim(p, args);
                     case "bypass":
                         return ArgBypass.argumentBypass(p, args);
                     case "add":
-                        return ArgAddRemove.template(p, args, currentPSID, "add");
+                        return ArgAddRemove.template(p, args, "add");
                     case "remove":
-                        return ArgAddRemove.template(p, args, currentPSID, "remove");
+                        return ArgAddRemove.template(p, args, "remove");
                     case "addowner":
-                        return ArgAddRemove.template(p, args, currentPSID, "addowner");
+                        return ArgAddRemove.template(p, args, "addowner");
                     case "removeowner":
-                        return ArgAddRemove.template(p, args, currentPSID, "removeowner");
+                        return ArgAddRemove.template(p, args, "removeowner");
                     case "view":
-                        return ArgView.argumentView(p, args, currentPSID);
+                        return ArgView.argumentView(p, args);
                     case "unhide":
-                        return ArgHideUnhide.template(p, "unhide", currentPSID);
+                        return ArgHideUnhide.template(p, "unhide");
                     case "hide":
-                        return ArgHideUnhide.template(p, "hide", currentPSID);
+                        return ArgHideUnhide.template(p, "hide");
                     case "priority":
-                        return ArgPriority.argPriority(p, args, currentPSID);
+                        return ArgPriority.argPriority(p, args);
                     case "flag":
-                        return ArgFlag.argumentFlag(p, args, currentPSID);
+                        return ArgFlag.argumentFlag(p, args);
                     case "info":
-                        return ArgInfo.argumentInfo(p, args, currentPSID);
+                        return ArgInfo.argumentInfo(p, args);
                     case "get":
                         return ArgGet.argumentGet(p, args);
                     case "give":
                         return ArgGive.argumentGive(p, args);
                     case "sethome":
-                        return ArgSethome.argumentSethome(p, args, currentPSID);
+                        return ArgSethome.argumentSethome(p, args);
                     default:
                         p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
@@ -425,7 +426,6 @@ public class ProtectionStones extends JavaPlugin {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        continue;
                     }
                 }
             }

@@ -9,7 +9,9 @@ import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.entity.Player;
 
 public class ArgSethome {
-    public static boolean argumentSethome(Player p, String[] args, String psID) {
+    public static boolean argumentSethome(Player p, String[] args) {
+        String psID = ProtectionStones.playerToPSID(p);
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.sethome")) {

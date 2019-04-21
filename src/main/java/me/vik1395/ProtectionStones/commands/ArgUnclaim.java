@@ -24,11 +24,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class ArgUnclaim {
     // /ps unclaim
-    public static boolean argumentUnclaim(Player p, String[] args, String psID) { // psID: id of the current region the player is in
+    public static boolean argumentUnclaim(Player p, String[] args) { // psID: id of the current region the player is in
+        String psID = ProtectionStones.playerToPSID(p);
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.unclaim")) {

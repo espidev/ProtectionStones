@@ -39,7 +39,6 @@ public class ArgGet {
                 p.sendMessage(er.errorMessage);
                 return true;
             }
-            p.sendMessage(er.amount + " " + er.balance + " " + er.type + " " + er.errorMessage);
         }
 
         // check if item was able to be added (inventory not full)

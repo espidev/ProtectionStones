@@ -24,12 +24,18 @@ import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.entity.Player;
 
 public class ArgFlag {
-    public static boolean argumentFlag(Player p, String[] args, String psID) {
+    public static boolean argumentFlag(Player p, String[] args) {
+        String psID = ProtectionStones.playerToPSID(p);
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.flags")) {
             p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
+            return true;
+        }
+        if (psID.equals("")) {
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {

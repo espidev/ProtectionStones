@@ -31,14 +31,14 @@ public class ArgAddRemove {
         } else if (permType.equals("owners") && !p.hasPermission("protectionstones.owners")) {
             p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
             return null;
+        } else if (psID.equals("")) {
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            return null;
         } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
             p.sendMessage(PSL.NO_ACCESS.msg());
             return null;
         } else if (args.length < 2) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
-            return null;
-        } else if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return null;
         }
         if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
@@ -55,7 +55,8 @@ public class ArgAddRemove {
     //   addowner: add owner
     //   removeowner: remove owner
 
-    public static boolean template(Player p, String[] args, String psID, String type) {
+    public static boolean template(Player p, String[] args, String type) {
+        String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
