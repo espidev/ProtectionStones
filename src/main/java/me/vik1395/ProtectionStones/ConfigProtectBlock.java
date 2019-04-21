@@ -16,80 +16,87 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.electronwill.nightconfig.core.conversion.Path;
+import com.electronwill.nightconfig.core.conversion.SpecDoubleInRange;
+import com.electronwill.nightconfig.core.conversion.SpecIntInRange;
+import com.sk89q.worldguard.protection.flags.Flag;
+
+import java.util.HashMap;
 import java.util.List;
 
 public class ConfigProtectBlock {
-    private int regionX, regionY, regionZ, defaultPriority;
-    private boolean autoHide, noDrop, blockPiston, silkTouch, worldListOption;
-
-    private List<String> worlds;
-
 
     /*
-     * Object to represent a protection block as defined in config ("Region" section)
+     * Object to represent a protection block as defined in config ("Blocks" section)
      */
 
-    public int getRegionX() {
-        return regionX;
-    }
+    // Annotations are for types that have names that aren't the same as the config name
 
-    public void setRegionX(int regionX) {
-        this.regionX = regionX;
-    }
+    // main section
+    public String type, alias;
+    @Path("restrict_obtaining")
+    public boolean restrictObtaining;
+    @Path("world_list_type")
+    public String worldListType;
+    @Path("worlds")
+    public List<String> worlds;
 
-    public int getRegionY() {
-        return regionY;
-    }
+    // region section
+    @Path("region.x_radius")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int xRadius;
+    @Path("region.y_radius")
+    @SpecIntInRange(min = -1, max = Integer.MAX_VALUE)
+    public int yRadius;
+    @Path("region.z_radius")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int zRadius;
+    @Path("region.home_x_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int homeXOffset;
+    @Path("region.home_y_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int homeYOffset;
+    @Path("region.home_z_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int homeZOffset;
+    @Path("region.flags")
+    public List<String> flags;
+    @Path("region.allowed_flags")
+    public List<String> allowed_flags;
+    @Path("region.priority")
+    public int priority;
 
-    public void setRegionY(int regionY) {
-        this.regionY = regionY;
-    }
+    // block data section
+    @Path("block_data.display_name")
+    public String displayName;
+    @Path("block_data.lore")
+    public List<String> lore;
+    @Path("block_data.price")
+    @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
+    public double price;
 
-    public int getRegionZ() {
-        return regionZ;
-    }
+    // behaviour section
+    @Path("behaviour.auto_hide")
+    public boolean autoHide;
+    @Path("behaviour.no_drop")
+    public boolean noDrop;
+    @Path("behaviour.prevent_piston_push")
+    public boolean preventPistonPush;
+    @Path("behaviour.prevent_silk_touch")
+    public boolean preventSilkTouch;
 
-    public void setRegionZ(int regionZ) {
-        this.regionZ = regionZ;
-    }
+    // player section
+    @Path("player.prevent_teleport_in")
+    public boolean preventTeleportIn;
+    @Path("player.no_moving_when_tp_waiting")
+    public boolean noMovingWhenTeleportWaiting;
+    @Path("player.tp_waiting_seconds")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int tpWaitingSeconds;
+    @Path("player.permission")
+    public String permission;
 
-    public int getDefaultPriority() {
-        return defaultPriority;
-    }
-
-    public void setDefaultPriority(int defaultPriority) {
-        this.defaultPriority = defaultPriority;
-    }
-
-    public boolean isAutoHide() {
-        return autoHide;
-    }
-
-    public void setAutoHide(boolean autoHide) {
-        this.autoHide = autoHide;
-    }
-
-    public boolean noDrop() {
-        return noDrop;
-    }
-
-    public void setNoDrop(boolean noDrop) {
-        this.noDrop = noDrop;
-    }
-
-    public boolean denyBlockPiston() {
-        return blockPiston;
-    }
-
-    public void setBlockPiston(boolean blockPiston) {
-        this.blockPiston = blockPiston;
-    }
-
-    public boolean denySilkTouch() {
-        return silkTouch;
-    }
-
-    public void setSilkTouch(boolean silkTouch) {
-        this.silkTouch = silkTouch;
-    }
+    // non-config items
+    public HashMap<Flag<?>, Object> regionFlags = new HashMap<>();
 }

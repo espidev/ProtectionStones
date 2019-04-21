@@ -16,24 +16,34 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 
 public class ArgAdminStats {
 
     // /ps admin stats
-    public static boolean argumentAdminStats(Player p, String[] args) {
+    public static boolean argumentAdminStats(CommandSender p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+
+        int size = 0;
+        for (World w : Bukkit.getWorlds()) {
+            size += WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w)).size();
+        }
 
         if (args.length > 2) {
             String playerName = args[2];
             OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
+            int count = 0;
+            for (World w : Bukkit.getWorlds()) {
+                count += WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w)).getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
+            }
             p.sendMessage(ChatColor.YELLOW + playerName + ":");
             p.sendMessage(ChatColor.YELLOW + "================");
             long firstPlayed = (System.currentTimeMillis() - op.getFirstPlayed()) / 86400000L;
@@ -43,20 +53,13 @@ public class ArgAdminStats {
 
             String banMessage = (op.isBanned()) ? "Banned" : "Not Banned";
             p.sendMessage(ChatColor.YELLOW + banMessage);
-
-            int count = 0;
-            try {
-                count = rgm.getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
-            } catch (Exception localException1) {
-            }
             p.sendMessage(ChatColor.YELLOW + "Regions: " + count);
             p.sendMessage(ChatColor.YELLOW + "================");
             return true;
         }
 
-        p.sendMessage(ChatColor.YELLOW + "World:");
         p.sendMessage(ChatColor.YELLOW + "================");
-        p.sendMessage(ChatColor.YELLOW + "Regions: " + rgm.size());
+        p.sendMessage(ChatColor.YELLOW + "Regions: " + size);
         p.sendMessage(ChatColor.YELLOW + "================");
 
         return true;

@@ -1,0 +1,13 @@
+config_version = 3
+uuidupdated = true
+# Please do not change the config version unless you know what you are doing!
+
+# ---------------------------------------------------------------------------------------
+# Protection Stones Config
+# Block configs have been moved to the blocks folder.
+# If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones-Minecraft/tree/master/src/main/resources
+# ---------------------------------------------------------------------------------------
+
+
+# Cooldown between placing protection blocks (in seconds). -1 to disable.
+placing_cooldown = -1

@@ -16,89 +16,171 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.electronwill.nightconfig.core.conversion.ObjectConverter;
+import com.electronwill.nightconfig.core.conversion.Path;
+import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Config {
 
+    // config options
+    // config.toml will be loaded into these fields
+    @Path("config_version")
+    int configVersion;
+    @Path("uuidupdated")
+    Boolean uuidupdated;
+    @Path("placing_cooldown")
+    int placingCooldown;
+    //@Path("allow_dangerous_commands")
+    //Boolean allowDangerousCommands;
+    //@Path("base_command")
+    //String baseCommand;
+
+
     public static void initConfig() {
-        ProtectionStones.config = new YamlConfiguration();
+
+        // check if using config v1 or v2 (config.yml -> config.toml)
+        if (new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml").exists() && !ProtectionStones.configLocation.exists()) {
+            upgradeFromV1V2();
+        }
+
+        // check if config files exist
         try {
-            ProtectionStones.config.load(ProtectionStones.conf);
-        } catch (IOException | InvalidConfigurationException ex) {
+            if (!ProtectionStones.getPlugin().getDataFolder().exists()) {
+                ProtectionStones.getPlugin().getDataFolder().mkdir();
+            }
+            if (!ProtectionStones.blockDataFolder.exists()) {
+                ProtectionStones.blockDataFolder.mkdir();
+                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(ProtectionStones.blockDataFolder.getAbsolutePath() + "/block1.toml"), StandardCopyOption.REPLACE_EXISTING);
+            }
+            if (!ProtectionStones.configLocation.exists()) {
+                Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException ex) {
             Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        // not necessary for now
-//        ProtectionStones.getPlugin().getLogger().info("[ProtectionStones] Checking Configuration Version");
-//
-//        if (ProtectionStones.getPlugin().getConfig().get("ConfVer") == null) {
-//            ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
-//        } else {
-//            if (ProtectionStones.config.getInt("ConfVer") == 1) {
-//                ProtectionStones.getPlugin().getLogger().info("Config is correct version, continuing start-up");
-//            } else if (ProtectionStones.config.getInt("ConfVer") > 1) {
-//                ProtectionStones.getPlugin().getLogger().info("Config version is higher than required version, this might cause trouble");
-//            } else {
-//                fixInitialHidden(ProtectionStones.config.get("Block"));
-//                ProtectionStones.getPlugin().getLogger().info("Config is outdated, this WILL generate errors, please refresh it!");
-//            }
-//        }
+        // clear data (for /ps reload)
+        ProtectionStones.protectionStonesOptions.clear();
+
+        if (ProtectionStones.config == null) {
+            ProtectionStones.config = FileConfig.of(ProtectionStones.configLocation);
+        }
+        ProtectionStones.config.load();
 
         // keep in mind that there is /ps reload, so clear arrays before adding config options!
 
-        ProtectionStones.flags = ProtectionStones.getPlugin().getConfig().getStringList("Flags");
-        ProtectionStones.allowedFlags = Arrays.asList((ProtectionStones.getPlugin().getConfig().getString("Allowed Flags").toLowerCase()).split(","));
-        ProtectionStones.deniedWorlds = ProtectionStones.getPlugin().getConfig().getStringList("Worlds Denied");
-        ProtectionStones.isCooldownEnable = ProtectionStones.getPlugin().getConfig().getBoolean("cooldown.enable");
-        ProtectionStones.cooldown = ProtectionStones.getPlugin().getConfig().getInt("cooldown.cooldown") * 1000;
-
-        ProtectionStones.protectBlocks.clear();
-        ProtectionStones.protectionStonesOptions.clear();
-
-        Bukkit.getLogger().info("Placing of Protection Stones is disabled in the following worlds (override with protectionstones.admin): ");
-        for (String world : ProtectionStones.deniedWorlds) {
-            Bukkit.getLogger().info("- " + world);
-        }
-
-        // add block types
-        for (String material : ProtectionStones.getPlugin().getConfig().getString("Blocks").split(",")) {
-            if (Material.getMaterial(material) == null) {
-                Bukkit.getLogger().info("Unrecognized block: " + material + ". Please make sure you have updated your block name for 1.13!");
-            } else {
-                ProtectionStones.protectBlocks.add(material.toUpperCase());
-            }
-        }
+        // load config into configOptions object
+        ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
 
         // add protection stones to options map
-        if (ProtectionStones.config.get("Region") == null) {
-            Bukkit.getLogger().info("Region block not found! You do not have any protection blocks configured!");
+        if (ProtectionStones.blockDataFolder.listFiles().length == 0) {
+            Bukkit.getLogger().info("The blocks folder is empty! You do not have any protection blocks configured!");
         } else {
             Bukkit.getLogger().info("Protection Stone Blocks:");
-            for (String block : ProtectionStones.config.getConfigurationSection("Region").getKeys(false)) {
-                Bukkit.getLogger().info("- " + block);
-                // code looks cleaner without constructor
-                ConfigProtectBlock b = new ConfigProtectBlock();
-                b.setRegionX(ProtectionStones.config.getInt("Region." + block + ".X Radius"));
-                b.setRegionY(ProtectionStones.config.getInt("Region." + block + ".Y Radius"));
-                b.setRegionZ(ProtectionStones.config.getInt("Region." + block + ".Z Radius"));
 
-                b.setAutoHide(ProtectionStones.config.getBoolean("Region." + block + ".Auto Hide"));
-                b.setBlockPiston(ProtectionStones.config.getBoolean("Region." + block + ".Block Piston"));
-                b.setNoDrop(ProtectionStones.config.getBoolean("Region." + block + ".No Drop"));
-                b.setSilkTouch(ProtectionStones.config.getBoolean("Region." + block + ".Silk Touch"));
-                b.setDefaultPriority(ProtectionStones.config.getInt("Region." + block + ".Priority"));
+            // iterate over block files and load into map
+            for (File file : ProtectionStones.blockDataFolder.listFiles()) {
+                FileConfig c = FileConfig.of(file);
+                c.load();
 
-                ProtectionStones.protectionStonesOptions.put(block, b);
+                // convert toml data into object
+                ConfigProtectBlock b = new ObjectConverter().toObject(c, ConfigProtectBlock::new);
+
+                if (Material.getMaterial(b.type) == null) {
+                    Bukkit.getLogger().info("Unrecognized material: " + b.type);
+                    Bukkit.getLogger().info("Block will not be added. Please fix this in your config.");
+                    continue;
+                }
+
+                Bukkit.getLogger().info("- " + b.type);
+                FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
+                ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
             }
         }
 
+    }
+
+    // upgrade from config < v2.0.0
+    public static void upgradeFromV1V2() {
+        Bukkit.getLogger().info(ChatColor.AQUA + "Upgrading configs from v1.x to v2.0+...");
+
+        try {
+            ProtectionStones.blockDataFolder.mkdir();
+            Files.copy(Config.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
+
+            FileConfig fc = FileConfig.builder(ProtectionStones.configLocation).build();
+            fc.load();
+
+            File oldConfig = new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml");
+            YamlConfiguration yml = YamlConfiguration.loadConfiguration(oldConfig);
+
+            fc.set("uuidupdated", (yml.get("UUIDUpdated") != null) && yml.getBoolean("UUIDUpdated"));
+            fc.set("placing_cooldown", (yml.getBoolean("cooldown.enable")) ? yml.getInt("cooldown.cooldown") : -1);
+
+            // options from global scope
+            List<String> worldsDenied = yml.getStringList("Worlds Denied");
+            List<String> flags = yml.getStringList("Flags");
+            List<String> allowedFlags = new ArrayList<>(Arrays.asList(yml.getString("Allowed Flags").split(",")));
+
+            // upgrade blocks
+            for (String type : yml.getConfigurationSection("Region").getKeys(false)) {
+                File file = new File(ProtectionStones.blockDataFolder.getAbsolutePath() + "/" + type + ".toml");
+                Files.copy(Config.class.getResourceAsStream("/block1.toml"), Paths.get(file.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                FileConfig b = FileConfig.builder(file).build();
+                b.load();
+
+                b.set("type", type);
+                b.set("alias", type);
+                b.set("restrict_obtaining", false);
+                b.set("world_list_type", "blacklist");
+                b.set("worlds", worldsDenied);
+                b.set("region.x_radius", yml.getInt("Region." + type + ".X Radius"));
+                b.set("region.y_radius", yml.getInt("Region." + type + ".Y Radius"));
+                b.set("region.z_radius", yml.getInt("Region." + type + ".Z Radius"));
+                b.set("region.flags", flags);
+                b.set("region.allowed_flags",  allowedFlags);
+                b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
+                b.set("block_data.display_name", "");
+                b.set("block_data.lore", Arrays.asList());
+                b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
+                b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
+                b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));
+                // ignore silk touch option
+                b.set("player.prevent_teleport_in", yml.getBoolean("Teleport To PVP.Block Teleport"));
+
+                b.save();
+                b.close();
+            }
+
+            fc.save();
+            fc.close();
+
+            oldConfig.renameTo(new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml.old"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
+        Bukkit.getLogger().info(ChatColor.GREEN + "Please be sure to double check your configs with the new options!");
+
+        Bukkit.getLogger().info(ChatColor.AQUA + "Updating PS Regions to new format...");
+        ProtectionStones.upgradeRegions();
+        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
     }
 }

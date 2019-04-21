@@ -17,24 +17,49 @@
 package me.vik1395.ProtectionStones;
 
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.FlagContext;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
 public class FlagHandler {
 
-    public static HashMap<Flag<?>, Object> defaultFlags = new HashMap<>();
+    // Custom WorldGuard Flags used by ProtectionStones
+    // Added to blocks on BlockPlaceEvent Listener
+    public static final Flag<String> PS_HOME = new StringFlag("ps-home");
+    public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
 
-    public static void initFlags() {
-        defaultFlags.clear();
+    public static void registerFlags() {
+        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+        try {
+            registry.register(PS_HOME);
+            registry.register(PS_BLOCK_MATERIAL);
+        } catch (FlagConflictException e ) {
+            Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
+            e.printStackTrace();
+        }
+    }
 
-        for (String flagraw : ProtectionStones.flags) {
+    // Add the correct flags for the ps region
+    public static void initCustomFlagsForPS(ProtectedRegion region, Block block, ConfigProtectBlock cpb) {
+
+        String home = block.getLocation().getBlockX() + cpb.homeXOffset + " ";
+        home += (block.getLocation().getBlockY() + cpb.homeYOffset) + " ";
+        home += (block.getLocation().getBlockZ() + cpb.homeZOffset);
+        region.setFlag(PS_HOME, home);
+
+        region.setFlag(PS_BLOCK_MATERIAL, cpb.type);
+    }
+
+    // Initializes user defined default flags for block
+    public static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
+        b.regionFlags = new HashMap<>();
+        for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
             String settings = "";
             for (int i = 1; i < split.length; i++) settings += split[i] + " ";
@@ -43,7 +68,7 @@ public class FlagHandler {
             Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
-                defaultFlags.put(flag, flag.parseInput(fc));
+                b.regionFlags.put(flag, flag.parseInput(fc));
             } catch (Exception e) {
                 Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
                 e.printStackTrace();
@@ -51,6 +76,7 @@ public class FlagHandler {
         }
     }
 
+    // /ps flag logic (utilizing WG internal /region flag logic)
     public void setFlag(String[] args, ProtectedRegion region, Player p) {
         Flag flag;
 
@@ -79,7 +105,7 @@ public class FlagHandler {
                     region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(args[2]));
                 }
             } catch (InvalidFlagFormat invalidFlagFormat) {
-                invalidFlagFormat.printStackTrace();
+                //invalidFlagFormat.printStackTrace();
                 p.sendMessage(PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
                 return;
             }

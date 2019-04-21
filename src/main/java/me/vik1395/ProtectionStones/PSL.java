@@ -30,6 +30,9 @@ public enum PSL {
     NO_SUCH_COMMAND("no_such_command", ChatColor.RED + "No such command. please type /ps help for more info"),
     NO_ACCESS("no_access", ChatColor.RED + "You are not allowed to do that here."),
     NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
+    INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
+    NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
+    INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -54,6 +57,9 @@ public enum PSL {
     NO_PERMISSION_HOME("no_permission_home", ChatColor.RED + "You do not have permission to teleport to your protection blocks."),
     NO_PERMISSION_UNCLAIM("no_permission_unclaim", ChatColor.RED + "You do not have permission to use the unclaim command."),
     NO_PERMISSION_VIEW("no_permission_view", ChatColor.RED + "You do not have permission to use the view command."),
+    NO_PERMISSION_GIVE("no_permission_give", ChatColor.RED + "You do not have permission to use the give command."),
+    NO_PERMISSION_GET("no_permission_get", ChatColor.RED + "You do not have permission to use the get command."),
+    NO_PERMISSION_SETHOME("no_permission_sethome", ChatColor.RED + "You do not have permission to use the sethome command."),
 
     ADDED_TO_REGION("psregion.added_to_region",  ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
@@ -69,6 +75,7 @@ public enum PSL {
     REACHED_REGION_LIMIT("psregion.reached_region_limit", ChatColor.RED + "You can not create any more protected regions."),
     WORLD_DENIED_CREATE("psregion.world_denied_create", ChatColor.RED + "You can not create protections in this world."),
     REGION_OVERLAP("psregion.region_overlap", ChatColor.RED + "You can not place a protection block here as it overlaps another region."),
+    REGION_CANT_TELEPORT("psregion.cant_teleport", ChatColor.RED + "Your teleportation was blocked by a protection region!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
@@ -132,6 +139,8 @@ public enum PSL {
     TPING("tp.tping", ChatColor.GREEN + "Teleporting..."),
     TP_ERROR_NAME("tp.error_name", ChatColor.RED + "Error in teleporting to protected region! (parsing WG region name error)"),
     TP_ERROR_TP("tp.error_tp", ChatColor.RED + "Error in finding the region to teleport to!"),
+    TP_IN_SECONDS("tp.in_seconds", ChatColor.GRAY + "Teleporting in " + ChatColor.AQUA + "%seconds%" + ChatColor.GRAY + " seconds."),
+    TP_CANCELLED_MOVED("tp.cancelled_moved", ChatColor.RED + "Teleport cancelled. You moved!"),
 
     // ps home,
     HOME_HELP("home.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps home [num]"),
@@ -141,7 +150,6 @@ public enum PSL {
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),
     UNCLAIM_HELP_DESC("unclaim.help_desc", "Use this command to pickup a placed protection stone and remove the region."),
-    UNCLAIM_CANT_FIND("unclaim.cant_find", ChatColor.RED + "We can't seem to find the protection block! Please ask an admin to remove the region manually."),
 
     // ps view
     VIEW_HELP("view.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps view"),
@@ -151,15 +159,16 @@ public enum PSL {
     VIEW_REMOVING("view.removing", ChatColor.AQUA + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
 
     // ps admin
-    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | settings | hide | unhide |\n" + ChatColor.GRAY + "         cleanup | lastlogon | lastlogons | stats }"),
+    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | hide | unhide | cleanup |\n" + ChatColor.GRAY + "         lastlogon | lastlogons | stats | fixregions}"),
     ADMIN_HELP_DESC("admin.help_desc", "This is an admin command showing different stats and allowing to override other player's regions."),
-    ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days]"),
+    ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]"),
     ADMIN_CLEANUP_HEADER("admin.cleanup_header", ChatColor.YELLOW + "Cleanup %arg% %days% days\n================"),
     ADMIN_CLEANUP_FOOTER("admin.cleanup_footer", ChatColor.YELLOW + "================\nCompleted %arg% cleanup."),
     ADMIN_HIDE_TOGGLED("admin.hide_toggled", ChatColor.YELLOW + "All protection stones have been %message% in this world."),
     ADMIN_LAST_LOGON("admin.last_logon", ChatColor.YELLOW + "%player% last played %days% days ago."),
     ADMIN_IS_BANNED("admin.is_banned", ChatColor.YELLOW + "%player% is banned."),
     ADMIN_ERROR_PARSING("admin.error_parsing", ChatColor.RED + "Error parsing days, are you sure it is a number?"),
+    ADMIN_CONSOLE_WORLD("admin.console_world", ChatColor.RED + "Please specify the world as the last parameter."),
     ADMIN_LASTLOGONS_HEADER("admin.lastlogons_header", ChatColor.YELLOW + "%days% Days Plus:\n================"),
     ADMIN_LASTLOGONS_LINE("admin.lastlogons_line", ChatColor.YELLOW + "%player% %time% days"),
     ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),
@@ -175,6 +184,22 @@ public enum PSL {
     ADDREMOVE_HELP_DESC("addremove.help_desc", "Use this command to add or remove a member of your protected region."),
     ADDREMOVE_OWNER_HELP("addremove.owner_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps addowner|removeowner [playername]"),
     ADDREMOVE_OWNER_HELP_DESC("addremove.owner_help_desc", "Use this command to add or remove an owner of your protected region."),
+
+    // ps get
+    GET_HELP("get.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps get [block]"),
+    GET_HELP_DESC("get.help_desc", "Use this command to get or purchase a protection block."),
+    GET_GOTTEN("get.gotten", ChatColor.AQUA + "Added protection block to inventory!"),
+
+    // ps give
+    GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player]"),
+    GIVE_HELP_DESC("give.help_desc", "Use this command to give a player a protection block."),
+    GIVE_GIVEN("give.given", ChatColor.GRAY + "Gave " + ChatColor.AQUA + "%block%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+    GIVE_NO_INVENTORY_ROOM("give.no_inventory_room", ChatColor.RED + "The player does not have enough inventory room."),
+
+    // ps sethome
+    SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),
+    SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
+    SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for " + ChatColor.AQUA + "%psid%" + ChatColor.GRAY + " has been set to your location."),
 
     ;
 

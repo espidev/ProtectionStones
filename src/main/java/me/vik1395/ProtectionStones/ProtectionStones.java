@@ -16,6 +16,8 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -28,47 +30,46 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ProtectionStones extends JavaPlugin {
     public static Map<UUID, String> uuidToName = new HashMap<>();
     public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
-    public static File psStoneData;
-    public static File conf;
+    public static File configLocation, blockDataFolder;
 
     public static Metrics metrics;
 
-    public static FileConfiguration config;
-    public static List<String> flags = new ArrayList<>();
-    public static List<String> toggleList = new ArrayList<>();
-    public static List<String> allowedFlags = new ArrayList<>();
-    public static List<String> deniedWorlds = new ArrayList<>();
+    public static FileConfig config;
+    // all configuration file options are stored in here
+    public static Config configOptions;
+    // block options
     public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
-    public static Collection<String> protectBlocks = new HashSet<>();
-    public Map<CommandSender, Integer> viewTaskList;
 
-    public static boolean isCooldownEnable = false;
-    public static int cooldown = 0;
+    // vault economy integration
+    public static boolean isVaultEnabled = false;
+    public static Economy vaultEconomy;
+
+    public static List<String> toggleList = new ArrayList<>();
 
     public static Plugin getPlugin() {
         return plugin;
@@ -80,11 +81,45 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to get the config options for a protection stone
     // Makes code look cleaner
-    public static ConfigProtectBlock getProtectStoneOptions(String blockType) {
+    public static ConfigProtectBlock getBlockOptions(String blockType) {
         return protectionStonesOptions.get(blockType);
     }
 
-    // Turn WG region name into a location (ex. ps138x35y358z i think)
+    // Check if block material name is valid protection block
+    public static boolean isProtectBlock(String material) {
+        return protectionStonesOptions.containsKey(material);
+    }
+
+    // Get block from name (including aliases)
+    public static ConfigProtectBlock getProtectBlockFromName(String name) {
+        for (ConfigProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
+            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) {
+                return cpb;
+            }
+        }
+        return null;
+    }
+
+    // Create protection stone item (for /ps get and /ps give, and unclaiming)
+    public static ItemStack createProtectBlockItem(ConfigProtectBlock b) {
+        ItemStack is = new ItemStack(Material.getMaterial(b.type));
+        ItemMeta im = is.getItemMeta();
+
+        if (!b.displayName.equals("")) {
+            im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
+        }
+        List<String> lore = new ArrayList<>();
+        for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+        im.setLore(lore);
+
+        // add identifier for protection stone created items
+        im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.STRING, "true");
+
+        is.setItemMeta(im);
+        return is;
+    }
+
+    // Turn WG region name into a location (ex. ps138x35y358z)
     public static PSLocation parsePSRegionToLocation(String regionName) {
         int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
         int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
@@ -92,9 +127,35 @@ public class ProtectionStones extends JavaPlugin {
         return new PSLocation(psx, psy, psz);
     }
 
+    // Find the id of the current region the player is in and get WorldGuard player object for use later
+    public static String playerToPSID(Player p) {
+        BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
+        String currentPSID = "";
+        RegionManager rgm = getRegionManagerWithPlayer(p);
+        List<String> idList = rgm.getApplicableRegionsIDs(v);
+        if (idList.size() == 1) {
+            if (idList.get(0).startsWith("ps")) currentPSID = idList.get(0);
+        } else {
+            // Get nearest protection stone if in overlapping region
+            double distanceToPS = 10000D, tempToPS;
+            for (String currentID : idList) {
+                if (currentID.substring(0, 2).equals("ps")) {
+                    PSLocation psl = parsePSRegionToLocation(currentID);
+                    Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
+                    tempToPS = p.getLocation().distance(psLocation);
+                    if (tempToPS < distanceToPS) {
+                        distanceToPS = tempToPS;
+                        currentPSID = currentID;
+                    }
+                }
+            }
+        }
+        return currentPSID;
+    }
+
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, World w) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
@@ -105,7 +166,7 @@ public class ProtectionStones extends JavaPlugin {
             case "remove":
                 if (region.substring(0, 2).equals("ps")) {
                     PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
-                    Block blockToRemove = admin.getWorld().getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
+                    Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
                     blockToRemove.setType(Material.AIR);
                 }
                 rgm.removeRegion(region);
@@ -114,47 +175,59 @@ public class ProtectionStones extends JavaPlugin {
     }
 
 
+    // called on first start, and /ps reload
+    public static void loadConfig() {
+        // init config
+        Config.initConfig();
+
+        // init messages
+        PSL.loadConfig();
+    }
+
+    @Override
+    public void onLoad() {
+        // register flags
+        FlagHandler.registerFlags();
+    }
+
     // plugin enable
     @Override
     public void onEnable() {
-        viewTaskList = new HashMap<>();
-        saveDefaultConfig();
-        getConfig().options().copyDefaults(true);
+        TomlFormat.instance();
+
         plugin = this;
-        conf = new File(this.getDataFolder() + "/config.yml");
-        psStoneData = new File(this.getDataFolder() + "/hiddenpstones.yml");
+        configLocation = new File(this.getDataFolder() + "/config.toml");
+        blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
         // Metrics (bStats)
         metrics = new Metrics(this);
-
-        // generate protection stones stored blocks file
-        if (!psStoneData.exists()) {
-            try {
-                ProtectionStones.psStoneData.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
 
         // register event listeners
         getServer().getPluginManager().registerEvents(new ListenerClass(), this);
 
         // check that WorldGuard and WorldEdit are enabled (Worldguard will only be enabled if there's worldedit)
-        if (getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("WorldGuard") != null && getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
             wgd = getServer().getPluginManager().getPlugin("WorldGuard");
         } else {
             getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        // init config
-        Config.initConfig();
+        // check if Vault is enabled (for economy support)_
+        if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
+            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            if (econ == null) {
+                getServer().getLogger().info("No economy plugin found by Vault! There will be no economy support!");
+            } else {
+                vaultEconomy = econ.getProvider();
+                isVaultEnabled = true;
+            }
+        } else {
+            getServer().getLogger().info("Vault not enabled! There will be no economy support!");
+        }
 
-        // init messages
-        PSL.loadConfig();
-
-        // initialize flags
-        FlagHandler.initFlags();
+        // Load configuration
+        loadConfig();
 
         // register permissions
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));
@@ -162,12 +235,17 @@ public class ProtectionStones extends JavaPlugin {
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unclaim"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.view"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.info"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.get"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.give"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count.others"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.hide"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.sethome"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypassprevent"));
+        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypasswait"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.priority"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.owners"));
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.members"));
@@ -189,15 +267,11 @@ public class ProtectionStones extends JavaPlugin {
         getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
 
         // Update to UUIDs
-        if (!getConfig().contains("UUIDUpdated", true) || !getConfig().getBoolean("UUIDUpdated")) {
+        if (configOptions.uuidupdated == null || !configOptions.uuidupdated) {
             convertToUUID();
         }
 
         getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
-    }
-
-    private static UUID nameToUUID(String name) {
-        return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
     private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
@@ -217,6 +291,8 @@ public class ProtectionStones extends JavaPlugin {
 
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             return ArgReload.argumentReload(s, args);
+        } else if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
+            return ArgAdmin.argumentAdmin(s, args);
         }
 
         if (s instanceof Player) {
@@ -226,9 +302,12 @@ public class ProtectionStones extends JavaPlugin {
                     sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info","protectionstones.info");
                     sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps","protectionstones.members");
                     sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
+                    sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), "/ps get", "protectionstones.get");
+                    sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), "/ps give", "protectionstones.give");
                     sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
                     sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
                     sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
+                    sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), "/ps sethome", "protectionstones.sethome");
                     sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
                     sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
                     sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
@@ -240,31 +319,6 @@ public class ProtectionStones extends JavaPlugin {
                     sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), "/ps admin", "protectionstones.admin");
                     sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), "/ps reload", "protectionstones.admin");
                     return true;
-                }
-
-                // Find the id of the current region the player is in and get WorldGuard player object for use later
-                BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
-                String currentPSID;
-                RegionManager rgm = getRegionManagerWithPlayer(p);
-                List<String> idList = rgm.getApplicableRegionsIDs(v);
-                if (idList.size() == 1) {
-                    currentPSID = idList.toString().substring(1, idList.toString().length() - 1);
-                } else {
-                    // Get nearest protection stone if in overlapping region
-                    double distanceToPS = 10000D, tempToPS;
-                    String namePSID = "";
-                    for (String currentID : idList) {
-                        if (currentID.substring(0, 2).equals("ps")) {
-                            PSLocation psl = parsePSRegionToLocation(currentID);
-                            Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
-                            tempToPS = p.getLocation().distance(psLocation);
-                            if (tempToPS < distanceToPS) {
-                                distanceToPS = tempToPS;
-                                namePSID = currentID;
-                            }
-                        }
-                    }
-                    currentPSID = namePSID;
                 }
 
                 switch (args[0].toLowerCase()) {
@@ -289,37 +343,41 @@ public class ProtectionStones extends JavaPlugin {
                         return ArgTp.argumentTp(p, args);
                     case "home":
                         return ArgTp.argumentTp(p, args);
-                    case "admin":
-                        return ArgAdmin.argumentAdmin(p, args);
                     case "unclaim":
-                        return ArgUnclaim.argumentUnclaim(p, args, currentPSID);
+                        return ArgUnclaim.argumentUnclaim(p, args);
                     case "bypass":
                         return ArgBypass.argumentBypass(p, args);
                     case "add":
-                        return ArgAddRemove.template(p, args, currentPSID, "add");
+                        return ArgAddRemove.template(p, args, "add");
                     case "remove":
-                        return ArgAddRemove.template(p, args, currentPSID, "remove");
+                        return ArgAddRemove.template(p, args, "remove");
                     case "addowner":
-                        return ArgAddRemove.template(p, args, currentPSID, "addowner");
+                        return ArgAddRemove.template(p, args, "addowner");
                     case "removeowner":
-                        return ArgAddRemove.template(p, args, currentPSID, "removeowner");
+                        return ArgAddRemove.template(p, args, "removeowner");
                     case "view":
-                        return ArgView.argumentView(p, args, currentPSID);
+                        return ArgView.argumentView(p, args);
                     case "unhide":
-                        return ArgHideUnhide.template(p, "unhide", currentPSID);
+                        return ArgHideUnhide.template(p, "unhide");
                     case "hide":
-                        return ArgHideUnhide.template(p, "hide", currentPSID);
+                        return ArgHideUnhide.template(p, "hide");
                     case "priority":
-                        return ArgPriority.argPriority(p, args, currentPSID);
+                        return ArgPriority.argPriority(p, args);
                     case "flag":
-                        return ArgFlag.argumentFlag(p, args, currentPSID);
+                        return ArgFlag.argumentFlag(p, args);
                     case "info":
-                        return ArgInfo.argumentInfo(p, args, currentPSID);
+                        return ArgInfo.argumentInfo(p, args);
+                    case "get":
+                        return ArgGet.argumentGet(p, args);
+                    case "give":
+                        return ArgGive.argumentGive(p, args);
+                    case "sethome":
+                        return ArgSethome.argumentSethome(p, args);
                     default:
                         p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
         } else {
-            s.sendMessage(ChatColor.RED + "PS cannot be used from the console.");
+            s.sendMessage(ChatColor.RED + "You can only use /ps reload and /ps admin from console.");
         }
         return true;
     }
@@ -331,6 +389,55 @@ public class ProtectionStones extends JavaPlugin {
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
+    // check that all of the PS custom flags are in ps regions and upgrade if not
+    public static void upgradeRegions() {
+
+        YamlConfiguration hideFile = null;
+        if (new File(plugin.getDataFolder() + "/hiddenpstones.yml").exists()) {
+            hideFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + "/hiddenpstones.yml"));
+        }
+        for (World world : Bukkit.getWorlds()) {
+            RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            for (String regionName : rm.getRegions().keySet()) {
+                if (regionName.startsWith("ps")) {
+                    try {
+                        PSLocation psl = parsePSRegionToLocation(regionName);
+                        ProtectedRegion r = rm.getRegion(regionName);
+
+                        // get material of ps
+                        String entry = psl.x + "x" + psl.y + "y" + psl.z + "z", material;
+                        if (hideFile != null && hideFile.contains(entry)) {
+                            material = hideFile.getString(entry);
+                        } else {
+                            material = world.getBlockAt(psl.x, psl.y, psl.z).getType().toString();
+                        }
+
+                        if (r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) == null) {
+                            r.setFlag(FlagHandler.PS_BLOCK_MATERIAL, material);
+                        }
+
+                        if (r.getFlag(FlagHandler.PS_HOME) == null) {
+                            if (ProtectionStones.isProtectBlock(material)) {
+                                ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(material);
+                                r.setFlag(FlagHandler.PS_HOME, (psl.x + cpb.homeXOffset) + " " + (psl.y + cpb.homeYOffset) + " " + (psl.z + cpb.homeZOffset));
+                            } else {
+                                r.setFlag(FlagHandler.PS_HOME, psl.x + " " + psl.y + " " + psl.z);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            try {
+                rm.save();
+            } catch (Exception e) {
+                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+            }
+        }
+    }
+
+    // convert regions to use UUIDs instead of player names
     public static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
@@ -348,12 +455,12 @@ public class ProtectionStones extends JavaPlugin {
 
                     // convert
                     for (String owner : owners) {
-                        UUID uuid = nameToUUID(owner);
+                        UUID uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
                         region.getOwners().removePlayer(owner);
                         region.getOwners().addPlayer(uuid);
                     }
                     for (String member : members) {
-                        UUID uuid = nameToUUID(member);
+                        UUID uuid = Bukkit.getOfflinePlayer(member).getUniqueId();
                         region.getMembers().removePlayer(member);
                         region.getMembers().addPlayer(uuid);
                     }
@@ -368,14 +475,8 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // update config to mark that uuid upgrade has been done
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(conf, true));
-            writer.write("\nUUIDUpdated: true");
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        config.set("uuidupdated", true);
+        config.save();
         Bukkit.getLogger().info("Done!");
     }
 

@@ -24,21 +24,21 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class ArgAddRemove {
-    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType, boolean checkPlayer) {
+    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
         } else if (permType.equals("owners") && !p.hasPermission("protectionstones.owners")) {
             p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
             return null;
+        } else if (psID.equals("")) {
+            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            return null;
         } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
             p.sendMessage(PSL.NO_ACCESS.msg());
             return null;
         } else if (args.length < 2) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
-            return null;
-        } else if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
             return null;
         }
         if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
@@ -55,11 +55,12 @@ public class ArgAddRemove {
     //   addowner: add owner
     //   removeowner: remove owner
 
-    public static boolean template(Player p, String[] args, String psID, String type) {
+    public static boolean template(Player p, String[] args, String type) {
+        String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners", type.startsWith("add")); // validate permissions and stuff
+        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
         if (op == null) return true;
         switch (type) {
             case "add":

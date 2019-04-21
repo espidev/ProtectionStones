@@ -23,7 +23,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Map;

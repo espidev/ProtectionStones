@@ -19,15 +19,15 @@ package me.vik1395.ProtectionStones.commands.admin;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PlayerComparator;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
 public class ArgAdminLastlogon {
     // /ps admin lastlogon
-    public static boolean argumentAdminLastLogon(Player p, String[] args) {
+    public static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
         if (args.length < 3) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return true;
@@ -50,7 +50,7 @@ public class ArgAdminLastlogon {
     }
 
     // /ps admin lastlogons
-    public static boolean argumentAdminLastLogons(Player p, String[] args) {
+    public static boolean argumentAdminLastLogons(CommandSender p, String[] args) {
         int days = 0;
         if (args.length > 2) {
             try {

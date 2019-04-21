@@ -25,12 +25,12 @@ import me.vik1395.ProtectionStones.commands.admin.ArgAdminLastlogon;
 import me.vik1395.ProtectionStones.commands.admin.ArgAdminStats;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 public class ArgAdmin {
 
     // /ps admin [arg]
-    public static boolean argumentAdmin(Player p, String[] args) {
+    public static boolean argumentAdmin(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
             p.sendMessage(PSL.NO_PERMISSION_ADMIN.msg());
             return true;
@@ -49,9 +49,6 @@ public class ArgAdmin {
                 p.sendMessage(ChatColor.YELLOW + "WG: " + ProtectionStones.wgd.getDescription().getVersion());
                 p.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
                 break;
-            case "settings":
-                p.sendMessage(ProtectionStones.getPlugin().getConfig().saveToString().split("\n"));
-                break;
             case "hide":
                 return ArgAdminHide.argumentAdminHide(p, args);
             case "unhide":
@@ -64,6 +61,11 @@ public class ArgAdmin {
                 return ArgAdminLastlogon.argumentAdminLastLogon(p, args);
             case "lastlogons":
                 return ArgAdminLastlogon.argumentAdminLastLogons(p, args);
+            case "fixregions":
+                p.sendMessage(ChatColor.YELLOW + "Fixing...");
+                ProtectionStones.upgradeRegions();
+                p.sendMessage(ChatColor.YELLOW + "Done!");
+                break;
         }
         return true;
     }

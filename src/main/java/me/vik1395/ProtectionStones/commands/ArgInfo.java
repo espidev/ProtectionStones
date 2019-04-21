@@ -27,13 +27,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public class ArgInfo {
-    public static boolean argumentInfo(Player p, String[] args, String psID) {
+    public static boolean argumentInfo(Player p, String[] args) {
+        String psID = ProtectionStones.playerToPSID(p);
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 

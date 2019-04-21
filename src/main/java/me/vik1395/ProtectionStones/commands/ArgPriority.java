@@ -24,7 +24,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ArgPriority {
-    public static boolean argPriority(Player p, String[] args, String psID) {
+    public static boolean argPriority(Player p, String[] args) {
+        String psID = ProtectionStones.playerToPSID(p);
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 

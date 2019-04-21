@@ -98,7 +98,7 @@ public class ArgRegion {
             }
 
             // Remove regions
-            for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p);
+            for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p.getWorld());
 
             p.sendMessage(PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
             try {

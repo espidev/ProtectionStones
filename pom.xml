@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.vik1395</groupId>
     <artifactId>ProtectionStones</artifactId>
-    <version>1.7.1</version>
+    <version>2.0.0</version>
     <name>ProtectionStones</name>
     <description>A grief prevention plugin.</description>
 
@@ -93,6 +93,10 @@
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
+        <repository>
+            <id>vault-repo</id>
+            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -121,6 +125,12 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.0.0-SNAPSHOT</version>
@@ -132,6 +142,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.electronwill.night-config</groupId>
+            <artifactId>toml</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+
         <!--<dependency> LOCAL DEPENDENCIES-->
         <!--<groupId>com.sk89q.worldedit</groupId>-->
         <!--<artifactId>worldedit-bukkit</artifactId>-->
