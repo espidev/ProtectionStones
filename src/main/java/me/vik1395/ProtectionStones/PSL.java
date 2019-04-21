@@ -194,6 +194,7 @@ public enum PSL {
     // ps sethome
     SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),
     SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
+    SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for %psid% has been set to your location."),
 
     ;
 
