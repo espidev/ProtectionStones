@@ -11,13 +11,3 @@ uuidupdated = true
 
 # Cooldown between placing protection blocks (in seconds). -1 to disable.
 placing_cooldown = -1
-
-# Whether or not to allow the use of /ps admin cleanup|disown, etc.
-# You should only enable this when you need
-allow_dangerous_commands = false
-
-# Which base command ProtectionStones should use
-# By default, it is /ps [argument]
-# When changing this value, you also have to edit the messages in messages.yml accordingly (they don't auto update)
-base_command = 'ps'
-

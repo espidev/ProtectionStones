@@ -16,7 +16,9 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -25,6 +27,8 @@ import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -34,14 +38,31 @@ import java.util.Map;
 public class ArgAdminCleanup {
 
     // /ps admin cleanup
-    public static boolean argumentAdminCleanup(Player p, String[] args) {
+    public static boolean argumentAdminCleanup(CommandSender p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             p.sendMessage(PSL.ADMIN_CLEANUP_HELP.msg());
             return true;
         }
 
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        RegionManager rgm;
+        World w;
+        if (p instanceof Player) {
+            rgm = ProtectionStones.getRegionManagerWithPlayer((Player) p);
+            w = ((Player) p).getWorld();
+        } else {
+            if (args.length != 5) {
+                p.sendMessage(PSL.ADMIN_CONSOLE_WORLD.msg());
+                return true;
+            }
+            if (Bukkit.getWorld(args[4]) == null) {
+                p.sendMessage(PSL.INVALID_WORLD.msg());
+                return true;
+            }
+            w = Bukkit.getWorld(args[4]);
+            rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+        }
+
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
@@ -84,7 +105,7 @@ public class ArgAdminCleanup {
                     // remove regions
                     p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
                     for (String region : opRegions) {
-                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()-> ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, p));
+                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()-> ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, w));
                     }
                 }
 

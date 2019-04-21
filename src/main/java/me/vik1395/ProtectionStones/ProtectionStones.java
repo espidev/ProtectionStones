@@ -155,7 +155,7 @@ public class ProtectionStones extends JavaPlugin {
 
     // Helper method to either remove, disown or regen a player's ps region
     // NOTE: be sure to save the region manager after
-    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, Player admin) {
+    public static void removeDisownPSRegion(LocalPlayer lp, String arg, String region, RegionManager rgm, World w) {
         ProtectedRegion r = rgm.getRegion(region);
         switch (arg) {
             case "disown":
@@ -166,7 +166,7 @@ public class ProtectionStones extends JavaPlugin {
             case "remove":
                 if (region.substring(0, 2).equals("ps")) {
                     PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
-                    Block blockToRemove = admin.getWorld().getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
+                    Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
                     blockToRemove.setType(Material.AIR);
                 }
                 rgm.removeRegion(region);
@@ -291,6 +291,8 @@ public class ProtectionStones extends JavaPlugin {
 
         if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
             return ArgReload.argumentReload(s, args);
+        } else if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
+            return ArgAdmin.argumentAdmin(s, args);
         }
 
         if (s instanceof Player) {
@@ -341,8 +343,6 @@ public class ProtectionStones extends JavaPlugin {
                         return ArgTp.argumentTp(p, args);
                     case "home":
                         return ArgTp.argumentTp(p, args);
-                    case "admin":
-                        return ArgAdmin.argumentAdmin(p, args);
                     case "unclaim":
                         return ArgUnclaim.argumentUnclaim(p, args);
                     case "bypass":
@@ -377,7 +377,7 @@ public class ProtectionStones extends JavaPlugin {
                         p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
                 }
         } else {
-            s.sendMessage(ChatColor.RED + "PS cannot be used from the console.");
+            s.sendMessage(ChatColor.RED + "You can only use /ps reload and /ps admin from console.");
         }
         return true;
     }

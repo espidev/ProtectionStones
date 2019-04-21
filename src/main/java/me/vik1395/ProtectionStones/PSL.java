@@ -32,6 +32,7 @@ public enum PSL {
     NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
     INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
     NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
+    INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -158,15 +159,16 @@ public enum PSL {
     VIEW_REMOVING("view.removing", ChatColor.AQUA + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
 
     // ps admin
-    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | settings | hide | unhide |\n" + ChatColor.GRAY + "         cleanup | lastlogon | lastlogons | stats | fixregions}"),
+    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | hide | unhide | cleanup |\n" + ChatColor.GRAY + "         lastlogon | lastlogons | stats | fixregions}"),
     ADMIN_HELP_DESC("admin.help_desc", "This is an admin command showing different stats and allowing to override other player's regions."),
-    ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days]"),
+    ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]"),
     ADMIN_CLEANUP_HEADER("admin.cleanup_header", ChatColor.YELLOW + "Cleanup %arg% %days% days\n================"),
     ADMIN_CLEANUP_FOOTER("admin.cleanup_footer", ChatColor.YELLOW + "================\nCompleted %arg% cleanup."),
     ADMIN_HIDE_TOGGLED("admin.hide_toggled", ChatColor.YELLOW + "All protection stones have been %message% in this world."),
     ADMIN_LAST_LOGON("admin.last_logon", ChatColor.YELLOW + "%player% last played %days% days ago."),
     ADMIN_IS_BANNED("admin.is_banned", ChatColor.YELLOW + "%player% is banned."),
     ADMIN_ERROR_PARSING("admin.error_parsing", ChatColor.RED + "Error parsing days, are you sure it is a number?"),
+    ADMIN_CONSOLE_WORLD("admin.console_world", ChatColor.RED + "Please specify the world as the last parameter."),
     ADMIN_LASTLOGONS_HEADER("admin.lastlogons_header", ChatColor.YELLOW + "%days% Days Plus:\n================"),
     ADMIN_LASTLOGONS_LINE("admin.lastlogons_line", ChatColor.YELLOW + "%player% %time% days"),
     ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),

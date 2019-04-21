@@ -16,13 +16,18 @@
 
 package me.vik1395.ProtectionStones.commands.admin;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import me.vik1395.ProtectionStones.FlagHandler;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -31,35 +36,53 @@ import java.util.List;
 public class ArgAdminHide {
 
     // /ps admin hide
-    public static boolean argumentAdminHide(Player p, String[] args) {
-        RegionManager mgr = ProtectionStones.getRegionManagerWithPlayer(p);
+    public static boolean argumentAdminHide(CommandSender p, String[] args) {
+        RegionManager mgr;
+        World w;
+        if (p instanceof Player) {
+            mgr = ProtectionStones.getRegionManagerWithPlayer((Player) p);
+            w = ((Player) p).getWorld();
+        } else {
+            if (args.length != 3) {
+                p.sendMessage(PSL.ADMIN_CONSOLE_WORLD.msg());
+                return true;
+            }
+            if (Bukkit.getWorld(args[2]) == null) {
+                p.sendMessage(PSL.INVALID_WORLD.msg());
+                return true;
+            }
+            w = Bukkit.getWorld(args[2]);
+            mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+        }
         List<String> regionIDList = new ArrayList<>();
 
-        // add all protection stone regions to regions map
-        for (String idname : mgr.getRegions().keySet()) {
-            if (idname.length() >= 9 && idname.substring(0, 2).equals("ps")) {
-                regionIDList.add(idname);
-            }
-        }
-
-        // loop through regions that are protection stones and hide or unhide the block
-        for (String regionID : regionIDList) {
-            PSLocation psl = ProtectionStones.parsePSRegionToLocation(regionID);
-            Block blockToChange = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-
-            if (args[1].equalsIgnoreCase("unhide")) {
-                blockToChange.setType(Material.getMaterial(mgr.getRegion(regionID).getFlag(FlagHandler.PS_BLOCK_MATERIAL)));
-            } else if (args[1].equalsIgnoreCase("hide")) {
-                if (ProtectionStones.isProtectBlock(blockToChange.getType().toString())) {
-                    blockToChange.setType(Material.AIR);
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+            // add all protection stone regions to regions map
+            for (String idname : mgr.getRegions().keySet()) {
+                if (idname.length() >= 9 && idname.substring(0, 2).equals("ps")) {
+                    regionIDList.add(idname);
                 }
             }
 
-        }
+            // loop through regions that are protection stones and hide or unhide the block
+            for (String regionID : regionIDList) {
+                PSLocation psl = ProtectionStones.parsePSRegionToLocation(regionID);
+                Block blockToChange = w.getBlockAt(psl.x, psl.y, psl.z);
 
-        String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";
-        p.sendMessage(PSL.ADMIN_HIDE_TOGGLED.msg()
-                .replace("%message%", hMessage));
+                if (args[1].equalsIgnoreCase("unhide")) {
+                    Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), () -> blockToChange.setType(Material.getMaterial(mgr.getRegion(regionID).getFlag(FlagHandler.PS_BLOCK_MATERIAL))));
+                } else if (args[1].equalsIgnoreCase("hide")) {
+                    if (ProtectionStones.isProtectBlock(blockToChange.getType().toString())) {
+                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), () -> blockToChange.setType(Material.AIR));
+                    }
+                }
+
+            }
+
+            String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";
+            p.sendMessage(PSL.ADMIN_HIDE_TOGGLED.msg()
+                    .replace("%message%", hMessage));
+        });
 
         return true;
     }
