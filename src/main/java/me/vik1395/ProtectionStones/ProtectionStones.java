@@ -180,7 +180,7 @@ public class ProtectionStones extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ListenerClass(), this);
 
         // check that WorldGuard and WorldEdit are enabled (Worldguard will only be enabled if there's worldedit)
-        if (getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("WorldGuard") != null && getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
             wgd = getServer().getPluginManager().getPlugin("WorldGuard");
         } else {
             getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
@@ -188,7 +188,7 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // check if Vault is enabled (for economy support)_
-        if (getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
             RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
             if (econ == null) {
                 getServer().getLogger().info("No economy plugin found by Vault! There will be no economy support!");
