@@ -78,8 +78,11 @@ public class ListenerClass implements Listener {
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
-        CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
-        String tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+        String tag = null;
+        if (e.getItemInHand().getItemMeta() != null) {
+            CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
+            tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+        }
         if (blockOptions.restrictObtaining && (tag == null || !tag.equalsIgnoreCase("true"))) return;
 
         // check permission
