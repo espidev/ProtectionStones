@@ -63,7 +63,7 @@ public class ArgUnclaim {
         String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
         ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(type);
 
-        if (!cpb.noDrop) {
+        if (cpb == null || !cpb.noDrop) {
             // return protection stone
             if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
                 // method will return not empty if item couldn't be added

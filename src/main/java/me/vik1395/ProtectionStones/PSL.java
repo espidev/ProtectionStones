@@ -18,6 +18,7 @@ package me.vik1395.ProtectionStones;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,6 +218,12 @@ public enum PSL {
     public String msg() {
         String msgG = keyToMsg.get(key);
         return ChatColor.translateAlternateColorCodes('&', (msgG == null) ? msg : msgG);
+    }
+
+    public static void msg(Player p, String str) {
+        if (!str.equals("")) {
+            p.sendMessage(str);
+        }
     }
 
     public static void loadConfig() {
