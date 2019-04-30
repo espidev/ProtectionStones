@@ -87,7 +87,7 @@ public class ListenerClass implements Listener {
 
         // check permission
         if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
-            p.sendMessage(PSL.NO_PERMISSION_CREATE.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
             e.setCancelled(true);
             return;
         }
@@ -100,7 +100,7 @@ public class ListenerClass implements Listener {
 
         // check if player can place block in that area
         if (!wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
-            p.sendMessage(PSL.CANT_PROTECT_THAT.msg());
+            PSL.msg(p, PSL.CANT_PROTECT_THAT.msg());
             e.setCancelled(true);
             return;
         }
@@ -114,7 +114,7 @@ public class ListenerClass implements Listener {
 
                 if (lastPlace + cooldown*1000 > currentTime) { // if cooldown has not been finished
                     e.setCancelled(true);
-                    p.sendMessage(PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000))));
+                    PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000))));
                     return;
                 }
 
@@ -145,7 +145,7 @@ public class ListenerClass implements Listener {
             // check if player has passed region limit
             if (rm.getRegionCountOfPlayer(lp) >= max) {
                 if (max != 0) {
-                    p.sendMessage(PSL.REACHED_REGION_LIMIT.msg());
+                    PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
                     e.setCancelled(true);
                     return;
                 }
@@ -154,7 +154,7 @@ public class ListenerClass implements Listener {
             if (blockOptions.worldListType.equalsIgnoreCase("blacklist")) {
                 for (String world : blockOptions.worlds) {
                     if (world.trim().equals(p.getLocation().getWorld().getName())) {
-                        p.sendMessage(PSL.WORLD_DENIED_CREATE.msg());
+                        PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
                         e.setCancelled(true);
                         return;
                     }
@@ -167,7 +167,7 @@ public class ListenerClass implements Listener {
                     }
                 }
                 if (!found) {
-                    p.sendMessage(PSL.WORLD_DENIED_CREATE.msg());
+                    PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
                     e.setCancelled(true);
                     return;
                 }
@@ -217,7 +217,7 @@ public class ListenerClass implements Listener {
                 } catch (StorageException e1) {
                     e1.printStackTrace();
                 }
-                p.sendMessage(PSL.REGION_OVERLAP.msg());
+                PSL.msg(p, PSL.REGION_OVERLAP.msg());
                 e.setCancelled(true);
                 return;
             }
@@ -304,13 +304,13 @@ public class ListenerClass implements Listener {
         // check for destroy permission
         if (!p.hasPermission("protectionstones.destroy")) {
             e.setCancelled(true);
-            p.sendMessage(PSL.NO_PERMISSION_DESTROY.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
             return;
         }
 
         // check if player is owner of region
         if (!rgm.getRegion(id).isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
-            p.sendMessage(PSL.NO_REGION_PERMISSION.msg());
+            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             e.setCancelled(true);
             return;
         }
@@ -319,7 +319,7 @@ public class ListenerClass implements Listener {
         if (!blockOptions.noDrop) {
             if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(blockOptions)).isEmpty()) {
                 // method will return not empty if item couldn't be added
-                p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
+                PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 e.setCancelled(true);
                 return;
             }
@@ -334,7 +334,7 @@ public class ListenerClass implements Listener {
         } catch (Exception e1) {
             ProtectionStones.getPlugin().getLogger().severe("WorldGuard Error [" + e1 + "] during Region File Save");
         }
-        p.sendMessage(PSL.NO_LONGER_PROTECTED.msg());
+        PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
         e.setDropItems(false);
         e.setExpToDrop(0);
@@ -382,7 +382,7 @@ public class ListenerClass implements Listener {
         }
 
         if (foundNoTeleport) {
-            event.getPlayer().sendMessage(PSL.REGION_CANT_TELEPORT.msg());
+            PSL.msg(event.getPlayer(), PSL.REGION_CANT_TELEPORT.msg());
             event.setCancelled(true);
         }
     }

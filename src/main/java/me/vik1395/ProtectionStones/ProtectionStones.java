@@ -275,6 +275,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
+        if (msg.equals("")) return;
         for (String perm : permission) {
             if (p.hasPermission(perm)) {
                 TextComponent m = new TextComponent(msg);
@@ -374,7 +375,7 @@ public class ProtectionStones extends JavaPlugin {
                     case "sethome":
                         return ArgSethome.argumentSethome(p, args);
                     default:
-                        p.sendMessage(PSL.NO_SUCH_COMMAND.msg());
+                        PSL.msg(p, PSL.NO_SUCH_COMMAND.msg());
                 }
         } else {
             s.sendMessage(ChatColor.RED + "You can only use /ps reload and /ps admin from console.");

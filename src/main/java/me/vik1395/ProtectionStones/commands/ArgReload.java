@@ -23,12 +23,12 @@ import org.bukkit.command.CommandSender;
 public class ArgReload {
     public static boolean argumentReload(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
-            p.sendMessage(PSL.NO_PERMISSION_ADMIN.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
             return true;
         }
-        p.sendMessage(PSL.RELOAD_START.msg());
+        PSL.msg(p, PSL.RELOAD_START.msg());
         ProtectionStones.loadConfig();
-        p.sendMessage(PSL.RELOAD_COMPLETE.msg());
+        PSL.msg(p, PSL.RELOAD_COMPLETE.msg());
         return true;
     }
 }

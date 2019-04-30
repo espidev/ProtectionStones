@@ -38,14 +38,14 @@ public class ArgView {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.view")) {
-            p.sendMessage(PSL.NO_PERMISSION_VIEW.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
-        p.sendMessage(PSL.VIEW_GENERATING.msg());
+        PSL.msg(p, PSL.VIEW_GENERATING.msg());
 
         BlockVector3 minVector = rgm.getRegion(psID).getMinimumPoint();
         BlockVector3 maxVector = rgm.getRegion(psID).getMaximumPoint();
@@ -104,10 +104,10 @@ public class ArgView {
                 }
             }
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> p.sendMessage(PSL.VIEW_GENERATE_DONE.msg()), wait);
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait);
 
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
-                p.sendMessage(PSL.VIEW_REMOVING.msg());
+                PSL.msg(p, PSL.VIEW_REMOVING.msg());
                 for (Block b : blocks) {
                     if (b.getWorld().isChunkLoaded(b.getLocation().getBlockX()/16, b.getLocation().getBlockZ()/16)) {
                         p.sendBlockChange(b.getLocation(), b.getBlockData());

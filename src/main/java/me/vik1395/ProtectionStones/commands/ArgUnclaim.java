@@ -33,26 +33,26 @@ public class ArgUnclaim {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.unclaim")) {
-            p.sendMessage(PSL.NO_PERMISSION_UNCLAIM.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
         if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
         ProtectedRegion region = rgm.getRegion(psID);
 
         if (region == null) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
         if (!psID.substring(0, 2).equals("ps")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
 
         if (!region.isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
-            p.sendMessage(PSL.NO_REGION_PERMISSION.msg());
+            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return true;
         }
 
@@ -67,7 +67,7 @@ public class ArgUnclaim {
             // return protection stone
             if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
                 // method will return not empty if item couldn't be added
-                p.sendMessage(PSL.NO_ROOM_IN_INVENTORY.msg());
+                PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
             }
         }
@@ -84,7 +84,7 @@ public class ArgUnclaim {
         } catch (Exception e1) {
             Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e1 + "] during Region File Save");
         }
-        p.sendMessage(PSL.NO_LONGER_PROTECTED.msg());
+        PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
         return true;
     }

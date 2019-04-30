@@ -37,17 +37,17 @@ public class ArgRegion {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.region")) {
-            p.sendMessage(PSL.NO_PERMISSION_REGION.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_REGION.msg());
             return true;
         }
 
         if (args.length < 3) {
-            p.sendMessage(PSL.REGION_HELP.msg());
+            PSL.msg(p, PSL.REGION_HELP.msg());
             return true;
         }
 
         if (!ProtectionStones.nameToUUID.containsKey(args[2])) {
-            p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return true;
         }
 
@@ -56,7 +56,7 @@ public class ArgRegion {
         if (args[1].equalsIgnoreCase("count")) { // count player's regions
             int count = ArgCount.countRegionsOfPlayer(lp, rgm); // TODO check if rgm needs to be p2's
 
-            p.sendMessage(PSL.OTHER_REGION_COUNT.msg()
+            PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
                     .replace("%player%", args[2])
                     .replace("%num%", "" + count));
 
@@ -71,11 +71,11 @@ public class ArgRegion {
             }
 
             if (!found) {
-                p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
                         .replace("%player%", args[2]));
             } else {
                 regionMessage = new StringBuilder(regionMessage.substring(0, regionMessage.length() - 2) + ".");
-                p.sendMessage(PSL.REGION_LIST.msg()
+                PSL.msg(p, PSL.REGION_LIST.msg()
                         .replace("%player%", args[2])
                         .replace("%regions%", regionMessage));
             }
@@ -93,21 +93,21 @@ public class ArgRegion {
                 }
             }
             if (!found) {
-                p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg().replace("%player%", args[2]));
+                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg().replace("%player%", args[2]));
                 return true;
             }
 
             // Remove regions
             for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p.getWorld());
 
-            p.sendMessage(PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
+            PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
             try {
                 rgm.save();
             } catch (Exception e) {
                 Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
             }
         } else {
-            p.sendMessage(PSL.REGION_HELP.msg());
+            PSL.msg(p, PSL.REGION_HELP.msg());
         }
         return true;
     }

@@ -89,7 +89,7 @@ public class FlagHandler {
         if (args[2].equalsIgnoreCase("default")) {
             region.setFlag(flag, flag.getDefault());
             region.setFlag(flag.getRegionGroupFlag(), null);
-            p.sendMessage(PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
         } else {
             String settings = "";
             if (args[1].equalsIgnoreCase("-g")) {
@@ -106,10 +106,10 @@ public class FlagHandler {
                 }
             } catch (InvalidFlagFormat invalidFlagFormat) {
                 //invalidFlagFormat.printStackTrace();
-                p.sendMessage(PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
+                PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
                 return;
             }
-            p.sendMessage(PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
         }
     }
 

@@ -15,21 +15,21 @@ public class ArgSethome {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.sethome")) {
-            p.sendMessage(PSL.NO_PERMISSION_SETHOME.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_SETHOME.msg());
             return true;
         }
         if (psID.equals("") || !rgm.hasRegion(psID)) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
         ProtectedRegion r = rgm.getRegion(psID);
         if (ProtectionStones.hasNoAccess(r, p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
 
         r.setFlag(FlagHandler.PS_HOME, p.getLocation().getBlockX() + " " + p.getLocation().getBlockY() + " " + p.getLocation().getBlockZ());
-        p.sendMessage(PSL.SETHOME_SET.msg().replace("%psid%", psID));
+        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", psID));
         return true;
     }
 }

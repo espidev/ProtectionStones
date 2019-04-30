@@ -46,26 +46,26 @@ public class ArgTp {
         // preliminary checks
         if (args[0].equalsIgnoreCase("tp")) { // argument tp
             if (!p.hasPermission("protectionstones.tp")) {
-                p.sendMessage(PSL.NO_PERMISSION_TP.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_TP.msg());
                 return true;
             } else if (args.length != 3) {
-                p.sendMessage(PSL.TP_HELP.msg());
+                PSL.msg(p, PSL.TP_HELP.msg());
                 return true;
             }
             rgnum = Integer.parseInt(args[2]);
         } else { // argument home
             if (!p.hasPermission("protectionstones.home")) {
-                p.sendMessage(PSL.NO_PERMISSION_HOME.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
                 return true;
             } else if (args.length != 2) {
-                p.sendMessage(PSL.HOME_HELP.msg());
+                PSL.msg(p, PSL.HOME_HELP.msg());
                 return true;
             }
             rgnum = Integer.parseInt(args[1]);
         }
 
         if (rgnum <= 0) {
-            p.sendMessage(PSL.NUMBER_ABOVE_ZERO.msg());
+            PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
             return true;
         }
 
@@ -73,7 +73,7 @@ public class ArgTp {
         if (args[0].equalsIgnoreCase("tp")) {
 
             if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
-                p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+                PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
                 return true;
             }
 
@@ -81,7 +81,7 @@ public class ArgTp {
             try {
                 lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1])));
             } catch (Exception e) {
-                p.sendMessage(PSL.REGION_ERROR_SEARCH.msg()
+                PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
                         .replace("%player%", args[1]));
                 return true;
             }
@@ -97,11 +97,11 @@ public class ArgTp {
             }
 
             if (index <= 0) {
-                p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
                         .replace("%player%", lp.getName()));
                 return true;
             } else if (rgnum > index) {
-                p.sendMessage(PSL.ONLY_HAS_REGIONS.msg()
+                PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
                         .replace("%player%", lp.getName())
                         .replace("%num%", "" + index));
                 return true;
@@ -118,16 +118,16 @@ public class ArgTp {
             }
 
             if (index <= 0) {
-                p.sendMessage(PSL.NO_REGIONS_OWNED.msg());
+                PSL.msg(p, PSL.NO_REGIONS_OWNED.msg());
             }
             if (rgnum > index) {
-                p.sendMessage(PSL.HOME_ONLY.msg().replace("%num%", "" + index));
+                PSL.msg(p, PSL.HOME_ONLY.msg().replace("%num%", "" + index));
                 return true;
             }
         }
 
         if (!(rgnum <= index)) {
-            p.sendMessage(PSL.TP_ERROR_TP.msg());
+            PSL.msg(p, PSL.TP_ERROR_TP.msg());
             return true;
         }
 
@@ -147,7 +147,7 @@ public class ArgTp {
         String[] pos = r.getFlag(FlagHandler.PS_HOME).split(" ");
 
         if (pos.length != 3) {
-            p.sendMessage(PSL.TP_ERROR_NAME.msg());
+            PSL.msg(p, PSL.TP_ERROR_NAME.msg());
             return true;
         }
 
@@ -155,18 +155,18 @@ public class ArgTp {
         Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
 
         if (cpb.tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) { // no delay
-            p.sendMessage(PSL.TPING.msg());
+            PSL.msg(p, PSL.TPING.msg());
             p.teleport(tploc);
         } else if (!cpb.noMovingWhenTeleportWaiting) { // delay
 
             p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
-                p.sendMessage(PSL.TPING.msg());
+                PSL.msg(p, PSL.TPING.msg());
                 p.teleport(tploc);
             }, 20 * cpb.tpWaitingSeconds);
 
         } else {// delay and not allowed to move
-            p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
+            PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
             Location l = p.getLocation().clone();
             UUID uuid = p.getUniqueId();
 
@@ -192,13 +192,13 @@ public class ArgTp {
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
                         // if the player moved cancel it
                         if (l.getX() != pl.getLocation().getX() || l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
-                            pl.sendMessage(PSL.TP_CANCELLED_MOVED.msg());
+                            PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
                             taskCounter.get(uuid).cancel();
                             waitCounter.remove(uuid);
                             taskCounter.remove(uuid);
                         } else if (waitCounter.get(uuid) == cpb.tpWaitingSeconds*4) { // * 4 since this loops 4 times a second
                             // if the timer has passed, teleport and cancel
-                            pl.sendMessage(PSL.TPING.msg());
+                            PSL.msg(pl, PSL.TPING.msg());
                             pl.teleport(tploc);
                             taskCounter.get(uuid).cancel();
                             waitCounter.remove(uuid);
