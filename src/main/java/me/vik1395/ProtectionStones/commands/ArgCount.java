@@ -39,11 +39,11 @@ public class ArgCount {
             if (p.hasPermission("protectionstones.count")) {
 
                 count = countRegionsOfPlayer(wg.wrapPlayer(p), rgm);
-                p.sendMessage(PSL.PERSONAL_REGION_COUNT.msg()
+                PSL.msg(p, PSL.PERSONAL_REGION_COUNT.msg()
                         .replace("%num%", ""+count));
 
             } else {
-                p.sendMessage(PSL.NO_PERMISSION_COUNT.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_COUNT.msg());
             }
 
             return true;
@@ -52,21 +52,21 @@ public class ArgCount {
             if (p.hasPermission("protectionstones.count.others")) {
 
                 if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
-                    p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+                    PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
                     return true;
                 }
 
                 count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]))), rgm);
 
-                p.sendMessage(PSL.OTHER_REGION_COUNT.msg()
+                PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
                         .replace("%player%", args[1])
                         .replace("%num%", ""+count));
             } else {
-                p.sendMessage(PSL.NO_PERMISSION_COUNT_OTHERS.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_COUNT_OTHERS.msg());
             }
             return true;
         } else {
-            p.sendMessage(PSL.COUNT_HELP.msg());
+            PSL.msg(p, PSL.COUNT_HELP.msg());
             return true;
         }
     }

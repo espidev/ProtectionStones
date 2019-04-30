@@ -31,11 +31,11 @@ public class ArgPriority {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.priority")) {
-            p.sendMessage(PSL.NO_PERMISSION_PRIORITY.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_PRIORITY.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
         if (args.length < 2) {

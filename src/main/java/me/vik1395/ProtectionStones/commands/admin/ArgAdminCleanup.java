@@ -41,7 +41,7 @@ public class ArgAdminCleanup {
     public static boolean argumentAdminCleanup(CommandSender p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
-            p.sendMessage(PSL.ADMIN_CLEANUP_HELP.msg());
+            PSL.msg(p, PSL.ADMIN_CLEANUP_HELP.msg());
             return true;
         }
 
@@ -52,11 +52,11 @@ public class ArgAdminCleanup {
             w = ((Player) p).getWorld();
         } else {
             if (args.length != 5) {
-                p.sendMessage(PSL.ADMIN_CONSOLE_WORLD.msg());
+                PSL.msg(p, PSL.ADMIN_CONSOLE_WORLD.msg());
                 return true;
             }
             if (Bukkit.getWorld(args[4]) == null) {
-                p.sendMessage(PSL.INVALID_WORLD.msg());
+                PSL.msg(p, PSL.INVALID_WORLD.msg());
                 return true;
             }
             w = Bukkit.getWorld(args[4]);
@@ -69,7 +69,7 @@ public class ArgAdminCleanup {
             if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("disown"))) {
                 int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
 
-                p.sendMessage(PSL.ADMIN_CLEANUP_HEADER.msg()
+                PSL.msg(p, PSL.ADMIN_CLEANUP_HEADER.msg()
                         .replace("%arg%", args[2])
                         .replace("%days%", "" + days));
 
@@ -96,7 +96,7 @@ public class ArgAdminCleanup {
 
                     if (!found) {
 
-                        p.sendMessage(PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                        PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
                                 .replace("%player%", op.getName()));
 
                         continue;
@@ -114,7 +114,7 @@ public class ArgAdminCleanup {
                 } catch (Exception e) {
                     Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
                 }
-                p.sendMessage(PSL.ADMIN_CLEANUP_FOOTER.msg()
+                PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
                         .replace("%arg%", args[2]));
             }
         });

@@ -26,23 +26,23 @@ import org.bukkit.entity.Player;
 public class ArgAddRemove {
     private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
-            p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
         } else if (permType.equals("owners") && !p.hasPermission("protectionstones.owners")) {
-            p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
             return null;
         } else if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return null;
         } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return null;
         } else if (args.length < 2) {
-            p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
+            PSL.msg(p, PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return null;
         }
         if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
-            p.sendMessage(PSL.PLAYER_NOT_FOUND.msg());
+            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return null;
         }
         return Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]));
@@ -85,9 +85,9 @@ public class ArgAddRemove {
         }
 
         if (type.equals("add") || type.equals("addowner")) {
-            p.sendMessage(PSL.ADDED_TO_REGION.msg().replace("%player%", op.getName()));
+            PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", op.getName()));
         } else if (type.equals("remove") || type.equals("removeowner")) {
-            p.sendMessage(PSL.REMOVED_FROM_REGION.msg().replace("%player%", op.getName()));
+            PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", op.getName()));
         }
         return true;
     }

@@ -44,11 +44,11 @@ public class ArgAdminHide {
             w = ((Player) p).getWorld();
         } else {
             if (args.length != 3) {
-                p.sendMessage(PSL.ADMIN_CONSOLE_WORLD.msg());
+                PSL.msg(p, PSL.ADMIN_CONSOLE_WORLD.msg());
                 return true;
             }
             if (Bukkit.getWorld(args[2]) == null) {
-                p.sendMessage(PSL.INVALID_WORLD.msg());
+                PSL.msg(p, PSL.INVALID_WORLD.msg());
                 return true;
             }
             w = Bukkit.getWorld(args[2]);
@@ -80,7 +80,7 @@ public class ArgAdminHide {
             }
 
             String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";
-            p.sendMessage(PSL.ADMIN_HIDE_TOGGLED.msg()
+            PSL.msg(p, PSL.ADMIN_HIDE_TOGGLED.msg()
                     .replace("%message%", hMessage));
         });
 

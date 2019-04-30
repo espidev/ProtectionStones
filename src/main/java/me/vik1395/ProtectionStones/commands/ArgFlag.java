@@ -31,27 +31,27 @@ public class ArgFlag {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.flags")) {
-            p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
             return true;
         }
         if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
 
         if (args.length < 3) {
-            p.sendMessage(PSL.FLAG_HELP.msg());
+            PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
             String blockType = rgm.getRegion(psID).getFlag(FlagHandler.PS_BLOCK_MATERIAL);
             if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains(args[1].toLowerCase())) {
                 FlagHandler fh = new FlagHandler();
                 fh.setFlag(args, rgm.getRegion(psID), p);
             } else {
-                p.sendMessage(PSL.NO_PERMISSION_PER_FLAG.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
             }
         }
         return true;

@@ -17,6 +17,7 @@
 package me.vik1395.ProtectionStones;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -220,8 +221,10 @@ public enum PSL {
         return ChatColor.translateAlternateColorCodes('&', (msgG == null) ? msg : msgG);
     }
 
-    public static void msg(Player p, String str) {
-        if (!str.equals("")) {
+    // Sends a message to a commandsender if the string is not empty
+
+    public static void msg(CommandSender p, String str) {
+        if (str != null && !str.equals("")) {
             p.sendMessage(str);
         }
     }

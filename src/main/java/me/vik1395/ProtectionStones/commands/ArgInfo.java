@@ -39,28 +39,28 @@ public class ArgInfo {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         if (psID.equals("")) {
-            p.sendMessage(PSL.NOT_IN_REGION.msg());
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
         ProtectedRegion region = rgm.getRegion(psID);
         if (region == null) {
-            p.sendMessage(PSL.REGION_DOES_NOT_EXIST.msg());
+            PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
             return true;
         }
 
         if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
 
         if (args.length == 1) { // info of current region player is in
             if (!p.hasPermission("protectionstones.info")) {
-                p.sendMessage(PSL.NO_PERMISSION_INFO.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
                 return true;
             }
 
-            p.sendMessage(PSL.INFO_HEADER.msg());
-            p.sendMessage(PSL.INFO_REGION.msg() + psID + ", " + PSL.INFO_PRIORITY.msg() + rgm.getRegion(psID).getPriority());
+            PSL.msg(p, PSL.INFO_HEADER.msg());
+            PSL.msg(p, PSL.INFO_REGION.msg() + psID + ", " + PSL.INFO_PRIORITY.msg() + rgm.getRegion(psID).getPriority());
 
 
             displayFlags(p, region);
@@ -69,38 +69,38 @@ public class ArgInfo {
 
             BlockVector3 min = region.getMinimumPoint();
             BlockVector3 max = region.getMaximumPoint();
-            p.sendMessage(PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
+            PSL.msg(p, PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
 
         } else if (args.length == 2) { // get specific information on current region
 
             switch (args[1].toLowerCase()) {
                 case "members":
                     if (!p.hasPermission("protectionstones.members")) {
-                        p.sendMessage(PSL.NO_PERMISSION_MEMBERS.msg());
+                        PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
                         return true;
                     }
                     displayMembers(p, region);
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners")) {
-                        p.sendMessage(PSL.NO_PERMISSION_OWNERS.msg());
+                        PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
                         return true;
                     }
                     displayOwners(p, region);
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags")) {
-                        p.sendMessage(PSL.NO_PERMISSION_FLAGS.msg());
+                        PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
                     displayFlags(p, region);
                     break;
                 default:
-                    p.sendMessage(PSL.INFO_HELP.msg());
+                    PSL.msg(p, PSL.INFO_HELP.msg());
                     break;
             }
         } else {
-            p.sendMessage(PSL.INFO_HELP.msg());
+            PSL.msg(p, PSL.INFO_HELP.msg());
         }
         return true;
     }
@@ -123,9 +123,9 @@ public class ArgInfo {
 
         if (myFlag.length() > 2) {
             myFlag = new StringBuilder(myFlag.substring(0, myFlag.length() - 2) + ".");
-            p.sendMessage(PSL.INFO_FLAGS.msg() + myFlag);
+            PSL.msg(p, PSL.INFO_FLAGS.msg() + myFlag);
         } else {
-            p.sendMessage(PSL.INFO_FLAGS.msg() + "(none)");
+            PSL.msg(p, PSL.INFO_FLAGS.msg() + "(none)");
         }
     }
 
@@ -134,7 +134,7 @@ public class ArgInfo {
         StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg());
         if (owners.size() == 0) {
             send.append(PSL.INFO_NO_OWNERS.msg());
-            p.sendMessage(send.toString());
+            PSL.msg(p, send.toString());
         } else {
             for (UUID uuid : owners.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
@@ -144,7 +144,7 @@ public class ArgInfo {
             for (String name : owners.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            p.sendMessage(send.substring(0, send.length() - 2));
+            PSL.msg(p, send.substring(0, send.length() - 2));
         }
     }
 
@@ -153,7 +153,7 @@ public class ArgInfo {
         StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg());
         if (members.size() == 0) {
             send.append(PSL.INFO_NO_MEMBERS.msg());
-            p.sendMessage(send.toString());
+            PSL.msg(p, send.toString());
         } else {
             for (UUID uuid : members.getUniqueIds()) {
                 String name = ProtectionStones.uuidToName.get(uuid);
@@ -163,7 +163,7 @@ public class ArgInfo {
             for (String name : members.getPlayers()) { // legacy purposes
                 send.append(name).append(", ");
             }
-            p.sendMessage(send.substring(0, send.length() - 2));
+            PSL.msg(p, send.substring(0, send.length() - 2));
         }
     }
 }

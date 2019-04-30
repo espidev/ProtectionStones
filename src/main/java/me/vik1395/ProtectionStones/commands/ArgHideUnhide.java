@@ -37,19 +37,19 @@ public class ArgHideUnhide {
 
         // preliminary checks
         if (arg.equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
-            p.sendMessage(PSL.NO_PERMISSION_UNHIDE.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_UNHIDE.msg());
             return true;
         }
         if (arg.equals("hide") && !p.hasPermission("protectionstones.hide")) {
-            p.sendMessage(PSL.NO_PERMISSION_HIDE.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
             return true;
         }
         if (ProtectionStones.hasNoAccess(r, p, wg.wrapPlayer(p), false)) {
-            p.sendMessage(PSL.NO_ACCESS.msg());
+            PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
         if (!psID.startsWith("ps")) {
-            p.sendMessage(PSL.NOT_PS_REGION.msg());
+            PSL.msg(p, PSL.NOT_PS_REGION.msg());
             return true;
         }
 
@@ -60,13 +60,13 @@ public class ArgHideUnhide {
 
         if (ProtectionStones.isProtectBlock(currentType.toString())) {
             if (arg.equals("unhide")) {
-                p.sendMessage(PSL.ALREADY_NOT_HIDDEN.msg());
+                PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
             }
             blockToEdit.setType(Material.AIR);
         } else {
             if (arg.equals("hide")) {
-                p.sendMessage(PSL.ALREADY_HIDDEN.msg());
+                PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
             blockToEdit.setType(Material.getMaterial(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL)));

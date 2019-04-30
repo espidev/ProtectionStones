@@ -32,7 +32,7 @@ public class ArgAdmin {
     // /ps admin [arg]
     public static boolean argumentAdmin(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
-            p.sendMessage(PSL.NO_PERMISSION_ADMIN.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
             return true;
         }
 
