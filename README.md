@@ -14,7 +14,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 3
+    config_version = 4
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -27,6 +27,16 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
     # Cooldown between placing protection blocks (in seconds). -1 to disable.
     placing_cooldown = -1
+    
+    # Base command for protection stones (change if conflicting with other commands)
+    base_command = "ps"
+    
+    # Aliases for the command
+    aliases = [
+        "pstone",
+        "protectionstone",
+        "protectionstones"
+    ]
 
 ## Default Configuration (block1.toml)
 

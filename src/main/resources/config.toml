@@ -1,10 +1,11 @@
-config_version = 3
+config_version = 4
 uuidupdated = true
 # Please do not change the config version unless you know what you are doing!
 
 # ---------------------------------------------------------------------------------------
 # Protection Stones Config
 # Block configs have been moved to the blocks folder.
+# Does your config look messy? It's probably because of gradual config updates. Consider using the default configs.
 # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones-Minecraft/tree/master/src/main/resources
 # ---------------------------------------------------------------------------------------
 

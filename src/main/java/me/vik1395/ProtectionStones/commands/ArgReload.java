@@ -27,7 +27,7 @@ public class ArgReload {
             return true;
         }
         PSL.msg(p, PSL.RELOAD_START.msg());
-        ProtectionStones.loadConfig();
+        ProtectionStones.loadConfig(true);
         PSL.msg(p, PSL.RELOAD_COMPLETE.msg());
         return true;
     }

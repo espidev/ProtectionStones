@@ -25,18 +25,12 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.vik1395.ProtectionStones.commands.*;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -50,9 +44,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.List;
 
 public class ProtectionStones extends JavaPlugin {
+    public static final int CONFIG_VERSION = 4;
+
     public static Map<UUID, String> uuidToName = new HashMap<>();
     public static Map<String, UUID> nameToUUID = new HashMap<>();
 
@@ -178,12 +173,27 @@ public class ProtectionStones extends JavaPlugin {
 
 
     // called on first start, and /ps reload
-    public static void loadConfig() {
+    public static void loadConfig(boolean isReload) {
         // init config
         Config.initConfig();
 
         // init messages
         PSL.loadConfig();
+
+        // add command to Bukkit (using reflection)
+        try {
+            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            bukkitCommandMap.setAccessible(true);
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+
+            PSCommand psc = new PSCommand(ProtectionStones.configOptions.base_command);
+            for (String command : ProtectionStones.configOptions.aliases) { // add aliases
+                psc.getAliases().add(command);
+            }
+            commandMap.register(ProtectionStones.configOptions.base_command, psc); // register command
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -215,23 +225,6 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        // add command to Bukkit
-        try {
-            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-
-            PSCommand psc = new PSCommand(ProtectionStones.configOptions.base_command);
-
-            for (String command : ProtectionStones.configOptions.aliases) {
-                psc.getAliases().add(command);
-            }
-
-            commandMap.register(ProtectionStones.configOptions.base_command, psc);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
 
         // check if Vault is enabled (for economy support)_
         if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
@@ -247,7 +240,7 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // Load configuration
-        loadConfig();
+        loadConfig(false);
 
         // register permissions
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));

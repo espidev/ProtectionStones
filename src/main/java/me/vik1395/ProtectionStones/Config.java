@@ -50,7 +50,6 @@ public class Config {
     @Path("base_command")
     String base_command;
     @Path("aliases")
-
     List<String> aliases;
 
 
@@ -77,22 +76,31 @@ public class Config {
             Logger.getLogger(ProtectionStones.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        // keep in mind that there is /ps reload, so clear arrays before adding config options!
         // clear data (for /ps reload)
         ProtectionStones.protectionStonesOptions.clear();
 
+        // create config object
         if (ProtectionStones.config == null) {
             ProtectionStones.config = FileConfig.of(ProtectionStones.configLocation);
         }
-        ProtectionStones.config.load();
 
-        // keep in mind that there is /ps reload, so clear arrays before adding config options!
+        // loop upgrades until the config has been updated to the latest version
+        do {
+            ProtectionStones.config.load(); // load latest settings
 
-        // load config into configOptions object
-        ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
+            // load config into configOptions object
+            ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
 
-        //TODO UPDATE CONFIG
+            // upgrade config if need be (v3+)
+            boolean leaveLoop = doConfigUpgrades();
+            if (leaveLoop) break; // leave loop if config version is correct
 
-        // add protection stones to options map
+            // save config if upgrading
+            ProtectionStones.config.save();
+        } while (true);
+
+        // load protection stones to options map
         if (ProtectionStones.blockDataFolder.listFiles().length == 0) {
             Bukkit.getLogger().info("The blocks folder is empty! You do not have any protection blocks configured!");
         } else {
@@ -112,12 +120,32 @@ public class Config {
                     continue;
                 }
 
-                Bukkit.getLogger().info("- " + b.type);
+                Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
             }
         }
 
+    }
+
+    // Upgrade the config one version up (ex. 3 -> 4)
+    public static boolean doConfigUpgrades() {
+        boolean leaveLoop = false;
+        switch (ProtectionStones.configOptions.configVersion) {
+            case 3:
+                ProtectionStones.config.set("config_version", 4);
+                ProtectionStones.config.set("base_command", "ps");
+                ProtectionStones.config.set("aliases", Arrays.asList("pstone", "protectionstones", "protectionstone"));
+                break;
+            case ProtectionStones.CONFIG_VERSION:
+                leaveLoop = true;
+                break;
+            default:
+                Bukkit.getLogger().info("Invalid config version! The plugin may not load correctly!");
+                leaveLoop = true;
+                break;
+        }
+        return leaveLoop;
     }
 
     // upgrade from config < v2.0.0
@@ -158,7 +186,7 @@ public class Config {
                 b.set("region.y_radius", yml.getInt("Region." + type + ".Y Radius"));
                 b.set("region.z_radius", yml.getInt("Region." + type + ".Z Radius"));
                 b.set("region.flags", flags);
-                b.set("region.allowed_flags",  allowedFlags);
+                b.set("region.allowed_flags", allowedFlags);
                 b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
                 b.set("block_data.display_name", "");
                 b.set("block_data.lore", Arrays.asList());
