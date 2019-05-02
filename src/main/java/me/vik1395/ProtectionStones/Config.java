@@ -47,8 +47,11 @@ public class Config {
     int placingCooldown;
     //@Path("allow_dangerous_commands")
     //Boolean allowDangerousCommands;
-    //@Path("base_command")
-    //String baseCommand;
+    @Path("base_command")
+    String base_command;
+    @Path("aliases")
+
+    List<String> aliases;
 
 
     public static void initConfig() {
@@ -86,6 +89,8 @@ public class Config {
 
         // load config into configOptions object
         ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, Config::new);
+
+        //TODO UPDATE CONFIG
 
         // add protection stones to options map
         if (ProtectionStones.blockDataFolder.listFiles().length == 0) {

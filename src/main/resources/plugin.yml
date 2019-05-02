@@ -7,9 +7,3 @@ depend: [WorldGuard, WorldEdit]
 softdepend: [Vault]
 main: me.vik1395.ProtectionStones.ProtectionStones
 api-version: 1.13
-
-commands:
-  ps:
-    description: Base command for protection stones.
-    aliases: [protectionstone, protectionstones, pstone]
-    usage: /ps help

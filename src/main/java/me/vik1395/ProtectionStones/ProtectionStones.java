@@ -35,6 +35,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -47,6 +48,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 
@@ -213,6 +215,24 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
+        // add command to Bukkit
+        try {
+            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            bukkitCommandMap.setAccessible(true);
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+
+            PSCommand psc = new PSCommand(ProtectionStones.configOptions.base_command);
+
+            for (String command : ProtectionStones.configOptions.aliases) {
+                psc.getAliases().add(command);
+            }
+
+            commandMap.register(ProtectionStones.configOptions.base_command, psc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         // check if Vault is enabled (for economy support)_
         if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
             RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
@@ -272,115 +292,6 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
-    }
-
-    private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
-        if (msg.equals("")) return;
-        for (String perm : permission) {
-            if (p.hasPermission(perm)) {
-                TextComponent m = new TextComponent(msg);
-                m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
-                m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
-                p.spigot().sendMessage(m);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {
-
-        if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-            return ArgReload.argumentReload(s, args);
-        } else if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
-            return ArgAdmin.argumentAdmin(s, args);
-        }
-
-        if (s instanceof Player) {
-            Player p = (Player) s;
-                if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-                    p.sendMessage(PSL.HELP.msg());
-                    sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info","protectionstones.info");
-                    sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps","protectionstones.members");
-                    sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
-                    sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), "/ps get", "protectionstones.get");
-                    sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), "/ps give", "protectionstones.give");
-                    sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
-                    sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
-                    sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
-                    sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), "/ps sethome", "protectionstones.sethome");
-                    sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
-                    sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
-                    sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
-                    sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), "/ps toggle","protectionstones.toggle");
-                    sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), "/ps view","protectionstones.view");
-                    sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), "/ps unclaim", "protectionstones.unclaim");
-                    sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), "/ps priority","protectionstones.priority");
-                    sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), "/ps region", "protectionstones.region");
-                    sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), "/ps admin", "protectionstones.admin");
-                    sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), "/ps reload", "protectionstones.admin");
-                    return true;
-                }
-
-                switch (args[0].toLowerCase()) {
-                    case "toggle":
-                        if (p.hasPermission("protectionstones.toggle")) {
-                            if (!toggleList.contains(p.getName())) {
-                                toggleList.add(p.getName());
-                                p.sendMessage(PSL.TOGGLE_OFF.msg());
-                            } else {
-                                toggleList.remove(p.getName());
-                                p.sendMessage(PSL.TOGGLE_ON.msg());
-                            }
-                        } else {
-                            p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
-                        }
-                        break;
-                    case "count":
-                        return ArgCount.argumentCount(p, args);
-                    case "region":
-                        return ArgRegion.argumentRegion(p, args);
-                    case "tp":
-                        return ArgTp.argumentTp(p, args);
-                    case "home":
-                        return ArgTp.argumentTp(p, args);
-                    case "unclaim":
-                        return ArgUnclaim.argumentUnclaim(p, args);
-                    case "bypass":
-                        return ArgBypass.argumentBypass(p, args);
-                    case "add":
-                        return ArgAddRemove.template(p, args, "add");
-                    case "remove":
-                        return ArgAddRemove.template(p, args, "remove");
-                    case "addowner":
-                        return ArgAddRemove.template(p, args, "addowner");
-                    case "removeowner":
-                        return ArgAddRemove.template(p, args, "removeowner");
-                    case "view":
-                        return ArgView.argumentView(p, args);
-                    case "unhide":
-                        return ArgHideUnhide.template(p, "unhide");
-                    case "hide":
-                        return ArgHideUnhide.template(p, "hide");
-                    case "priority":
-                        return ArgPriority.argPriority(p, args);
-                    case "flag":
-                        return ArgFlag.argumentFlag(p, args);
-                    case "info":
-                        return ArgInfo.argumentInfo(p, args);
-                    case "get":
-                        return ArgGet.argumentGet(p, args);
-                    case "give":
-                        return ArgGive.argumentGive(p, args);
-                    case "sethome":
-                        return ArgSethome.argumentSethome(p, args);
-                    default:
-                        PSL.msg(p, PSL.NO_SUCH_COMMAND.msg());
-                }
-        } else {
-            s.sendMessage(ChatColor.RED + "You can only use /ps reload and /ps admin from console.");
-        }
-        return true;
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
@@ -480,5 +391,4 @@ public class ProtectionStones extends JavaPlugin {
         config.save();
         Bukkit.getLogger().info("Done!");
     }
-
 }
