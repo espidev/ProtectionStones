@@ -181,6 +181,7 @@ public class ProtectionStones extends JavaPlugin {
         PSL.loadConfig();
 
         // add command to Bukkit (using reflection)
+        if (!isReload) {
         try {
             final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
@@ -193,6 +194,7 @@ public class ProtectionStones extends JavaPlugin {
             commandMap.register(ProtectionStones.configOptions.base_command, psc); // register command
         } catch (Exception e) {
             e.printStackTrace();
+        }
         }
     }
 
