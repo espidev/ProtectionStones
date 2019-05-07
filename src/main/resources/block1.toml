@@ -39,7 +39,8 @@ worlds = [
     flags = [
         "pvp deny",
         "greeting &lEntering &b&l%player%'s &r&lprotected area",
-        "farewell &lLeaving &b&l%player%'s &r&lprotected area"
+        "farewell &lLeaving &b&l%player%'s &r&lprotected area",
+        "creeper-explosion deny",
     ]
 
     # List all the flags that can be set by region owners. Separate them with a comma, no space.
@@ -49,6 +50,7 @@ worlds = [
         "greeting",
         "farewell",
         "mob-spawning",
+        "creeper-explosion",
     ]
 
     # Default priority type for this block type protection stone

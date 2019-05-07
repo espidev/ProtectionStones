@@ -40,6 +40,7 @@ public class ArgTp {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
+        String rgnumParse;
         int index = 0, rgnum; // index: index in playerRegions for selected region, rgnum: index specified by player to teleport to
         Map<Integer, String> playerRegions = new HashMap<>();
 
@@ -52,7 +53,7 @@ public class ArgTp {
                 PSL.msg(p, PSL.TP_HELP.msg());
                 return true;
             }
-            rgnum = Integer.parseInt(args[2]);
+            rgnumParse = args[2];
         } else { // argument home
             if (!p.hasPermission("protectionstones.home")) {
                 PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
@@ -61,7 +62,14 @@ public class ArgTp {
                 PSL.msg(p, PSL.HOME_HELP.msg());
                 return true;
             }
-            rgnum = Integer.parseInt(args[1]);
+            rgnumParse = args[1];
+        }
+
+        try {
+            rgnum = Integer.parseInt(rgnumParse);
+        } catch (NumberFormatException e) {
+            PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
+            return true;
         }
 
         if (rgnum <= 0) {

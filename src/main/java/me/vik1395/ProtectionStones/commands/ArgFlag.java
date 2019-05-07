@@ -47,7 +47,7 @@ public class ArgFlag {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
             String blockType = rgm.getRegion(psID).getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-            if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains(args[1].toLowerCase())) {
+            if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
                 FlagHandler fh = new FlagHandler();
                 fh.setFlag(args, rgm.getRegion(psID), p);
             } else {
