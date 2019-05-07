@@ -64,7 +64,7 @@ worlds = [
     # Lore given to protection block when obtained with /ps give or /ps get
     # Leave as [] for no lore
     lore = [
-        "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"
+        "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
     ]
 
     # Add price when using /ps get

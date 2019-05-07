@@ -89,8 +89,6 @@ public class PSCommand extends Command {
                         return ArgTp.argumentTp(p, args);
                     case "unclaim":
                         return ArgUnclaim.argumentUnclaim(p, args);
-                    case "bypass":
-                        return ArgBypass.argumentBypass(p, args);
                     case "add":
                         return ArgAddRemove.template(p, args, "add");
                     case "remove":
