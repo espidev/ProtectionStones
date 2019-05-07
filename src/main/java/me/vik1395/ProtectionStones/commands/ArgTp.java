@@ -41,7 +41,7 @@ public class ArgTp {
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
         String rgnumParse;
-        int index = 0, rgnum; // index: index in playerRegions for selected region, rgnum: index specified by player to teleport to
+        int rgnum; // index: index in playerRegions for selected region, rgnum: index specified by player to teleport to
         Map<Integer, String> playerRegions = new HashMap<>();
 
         // preliminary checks
@@ -77,7 +77,9 @@ public class ArgTp {
             return true;
         }
 
-        // region checks
+        LocalPlayer lp = wg.wrapPlayer(p);
+
+        // region checks, and set lp to offline player (for /ps tp)
         if (args[0].equalsIgnoreCase("tp")) {
 
             if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
@@ -85,7 +87,6 @@ public class ArgTp {
                 return true;
             }
 
-            LocalPlayer lp;
             try {
                 lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1])));
             } catch (Exception e) {
@@ -94,127 +95,124 @@ public class ArgTp {
                 return true;
             }
 
+        }
+
+        // run region search asynchronously to avoid blocking server thread
+        LocalPlayer finalLp = lp;
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+            int index = 0;
+
             // find regions that the player has
             for (String region : rgm.getRegions().keySet()) {
                 if (region.startsWith("ps")) {
-                    if (rgm.getRegions().get(region).getOwners().contains(lp)) {
+                    if (rgm.getRegions().get(region).getOwners().contains(finalLp)) {
                         index++;
                         playerRegions.put(index, region);
                     }
                 }
             }
 
-            if (index <= 0) {
-                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
-                        .replace("%player%", lp.getName()));
-                return true;
-            } else if (rgnum > index) {
-                PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
-                        .replace("%player%", lp.getName())
-                        .replace("%num%", "" + index));
-                return true;
-            }
-        } else if (args[0].equalsIgnoreCase("home")) {
-            // find regions that the player has
-            for (String region : rgm.getRegions().keySet()) {
-                if (region.startsWith("ps")) {
-                    if (rgm.getRegions().get(region).getOwners().contains(wg.wrapPlayer(p))) {
-                        index++;
-                        playerRegions.put(index, region);
-                    }
+            // check if region was found
+            if (args[0].equalsIgnoreCase("tp")) {
+                if (index <= 0) {
+                    PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                            .replace("%player%", finalLp.getName()));
+                    return;
+                } else if (rgnum > index) {
+                    PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
+                            .replace("%player%", finalLp.getName())
+                            .replace("%num%", "" + index));
+                    return;
+                }
+            } else if (args[0].equalsIgnoreCase("home")) {
+                if (index <= 0) {
+                    PSL.msg(p, PSL.NO_REGIONS_OWNED.msg());
+                    return;
+                } else if (rgnum > index) {
+                    PSL.msg(p, PSL.HOME_ONLY.msg().replace("%num%", "" + index));
+                    return;
                 }
             }
 
-            if (index <= 0) {
-                PSL.msg(p, PSL.NO_REGIONS_OWNED.msg());
+            ProtectedRegion r = rgm.getRegion(playerRegions.get(rgnum));
+            ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
+
+            // if the region does not have the ps-home flag, add it
+            if (r.getFlag(FlagHandler.PS_HOME) == null) {
+                PSLocation psl = ProtectionStones.parsePSRegionToLocation(r.getId());
+                String home = psl.x + cpb.homeXOffset + " ";
+                home += (psl.y + cpb.homeYOffset) + " ";
+                home += (psl.z + cpb.homeZOffset);
+                r.setFlag(FlagHandler.PS_HOME, home);
             }
-            if (rgnum > index) {
-                PSL.msg(p, PSL.HOME_ONLY.msg().replace("%num%", "" + index));
-                return true;
+
+            // get flag ps-home for ps teleport location
+            String[] pos = r.getFlag(FlagHandler.PS_HOME).split(" ");
+
+            if (pos.length != 3) {
+                PSL.msg(p, PSL.TP_ERROR_NAME.msg());
+                return;
             }
-        }
 
-        if (!(rgnum <= index)) {
-            PSL.msg(p, PSL.TP_ERROR_TP.msg());
-            return true;
-        }
+            // teleport player
+            Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
 
-        ProtectedRegion r = rgm.getRegion(playerRegions.get(rgnum));
-        ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
-
-        // if the region does not have the ps-home flag, add it
-        if (r.getFlag(FlagHandler.PS_HOME) == null) {
-            PSLocation psl = ProtectionStones.parsePSRegionToLocation(r.getId());
-            String home = psl.x + cpb.homeXOffset + " ";
-            home += (psl.y + cpb.homeYOffset) + " ";
-            home += (psl.z + cpb.homeZOffset);
-            r.setFlag(FlagHandler.PS_HOME, home);
-        }
-
-        // get flag ps-home for ps teleport location
-        String[] pos = r.getFlag(FlagHandler.PS_HOME).split(" ");
-
-        if (pos.length != 3) {
-            PSL.msg(p, PSL.TP_ERROR_NAME.msg());
-            return true;
-        }
-
-        // teleport player
-        Location tploc = new Location(p.getWorld(), Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-
-        if (cpb.tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) { // no delay
-            PSL.msg(p, PSL.TPING.msg());
-            p.teleport(tploc);
-        } else if (!cpb.noMovingWhenTeleportWaiting) { // delay
-
-            p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+            if (cpb.tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) { // no delay
                 PSL.msg(p, PSL.TPING.msg());
-                p.teleport(tploc);
-            }, 20 * cpb.tpWaitingSeconds);
+                Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), () -> p.teleport(tploc)); // run on main thread, not async
+            } else if (!cpb.noMovingWhenTeleportWaiting) { // delay
+                p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
 
-        } else {// delay and not allowed to move
-            PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
-            Location l = p.getLocation().clone();
-            UUID uuid = p.getUniqueId();
+                Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+                    PSL.msg(p, PSL.TPING.msg());
+                    p.teleport(tploc);
+                }, 20 * cpb.tpWaitingSeconds);
 
-            // remove queued teleport if already running
-            if (taskCounter.get(uuid) != null) {
-                taskCounter.get(uuid).cancel();
-                waitCounter.remove(uuid);
-                taskCounter.remove(uuid);
+            } else {// delay and not allowed to move
+                PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
+                Location l = p.getLocation().clone();
+                UUID uuid = p.getUniqueId();
+
+                // remove queued teleport if already running
+                if (taskCounter.get(uuid) != null) {
+                    taskCounter.get(uuid).cancel();
+                    waitCounter.remove(uuid);
+                    taskCounter.remove(uuid);
+                }
+
+                // add teleport wait tasks to queue
+                waitCounter.put(uuid, 0);
+                taskCounter.put(uuid, Bukkit.getScheduler().runTaskTimer(ProtectionStones.getPlugin(), () -> {
+                            // cancel if the player is not on the server
+                            if (Bukkit.getPlayer(uuid) == null) {
+                                taskCounter.get(uuid).cancel();
+                                waitCounter.remove(uuid);
+                                taskCounter.remove(uuid);
+                                return;
+                            }
+
+                            Player pl = Bukkit.getPlayer(uuid);
+                            // increment seconds
+                            waitCounter.put(uuid, waitCounter.get(uuid) + 1);
+                            // if the player moved cancel it
+                            if (l.getX() != pl.getLocation().getX() || l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
+                                PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
+                                taskCounter.get(uuid).cancel();
+                                waitCounter.remove(uuid);
+                                taskCounter.remove(uuid);
+                            } else if (waitCounter.get(uuid) == cpb.tpWaitingSeconds * 4) { // * 4 since this loops 4 times a second
+                                // if the timer has passed, teleport and cancel
+                                PSL.msg(pl, PSL.TPING.msg());
+                                pl.teleport(tploc);
+                                taskCounter.get(uuid).cancel();
+                                waitCounter.remove(uuid);
+                                taskCounter.remove(uuid);
+                            }
+                        }, 5, 5) // loop 4 times a second
+                );
             }
+        });
 
-            waitCounter.put(uuid, 0);
-            taskCounter.put(uuid, Bukkit.getScheduler().runTaskTimer(ProtectionStones.getPlugin(), () -> {
-                        // cancel if the player is not on the server
-                        if (Bukkit.getPlayer(uuid) == null) {
-                            taskCounter.get(uuid).cancel();
-                            waitCounter.remove(uuid);
-                            taskCounter.remove(uuid);
-                            return;
-                        }
-
-                        Player pl = Bukkit.getPlayer(uuid);
-                        // increment seconds
-                        waitCounter.put(uuid, waitCounter.get(uuid) + 1);
-                        // if the player moved cancel it
-                        if (l.getX() != pl.getLocation().getX() || l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
-                            PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
-                            taskCounter.get(uuid).cancel();
-                            waitCounter.remove(uuid);
-                            taskCounter.remove(uuid);
-                        } else if (waitCounter.get(uuid) == cpb.tpWaitingSeconds*4) { // * 4 since this loops 4 times a second
-                            // if the timer has passed, teleport and cancel
-                            PSL.msg(pl, PSL.TPING.msg());
-                            pl.teleport(tploc);
-                            taskCounter.get(uuid).cancel();
-                            waitCounter.remove(uuid);
-                            taskCounter.remove(uuid);
-                        }
-                    }, 5, 5) // loop 4 times a second
-            );
-        }
         return true;
     }
 }

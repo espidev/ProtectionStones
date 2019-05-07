@@ -21,7 +21,8 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # ---------------------------------------------------------------------------------------
     # Protection Stones Config
     # Block configs have been moved to the blocks folder.
-    # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones-Minecraft/tree/master/src/main/resources
+    # Does your config look messy? It's probably because of gradual config updates. Consider using the default configs.
+    # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones/tree/master/src/main/resources
     # ---------------------------------------------------------------------------------------
     
     
@@ -81,7 +82,8 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         flags = [
             "pvp deny",
             "greeting &lEntering &b&l%player%'s &r&lprotected area",
-            "farewell &lLeaving &b&l%player%'s &r&lprotected area"
+            "farewell &lLeaving &b&l%player%'s &r&lprotected area",
+            "creeper-explosion deny",
         ]
     
         # List all the flags that can be set by region owners. Separate them with a comma, no space.
@@ -91,6 +93,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
             "greeting",
             "farewell",
             "mob-spawning",
+            "creeper-explosion",
         ]
     
         # Default priority type for this block type protection stone
@@ -104,7 +107,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Lore given to protection block when obtained with /ps give or /ps get
         # Leave as [] for no lore
         lore = [
-            "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"
+            "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
         ]
     
         # Add price when using /ps get

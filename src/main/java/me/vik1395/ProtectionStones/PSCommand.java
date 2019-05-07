@@ -33,6 +33,7 @@ public class PSCommand extends Command {
     public boolean execute(CommandSender s, String label, String[] args) {
         try {
 
+            // can be used from console
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 return ArgReload.argumentReload(s, args);
             } else if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {

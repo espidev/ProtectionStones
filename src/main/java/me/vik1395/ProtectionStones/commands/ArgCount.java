@@ -33,42 +33,41 @@ public class ArgCount {
     public static boolean argumentCount(Player p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        int count;
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+            int count;
 
-        if (args.length == 1) {
-            if (p.hasPermission("protectionstones.count")) {
+            if (args.length == 1) {
+                if (p.hasPermission("protectionstones.count")) {
 
-                count = countRegionsOfPlayer(wg.wrapPlayer(p), rgm);
-                PSL.msg(p, PSL.PERSONAL_REGION_COUNT.msg()
-                        .replace("%num%", ""+count));
+                    count = countRegionsOfPlayer(wg.wrapPlayer(p), rgm);
+                    PSL.msg(p, PSL.PERSONAL_REGION_COUNT.msg()
+                            .replace("%num%", "" + count));
 
-            } else {
-                PSL.msg(p, PSL.NO_PERMISSION_COUNT.msg());
-            }
-
-            return true;
-        } else if (args.length == 2) {
-
-            if (p.hasPermission("protectionstones.count.others")) {
-
-                if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
-                    PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
-                    return true;
+                } else {
+                    PSL.msg(p, PSL.NO_PERMISSION_COUNT.msg());
                 }
+            } else if (args.length == 2) {
 
-                count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]))), rgm);
+                if (p.hasPermission("protectionstones.count.others")) {
 
-                PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
-                        .replace("%player%", args[1])
-                        .replace("%num%", ""+count));
+                    if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+                        PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
+                        return;
+                    }
+
+                    count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]))), rgm);
+
+                    PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
+                            .replace("%player%", args[1])
+                            .replace("%num%", "" + count));
+                } else {
+                    PSL.msg(p, PSL.NO_PERMISSION_COUNT_OTHERS.msg());
+                }
             } else {
-                PSL.msg(p, PSL.NO_PERMISSION_COUNT_OTHERS.msg());
+                PSL.msg(p, PSL.COUNT_HELP.msg());
             }
-            return true;
-        } else {
-            PSL.msg(p, PSL.COUNT_HELP.msg());
-            return true;
-        }
+        });
+        return true;
     }
 
     // Only PS regions, not other regions
