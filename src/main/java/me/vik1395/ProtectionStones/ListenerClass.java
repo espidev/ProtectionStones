@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -59,8 +60,10 @@ public class ListenerClass implements Listener {
         ProtectionStones.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockPlace(BlockPlaceEvent e) {
+        if (e.isCancelled()) return;
+
         Player p = e.getPlayer();
         Block b = e.getBlock();
 
@@ -79,10 +82,12 @@ public class ListenerClass implements Listener {
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
         String tag = null;
-        if (e.getItemInHand().getItemMeta() != null) {
-            CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
-            tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
-        }
+        try {
+            if (e.getItemInHand().getItemMeta() != null) {
+                CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
+                tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+            }
+        } catch (IllegalArgumentException ignored) {} // ignore item tags that aren't of "string" type
         if (blockOptions.restrictObtaining && (tag == null || !tag.equalsIgnoreCase("true"))) return;
 
         // check permission
@@ -191,7 +196,7 @@ public class ListenerClass implements Listener {
 
         BlockVector3 min = v1;
         BlockVector3 max = v2;
-        String id = "ps" + (int) bx + "x" + (int) by + "y" + (int) bz + "z";
+        String id = "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
 
         ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
         region.getOwners().addPlayer(p.getUniqueId());
@@ -258,8 +263,10 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent e) {
+        if (e.isCancelled()) return;
+
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
@@ -274,16 +281,7 @@ public class ListenerClass implements Listener {
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
 
-        // check if player can actually break block
-        if (!wg.createProtectionQuery().testBlockBreak(p, pb)) {
-            e.setCancelled(true);
-            return;
-        }
-
-        String psx = Double.toString(pb.getLocation().getX());
-        String psy = Double.toString(pb.getLocation().getY());
-        String psz = Double.toString(pb.getLocation().getZ());
-        String id = "ps" + psx.substring(0, psx.indexOf(".")) + "x" + psy.substring(0, psy.indexOf(".")) + "y" + psz.substring(0, psz.indexOf(".")) + "z";
+        String id = "ps" + (long) pb.getLocation().getX() + "x" + (long) pb.getLocation().getY() + "y" + (long) pb.getLocation().getZ() + "z";
 
         // check if that is actually a protection stone block (owns a region)
         if (rgm.getRegion(id) == null) {
@@ -303,8 +301,8 @@ public class ListenerClass implements Listener {
 
         // check for destroy permission
         if (!p.hasPermission("protectionstones.destroy")) {
-            e.setCancelled(true);
             PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
+            e.setCancelled(true);
             return;
         }
 
