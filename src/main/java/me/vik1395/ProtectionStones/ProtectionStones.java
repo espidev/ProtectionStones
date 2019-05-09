@@ -45,27 +45,28 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class ProtectionStones extends JavaPlugin {
-    public static final int CONFIG_VERSION = 4;
+    // change this when the config version goes up
+    static final int CONFIG_VERSION = 5;
 
     public static Map<UUID, String> uuidToName = new HashMap<>();
     public static Map<String, UUID> nameToUUID = new HashMap<>();
 
     public static Plugin plugin, wgd;
-    public static File configLocation, blockDataFolder;
+    static File configLocation, blockDataFolder;
 
-    public static Metrics metrics;
+    private static Metrics metrics;
 
-    public static FileConfig config;
+    static FileConfig config;
     // all configuration file options are stored in here
     public static Config configOptions;
     // block options
-    public static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
+    static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
 
     // vault economy integration
     public static boolean isVaultEnabled = false;
     public static Economy vaultEconomy;
 
-    public static List<String> toggleList = new ArrayList<>();
+    static List<String> toggleList = new ArrayList<>();
 
     public static Plugin getPlugin() {
         return plugin;
@@ -181,19 +182,19 @@ public class ProtectionStones extends JavaPlugin {
 
         // add command to Bukkit (using reflection)
         if (!isReload) {
-        try {
-            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+            try {
+                final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+                bukkitCommandMap.setAccessible(true);
+                CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
 
-            PSCommand psc = new PSCommand(ProtectionStones.configOptions.base_command);
-            for (String command : ProtectionStones.configOptions.aliases) { // add aliases
-                psc.getAliases().add(command);
+                PSCommand psc = new PSCommand(ProtectionStones.configOptions.base_command);
+                for (String command : ProtectionStones.configOptions.aliases) { // add aliases
+                    psc.getAliases().add(command);
+                }
+                commandMap.register(ProtectionStones.configOptions.base_command, psc); // register command
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            commandMap.register(ProtectionStones.configOptions.base_command, psc); // register command
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         }
     }
 
@@ -271,10 +272,19 @@ public class ProtectionStones extends JavaPlugin {
         Bukkit.getPluginManager().addPermission(new Permission("protectionstones.superowner"));
 
         // uuid cache
-        getServer().getConsoleSender().sendMessage("Building UUID cache...");
-        for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-            uuidToName.put(op.getUniqueId(), op.getName());
-            nameToUUID.put(op.getName(), op.getUniqueId());
+        getServer().getConsoleSender().sendMessage("Building UUID cache... (if slow change async-load-uuid-cache in the config to true)");
+        if (configOptions.asyncLoadUUIDCache) { // async load
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+                    uuidToName.put(op.getUniqueId(), op.getName());
+                    nameToUUID.put(op.getName(), op.getUniqueId());
+                }
+            });
+        } else { // sync load
+            for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+                uuidToName.put(op.getUniqueId(), op.getName());
+                nameToUUID.put(op.getName(), op.getUniqueId());
+            }
         }
 
         // check if uuids have been upgraded already
@@ -344,7 +354,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     // convert regions to use UUIDs instead of player names
-    public static void convertToUUID() {
+    private static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));

@@ -7,7 +7,7 @@ This plugin is based off the original ProtectionStones plugin by AxelDios.
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.0.3
+* ProtectionStones 2.0.4
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
@@ -21,6 +21,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # ---------------------------------------------------------------------------------------
     # Protection Stones Config
     # Block configs have been moved to the blocks folder.
+    # To make new blocks, copy the default "block1.toml" and make another file (ex. "block2.toml")
     # Does your config look messy? It's probably because of gradual config updates. Consider using the default configs.
     # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones/tree/master/src/main/resources
     # ---------------------------------------------------------------------------------------

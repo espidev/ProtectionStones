@@ -1,10 +1,11 @@
-config_version = 4
+config_version = 5
 uuidupdated = true
 # Please do not change the config version unless you know what you are doing!
 
 # ---------------------------------------------------------------------------------------
 # Protection Stones Config
 # Block configs have been moved to the blocks folder.
+# To make new blocks, copy the default "block1.toml" and make another file (ex. "block2.toml")
 # Does your config look messy? It's probably because of gradual config updates. Consider using the default configs.
 # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones/tree/master/src/main/resources
 # ---------------------------------------------------------------------------------------
@@ -12,6 +13,14 @@ uuidupdated = true
 
 # Cooldown between placing protection blocks (in seconds). -1 to disable.
 placing_cooldown = -1
+
+# Set to true to not block server startup for loading the UUID cache.
+# /ps add and /ps remove will not work for offline players until the cache is finished loading.
+async_load_uuid_cache = false
+
+# Time in seconds between /ps view attempts.
+# Can prevent lag from spamming the command.
+ps_view_cooldown = 20
 
 # Base command for protection stones (change if conflicting with other commands)
 base_command = "ps"

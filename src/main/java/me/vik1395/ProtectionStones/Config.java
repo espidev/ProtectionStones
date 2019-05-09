@@ -39,12 +39,17 @@ public class Config {
 
     // config options
     // config.toml will be loaded into these fields
+    // use autoboxing for primitives to allow for null
     @Path("config_version")
     int configVersion;
     @Path("uuidupdated")
     Boolean uuidupdated;
     @Path("placing_cooldown")
     int placingCooldown;
+    @Path("async_load_uuid_cache")
+    Boolean asyncLoadUUIDCache;
+    @Path("ps_view_cooldown")
+    public Integer psViewCooldown;
     //@Path("allow_dangerous_commands")
     //Boolean allowDangerousCommands;
     @Path("base_command")
@@ -136,6 +141,11 @@ public class Config {
                 ProtectionStones.config.set("config_version", 4);
                 ProtectionStones.config.set("base_command", "ps");
                 ProtectionStones.config.set("aliases", Arrays.asList("pstone", "protectionstones", "protectionstone"));
+                break;
+            case 4:
+                ProtectionStones.config.set("config_version", 5);
+                ProtectionStones.config.set("async_load_uuid_cache", false);
+                ProtectionStones.config.set("ps_view_cooldown", 20);
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

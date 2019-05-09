@@ -156,6 +156,7 @@ public enum PSL {
     // ps view
     VIEW_HELP("view.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps view"),
     VIEW_HELP_DESC("view.help_desc", "Use this command to view the borders of a protected region."),
+    VIEW_COOLDOWN("view.cooldown", ChatColor.RED + "Please wait a while before using /ps view again."),
     VIEW_GENERATING("view.generating", ChatColor.GRAY + "Generating border..."),
     VIEW_GENERATE_DONE("view.generate_done", ChatColor.GREEN + "Done! The border will disappear after 30 seconds!"),
     VIEW_REMOVING("view.removing", ChatColor.AQUA + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
