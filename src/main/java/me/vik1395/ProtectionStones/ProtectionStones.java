@@ -46,7 +46,7 @@ import java.util.*;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 5, BLOCK_CONFIG_VERSION = 1;
+    static final int CONFIG_VERSION = 5;
 
     public static Map<UUID, String> uuidToName = new HashMap<>();
     public static Map<String, UUID> nameToUUID = new HashMap<>();
