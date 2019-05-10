@@ -16,15 +16,19 @@
 
 package me.vik1395.ProtectionStones;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -87,7 +91,7 @@ public class Config {
 
         // create config object
         if (ProtectionStones.config == null) {
-            ProtectionStones.config = FileConfig.of(ProtectionStones.configLocation);
+            ProtectionStones.config = CommentedFileConfig.of(ProtectionStones.configLocation);
         }
 
         // loop upgrades until the config has been updated to the latest version
@@ -109,12 +113,47 @@ public class Config {
         if (ProtectionStones.blockDataFolder.listFiles().length == 0) {
             Bukkit.getLogger().info("The blocks folder is empty! You do not have any protection blocks configured!");
         } else {
-            Bukkit.getLogger().info("Protection Stone Blocks:");
+
+            // temp file to load in default ps block config
+            File tempFile;
+            try {
+                tempFile = File.createTempFile("psconfigtemp", ".toml");
+                try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                    IOUtils.copy(Config.class.getResourceAsStream("/block1.toml"), out);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            FileConfig template = FileConfig.of(tempFile);
+            template.load();
 
             // iterate over block files and load into map
+            Bukkit.getLogger().info("Protection Stone Blocks:");
             for (File file : ProtectionStones.blockDataFolder.listFiles()) {
-                FileConfig c = FileConfig.of(file);
+
+                CommentedFileConfig c = CommentedFileConfig.of(file);
                 c.load();
+
+                // check to make sure all options are not null
+                boolean updated = false;
+                for (String str : template.valueMap().keySet()) {
+                    if (c.get(str) == null) {
+                        c.set(str, template.get(str));
+                        updated = true;
+                    } else if (c.get(str) instanceof CommentedConfig) {
+                        // no DFS for now (since there's only 2 layers of config)
+                        CommentedConfig template2 = template.get(str);
+                        CommentedConfig c2 = c.get(str);
+                        for (String str2 : template2.valueMap().keySet()) {
+                            if (c2.get(str2) == null) {
+                                c2.set(str2, template2.get(str2));
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+                if (updated) c.save();
 
                 // convert toml data into object
                 ConfigProtectBlock b = new ObjectConverter().toObject(c, ConfigProtectBlock::new);
@@ -129,6 +168,10 @@ public class Config {
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
             }
+
+            // cleanup temp file
+            template.close();
+            tempFile.delete();
         }
 
     }

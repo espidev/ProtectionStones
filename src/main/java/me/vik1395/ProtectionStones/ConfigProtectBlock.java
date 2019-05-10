@@ -84,6 +84,10 @@ public class ConfigProtectBlock {
     public boolean noDrop;
     @Path("behaviour.prevent_piston_push")
     public boolean preventPistonPush;
+    @Path("behaviour.prevent_explode")
+    public boolean preventExplode;
+    @Path("behaviour.destroy_region_when_explode")
+    public boolean destroyRegionWhenExplode;
     @Path("behaviour.prevent_silk_touch")
     public boolean preventSilkTouch;
 

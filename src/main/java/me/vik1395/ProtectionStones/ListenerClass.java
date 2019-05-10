@@ -37,6 +37,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -86,7 +87,8 @@ public class ListenerClass implements Listener {
                 CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
                 tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
             }
-        } catch (IllegalArgumentException ignored) {} // ignore item tags that aren't of "string" type
+        } catch (IllegalArgumentException ignored) {
+        } // ignore item tags that aren't of "string" type
         if (blockOptions.restrictObtaining && (tag == null || !tag.equalsIgnoreCase("true"))) return;
 
         // check permission
@@ -116,7 +118,7 @@ public class ListenerClass implements Listener {
                 double cooldown = ProtectionStones.configOptions.placingCooldown; // seconds
                 double lastPlace = lastProtectStonePlaced.get(p); // milliseconds
 
-                if (lastPlace + cooldown*1000 > currentTime) { // if cooldown has not been finished
+                if (lastPlace + cooldown * 1000 > currentTime) { // if cooldown has not been finished
                     e.setCancelled(true);
                     PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000))));
                     return;
@@ -348,6 +350,36 @@ public class ListenerClass implements Listener {
         }
     }
 
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent e) {
+        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getEntity().getWorld()));
+
+        // loop through exploded blocks
+        for (int i = 0; i < e.blockList().size(); i++) {
+            Block b = e.blockList().get(i);
+
+            if (ProtectionStones.isProtectBlock(b.getType().toString())) {
+                String id = "ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z";
+                if (rgm.getRegion(id) != null) {
+                    if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
+                        // remove block from exploded list if prevent_explode is enabled
+                        e.blockList().remove(i);
+                        i--;
+                    } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
+                        // remove region from worldguard if destroy_region_when_explode is enabled
+                        rgm.removeRegion(id);
+                        try {
+                            rgm.save();
+                        } catch (StorageException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPistonExtend(BlockPistonExtendEvent e) {
         pistonUtil(e.getBlocks(), e);
@@ -374,7 +406,8 @@ public class ListenerClass implements Listener {
         boolean foundNoTeleport = false;
         for (ProtectedRegion r : regions) {
             String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-            if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn) foundNoTeleport = true;
+            if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn)
+                foundNoTeleport = true;
             if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
         }
 
