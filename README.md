@@ -14,7 +14,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 4
+    config_version = 5
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -29,6 +29,14 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
     # Cooldown between placing protection blocks (in seconds). -1 to disable.
     placing_cooldown = -1
+    
+    # Set to true to not block server startup for loading the UUID cache.
+    # /ps add and /ps remove will not work for offline players until the cache is finished loading.
+    async_load_uuid_cache = false
+    
+    # Time in seconds between /ps view attempts.
+    # Can prevent lag from spamming the command.
+    ps_view_cooldown = 20
     
     # Base command for protection stones (change if conflicting with other commands)
     base_command = "ps"
@@ -125,6 +133,14 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Prevents piston pushing of the block. Recommended to keep as true.
         prevent_piston_push = true
     
+        # Prevents the block from being destroyed when exploded.
+        # Recommended to keep true to prevent players from exploiting more protection stones with /ps unhide (when the block is destroyed)
+        prevent_explode = true
+    
+        # Destroys the protection stone region when block is exploded. Can be useful for PVP/Factions servers.
+        # prevent_explode must be false for this to work.
+        destroy_region_when_explode = false
+    
         # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
         # This was the old behaviour to prevent natural obtaining of the protection stone.
         # Recommended to keep false if "Restrict Obtaining" (the new way) is true
@@ -132,6 +148,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
     [player]
         # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
+        # Does not prevent entry, use the flag "entry deny" for preventing entry.
         # Bypass with protectionstones.tp.bypasstp
         prevent_teleport_in = false
     
