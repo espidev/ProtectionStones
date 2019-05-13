@@ -192,9 +192,10 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions (block break).
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
-    protectionstones.get - Allows players the use of /ps get.
     protectionstones.view - Allows players the use of /ps view.
     protectionstones.info - Allows players the use of /ps info.
+    protectionstones.get - Allows players the use of /ps get.
+    protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.count - Allows players the use of /ps count.
     protectionstones.count.others - Allows players the use of /ps count [player].
     protectionstones.hide - Allow players to hide their ProtectionStones block.
@@ -210,7 +211,6 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.flags - Allows players to set their region flags.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
-    protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.

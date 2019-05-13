@@ -7,3 +7,77 @@ depend: [WorldGuard, WorldEdit]
 softdepend: [Vault]
 main: me.vik1395.ProtectionStones.ProtectionStones
 api-version: 1.13
+
+permissions:
+  protectionstones.create:
+    description: Protect a region by placing a ProtectionStones block.
+    default: op
+  protectionstones.destroy:
+    description: Allow players to remove their own protected regions (block break).
+    default: op
+  protectionstones.unclaim:
+    description: Allow players to unclaim their region using /ps unclaim.
+    default: op
+  protectionstones.view:
+    description: Allows players the use of /ps view.
+    default: op
+  protectionstones.info:
+    description: Allows players the use of /ps info.
+    default: op
+  protectionstones.get:
+    description: Allows players the use of /ps get.
+    default: op
+  protectionstones.give:
+    description: Allows players the use of /ps give (give protectionstones to others as admin).
+    default: op
+  protectionstones.count:
+    description: Allows players the use of /ps count.
+    default: op
+  protectionstones.count.others:
+    description: Allows players the use of /ps count [player].
+    default: op
+  protectionstones.hide:
+    description: Allow players to hide their ProtectionStones block.
+    default: op
+  protectionstones.unhide:
+    description: Allow players to unhide their ProtectionStones block.
+    default: op
+  protectionstones.home:
+    description: Access to the /ps home command.
+    default: op
+  protectionstones.sethome:
+    description: Access to /ps sethome.
+    default: op
+  protectionstones.tp:
+    description: Access to /ps tp command.
+    default: op
+  protectionstones.tp.bypasswait:
+    description: Bypass the wait time set in the config for /ps home and /ps tp
+    default: op
+  protectionstones.tp.bypassprevent:
+    description: Bypass prevent_teleport_in option in config
+    default: op
+  protectionstones.priority:
+    description: Allows players to set their region's priority.
+    default: op
+  protectionstones.owners:
+    description: Allows players to add or remove region owners. Allows players to use /ps info owners command.
+    default: op
+  protectionstones.members:
+    description: Allows players to add or remove region members. Allows players to use /ps info members command.
+    default: op
+  protectionstones.flags:
+    description: Allows players to set their region flags.
+    default: op
+  protectionstones.toggle:
+    description: Allows players to toggle ProtectionStones placement.
+    default: op
+  protectionstones.region:
+    description: Allows players to use the /ps region commands.
+    default: op
+  protectionstones.admin:
+    description: This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
+    default: op
+  protectionstones.superowner:
+    description: Allows players to override region permissions.
+    default: op

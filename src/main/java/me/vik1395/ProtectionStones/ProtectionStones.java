@@ -244,33 +244,6 @@ public class ProtectionStones extends JavaPlugin {
         // Load configuration
         loadConfig(false);
 
-        // register permissions
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.create"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.destroy"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unclaim"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.view"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.info"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.get"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.give"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.count.others"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.hide"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.unhide"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.sethome"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.home"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypassprevent"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.tp.bypasswait"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.priority"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.owners"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.members"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.toggle"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.region"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.admin"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.bypass"));
-        Bukkit.getPluginManager().addPermission(new Permission("protectionstones.superowner"));
-
         // uuid cache
         getServer().getConsoleSender().sendMessage("Building UUID cache... (if slow change async-load-uuid-cache in the config to true)");
         if (configOptions.asyncLoadUUIDCache) { // async load
