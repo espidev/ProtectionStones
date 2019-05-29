@@ -1,3 +1,5 @@
+This project was forked from https://github.com/vik1395/ProtectionStones-Minecraft.
+
 ProtectionStones is a grief prevention and land claiming plugin.
 
 This plugin uses a specified type of minecraft block/blocks as a protection block. When a player placed a block of that type, they are able to protect a region around them. The size of the protected region is configurable in the plugins config file. You can also set which flags players can change and also the default flags to be set when a new region is created.

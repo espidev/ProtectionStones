@@ -38,6 +38,8 @@ public class PSCommand extends Command {
                 return ArgReload.argumentReload(s, args);
             } else if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
                 return ArgAdmin.argumentAdmin(s, args);
+            } else if (args.length > 0 && args[0].equalsIgnoreCase("give")) {
+                return ArgGive.argumentGive(s, args);
             }
 
             if (s instanceof Player) {

@@ -91,19 +91,7 @@ public class Config {
 
         // create config object
         if (ProtectionStones.config == null) {
-            try {
-                UniversalDetector detector = new UniversalDetector(null);
-                FileInputStream fis = new FileInputStream(ProtectionStones.configLocation);
-                int nread;
-                byte[] buf = new byte[4096];
-                while ((nread = fis.read(buf)) > 0 && !detector.isDone()) detector.handleData(buf, 0, nread);
-                detector.dataEnd();
-                String encoding = detector.getDetectedCharset();
-                System.out.println(encoding);
-                ProtectionStones.config = CommentedFileConfig.builder(ProtectionStones.configLocation).charset(Charset.forName(encoding)).build();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ProtectionStones.config = CommentedFileConfig.builder(ProtectionStones.configLocation).build();
         }
 
         // loop upgrades until the config has been updated to the latest version

@@ -4,10 +4,10 @@ import me.vik1395.ProtectionStones.ConfigProtectBlock;
 import me.vik1395.ProtectionStones.PSL;
 import me.vik1395.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 public class ArgGive {
-    public static boolean argumentGive(Player p, String[] args) {
+    public static boolean argumentGive(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.give")) {
             PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
             return true;
@@ -37,7 +37,7 @@ public class ArgGive {
             return true;
         }
 
-        PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", p.getDisplayName()));
+        PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));
 
         return true;
     }

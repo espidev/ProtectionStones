@@ -62,6 +62,7 @@ public class ArgAdminCleanup {
 
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
+        // async cleanup task
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
             if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("disown"))) {
                 int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
@@ -72,7 +73,7 @@ public class ArgAdminCleanup {
 
                 List<LocalPlayer> inactivePlayers = new ArrayList<>();
 
-                // loop over offline players to delete old data
+                // loop over offline players and add to list if they haven't joined recently
                 for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
                     long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                     if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
@@ -81,23 +82,24 @@ public class ArgAdminCleanup {
 
                 List<String> toRemove = new ArrayList<>();
 
-                // 
+                // Loop over regions and check if offline player is in
                 for (String idname : regions.keySet()) {
                     if (!idname.substring(0, 2).equals("ps")) continue;
                     ProtectedRegion region = regions.get(idname);
+                    // remove inactive players from being owner
                     for (LocalPlayer lp : inactivePlayers) {
                         if (region.isOwner(lp)) {
                             region.getOwners().removePlayer(lp);
                         }
                     }
 
+                    // remove region if there are no owners left
                     if (args[2].equalsIgnoreCase("remove") && region.getOwners().size() == 0) {
                         p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
                         PSLocation psl = ProtectionStones.parsePSRegionToLocation(idname);
                         Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
                         blockToRemove.setType(Material.AIR);
                         toRemove.add(idname);
-                        rgm.removeRegion(idname);
                     }
                 }
 
