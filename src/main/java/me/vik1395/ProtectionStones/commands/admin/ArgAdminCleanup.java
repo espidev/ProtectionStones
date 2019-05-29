@@ -98,7 +98,7 @@ public class ArgAdminCleanup {
                         p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
                         PSLocation psl = ProtectionStones.parsePSRegionToLocation(idname);
                         Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
-                        blockToRemove.setType(Material.AIR);
+                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()->blockToRemove.setType(Material.AIR));
                         toRemove.add(idname);
                     }
                 }

@@ -18,16 +18,16 @@ public class ArgGive {
             return true;
         }
 
+        // check if player online
+        if (Bukkit.getPlayer(args[2]) == null) {
+            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg() + " (" + args[2] + ")");
+            return true;
+        }
+
         // check if argument is valid block
         ConfigProtectBlock cp = ProtectionStones.getProtectBlockFromName(args[1]);
         if (cp == null) {
             PSL.msg(p, PSL.INVALID_BLOCK.msg());
-            return true;
-        }
-
-        // check if player online
-        if (Bukkit.getPlayer(args[2]) == null) {
-            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return true;
         }
 
