@@ -26,10 +26,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -91,7 +91,19 @@ public class Config {
 
         // create config object
         if (ProtectionStones.config == null) {
-            ProtectionStones.config = CommentedFileConfig.of(ProtectionStones.configLocation);
+            try {
+                UniversalDetector detector = new UniversalDetector(null);
+                FileInputStream fis = new FileInputStream(ProtectionStones.configLocation);
+                int nread;
+                byte[] buf = new byte[4096];
+                while ((nread = fis.read(buf)) > 0 && !detector.isDone()) detector.handleData(buf, 0, nread);
+                detector.dataEnd();
+                String encoding = detector.getDetectedCharset();
+                System.out.println(encoding);
+                ProtectionStones.config = CommentedFileConfig.builder(ProtectionStones.configLocation).charset(Charset.forName(encoding)).build();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         // loop upgrades until the config has been updated to the latest version
