@@ -163,7 +163,7 @@ public class ProtectionStones extends JavaPlugin {
             case "remove":
                 if (region.substring(0, 2).equals("ps")) {
                     PSLocation psl = ProtectionStones.parsePSRegionToLocation(region);
-                    Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z); //TODO getWorld might not work
+                    Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
                     blockToRemove.setType(Material.AIR);
                 }
                 rgm.removeRegion(region);

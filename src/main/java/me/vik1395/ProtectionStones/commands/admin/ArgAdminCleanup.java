@@ -23,17 +23,14 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.vik1395.ProtectionStones.PSL;
+import me.vik1395.ProtectionStones.PSLocation;
 import me.vik1395.ProtectionStones.ProtectionStones;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ArgAdminCleanup {
 
@@ -73,47 +70,45 @@ public class ArgAdminCleanup {
                         .replace("%arg%", args[2])
                         .replace("%days%", "" + days));
 
+                List<LocalPlayer> inactivePlayers = new ArrayList<>();
+
                 // loop over offline players to delete old data
                 for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
                     long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                     if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
+                    inactivePlayers.add(wg.wrapOfflinePlayer(op));
+                }
 
-                    LocalPlayer lp = wg.wrapOfflinePlayer(op);
+                List<String> toRemove = new ArrayList<>();
 
-                    List<String> opRegions = new ArrayList<>();
-                    // add player's owned regions to list
-                    boolean found = false;
-                    for (String idname : regions.keySet()) {
-                        try {
-                            if (regions.get(idname).getOwners().contains(lp)) {
-                                opRegions.add(idname);
-                                found = true;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                // 
+                for (String idname : regions.keySet()) {
+                    if (!idname.substring(0, 2).equals("ps")) continue;
+                    ProtectedRegion region = regions.get(idname);
+                    for (LocalPlayer lp : inactivePlayers) {
+                        if (region.isOwner(lp)) {
+                            region.getOwners().removePlayer(lp);
                         }
                     }
 
-                    if (!found) {
-
-                        PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
-                                .replace("%player%", op.getName()));
-
-                        continue;
-                    }
-
-                    // remove regions
-                    p.sendMessage(ChatColor.YELLOW + args[2] + ": " + op.getName());
-                    for (String region : opRegions) {
-                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()-> ProtectionStones.removeDisownPSRegion(lp, args[2].toLowerCase(), region, rgm, w));
+                    if (args[2].equalsIgnoreCase("remove") && region.getOwners().size() == 0) {
+                        p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
+                        PSLocation psl = ProtectionStones.parsePSRegionToLocation(idname);
+                        Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
+                        blockToRemove.setType(Material.AIR);
+                        toRemove.add(idname);
+                        rgm.removeRegion(idname);
                     }
                 }
+
+                for (String r : toRemove) rgm.removeRegion(r);
 
                 try {
                     rgm.save();
                 } catch (Exception e) {
                     Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
                 }
+
                 PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
                         .replace("%arg%", args[2]));
             }
