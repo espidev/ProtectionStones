@@ -137,8 +137,8 @@ public class ListenerClass implements Listener {
             // check if player has limit on protection stones
             for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
                 String perm = rawperm.getPermission();
-                String[] spl = perm.split(".");
                 if (perm.startsWith("protectionstones.limit")) {
+                    String[] spl = perm.split("\\.");
                     if (spl.length == 3) {
                         try {
                             maxPS = Math.max(maxPS, Integer.parseInt(spl[2].trim()));
@@ -165,16 +165,15 @@ public class ListenerClass implements Listener {
                         }
                     }
                 }
-
                 // check if player has passed region limit
-                if (total > maxPS && maxPS != 0) {
+                if (total >= maxPS && maxPS != 0) {
                     PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
                     e.setCancelled(true);
                     return;
                 }
 
                 for (String ps : regionLimits.keySet()) {
-                    if (regionFound.containsKey(ps) && regionLimits.get(ps) < regionFound.get(ps)) {
+                    if (regionFound.containsKey(ps) && regionLimits.get(ps) <= regionFound.get(ps)) {
                         PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
                         e.setCancelled(true);
                         return;
