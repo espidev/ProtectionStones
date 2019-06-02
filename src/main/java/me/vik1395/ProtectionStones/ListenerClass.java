@@ -24,12 +24,13 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -70,9 +71,7 @@ public class ListenerClass implements Listener {
         String blockType = b.getType().toString();
 
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlock(blockType)) {
-            return;
-        }
+        if (!ProtectionStones.isProtectBlock(blockType)) return;
 
         ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
@@ -131,31 +130,58 @@ public class ListenerClass implements Listener {
 
         // non-admin checks
         if (!p.hasPermission("protectionstones.admin")) {
-            int max = 0;
 
+            HashMap<String, Integer> regionLimits = new HashMap<>(), regionFound = new HashMap<>();
+
+            int maxPS = 0;
             // check if player has limit on protection stones
             for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
                 String perm = rawperm.getPermission();
+                String[] spl = perm.split(".");
                 if (perm.startsWith("protectionstones.limit")) {
-                    try {
-                        int lim = Integer.parseInt(perm.substring(23).trim());
-                        if (lim > max) {
-                            max = lim;
+                    if (spl.length == 3) {
+                        try {
+                            maxPS = Math.max(maxPS, Integer.parseInt(spl[2].trim()));
+                        } catch (Exception er) {
+                            maxPS = 0;
                         }
-                    } catch (Exception er) {
-                        max = 0;
+                    } else if (spl.length == 4) {
+                        regionLimits.put(spl[2], Integer.parseInt(spl[3]));
                     }
                 }
             }
 
-            // check if player has passed region limit
-            if (rm.getRegionCountOfPlayer(lp) >= max) {
-                if (max != 0) {
+            if (maxPS != 0 || !regionLimits.isEmpty()) { // only check if limit was found
+                // count player's protection stones
+                int total = 0;
+                for (World w : Bukkit.getWorlds()) {
+                    RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+                    for (ProtectedRegion r : rgm.getRegions().values()) {
+                        String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+                        if (r.getOwners().contains(lp) && r.getId().startsWith("ps") && f != null) {
+                            total++;
+                            int num = regionFound.containsKey(ProtectionStones.getBlockOptions(f).alias) ? regionFound.get(ProtectionStones.getBlockOptions(f).alias) + 1 : 1;
+                            regionFound.put(ProtectionStones.getBlockOptions(f).alias, num);
+                        }
+                    }
+                }
+
+                // check if player has passed region limit
+                if (total > maxPS && maxPS != 0) {
                     PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
                     e.setCancelled(true);
                     return;
                 }
+
+                for (String ps : regionLimits.keySet()) {
+                    if (regionFound.containsKey(ps) && regionLimits.get(ps) < regionFound.get(ps)) {
+                        PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
             }
+
             // check if in world blacklist or not in world whitelist
             if (blockOptions.worldListType.equalsIgnoreCase("blacklist")) {
                 for (String world : blockOptions.worlds) {
@@ -217,12 +243,6 @@ public class ListenerClass implements Listener {
             if (powerfulOverLap) { // if we overlap a more powerful region
                 rm.removeRegion(id);
                 p.updateInventory();
-                try {
-                    rm.saveChanges();
-                    rm.save();
-                } catch (StorageException e1) {
-                    e1.printStackTrace();
-                }
                 PSL.msg(p, PSL.REGION_OVERLAP.msg());
                 e.setCancelled(true);
                 return;
@@ -250,18 +270,8 @@ public class ListenerClass implements Listener {
         region.setPriority(blockOptions.priority);
         p.sendMessage(PSL.PROTECTED.msg());
 
-        // save
-        try {
-            rm.saveChanges();
-            rm.save();
-        } catch (StorageException e1) {
-            e1.printStackTrace();
-        }
-
         // hide block if auto hide is enabled
-        if (blockOptions.autoHide) {
-            b.setType(Material.AIR);
-        }
+        if (blockOptions.autoHide) b.setType(Material.AIR);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -328,11 +338,6 @@ public class ListenerClass implements Listener {
         pb.setType(Material.AIR);
         rgm.removeRegion(id);
 
-        try {
-            rgm.save();
-        } catch (Exception e1) {
-            ProtectionStones.getPlugin().getLogger().severe("WorldGuard Error [" + e1 + "] during Region File Save");
-        }
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
         e.setDropItems(false);
@@ -369,11 +374,6 @@ public class ListenerClass implements Listener {
                     } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
                         // remove region from worldguard if destroy_region_when_explode is enabled
                         rgm.removeRegion(id);
-                        try {
-                            rgm.save();
-                        } catch (StorageException ex) {
-                            ex.printStackTrace();
-                        }
                     }
                 }
             }

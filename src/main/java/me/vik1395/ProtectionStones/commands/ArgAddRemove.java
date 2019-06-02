@@ -78,11 +78,6 @@ public class ArgAddRemove {
                 rgm.getRegion(psID).getOwners().removePlayer(op.getName());
                 break;
         }
-        try {
-            rgm.save();
-        } catch (Exception e) {
-            Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-        }
 
         if (type.equals("add") || type.equals("addowner")) {
             PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", op.getName()));

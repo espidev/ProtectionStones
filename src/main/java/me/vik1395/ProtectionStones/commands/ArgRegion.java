@@ -54,7 +54,7 @@ public class ArgRegion {
         LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[2])));
 
         if (args[1].equalsIgnoreCase("count")) { // count player's regions
-            int count = ArgCount.countRegionsOfPlayer(lp, rgm); // TODO check if rgm needs to be p2's
+            int count = ArgCount.countRegionsOfPlayer(lp, rgm);
 
             PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
                     .replace("%player%", args[2])
@@ -101,11 +101,6 @@ public class ArgRegion {
             for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p.getWorld());
 
             PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
-            try {
-                rgm.save();
-            } catch (Exception e) {
-                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-            }
         } else {
             PSL.msg(p, PSL.REGION_HELP.msg());
         }
