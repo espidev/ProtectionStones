@@ -215,6 +215,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.region - Allows players to use the /ps region commands.
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
+    protectionstones.limit.alias.x - Replace alias with the protection block alias and x with the limit of that protection block the player can place.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.superowner - Allows players to override region permissions.
 
