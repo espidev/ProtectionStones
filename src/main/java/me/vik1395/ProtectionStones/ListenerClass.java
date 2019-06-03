@@ -80,15 +80,22 @@ public class ListenerClass implements Listener {
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
-        String tag = null;
-        try {
-            if (e.getItemInHand().getItemMeta() != null) {
-                CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
-                tag = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+        boolean tag = false;
+
+        if (e.getItemInHand().getItemMeta() != null) {
+            CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
+            try { // check if tag byte is 1
+                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.BYTE);
+                tag = isPSBlock != null && isPSBlock == 1;
+            } catch (IllegalArgumentException es) {
+                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
+                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+                    tag = isPSBlock != null && isPSBlock.equals("true");
+                } catch (IllegalArgumentException ignored) {}
             }
-        } catch (IllegalArgumentException ignored) {
-        } // ignore item tags that aren't of "string" type
-        if (blockOptions.restrictObtaining && (tag == null || !tag.equalsIgnoreCase("true"))) return;
+        }
+
+        if (blockOptions.restrictObtaining && !tag) return;
 
         // check permission
         if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
