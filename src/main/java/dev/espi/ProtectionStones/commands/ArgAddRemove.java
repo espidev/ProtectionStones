@@ -20,12 +20,12 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class ArgAddRemove {
-    private static OfflinePlayer checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
+    private static UUID checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
@@ -46,7 +46,7 @@ public class ArgAddRemove {
             PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return null;
         }
-        return Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]));
+        return ProtectionStones.nameToUUID.get(args[1]);
     }
 
     // Handles adding and removing players to region, both as members and owners
@@ -61,29 +61,29 @@ public class ArgAddRemove {
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        OfflinePlayer op = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
-        if (op == null) return true;
+        UUID uuid = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
+        if (uuid == null) return true;
         switch (type) {
             case "add":
-                rgm.getRegion(psID).getMembers().addPlayer(op.getUniqueId());
+                rgm.getRegion(psID).getMembers().addPlayer(uuid);
                 break;
             case "remove":
-                rgm.getRegion(psID).getMembers().removePlayer(op.getUniqueId());
-                rgm.getRegion(psID).getMembers().removePlayer(op.getName());
+                rgm.getRegion(psID).getMembers().removePlayer(uuid);
+                rgm.getRegion(psID).getMembers().removePlayer(uuid);
                 break;
             case "addowner":
-                rgm.getRegion(psID).getOwners().addPlayer(op.getUniqueId());
+                rgm.getRegion(psID).getOwners().addPlayer(uuid);
                 break;
             case "removeowner":
-                rgm.getRegion(psID).getOwners().removePlayer(op.getUniqueId());
-                rgm.getRegion(psID).getOwners().removePlayer(op.getName());
+                rgm.getRegion(psID).getOwners().removePlayer(uuid);
+                rgm.getRegion(psID).getOwners().removePlayer(uuid);
                 break;
         }
 
         if (type.equals("add") || type.equals("addowner")) {
-            PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", op.getName()));
+            PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", args[1]));
         } else if (type.equals("remove") || type.equals("removeowner")) {
-            PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", op.getName()));
+            PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", args[1]));
         }
         return true;
     }
