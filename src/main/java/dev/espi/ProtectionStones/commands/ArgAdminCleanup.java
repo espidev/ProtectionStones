@@ -30,10 +30,11 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class ArgAdminCleanup {
+public class ArgAdminCleanup implements PSCommandArg {
 
     // /ps admin cleanup
-    public static boolean argumentAdminCleanup(CommandSender p, String[] args) {
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             PSL.msg(p, PSL.ADMIN_CLEANUP_HELP.msg());
@@ -115,4 +116,5 @@ public class ArgAdminCleanup {
         });
         return true;
     }
+
 }

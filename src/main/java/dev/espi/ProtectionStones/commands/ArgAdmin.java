@@ -23,44 +23,45 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class ArgAdmin {
+public class ArgAdmin implements PSCommandArg {
 
     // /ps admin [arg]
-    public static boolean argumentAdmin(CommandSender p, String[] args) {
-        if (!p.hasPermission("protectionstones.admin")) {
-            PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        if (!s.hasPermission("protectionstones.admin")) {
+            PSL.msg(s, PSL.NO_PERMISSION_ADMIN.msg());
             return true;
         }
 
         if (args.length < 2) {
-            p.sendMessage(PSL.ADMIN_HELP.msg());
+            s.sendMessage(PSL.ADMIN_HELP.msg());
             return true;
         }
 
         switch (args[1].toLowerCase()) {
             case "version":
-                p.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getPlugin().getDescription().getVersion());
-                p.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getPlugin().getDescription().getAuthors());
-                p.sendMessage(ChatColor.YELLOW + "Bukkit:  " + Bukkit.getVersion());
-                p.sendMessage(ChatColor.YELLOW + "WG: " + ProtectionStones.wgd.getDescription().getVersion());
-                p.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
+                s.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getPlugin().getDescription().getVersion());
+                s.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getPlugin().getDescription().getAuthors());
+                s.sendMessage(ChatColor.YELLOW + "Bukkit:  " + Bukkit.getVersion());
+                s.sendMessage(ChatColor.YELLOW + "WG: " + ProtectionStones.wgd.getDescription().getVersion());
+                s.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
                 break;
             case "hide":
-                return ArgAdminHide.argumentAdminHide(p, args);
+                return ArgAdminHide.argumentAdminHide(s, args);
             case "unhide":
-                return ArgAdminHide.argumentAdminHide(p, args);
+                return ArgAdminHide.argumentAdminHide(s, args);
             case "cleanup":
-                return ArgAdminCleanup.argumentAdminCleanup(p, args);
+                return ArgAdminCleanup.argumentAdminCleanup(s, args);
             case "stats":
-                return ArgAdminStats.argumentAdminStats(p, args);
+                return ArgAdminStats.argumentAdminStats(s, args);
             case "lastlogon":
-                return ArgAdminLastlogon.argumentAdminLastLogon(p, args);
+                return ArgAdminLastlogon.argumentAdminLastLogon(s, args);
             case "lastlogons":
-                return ArgAdminLastlogon.argumentAdminLastLogons(p, args);
+                return ArgAdminLastlogon.argumentAdminLastLogons(s, args);
             case "fixregions":
-                p.sendMessage(ChatColor.YELLOW + "Fixing...");
+                s.sendMessage(ChatColor.YELLOW + "Fixing...");
                 ProtectionStones.upgradeRegions();
-                p.sendMessage(ChatColor.YELLOW + "Done!");
+                s.sendMessage(ChatColor.YELLOW + "Done!");
                 break;
         }
         return true;

@@ -34,7 +34,7 @@ public class FlagHandler {
     public static final Flag<String> PS_HOME = new StringFlag("ps-home");
     public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
 
-    public static void registerFlags() {
+    static void registerFlags() {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
         try {
             registry.register(PS_HOME);
@@ -46,7 +46,7 @@ public class FlagHandler {
     }
 
     // Add the correct flags for the ps region
-    public static void initCustomFlagsForPS(ProtectedRegion region, Block block, ConfigProtectBlock cpb) {
+    static void initCustomFlagsForPS(ProtectedRegion region, Block block, ConfigProtectBlock cpb) {
 
         String home = block.getLocation().getBlockX() + cpb.homeXOffset + " ";
         home += (block.getLocation().getBlockY() + cpb.homeYOffset) + " ";
@@ -57,7 +57,7 @@ public class FlagHandler {
     }
 
     // Initializes user defined default flags for block
-    public static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
+    static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
         b.regionFlags = new HashMap<>();
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");

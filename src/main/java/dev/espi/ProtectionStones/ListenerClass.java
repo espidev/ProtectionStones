@@ -406,7 +406,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
-        // check if player can teleport into region (no region with preventTeleportIn = true)
+        // check if player can teleport into region (no region with dev.espi.ProtectionStones.commandspreventTeleportIn = true)
         ApplicableRegionSet regions = rgm.getApplicableRegions(v);
         if (regions.getRegions().isEmpty()) return;
         boolean foundNoTeleport = false;

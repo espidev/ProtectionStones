@@ -33,10 +33,11 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArgAdminHide {
+public class ArgAdminHide implements PSCommandArg {
 
     // /ps admin hide
-    public static boolean argumentAdminHide(CommandSender p, String[] args) {
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args) {
         RegionManager mgr;
         World w;
         if (p instanceof Player) {

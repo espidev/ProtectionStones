@@ -20,11 +20,13 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class ArgAddRemove {
+public class ArgAddRemove implements PSCommandArg {
+
     private static UUID checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
@@ -86,5 +88,10 @@ public class ArgAddRemove {
             PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", args[1]));
         }
         return true;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        return false;
     }
 }
