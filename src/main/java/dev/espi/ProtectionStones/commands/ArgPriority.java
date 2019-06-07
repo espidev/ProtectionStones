@@ -21,10 +21,22 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgPriority {
-    public static boolean argPriority(Player p, String[] args) {
+import java.util.Collections;
+import java.util.List;
+
+public class ArgPriority implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("priority");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -57,5 +69,10 @@ public class ArgPriority {
             PSL.msg(p, PSL.PRIORITY_ERROR.msg());
         }
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

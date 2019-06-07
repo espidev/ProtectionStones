@@ -25,10 +25,22 @@ import dev.espi.ProtectionStones.PSLocation;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgHideUnhide {
-    public static boolean template(Player p, String arg) {
+import java.util.Arrays;
+import java.util.List;
+
+public class ArgHideUnhide implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Arrays.asList("hide", "unhide");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] arg) {
+        Player p = (Player) s;
         String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -72,5 +84,10 @@ public class ArgHideUnhide {
             blockToEdit.setType(Material.getMaterial(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL)));
         }
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

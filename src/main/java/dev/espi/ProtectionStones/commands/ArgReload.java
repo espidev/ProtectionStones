@@ -20,8 +20,20 @@ import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.command.CommandSender;
 
-public class ArgReload {
-    public static boolean argumentReload(CommandSender p, String[] args) {
+import java.util.Collections;
+import java.util.List;
+
+public class ArgReload implements PSCommandArg {
+
+    // /ps reload
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("reload");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
             PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
             return true;
@@ -29,6 +41,11 @@ public class ArgReload {
         PSL.msg(p, PSL.RELOAD_START.msg());
         ProtectionStones.loadConfig(true);
         PSL.msg(p, PSL.RELOAD_COMPLETE.msg());
+        return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
         return true;
     }
 }

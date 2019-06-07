@@ -23,20 +23,28 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class ArgTp {
+public class ArgTp implements PSCommandArg {
 
     private static HashMap<UUID, Integer> waitCounter = new HashMap<>();
     private static HashMap<UUID, BukkitTask> taskCounter = new HashMap<>();
 
     // /ps tp, /ps home
-    public static boolean argumentTp(Player p, String[] args) {
+
+    @Override
+    public List<String> getNames() {
+        return Arrays.asList("tp", "home");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
+
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
@@ -214,5 +222,10 @@ public class ArgTp {
         });
 
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

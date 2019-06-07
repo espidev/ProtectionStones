@@ -23,16 +23,26 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ArgRegion {
+public class ArgRegion implements PSCommandArg {
 
     // /ps region
-    public static boolean argumentRegion(Player p, String[] args) {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("region");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
 
@@ -63,8 +73,8 @@ public class ArgRegion {
         } else if (args[1].equalsIgnoreCase("list")) { // list player's regions
             StringBuilder regionMessage = new StringBuilder();
             boolean found = false;
-            for (String s : rgm.getRegions().keySet()) {
-                if (s.startsWith("ps") && rgm.getRegions().get(s).getOwners().contains(lp)) {
+            for (String str : rgm.getRegions().keySet()) {
+                if (str.startsWith("ps") && rgm.getRegions().get(str).getOwners().contains(lp)) {
                     regionMessage.append(s).append(", ");
                     found = true;
                 }
@@ -98,12 +108,17 @@ public class ArgRegion {
             }
 
             // Remove regions
-            for (String s : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), s, rgm, p.getWorld());
+            for (String str : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), str, rgm, p.getWorld());
 
             PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
         } else {
             PSL.msg(p, PSL.REGION_HELP.msg());
         }
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

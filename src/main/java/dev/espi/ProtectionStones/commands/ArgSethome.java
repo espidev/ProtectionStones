@@ -6,10 +6,24 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgSethome {
-    public static boolean argumentSethome(Player p, String[] args) {
+import java.util.Collections;
+import java.util.List;
+
+public class ArgSethome implements PSCommandArg {
+
+    // /ps sethome
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("sethome");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -31,5 +45,10 @@ public class ArgSethome {
         r.setFlag(FlagHandler.PS_HOME, p.getLocation().getBlockX() + " " + p.getLocation().getBlockY() + " " + p.getLocation().getBlockZ());
         PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", psID));
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

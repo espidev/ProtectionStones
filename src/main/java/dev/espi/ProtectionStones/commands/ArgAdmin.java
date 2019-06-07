@@ -23,7 +23,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ArgAdmin implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("admin");
+    }
 
     // /ps admin [arg]
     @Override
@@ -64,6 +72,11 @@ public class ArgAdmin implements PSCommandArg {
                 s.sendMessage(ChatColor.YELLOW + "Done!");
                 break;
         }
+        return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
         return true;
     }
 }

@@ -23,6 +23,8 @@ import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class ArgAddRemove implements PSCommandArg {
@@ -91,7 +93,18 @@ public class ArgAddRemove implements PSCommandArg {
     }
 
     @Override
+    public List<String> getNames() {
+        return Arrays.asList("add", "remove", "addowner", "removeowner");
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
+        template((Player) s, args, args[0]);
+        return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
         return false;
     }
 }

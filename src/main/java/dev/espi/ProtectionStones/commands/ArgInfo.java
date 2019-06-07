@@ -27,12 +27,23 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
-public class ArgInfo {
-    public static boolean argumentInfo(Player p, String[] args) {
+public class ArgInfo implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("info");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -103,6 +114,11 @@ public class ArgInfo {
             PSL.msg(p, PSL.INFO_HELP.msg());
         }
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 
     private static void displayFlags(Player p, ProtectedRegion region) {

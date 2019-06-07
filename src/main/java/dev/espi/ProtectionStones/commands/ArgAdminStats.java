@@ -26,10 +26,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-public class ArgAdminStats {
+class ArgAdminStats {
 
     // /ps admin stats
-    public static boolean argumentAdminStats(CommandSender p, String[] args) {
+    static boolean argumentAdminStats(CommandSender p, String[] args) {
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
 
         int size = 0;

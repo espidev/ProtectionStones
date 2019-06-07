@@ -5,10 +5,22 @@ import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgGet {
-    public static boolean argumentGet(Player p, String[] args) {
+import java.util.Collections;
+import java.util.List;
+
+public class ArgGet implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("get");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         if (!p.hasPermission("protectionstones.get")) {
             PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
             return true;
@@ -60,5 +72,10 @@ public class ArgGet {
         PSL.msg(p, PSL.GET_GOTTEN.msg());
 
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

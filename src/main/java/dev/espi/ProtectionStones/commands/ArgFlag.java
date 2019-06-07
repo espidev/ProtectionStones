@@ -10,7 +10,7 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * See the License for the specific  language governing permissions and
  * limitations under the License.
  */
 
@@ -21,10 +21,22 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgFlag {
-    public static boolean argumentFlag(Player p, String[] args) {
+import java.util.Collections;
+import java.util.List;
+
+public class ArgFlag implements PSCommandArg {
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("flag");
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         String psID = ProtectionStones.playerToPSID(p);
 
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
@@ -55,5 +67,10 @@ public class ArgFlag {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }

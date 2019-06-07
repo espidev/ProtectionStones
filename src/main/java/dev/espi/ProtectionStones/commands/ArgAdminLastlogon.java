@@ -24,9 +24,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 
-public class ArgAdminLastlogon {
+class ArgAdminLastlogon {
     // /ps admin lastlogon
-    public static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
+    static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
         if (args.length < 3) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return true;
@@ -49,7 +49,7 @@ public class ArgAdminLastlogon {
     }
 
     // /ps admin lastlogons
-    public static boolean argumentAdminLastLogons(CommandSender p, String[] args) {
+    static boolean argumentAdminLastLogons(CommandSender p, String[] args) {
         int days = 0;
         if (args.length > 2) {
             try {

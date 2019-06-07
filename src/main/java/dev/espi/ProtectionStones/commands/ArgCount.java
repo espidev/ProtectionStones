@@ -23,14 +23,39 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-public class ArgCount {
+public class ArgCount implements PSCommandArg {
+
+    // Only PS regions, not other regions
+    public static int countRegionsOfPlayer(LocalPlayer lp, RegionManager rgm) {
+        int count = 0;
+        try {
+            Map<String, ProtectedRegion> regions = rgm.getRegions();
+            for (String selected : regions.keySet()) {
+                if (regions.get(selected).getOwners().contains(lp) && regions.get(selected).getId().startsWith("ps")) {
+                    count++;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return count;
+    }
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("count");
+    }
 
     // /ps count
-    public static boolean argumentCount(Player p, String[] args) {
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
         WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
         RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
@@ -70,19 +95,8 @@ public class ArgCount {
         return true;
     }
 
-    // Only PS regions, not other regions
-    public static int countRegionsOfPlayer(LocalPlayer lp, RegionManager rgm) {
-        int count = 0;
-        try {
-            Map<String, ProtectedRegion> regions = rgm.getRegions();
-            for (String selected : regions.keySet()) {
-                if (regions.get(selected).getOwners().contains(lp) && regions.get(selected).getId().startsWith("ps")) {
-                    count++;
-                }
-            }
-        } catch (Exception ignored) {
-
-        }
-        return count;
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
     }
 }
