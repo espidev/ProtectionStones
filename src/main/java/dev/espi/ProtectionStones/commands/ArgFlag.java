@@ -16,11 +16,18 @@
 
 package dev.espi.ProtectionStones.commands;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,12 +42,17 @@ public class ArgFlag implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = ProtectionStones.playerToPSID(p);
+        String psID = WGUtils.playerToPSID(p);
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.flags")) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
@@ -60,8 +72,7 @@ public class ArgFlag implements PSCommandArg {
         } else {
             String blockType = rgm.getRegion(psID).getFlag(FlagHandler.PS_BLOCK_MATERIAL);
             if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
-                FlagHandler fh = new FlagHandler();
-                fh.setFlag(args, rgm.getRegion(psID), p);
+                setFlag(args, rgm.getRegion(psID), p);
             } else {
                 PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
             }
@@ -69,8 +80,41 @@ public class ArgFlag implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
+    // /ps flag logic (utilizing WG internal /region flag logic)
+    private void setFlag(String[] args, ProtectedRegion region, Player p) {
+        Flag flag;
+
+        if (args[1].equalsIgnoreCase("-g")) {
+            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[3]);
+        } else {
+            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[1]);
+        }
+
+        if (args[2].equalsIgnoreCase("default")) {
+            region.setFlag(flag, flag.getDefault());
+            region.setFlag(flag.getRegionGroupFlag(), null);
+            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+        } else {
+            String settings = "";
+            if (args[1].equalsIgnoreCase("-g")) {
+                for (int i = 4; i < args.length; i++) settings += args[i] + " ";
+            } else {
+                for (int i = 2; i < args.length; i++) settings += args[i] + " ";
+            }
+
+            FlagContext fc = FlagContext.create().setInput(settings.trim()).build();
+            try {
+                region.setFlag(flag, flag.parseInput(fc));
+                if (args[1].equalsIgnoreCase("-g")) {
+                    region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(args[2]));
+                }
+            } catch (InvalidFlagFormat invalidFlagFormat) {
+                //invalidFlagFormat.printStackTrace();
+                PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
+                return;
+            }
+            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+        }
     }
+
 }

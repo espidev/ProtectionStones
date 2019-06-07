@@ -23,6 +23,7 @@ import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSLocation;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -39,12 +40,17 @@ public class ArgHideUnhide implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] arg) {
         Player p = (Player) s;
-        String psID = ProtectionStones.playerToPSID(p);
+        String psID = WGUtils.playerToPSID(p);
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         ProtectedRegion r = rgm.getRegion(psID);
 
         // preliminary checks
@@ -65,7 +71,7 @@ public class ArgHideUnhide implements PSCommandArg {
             return true;
         }
 
-        PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
+        PSLocation psl = WGUtils.parsePSRegionToLocation(psID);
         Block blockToEdit = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
         Material currentType = blockToEdit.getType();
@@ -86,8 +92,4 @@ public class ArgHideUnhide implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
-    }
 }

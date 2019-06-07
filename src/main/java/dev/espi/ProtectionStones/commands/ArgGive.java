@@ -17,6 +17,11 @@ public class ArgGive implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return true;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.give")) {
             PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
@@ -52,8 +57,4 @@ public class ArgGive implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return true;
-    }
 }

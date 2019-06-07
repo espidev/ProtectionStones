@@ -20,6 +20,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -46,11 +48,11 @@ public class ArgAddRemove implements PSCommandArg {
             PSL.msg(p, PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return null;
         }
-        if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+        if (!UUIDCache.nameToUUID.containsKey(args[1])) {
             PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return null;
         }
-        return ProtectionStones.nameToUUID.get(args[1]);
+        return UUIDCache.nameToUUID.get(args[1]);
     }
 
     // Handles adding and removing players to region, both as members and owners
@@ -61,10 +63,10 @@ public class ArgAddRemove implements PSCommandArg {
     //   removeowner: remove owner
 
     public static boolean template(Player p, String[] args, String type) {
-        String psID = ProtectionStones.playerToPSID(p);
+        String psID = WGUtils.playerToPSID(p);
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         UUID uuid = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
         if (uuid == null) return true;
         switch (type) {
@@ -98,13 +100,14 @@ public class ArgAddRemove implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         template((Player) s, args, args[0]);
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
-    }
 }

@@ -30,7 +30,7 @@ class ArgAdminStats {
 
     // /ps admin stats
     static boolean argumentAdminStats(CommandSender p, String[] args) {
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
 
         int size = 0;
         for (World w : Bukkit.getWorlds()) {

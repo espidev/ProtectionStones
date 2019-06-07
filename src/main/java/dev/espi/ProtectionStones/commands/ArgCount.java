@@ -22,6 +22,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,7 +35,7 @@ import java.util.Map;
 public class ArgCount implements PSCommandArg {
 
     // Only PS regions, not other regions
-    public static int countRegionsOfPlayer(LocalPlayer lp, RegionManager rgm) {
+    static int countRegionsOfPlayer(LocalPlayer lp, RegionManager rgm) {
         int count = 0;
         try {
             Map<String, ProtectedRegion> regions = rgm.getRegions();
@@ -52,13 +54,18 @@ public class ArgCount implements PSCommandArg {
         return Collections.singletonList("count");
     }
 
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
     // /ps count
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             int count;
 
             if (args.length == 1) {
@@ -75,12 +82,12 @@ public class ArgCount implements PSCommandArg {
 
                 if (p.hasPermission("protectionstones.count.others")) {
 
-                    if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+                    if (!UUIDCache.nameToUUID.containsKey(args[1])) {
                         PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
                         return;
                     }
 
-                    count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1]))), rgm);
+                    count = countRegionsOfPlayer(wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1]))), rgm);
 
                     PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
                             .replace("%player%", args[1])
@@ -95,8 +102,4 @@ public class ArgCount implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
-    }
 }

@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -22,12 +23,17 @@ public class ArgSethome implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = ProtectionStones.playerToPSID(p);
+        String psID = WGUtils.playerToPSID(p);
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.sethome")) {
             PSL.msg(p, PSL.NO_PERMISSION_SETHOME.msg());
             return true;
@@ -45,10 +51,5 @@ public class ArgSethome implements PSCommandArg {
         r.setFlag(FlagHandler.PS_HOME, p.getLocation().getBlockX() + " " + p.getLocation().getBlockY() + " " + p.getLocation().getBlockZ());
         PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", psID));
         return true;
-    }
-
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
     }
 }

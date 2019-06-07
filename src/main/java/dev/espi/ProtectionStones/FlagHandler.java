@@ -76,41 +76,4 @@ public class FlagHandler {
         }
     }
 
-    // /ps flag logic (utilizing WG internal /region flag logic)
-    public void setFlag(String[] args, ProtectedRegion region, Player p) {
-        Flag flag;
-
-        if (args[1].equalsIgnoreCase("-g")) {
-            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[3]);
-        } else {
-            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[1]);
-        }
-
-        if (args[2].equalsIgnoreCase("default")) {
-            region.setFlag(flag, flag.getDefault());
-            region.setFlag(flag.getRegionGroupFlag(), null);
-            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
-        } else {
-            String settings = "";
-            if (args[1].equalsIgnoreCase("-g")) {
-                for (int i = 4; i < args.length; i++) settings += args[i] + " ";
-            } else {
-                for (int i = 2; i < args.length; i++) settings += args[i] + " ";
-            }
-
-            FlagContext fc = FlagContext.create().setInput(settings.trim()).build();
-            try {
-                region.setFlag(flag, flag.parseInput(fc));
-                if (args[1].equalsIgnoreCase("-g")) {
-                    region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(args[2]));
-                }
-            } catch (InvalidFlagFormat invalidFlagFormat) {
-                //invalidFlagFormat.printStackTrace();
-                PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
-                return;
-            }
-            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
-        }
-    }
-
 }

@@ -21,6 +21,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
+import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -42,11 +44,16 @@ public class ArgTp implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
         String rgnumParse;
         int rgnum; // index: index in playerRegions for selected region, rgnum: index specified by player to teleport to
@@ -90,13 +97,13 @@ public class ArgTp implements PSCommandArg {
         // region checks, and set lp to offline player (for /ps tp)
         if (args[0].equalsIgnoreCase("tp")) {
 
-            if (!ProtectionStones.nameToUUID.containsKey(args[1])) {
+            if (!UUIDCache.nameToUUID.containsKey(args[1])) {
                 PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
                 return true;
             }
 
             try {
-                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[1])));
+                lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
             } catch (Exception e) {
                 PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
                         .replace("%player%", args[1]));
@@ -107,7 +114,7 @@ public class ArgTp implements PSCommandArg {
 
         // run region search asynchronously to avoid blocking server thread
         LocalPlayer finalLp = lp;
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             int index = 0;
 
             // find regions that the player has
@@ -147,7 +154,7 @@ public class ArgTp implements PSCommandArg {
 
             // if the region does not have the ps-home flag, add it
             if (r.getFlag(FlagHandler.PS_HOME) == null) {
-                PSLocation psl = ProtectionStones.parsePSRegionToLocation(r.getId());
+                PSLocation psl = WGUtils.parsePSRegionToLocation(r.getId());
                 String home = psl.x + cpb.homeXOffset + " ";
                 home += (psl.y + cpb.homeYOffset) + " ";
                 home += (psl.z + cpb.homeZOffset);
@@ -167,11 +174,11 @@ public class ArgTp implements PSCommandArg {
 
             if (cpb.tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) { // no delay
                 PSL.msg(p, PSL.TPING.msg());
-                Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), () -> p.teleport(tploc)); // run on main thread, not async
+                Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> p.teleport(tploc)); // run on main thread, not async
             } else if (!cpb.noMovingWhenTeleportWaiting) { // delay
                 p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + cpb.tpWaitingSeconds));
 
-                Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+                Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                     PSL.msg(p, PSL.TPING.msg());
                     p.teleport(tploc);
                 }, 20 * cpb.tpWaitingSeconds);
@@ -190,7 +197,7 @@ public class ArgTp implements PSCommandArg {
 
                 // add teleport wait tasks to queue
                 waitCounter.put(uuid, 0);
-                taskCounter.put(uuid, Bukkit.getScheduler().runTaskTimer(ProtectionStones.getPlugin(), () -> {
+                taskCounter.put(uuid, Bukkit.getScheduler().runTaskTimer(ProtectionStones.getInstance(), () -> {
                             // cancel if the player is not on the server
                             if (Bukkit.getPlayer(uuid) == null) {
                                 taskCounter.get(uuid).cancel();
@@ -222,10 +229,5 @@ public class ArgTp implements PSCommandArg {
         });
 
         return true;
-    }
-
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
     }
 }

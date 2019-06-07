@@ -17,6 +17,8 @@
 package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import dev.espi.ProtectionStones.LegacyUpgrade;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
@@ -31,6 +33,11 @@ public class ArgAdmin implements PSCommandArg {
     @Override
     public List<String> getNames() {
         return Collections.singletonList("admin");
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return true;
     }
 
     // /ps admin [arg]
@@ -48,10 +55,10 @@ public class ArgAdmin implements PSCommandArg {
 
         switch (args[1].toLowerCase()) {
             case "version":
-                s.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getPlugin().getDescription().getVersion());
-                s.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getPlugin().getDescription().getAuthors());
+                s.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getInstance().getDescription().getVersion());
+                s.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getInstance().getDescription().getAuthors());
                 s.sendMessage(ChatColor.YELLOW + "Bukkit:  " + Bukkit.getVersion());
-                s.sendMessage(ChatColor.YELLOW + "WG: " + ProtectionStones.wgd.getDescription().getVersion());
+                s.sendMessage(ChatColor.YELLOW + "WG: " + WorldGuardPlugin.inst().getDescription().getVersion());
                 s.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
                 break;
             case "hide":
@@ -68,15 +75,11 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminLastlogon.argumentAdminLastLogons(s, args);
             case "fixregions":
                 s.sendMessage(ChatColor.YELLOW + "Fixing...");
-                ProtectionStones.upgradeRegions();
+                LegacyUpgrade.upgradeRegions();
                 s.sendMessage(ChatColor.YELLOW + "Done!");
                 break;
         }
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return true;
-    }
 }

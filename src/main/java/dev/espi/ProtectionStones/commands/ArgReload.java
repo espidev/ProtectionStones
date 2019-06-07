@@ -33,6 +33,11 @@ public class ArgReload implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return true;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender p, String[] args) {
         if (!p.hasPermission("protectionstones.admin")) {
             PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
@@ -44,8 +49,4 @@ public class ArgReload implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return true;
-    }
 }

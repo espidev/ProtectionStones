@@ -41,36 +41,34 @@ public class PSConfig {
 
     // config options
     // config.toml will be loaded into these fields
-    // use autoboxing for primitives to allow for null
+    // uses autoboxing for primitives to allow for null
     @Path("config_version")
-    int configVersion;
+    public int configVersion;
     @Path("uuidupdated")
-    Boolean uuidupdated;
+    public Boolean uuidupdated;
     @Path("placing_cooldown")
-    int placingCooldown;
+    public int placingCooldown;
     @Path("async_load_uuid_cache")
-    Boolean asyncLoadUUIDCache;
+    public Boolean asyncLoadUUIDCache;
     @Path("ps_view_cooldown")
     public Integer psViewCooldown;
-    //@Path("allow_dangerous_commands")
-    //Boolean allowDangerousCommands;
     @Path("base_command")
-    String base_command;
+    public String base_command;
     @Path("aliases")
-    List<String> aliases;
+    public List<String> aliases;
 
 
     static void initConfig() {
 
         // check if using config v1 or v2 (config.yml -> config.toml)
-        if (new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml").exists() && !ProtectionStones.configLocation.exists()) {
-            upgradeFromV1V2();
+        if (new File(ProtectionStones.getInstance().getDataFolder() + "/config.yml").exists() && !ProtectionStones.configLocation.exists()) {
+            LegacyUpgrade.upgradeFromV1V2();
         }
 
         // check if config files exist
         try {
-            if (!ProtectionStones.getPlugin().getDataFolder().exists()) {
-                ProtectionStones.getPlugin().getDataFolder().mkdir();
+            if (!ProtectionStones.getInstance().getDataFolder().exists()) {
+                ProtectionStones.getInstance().getDataFolder().mkdir();
             }
             if (!ProtectionStones.blockDataFolder.exists()) {
                 ProtectionStones.blockDataFolder.mkdir();
@@ -97,7 +95,7 @@ public class PSConfig {
             ProtectionStones.config.load(); // load latest settings
 
             // load config into configOptions object
-            ProtectionStones.configOptions = new ObjectConverter().toObject(ProtectionStones.config, PSConfig::new);
+            ProtectionStones.getInstance().setConfigOptions(new ObjectConverter().toObject(ProtectionStones.config, PSConfig::new));
 
             // upgrade config if need be (v3+)
             boolean leaveLoop = doConfigUpgrades();
@@ -177,7 +175,7 @@ public class PSConfig {
     // Upgrade the config one version up (ex. 3 -> 4)
     private static boolean doConfigUpgrades() {
         boolean leaveLoop = false;
-        switch (ProtectionStones.configOptions.configVersion) {
+        switch (ProtectionStones.getInstance().getConfigOptions().configVersion) {
             case 3:
                 ProtectionStones.config.set("config_version", 4);
                 ProtectionStones.config.set("base_command", "ps");
@@ -197,74 +195,5 @@ public class PSConfig {
                 break;
         }
         return leaveLoop;
-    }
-
-    // upgrade from config < v2.0.0
-    private static void upgradeFromV1V2() {
-        Bukkit.getLogger().info(ChatColor.AQUA + "Upgrading configs from v1.x to v2.0+...");
-
-        try {
-            ProtectionStones.blockDataFolder.mkdir();
-            Files.copy(PSConfig.class.getResourceAsStream("/config.toml"), Paths.get(ProtectionStones.configLocation.toURI()), StandardCopyOption.REPLACE_EXISTING);
-
-            FileConfig fc = FileConfig.builder(ProtectionStones.configLocation).build();
-            fc.load();
-
-            File oldConfig = new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml");
-            YamlConfiguration yml = YamlConfiguration.loadConfiguration(oldConfig);
-
-            fc.set("uuidupdated", (yml.get("UUIDUpdated") != null) && yml.getBoolean("UUIDUpdated"));
-            fc.set("placing_cooldown", (yml.getBoolean("cooldown.enable")) ? yml.getInt("cooldown.cooldown") : -1);
-
-            // options from global scope
-            List<String> worldsDenied = yml.getStringList("Worlds Denied");
-            List<String> flags = yml.getStringList("Flags");
-            List<String> allowedFlags = new ArrayList<>(Arrays.asList(yml.getString("Allowed Flags").split(",")));
-
-            // upgrade blocks
-            for (String type : yml.getConfigurationSection("Region").getKeys(false)) {
-                File file = new File(ProtectionStones.blockDataFolder.getAbsolutePath() + "/" + type + ".toml");
-                Files.copy(PSConfig.class.getResourceAsStream("/block1.toml"), Paths.get(file.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
-                FileConfig b = FileConfig.builder(file).build();
-                b.load();
-
-                b.set("type", type);
-                b.set("alias", type);
-                b.set("restrict_obtaining", false);
-                b.set("world_list_type", "blacklist");
-                b.set("worlds", worldsDenied);
-                b.set("region.x_radius", yml.getInt("Region." + type + ".X Radius"));
-                b.set("region.y_radius", yml.getInt("Region." + type + ".Y Radius"));
-                b.set("region.z_radius", yml.getInt("Region." + type + ".Z Radius"));
-                b.set("region.flags", flags);
-                b.set("region.allowed_flags", allowedFlags);
-                b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
-                b.set("block_data.display_name", "");
-                b.set("block_data.lore", Arrays.asList());
-                b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
-                b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
-                b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));
-                // ignore silk touch option
-                b.set("player.prevent_teleport_in", yml.getBoolean("Teleport To PVP.Block Teleport"));
-
-                b.save();
-                b.close();
-            }
-
-            fc.save();
-            fc.close();
-
-            oldConfig.renameTo(new File(ProtectionStones.getPlugin().getDataFolder() + "/config.yml.old"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
-        Bukkit.getLogger().info(ChatColor.GREEN + "Please be sure to double check your configs with the new options!");
-
-        Bukkit.getLogger().info(ChatColor.AQUA + "Updating PS Regions to new format...");
-        ProtectionStones.upgradeRegions();
-        Bukkit.getLogger().info(ChatColor.GREEN + "Done!");
     }
 }

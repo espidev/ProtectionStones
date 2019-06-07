@@ -23,6 +23,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -34,7 +35,7 @@ class ArgAdminCleanup {
 
     // /ps admin cleanup
     static boolean argumentAdminCleanup(CommandSender p, String[] args) {
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             PSL.msg(p, PSL.ADMIN_CLEANUP_HELP.msg());
             return true;
@@ -43,7 +44,7 @@ class ArgAdminCleanup {
         RegionManager rgm;
         World w;
         if (p instanceof Player) {
-            rgm = ProtectionStones.getRegionManagerWithPlayer((Player) p);
+            rgm = WGUtils.getRegionManagerWithPlayer((Player) p);
             w = ((Player) p).getWorld();
         } else {
             if (args.length != 5) {
@@ -61,7 +62,7 @@ class ArgAdminCleanup {
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
         // async cleanup task
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("disown"))) {
                 int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
 
@@ -94,9 +95,9 @@ class ArgAdminCleanup {
                     // remove region if there are no owners left
                     if (args[2].equalsIgnoreCase("remove") && region.getOwners().size() == 0) {
                         p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
-                        PSLocation psl = ProtectionStones.parsePSRegionToLocation(idname);
+                        PSLocation psl = WGUtils.parsePSRegionToLocation(idname);
                         Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
-                        Bukkit.getScheduler().runTask(ProtectionStones.getPlugin(), ()->blockToRemove.setType(Material.AIR));
+                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), ()->blockToRemove.setType(Material.AIR));
                         toRemove.add(idname);
                     }
                 }

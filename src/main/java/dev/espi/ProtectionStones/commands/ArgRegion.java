@@ -18,11 +18,17 @@ package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSLocation;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -41,10 +47,15 @@ public class ArgRegion implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.region")) {
             PSL.msg(p, PSL.NO_PERMISSION_REGION.msg());
@@ -56,12 +67,12 @@ public class ArgRegion implements PSCommandArg {
             return true;
         }
 
-        if (!ProtectionStones.nameToUUID.containsKey(args[2])) {
+        if (!UUIDCache.nameToUUID.containsKey(args[2])) {
             PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return true;
         }
 
-        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(ProtectionStones.nameToUUID.get(args[2])));
+        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[2])));
 
         if (args[1].equalsIgnoreCase("count")) { // count player's regions
             int count = ArgCount.countRegionsOfPlayer(lp, rgm);
@@ -108,17 +119,29 @@ public class ArgRegion implements PSCommandArg {
             }
 
             // Remove regions
-            for (String str : regionIDList) ProtectionStones.removeDisownPSRegion(lp, args[1].toLowerCase(), str, rgm, p.getWorld());
+            for (String str : regionIDList) {
+                ProtectedRegion region = rgm.getRegion(str);
+                switch (args[1].toLowerCase()) {
+                    case "disown":
+                        DefaultDomain owners = region.getOwners();
+                        owners.removePlayer(lp);
+                        region.setOwners(owners);
+                        break;
+                    case "remove":
+                        if (str.substring(0, 2).equals("ps")) {
+                            PSLocation psl = WGUtils.parsePSRegionToLocation(str);
+                            Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
+                            blockToRemove.setType(Material.AIR);
+                        }
+                        rgm.removeRegion(str);
+                        break;
+                }
+            }
 
             PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
         } else {
             PSL.msg(p, PSL.REGION_HELP.msg());
         }
         return true;
-    }
-
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
     }
 }

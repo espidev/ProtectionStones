@@ -19,6 +19,11 @@ public class ArgGet implements PSCommandArg {
     }
 
     @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
         if (!p.hasPermission("protectionstones.get")) {
@@ -44,18 +49,18 @@ public class ArgGet implements PSCommandArg {
         }
 
         // check if player has enough money
-        if (ProtectionStones.isVaultEnabled && !ProtectionStones.vaultEconomy.has(p, cp.price)) {
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && !ProtectionStones.vaultEconomy.has(p, cp.price)) {
             PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
             return true;
         }
 
         // debug message
-        if (!ProtectionStones.isVaultEnabled && cp.price != 0) {
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
             Bukkit.getLogger().info("Vault is not enabled but there is a price set on the protection stone! It will not work!");
         }
 
         // take money
-        if (ProtectionStones.isVaultEnabled) {
+        if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
             EconomyResponse er = ProtectionStones.vaultEconomy.withdrawPlayer(p, cp.price);
             if (!er.transactionSuccess()) {
                 PSL.msg(p, er.errorMessage);
@@ -74,8 +79,4 @@ public class ArgGet implements PSCommandArg {
         return true;
     }
 
-    @Override
-    public boolean allowNonPlayersToExecute() {
-        return false;
-    }
 }

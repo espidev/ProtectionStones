@@ -18,7 +18,7 @@ package dev.espi.ProtectionStones;
 
 public class PSLocation {
     public int x, y, z;
-    PSLocation(int x, int y, int z) {
+    public PSLocation(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;

@@ -21,25 +21,41 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class ArgView {
+public class ArgView implements PSCommandArg {
 
     private static List<UUID> cooldown = new ArrayList<>();
 
-    public static boolean argumentView(Player p, String[] args) {
-        String psID = ProtectionStones.playerToPSID(p);
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("view");
+    }
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
+
+        String psID = WGUtils.playerToPSID(p);
+
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.view")) {
             PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());
@@ -58,7 +74,7 @@ public class ArgView {
 
         // add player to cooldown
         cooldown.add(p.getUniqueId());
-        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getPlugin(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.configOptions.psViewCooldown);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.configOptions.psViewCooldown);
 
         BlockVector3 minVector = rgm.getRegion(psID).getMinimumPoint();
         BlockVector3 maxVector = rgm.getRegion(psID).getMaximumPoint();
@@ -76,7 +92,7 @@ public class ArgView {
 
         // send fake blocks to client
 
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
 
             List<Block> blocks = new ArrayList<>();
             // base lines
@@ -117,9 +133,9 @@ public class ArgView {
                 }
             }
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait);
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait);
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                 PSL.msg(p, PSL.VIEW_REMOVING.msg());
                 for (Block b : blocks) {
                     if (b.getWorld().isChunkLoaded(b.getLocation().getBlockX() / 16, b.getLocation().getBlockZ() / 16)) {
@@ -137,7 +153,7 @@ public class ArgView {
     }
 
     private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
-        Bukkit.getScheduler().runTaskLater(ProtectionStones.getPlugin(), () -> {
+        Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
             if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
                 restore.add(p.getWorld().getBlockAt(x, y, z));
                 p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);

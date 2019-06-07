@@ -27,6 +27,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.espi.ProtectionStones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -55,10 +56,10 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        ProtectionStones.uuidToName.remove(e.getPlayer().getUniqueId());
-        ProtectionStones.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
-        ProtectionStones.nameToUUID.remove(e.getPlayer().getName());
-        ProtectionStones.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+        UUIDCache.uuidToName.remove(e.getPlayer().getUniqueId());
+        UUIDCache.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        UUIDCache.nameToUUID.remove(e.getPlayer().getName());
+        UUIDCache.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -76,7 +77,7 @@ public class ListenerClass implements Listener {
         ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
         // check if player has toggled off placement of protection stones
-        if (ProtectionStones.toggleList.contains(p.getName())) return;
+        if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
@@ -85,11 +86,11 @@ public class ListenerClass implements Listener {
         if (e.getItemInHand().getItemMeta() != null) {
             CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
             try { // check if tag byte is 1
-                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.BYTE);
+                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
                 tag = isPSBlock != null && isPSBlock == 1;
             } catch (IllegalArgumentException es) {
                 try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
-                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.plugin, "isPSBlock"), ItemTagType.STRING);
+                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
                     tag = isPSBlock != null && isPSBlock.equals("true");
                 } catch (IllegalArgumentException ignored) {}
             }
@@ -104,7 +105,7 @@ public class ListenerClass implements Listener {
             return;
         }
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rm = regionContainer.get(BukkitAdapter.adapt(e.getPlayer().getWorld()));
 
@@ -293,7 +294,7 @@ public class ListenerClass implements Listener {
         // check if block broken is protection stone
         if (blockOptions == null) return;
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
 
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
@@ -402,7 +403,7 @@ public class ListenerClass implements Listener {
 
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 

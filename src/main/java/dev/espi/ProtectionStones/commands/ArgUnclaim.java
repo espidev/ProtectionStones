@@ -20,17 +20,36 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ArgUnclaim {
-    // /ps unclaim
-    public static boolean argumentUnclaim(Player p, String[] args) { // psID: id of the current region the player is in
-        String psID = ProtectionStones.playerToPSID(p);
+import java.util.Collections;
+import java.util.List;
 
-        WorldGuardPlugin wg = (WorldGuardPlugin) ProtectionStones.wgd;
-        RegionManager rgm = ProtectionStones.getRegionManagerWithPlayer(p);
+public class ArgUnclaim implements PSCommandArg {
+
+    // /ps unclaim
+
+    @Override
+    public List<String> getNames() {
+        return Collections.singletonList("unclaim");
+    }
+
+    @Override
+    public boolean allowNonPlayersToExecute() {
+        return false;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args) {
+        Player p = (Player) s;
+        String psID = WGUtils.playerToPSID(p); // id of the current region the player is in
+
+        WorldGuardPlugin wg = WorldGuardPlugin.inst();
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.unclaim")) {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
@@ -56,7 +75,7 @@ public class ArgUnclaim {
         }
 
         // check if block is hidden first
-        PSLocation psl = ProtectionStones.parsePSRegionToLocation(psID);
+        PSLocation psl = WGUtils.parsePSRegionToLocation(psID);
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
         String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
