@@ -50,8 +50,8 @@ public class LegacyUpgrade {
                         }
 
                         if (r.getFlag(FlagHandler.PS_HOME) == null) {
-                            if (ProtectionStones.isProtectBlock(material)) {
-                                ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(material);
+                            if (ProtectionStones.isProtectBlockType(material)) {
+                                PSProtectBlock cpb = ProtectionStones.getBlockOptions(material);
                                 r.setFlag(FlagHandler.PS_HOME, (psl.x + cpb.homeXOffset) + " " + (psl.y + cpb.homeYOffset) + " " + (psl.z + cpb.homeZOffset));
                             } else {
                                 r.setFlag(FlagHandler.PS_HOME, psl.x + " " + psl.y + " " + psl.z);

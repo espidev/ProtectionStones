@@ -23,7 +23,6 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
@@ -47,7 +46,7 @@ public class FlagHandler {
     }
 
     // Add the correct flags for the ps region
-    static void initCustomFlagsForPS(ProtectedRegion region, Block block, ConfigProtectBlock cpb) {
+    static void initCustomFlagsForPS(ProtectedRegion region, Block block, PSProtectBlock cpb) {
 
         String home = block.getLocation().getBlockX() + cpb.homeXOffset + " ";
         home += (block.getLocation().getBlockY() + cpb.homeYOffset) + " ";
@@ -58,7 +57,7 @@ public class FlagHandler {
     }
 
     // Initializes user defined default flags for block
-    static void initDefaultFlagsForBlock(ConfigProtectBlock b) {
+    static void initDefaultFlagsForBlock(PSProtectBlock b) {
         b.regionFlags = new HashMap<>();
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");

@@ -73,7 +73,7 @@ class ArgAdminHide {
                 if (args[1].equalsIgnoreCase("unhide")) {
                     Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToChange.setType(Material.getMaterial(mgr.getRegion(regionID).getFlag(FlagHandler.PS_BLOCK_MATERIAL))));
                 } else if (args[1].equalsIgnoreCase("hide")) {
-                    if (ProtectionStones.isProtectBlock(blockToChange.getType().toString())) {
+                    if (ProtectionStones.isProtectBlockType(blockToChange.getType().toString())) {
                         Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToChange.setType(Material.AIR));
                     }
                 }

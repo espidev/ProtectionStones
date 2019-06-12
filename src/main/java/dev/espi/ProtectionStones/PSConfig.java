@@ -22,16 +22,13 @@ import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -152,7 +149,7 @@ public class PSConfig {
                 if (updated) c.save();
 
                 // convert toml data into object
-                ConfigProtectBlock b = new ObjectConverter().toObject(c, ConfigProtectBlock::new);
+                PSProtectBlock b = new ObjectConverter().toObject(c, PSProtectBlock::new);
 
                 if (Material.getMaterial(b.type) == null) {
                     Bukkit.getLogger().info("Unrecognized material: " + b.type);

@@ -79,7 +79,7 @@ public class ArgUnclaim implements PSCommandArg {
         Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
 
         String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-        ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(type);
+        PSProtectBlock cpb = ProtectionStones.getBlockOptions(type);
 
         if (cpb == null || !cpb.noDrop) {
             // return protection stone

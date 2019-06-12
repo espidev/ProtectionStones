@@ -76,7 +76,7 @@ public class ArgHideUnhide implements PSCommandArg {
 
         Material currentType = blockToEdit.getType();
 
-        if (ProtectionStones.isProtectBlock(currentType.toString())) {
+        if (ProtectionStones.isProtectBlockType(currentType.toString())) {
             if (arg.equals("unhide")) {
                 PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;

@@ -150,7 +150,7 @@ public class ArgTp implements PSCommandArg {
             }
 
             ProtectedRegion r = rgm.getRegion(playerRegions.get(rgnum));
-            ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
+            PSProtectBlock cpb = ProtectionStones.getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
 
             // if the region does not have the ps-home flag, add it
             if (r.getFlag(FlagHandler.PS_HOME) == null) {

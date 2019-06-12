@@ -72,9 +72,9 @@ public class ListenerClass implements Listener {
         String blockType = b.getType().toString();
 
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlock(blockType)) return;
+        if (!ProtectionStones.isProtectBlockType(blockType)) return;
 
-        ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
@@ -289,7 +289,7 @@ public class ListenerClass implements Listener {
         Block pb = e.getBlock();
 
         String blockType = pb.getType().toString();
-        ConfigProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
 
         // check if block broken is protection stone
         if (blockOptions == null) return;
@@ -355,7 +355,7 @@ public class ListenerClass implements Listener {
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
-            ConfigProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
+            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
             if (cpb != null && rgm.getRegion("ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z") != null && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
@@ -371,7 +371,7 @@ public class ListenerClass implements Listener {
         for (int i = 0; i < e.blockList().size(); i++) {
             Block b = e.blockList().get(i);
 
-            if (ProtectionStones.isProtectBlock(b.getType().toString())) {
+            if (ProtectionStones.isProtectBlockType(b.getType().toString())) {
                 String id = "ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z";
                 if (rgm.getRegion(id) != null) {
                     if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {

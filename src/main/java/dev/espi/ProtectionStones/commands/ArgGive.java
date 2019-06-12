@@ -1,6 +1,6 @@
 package dev.espi.ProtectionStones.commands;
 
-import dev.espi.ProtectionStones.ConfigProtectBlock;
+import dev.espi.ProtectionStones.PSProtectBlock;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Bukkit;
@@ -40,7 +40,7 @@ public class ArgGive implements PSCommandArg {
         }
 
         // check if argument is valid block
-        ConfigProtectBlock cp = ProtectionStones.getProtectBlockFromName(args[1]);
+        PSProtectBlock cp = ProtectionStones.getProtectBlockFromAlias(args[1]);
         if (cp == null) {
             PSL.msg(p, PSL.INVALID_BLOCK.msg());
             return true;

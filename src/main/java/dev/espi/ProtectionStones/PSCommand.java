@@ -38,6 +38,10 @@ public class PSCommand extends Command {
 
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {
+        if (args.length == 0) { // no arguments
+            new ArgHelp().executeArgument(s, args);
+            return true;
+        }
         for (PSCommandArg command : ProtectionStones.getInstance().getCommandArguments()) {
             if (command.getNames().contains(args[0])) {
                 if (command.allowNonPlayersToExecute() || s instanceof Player) {

@@ -18,27 +18,18 @@ package dev.espi.ProtectionStones;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.domains.DefaultDomain;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.commands.PSCommandArg;
 import dev.espi.ProtectionStones.utils.UUIDCache;
-import dev.espi.ProtectionStones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandMap;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -50,15 +41,15 @@ public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
     static final int CONFIG_VERSION = 5;
 
-    private static List<PSCommandArg> commandArgs = new ArrayList<>();
-    private static ProtectionStones plugin;
-
     static File configLocation, blockDataFolder;
     static FileConfig config;
 
+    private static List<PSCommandArg> commandArgs = new ArrayList<>();
+    private static ProtectionStones plugin;
+
     // all configuration file options are stored in here
     private PSConfig configOptions;
-    static HashMap<String, ConfigProtectBlock> protectionStonesOptions = new HashMap<>();
+    static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
 
     // vault economy integration
     private boolean vaultSupportEnabled = false;
@@ -66,24 +57,33 @@ public class ProtectionStones extends JavaPlugin {
 
     public static List<UUID> toggleList = new ArrayList<>();
 
+    /**
+     * @return the plugin instance that is currently being used
+     */
     public static ProtectionStones getInstance() {
         return plugin;
     }
 
-    // Helper method to get the config options for a protection stone
-    // Makes code look cleaner
-    public static ConfigProtectBlock getBlockOptions(String blockType) {
+    /**
+     * Gets the config options for the protection block type specified.
+     * @param blockType the material type name (Bukkit) of the protect block to get the options for
+     * @return the config options for the protect block specified (null if not found)
+     */
+    public static PSProtectBlock getBlockOptions(String blockType) {
         return protectionStonesOptions.get(blockType);
     }
 
-    // Check if block material name is valid protection block
-    public static boolean isProtectBlock(String material) {
+    /**
+     * @param material material type to check (Bukkit material name)
+     * @return whether or not that material is being used for a protection block
+     */
+    public static boolean isProtectBlockType(String material) {
         return protectionStonesOptions.containsKey(material);
     }
 
     // Get block from name (including aliases)
-    public static ConfigProtectBlock getProtectBlockFromName(String name) {
-        for (ConfigProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
+    public static PSProtectBlock getProtectBlockFromAlias(String name) {
+        for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
             if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) {
                 return cpb;
             }
@@ -93,7 +93,6 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Add a command argument to /ps.
-     *
      * @param psca PSCommandArg object to be added
      */
     public void addCommandArgument(PSCommandArg psca) {
@@ -136,7 +135,7 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
-    public static ItemStack createProtectBlockItem(ConfigProtectBlock b) {
+    public static ItemStack createProtectBlockItem(PSProtectBlock b) {
         ItemStack is = new ItemStack(Material.getMaterial(b.type));
         ItemMeta im = is.getItemMeta();
 

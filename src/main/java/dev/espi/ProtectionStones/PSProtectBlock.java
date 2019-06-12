@@ -24,7 +24,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import java.util.HashMap;
 import java.util.List;
 
-public class ConfigProtectBlock {
+public class PSProtectBlock {
 
     /*
      * Object to represent a protection block as defined in config (blocks folder)
