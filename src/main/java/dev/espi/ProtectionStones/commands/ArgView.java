@@ -74,7 +74,7 @@ public class ArgView implements PSCommandArg {
 
         // add player to cooldown
         cooldown.add(p.getUniqueId());
-        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.configOptions.psViewCooldown);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.getInstance().getConfigOptions().psViewCooldown);
 
         BlockVector3 minVector = rgm.getRegion(psID).getMinimumPoint();
         BlockVector3 maxVector = rgm.getRegion(psID).getMaximumPoint();

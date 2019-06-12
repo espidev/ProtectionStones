@@ -119,10 +119,10 @@ public class ListenerClass implements Listener {
         }
 
         // check cooldown
-        if (ProtectionStones.configOptions.placingCooldown != -1) {
+        if (ProtectionStones.getInstance().getConfigOptions().placingCooldown != -1) {
             double currentTime = System.currentTimeMillis();
             if (lastProtectStonePlaced.containsKey(p)) {
-                double cooldown = ProtectionStones.configOptions.placingCooldown; // seconds
+                double cooldown = ProtectionStones.getInstance().getConfigOptions().placingCooldown; // seconds
                 double lastPlace = lastProtectStonePlaced.get(p); // milliseconds
 
                 if (lastPlace + cooldown * 1000 > currentTime) { // if cooldown has not been finished

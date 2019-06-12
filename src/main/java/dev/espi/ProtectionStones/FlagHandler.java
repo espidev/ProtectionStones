@@ -34,6 +34,7 @@ public class FlagHandler {
     public static final Flag<String> PS_HOME = new StringFlag("ps-home");
     public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
 
+    // called on initial start
     static void registerFlags() {
         FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
         try {

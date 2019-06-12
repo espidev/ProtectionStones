@@ -209,7 +209,7 @@ public enum PSL {
     private final String key;
     private String msg;
 
-    private static File conf = new File(ProtectionStones.getPlugin().getDataFolder(), "messages.yml");
+    private static File conf = new File(ProtectionStones.getInstance().getDataFolder(), "messages.yml");
     private static HashMap<String, String> keyToMsg = new HashMap<>();
 
     PSL(String path, String start) {
