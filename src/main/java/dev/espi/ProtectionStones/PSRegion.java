@@ -2,7 +2,9 @@ package dev.espi.ProtectionStones;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.ProtectionStones.event.PSRemoveEvent;
 import dev.espi.ProtectionStones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -74,14 +76,23 @@ public class PSRegion {
     }
 
     /**
-     * Deletes the region forever.
+     * Deletes the region forever. Can be cancelled by event cancellation.
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
+     * @returns whether or not the region was able to be successfully removed
      */
-    public void deleteRegion(boolean deleteBlock) {
+    public boolean deleteRegion(boolean deleteBlock) {
+
+        PSRemoveEvent event = new PSRemoveEvent(this);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) { // if event was cancelled, prevent execution
+            return false;
+        }
+
         if (deleteBlock &&!this.isHidden()) {
             this.getProtectBlock().setType(Material.AIR);
         }
         rgmanager.removeRegion(wgregion.getId());
+        return true;
     }
 
     /**

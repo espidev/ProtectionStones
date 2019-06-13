@@ -81,7 +81,13 @@ public class ArgUnclaim implements PSCommandArg {
         String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
         PSProtectBlock cpb = ProtectionStones.getBlockOptions(type);
 
-        if (cpb == null || !cpb.noDrop) {
+        // remove region
+        // check if removing the region and firing region remove event blocked it
+        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, psID, p)) {
+            return true;
+        }
+
+        if (cpb != null && !cpb.noDrop) {
             // return protection stone
             if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
                 // method will return not empty if item couldn't be added
@@ -95,8 +101,6 @@ public class ArgUnclaim implements PSCommandArg {
             blockToUnhide.setType(Material.AIR);
         }
 
-        // remove region
-        rgm.removeRegion(psID);
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
         return true;

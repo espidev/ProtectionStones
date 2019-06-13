@@ -133,7 +133,11 @@ public class ArgRegion implements PSCommandArg {
                             Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
                             blockToRemove.setType(Material.AIR);
                         }
-                        rgm.removeRegion(str);
+                        // remove region
+                        // check if removing the region and firing region remove event blocked it
+                        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, str, p)) {
+                            return true;
+                        }
                         break;
                 }
             }

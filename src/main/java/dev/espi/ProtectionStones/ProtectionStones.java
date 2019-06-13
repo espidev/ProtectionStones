@@ -19,8 +19,10 @@ package dev.espi.ProtectionStones;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.commands.PSCommandArg;
+import dev.espi.ProtectionStones.event.PSRemoveEvent;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
@@ -81,7 +83,53 @@ public class ProtectionStones extends JavaPlugin {
         return protectionStonesOptions.containsKey(material);
     }
 
-    // Get block from name (including aliases)
+    /**
+     * Removes a protection stone region given its ID, and the region manager it is stored in
+     * Note: Does not remove the PS block.
+     * @param w the world that the region is in
+     * @param rgm the region manager the region is stored in
+     * @param psID the worldguard region ID of the region
+     * @return whether or not the event was cancelled
+     */
+    public static boolean removePSRegion(World w, RegionManager rgm, String psID) {
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm, rgm.getRegion(psID)));
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+        rgm.removeRegion(psID);
+        return true;
+    }
+
+    /**
+     * Removes a protection stone region given its ID, and the region manager it is stored in, with a player as its cause
+     * Note: Does not remove the PS block.
+     * @param w the world that the region is in
+     * @param rgm the region manager the region is stored in
+     * @param psID the worldguard region ID of the region
+     * @param cause the player that caused the removal
+     * @return whether or not the event was cancelled
+     */
+    public static boolean removePSRegion(World w, RegionManager rgm, String psID, Player cause) {
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm, rgm.getRegion(psID)), cause);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+        rgm.removeRegion(psID);
+        return true;
+    }
+
+    // TODO
+    public static PSRegion getPSRegionFromWGRegion(World w, RegionManager rgm, ProtectedRegion region) {
+        return new PSRegion(region, rgm, w);
+    }
+
+    /**
+     * Get the config options for a protect block based on its alias
+     * @param name the alias fo the protection block
+     * @return the protect block options, or null if it wasn't found
+     */
     public static PSProtectBlock getProtectBlockFromAlias(String name) {
         for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
             if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) {

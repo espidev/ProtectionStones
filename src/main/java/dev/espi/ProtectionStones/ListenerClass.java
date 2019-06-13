@@ -341,9 +341,13 @@ public class ListenerClass implements Listener {
             }
         }
 
+        // check if removing the region and firing region remove event blocked it
+        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, id, p)) {
+            return;
+        }
+
         // remove block
         pb.setType(Material.AIR);
-        rgm.removeRegion(id);
 
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
@@ -380,7 +384,10 @@ public class ListenerClass implements Listener {
                         i--;
                     } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
                         // remove region from worldguard if destroy_region_when_explode is enabled
-                        rgm.removeRegion(id);
+                        // check if removing the region and firing region remove event blocked it
+                        if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), rgm, id)) {
+                            return;
+                        }
                     }
                 }
             }
