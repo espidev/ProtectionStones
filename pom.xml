@@ -2,10 +2,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.espi</groupId>
-    <artifactId>ProtectionStones</artifactId>
+    <artifactId>protectionstones</artifactId>
     <version>2.1.0</version>
     <name>ProtectionStones</name>
-    <description>A grief prevention plugin.</description>
+    <description>A grief prevention plugin for Spigot Minecraft servers.</description>
+    <url>https://github.com/espidev/ProtectionStones</url>
+
+    <licenses>
+      <license>
+        <name>The Apache License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+    </licenses>
+
+    <developers>
+      <developer>
+        <name>Devin Lin</name>
+        <email>espidev@gmail.com</email>
+        <organization>EstiNet</organization>
+        <organizationUrl>https://estinet.net</organizationUrl>
+      </developer>
+    </developers>
+
+    <scm>
+      <connection>scm:git:git://github.com/espidev/ProtectionStones.git</connection>
+      <developerConnection>scm:git:ssh://github.com:espidev/ProtectionStones.git</developerConnection>
+      <url>http://github.com/espidev/ProtectionStones/tree/master</url>
+    </scm>
 
     <build>
         <resources>
