@@ -1,4 +1,4 @@
-This project was forked from https://github.com/vik1395/ProtectionStones-Minecraft.
+This project was originally forked from https://github.com/vik1395/ProtectionStones-Minecraft.
 
 ProtectionStones is a grief prevention and land claiming plugin.
 
