@@ -83,7 +83,7 @@ public class ArgUnclaim implements PSCommandArg {
 
         // remove region
         // check if removing the region and firing region remove event blocked it
-        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, psID, p)) {
+        if (!ProtectionStones.removePSRegion(p.getWorld(), psID, p)) {
             return true;
         }
 

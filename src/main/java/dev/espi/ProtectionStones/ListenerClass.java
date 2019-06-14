@@ -27,6 +27,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.espi.ProtectionStones.event.PSCreateEvent;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -69,34 +70,16 @@ public class ListenerClass implements Listener {
         Player p = e.getPlayer();
         Block b = e.getBlock();
 
-        String blockType = b.getType().toString();
-
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlockType(blockType)) return;
-
-        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
-
-        // check if player has toggled off placement of protection stones
-        if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
+        if (!ProtectionStones.isProtectBlockType(b.getType().toString())) return;
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b.getType().toString());
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
-        boolean tag = false;
+        if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(e.getItemInHand(), true)) return;
 
-        if (e.getItemInHand().getItemMeta() != null) {
-            CustomItemTagContainer tagContainer = e.getItemInHand().getItemMeta().getCustomTagContainer();
-            try { // check if tag byte is 1
-                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
-                tag = isPSBlock != null && isPSBlock == 1;
-            } catch (IllegalArgumentException es) {
-                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
-                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
-                    tag = isPSBlock != null && isPSBlock.equals("true");
-                } catch (IllegalArgumentException ignored) {}
-            }
-        }
-
-        if (blockOptions.restrictObtaining && !tag) return;
+        // check if player has toggled off placement of protection stones
+        if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
 
         // check permission
         if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
@@ -105,14 +88,12 @@ public class ListenerClass implements Listener {
             return;
         }
 
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager rm = regionContainer.get(BukkitAdapter.adapt(e.getPlayer().getWorld()));
+        RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(e.getPlayer().getWorld()));
 
-        LocalPlayer lp = wg.wrapPlayer(p);
+        LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
 
         // check if player can place block in that area
-        if (!wg.createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
+        if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
             PSL.msg(p, PSL.CANT_PROTECT_THAT.msg());
             e.setCancelled(true);
             return;
@@ -139,28 +120,13 @@ public class ListenerClass implements Listener {
         // non-admin checks
         if (!p.hasPermission("protectionstones.admin")) {
 
-            HashMap<String, Integer> regionLimits = new HashMap<>(), regionFound = new HashMap<>();
-
-            int maxPS = 0;
             // check if player has limit on protection stones
-            for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
-                String perm = rawperm.getPermission();
-                if (perm.startsWith("protectionstones.limit")) {
-                    String[] spl = perm.split("\\.");
-                    if (spl.length == 3) {
-                        try {
-                            maxPS = Math.max(maxPS, Integer.parseInt(spl[2].trim()));
-                        } catch (Exception er) {
-                            maxPS = 0;
-                        }
-                    } else if (spl.length == 4) {
-                        regionLimits.put(spl[2], Integer.parseInt(spl[3]));
-                    }
-                }
-            }
+            HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerPSBlockLimits(p);
+            int maxPS = ProtectionStones.getPlayerPSGlobalBlockLimits(p);
 
-            if (maxPS != 0 || !regionLimits.isEmpty()) { // only check if limit was found
+            if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
                 // count player's protection stones
+                HashMap<String, Integer> regionFound = new HashMap<>();
                 int total = 0;
                 for (World w : Bukkit.getWorlds()) {
                     RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
@@ -180,8 +146,8 @@ public class ListenerClass implements Listener {
                     return;
                 }
 
-                for (String ps : regionLimits.keySet()) {
-                    if (regionFound.containsKey(ps) && regionLimits.get(ps) <= regionFound.get(ps)) {
+                for (PSProtectBlock ps : regionLimits.keySet()) {
+                    if (regionFound.containsKey(ps.type) && regionLimits.get(ps) <= regionFound.get(ps.type)) {
                         PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg());
                         e.setCancelled(true);
                         return;
@@ -236,6 +202,15 @@ public class ListenerClass implements Listener {
         region.getOwners().addPlayer(p.getUniqueId());
 
         rm.addRegion(region);
+
+        // fire event and check if cancelled
+        PSCreateEvent event = new PSCreateEvent(ProtectionStones.getPSRegionFromWGRegion(p.getWorld(), region), p);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            e.setCancelled(true);
+            rm.removeRegion(id);
+            return;
+        }
 
         // check if new region overlaps more powerful region
         if (rm.overlapsUnownedRegion(region, lp)) {
@@ -342,7 +317,7 @@ public class ListenerClass implements Listener {
         }
 
         // check if removing the region and firing region remove event blocked it
-        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, id, p)) {
+        if (!ProtectionStones.removePSRegion(p.getWorld(), id, p)) {
             return;
         }
 
@@ -385,7 +360,7 @@ public class ListenerClass implements Listener {
                     } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
                         // remove region from worldguard if destroy_region_when_explode is enabled
                         // check if removing the region and firing region remove event blocked it
-                        if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), rgm, id)) {
+                        if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), id)) {
                             return;
                         }
                     }
@@ -414,7 +389,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
-        // check if player can teleport into region (no region with dev.espi.ProtectionStones.commandspreventTeleportIn = true)
+        // check if player can teleport into region (no region with preventTeleportIn = true)
         ApplicableRegionSet regions = rgm.getApplicableRegions(v);
         if (regions.getRegions().isEmpty()) return;
         boolean foundNoTeleport = false;

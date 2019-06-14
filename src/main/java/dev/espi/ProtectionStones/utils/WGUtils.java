@@ -6,6 +6,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSLocation;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -13,6 +14,10 @@ import java.util.List;
 public class WGUtils {
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    }
+
+    public static RegionManager getRegionManagerWithWorld(World w){
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z)

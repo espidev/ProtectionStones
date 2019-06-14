@@ -19,11 +19,13 @@ package dev.espi.ProtectionStones;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.commands.PSCommandArg;
 import dev.espi.ProtectionStones.event.PSRemoveEvent;
 import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
@@ -31,7 +33,9 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.inventory.meta.tags.ItemTagType;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -59,88 +63,11 @@ public class ProtectionStones extends JavaPlugin {
 
     public static List<UUID> toggleList = new ArrayList<>();
 
-    /**
-     * @return the plugin instance that is currently being used
-     */
-    public static ProtectionStones getInstance() {
-        return plugin;
-    }
-
-    /**
-     * Gets the config options for the protection block type specified.
-     * @param blockType the material type name (Bukkit) of the protect block to get the options for
-     * @return the config options for the protect block specified (null if not found)
-     */
-    public static PSProtectBlock getBlockOptions(String blockType) {
-        return protectionStonesOptions.get(blockType);
-    }
-
-    /**
-     * @param material material type to check (Bukkit material name)
-     * @return whether or not that material is being used for a protection block
-     */
-    public static boolean isProtectBlockType(String material) {
-        return protectionStonesOptions.containsKey(material);
-    }
-
-    /**
-     * Removes a protection stone region given its ID, and the region manager it is stored in
-     * Note: Does not remove the PS block.
-     * @param w the world that the region is in
-     * @param rgm the region manager the region is stored in
-     * @param psID the worldguard region ID of the region
-     * @return whether or not the event was cancelled
-     */
-    public static boolean removePSRegion(World w, RegionManager rgm, String psID) {
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm, rgm.getRegion(psID)));
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-        rgm.removeRegion(psID);
-        return true;
-    }
-
-    /**
-     * Removes a protection stone region given its ID, and the region manager it is stored in, with a player as its cause
-     * Note: Does not remove the PS block.
-     * @param w the world that the region is in
-     * @param rgm the region manager the region is stored in
-     * @param psID the worldguard region ID of the region
-     * @param cause the player that caused the removal
-     * @return whether or not the event was cancelled
-     */
-    public static boolean removePSRegion(World w, RegionManager rgm, String psID, Player cause) {
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm, rgm.getRegion(psID)), cause);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-        rgm.removeRegion(psID);
-        return true;
-    }
-
-    // TODO
-    public static PSRegion getPSRegionFromWGRegion(World w, RegionManager rgm, ProtectedRegion region) {
-        return new PSRegion(region, rgm, w);
-    }
-
-    /**
-     * Get the config options for a protect block based on its alias
-     * @param name the alias fo the protection block
-     * @return the protect block options, or null if it wasn't found
-     */
-    public static PSProtectBlock getProtectBlockFromAlias(String name) {
-        for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
-            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) {
-                return cpb;
-            }
-        }
-        return null;
-    }
+    /* ~~~~~~~~~~ Instance methods ~~~~~~~~~~~~ */
 
     /**
      * Add a command argument to /ps.
+     *
      * @param psca PSCommandArg object to be added
      */
     public void addCommandArgument(PSCommandArg psca) {
@@ -182,10 +109,146 @@ public class ProtectionStones extends JavaPlugin {
         this.configOptions = conf;
     }
 
+
+    /* ~~~~~~~~~~ Static methods ~~~~~~~~~~~~~~ */
+
+    /**
+     * @return the plugin instance that is currently being used
+     */
+    public static ProtectionStones getInstance() {
+        return plugin;
+    }
+
+    /**
+     * Gets the config options for the protection block type specified.
+     *
+     * @param blockType the material type name (Bukkit) of the protect block to get the options for
+     * @return the config options for the protect block specified (null if not found)
+     */
+    public static PSProtectBlock getBlockOptions(String blockType) {
+        return protectionStonesOptions.get(blockType);
+    }
+
+    /**
+     * @param material material type to check (Bukkit material name)
+     * @return whether or not that material is being used for a protection block
+     */
+    public static boolean isProtectBlockType(String material) {
+        return protectionStonesOptions.containsKey(material);
+    }
+
+    /**
+     * Removes a protection stone region given its ID, and the region manager it is stored in
+     * Note: Does not remove the PS block.
+     *
+     * @param w    the world that the region is in
+     * @param psID the worldguard region ID of the region
+     * @return whether or not the event was cancelled
+     */
+    public static boolean removePSRegion(World w, String psID) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm.getRegion(psID)));
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+        rgm.removeRegion(psID);
+        return true;
+    }
+
+    /**
+     * Removes a protection stone region given its ID, and the region manager it is stored in, with a player as its cause
+     * Note: Does not remove the PS block, and does not check if the player (cause) has permission to do this.
+     *
+     * @param w     the world that the region is in
+     * @param psID  the worldguard region ID of the region
+     * @param cause the player that caused the removal
+     * @return whether or not the event was cancelled
+     */
+    public static boolean removePSRegion(World w, String psID, Player cause) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm.getRegion(psID)), cause);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+        rgm.removeRegion(psID);
+        return true;
+    }
+
+    /**
+     * Get a PSRegion object from a WorldGuard protected region
+     *
+     * @param w      world that the worldguard region is in
+     * @param region worldguard region
+     * @return a PSRegion object if it is a protectionstones region, and null if it isn't
+     */
+    public static PSRegion getPSRegionFromWGRegion(World w, ProtectedRegion region) {
+        if (region.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
+            return new PSRegion(region, WGUtils.getRegionManagerWithWorld(w), w);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the config options for a protect block based on its alias
+     *
+     * @param name the alias fo the protection block
+     * @return the protect block options, or null if it wasn't found
+     */
+    public static PSProtectBlock getProtectBlockFromAlias(String name) {
+        for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
+            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) return cpb;
+        }
+        return null;
+    }
+
+    /**
+     * Check if an item is a valid protection block, and if it was created by ProtectionStones. Be aware that some
+     * users of the plugin may have restrict-obtaining off, meaning that they ignore whether or not the item is created by
+     * protection stones (in this case have checkNBT false).
+     *
+     * @param item     the item to check
+     * @param checkNBT whether or not to check if the plugin signed off on the item (restrict-obtaining)
+     * @return whether or not the item is a valid protection block item, and was created by protection stones
+     */
+    public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
+        if (!ProtectionStones.isProtectBlockType(item.getType().toString())) return false;
+        if (!checkNBT) return true; // if not checking nbt, you only need to check type
+
+        boolean tag = false;
+
+        // otherwise, check if the item was created by protection stones (stored in custom tag)
+        if (item.getItemMeta() != null) {
+            CustomItemTagContainer tagContainer = item.getItemMeta().getCustomTagContainer();
+            try { // check if tag byte is 1
+                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
+                tag = isPSBlock != null && isPSBlock == 1;
+            } catch (IllegalArgumentException es) {
+                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
+                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
+                    tag = isPSBlock != null && isPSBlock.equals("true");
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        return tag; // whether or not the nbt tag was found
+    }
+
+    /**
+     * Get a protection block item from a protect block config object.
+     *
+     * @param b the config options for the protection block
+     * @return the item with NBT and other metdata to signify that it was created by protection stones
+     */
+
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
         ItemStack is = new ItemStack(Material.getMaterial(b.type));
         ItemMeta im = is.getItemMeta();
+        assert im != null;
 
         if (!b.displayName.equals("")) {
             im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
@@ -199,6 +262,51 @@ public class ProtectionStones extends JavaPlugin {
 
         is.setItemMeta(im);
         return is;
+    }
+
+    /**
+     * Get a player's permission limits for each protection block (protectionstones.limit.alias.x)
+     * Protection blocks that aren't specified in the player's permissions will not be returned in the map.
+     *
+     * @param p player to look for limits on
+     * @return a hashmap containing a psprotectblock object to an integer, which is the number of protection regions of that type the player is allowed to place
+     */
+
+    public static HashMap<PSProtectBlock, Integer> getPlayerPSBlockLimits(Player p) {
+        HashMap<PSProtectBlock, Integer> regionLimits = new HashMap<>();
+        for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
+            String perm = rawperm.getPermission();
+            if (perm.startsWith("protectionstones.limit")) {
+                String[] spl = perm.split("\\.");
+                if (spl.length == 4) {
+                    regionLimits.put(ProtectionStones.getProtectBlockFromAlias(spl[2]), Integer.parseInt(spl[3]));
+                }
+            }
+        }
+        return regionLimits;
+    }
+
+    /**
+     * Get a player's total protection limit from permission (protectionstones.limit.x)
+     *
+     * @param p the player to look for limits on
+     * @return the number of protection regions the player can have, or -1 if there is no limit set.
+     */
+
+    public static int getPlayerPSGlobalBlockLimits(Player p) {
+        int max = -1;
+        for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
+            String perm = rawperm.getPermission();
+            if (perm.startsWith("protectionstones.limit")) {
+                String[] spl = perm.split("\\.");
+                if (spl.length == 3) {
+                    try {
+                        max = Math.max(max, Integer.parseInt(spl[2]));
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }
+        return max;
     }
 
     // called on first start, and /ps reload

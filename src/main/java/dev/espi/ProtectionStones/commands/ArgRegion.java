@@ -135,7 +135,7 @@ public class ArgRegion implements PSCommandArg {
                         }
                         // remove region
                         // check if removing the region and firing region remove event blocked it
-                        if (!ProtectionStones.removePSRegion(p.getWorld(), rgm, str, p)) {
+                        if (!ProtectionStones.removePSRegion(p.getWorld(), str, p)) {
                             return true;
                         }
                         break;

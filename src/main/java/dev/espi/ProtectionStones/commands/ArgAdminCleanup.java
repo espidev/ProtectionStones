@@ -105,7 +105,7 @@ class ArgAdminCleanup {
                 for (String r : toRemove) {
                     // remove region
                     // check if removing the region and firing region remove event blocked it
-                    if (!ProtectionStones.removePSRegion(w, rgm, r)) {
+                    if (!ProtectionStones.removePSRegion(w, r)) {
                         return;
                     }
                 }
