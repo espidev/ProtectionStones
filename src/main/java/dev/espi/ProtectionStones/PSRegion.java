@@ -82,7 +82,7 @@ public class PSRegion {
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
-     * @returns whether or not the region was able to be successfully removed
+     * @return whether or not the region was able to be successfully removed
      */
     public boolean deleteRegion(boolean deleteBlock) {
 
