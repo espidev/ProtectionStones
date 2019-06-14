@@ -12,6 +12,10 @@ import org.bukkit.block.Block;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * Represents an instance of a protectionstones protected region.
+ */
+
 public class PSRegion {
     private ProtectedRegion wgregion;
     private RegionManager rgmanager;

@@ -24,11 +24,12 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import java.util.HashMap;
 import java.util.List;
 
-public class PSProtectBlock {
+/**
+ * Object to represent a protection block as defined in config (blocks folder). The fields are the exact same as
+ * the ones in the config.
+ */
 
-    /*
-     * Object to represent a protection block as defined in config (blocks folder)
-     */
+public class PSProtectBlock {
 
     // Annotations are for types that have names that aren't the same as the config name
     // Check here for help: https://github.com/TheElectronWill/Night-Config

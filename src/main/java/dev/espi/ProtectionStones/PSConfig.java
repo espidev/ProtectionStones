@@ -34,6 +34,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Represents the global config (config.toml) settings.
+ */
+
 public class PSConfig {
 
     // config options

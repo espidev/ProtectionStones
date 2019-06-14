@@ -6,6 +6,10 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Event that is called when a protectionstones region is created, either by a player, or by the plugin.
+ */
+
 public class PSCreateEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 

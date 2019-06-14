@@ -43,6 +43,12 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 
+
+/**
+ * The base class for the plugin. Some utilities are static, and others are instance methods, so they need to
+ * be accessed through getInstance().
+ */
+
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
     static final int CONFIG_VERSION = 5;
@@ -181,7 +187,7 @@ public class ProtectionStones extends JavaPlugin {
      *
      * @param w      world that the worldguard region is in
      * @param region worldguard region
-     * @return a PSRegion object if it is a protectionstones region, and null if it isn't
+     * @return a {@link PSRegion} object if it is a protectionstones region, and null if it isn't
      */
     public static PSRegion getPSRegionFromWGRegion(World w, ProtectedRegion region) {
         if (region.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
