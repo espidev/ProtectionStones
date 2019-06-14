@@ -20,6 +20,7 @@ import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.conversion.SpecDoubleInRange;
 import com.electronwill.nightconfig.core.conversion.SpecIntInRange;
 import com.sk89q.worldguard.protection.flags.Flag;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -105,4 +106,13 @@ public class PSProtectBlock {
 
     // non-config items
     public HashMap<Flag<?>, Object> regionFlags = new HashMap<>();
+
+    /**
+     * Get the protection block item for this specific protection block.
+     *
+     * @return the item with NBT and other metadata to signify that it was created by protection stones
+     */
+    public ItemStack createItem() {
+        return ProtectionStones.createProtectBlockItem(this);
+    }
 }

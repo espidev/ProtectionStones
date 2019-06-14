@@ -5,6 +5,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
@@ -30,26 +31,24 @@ public class ArgSethome implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.sethome")) {
             PSL.msg(p, PSL.NO_PERMISSION_SETHOME.msg());
             return true;
         }
-        if (psID.equals("") || !rgm.hasRegion(psID)) {
+        if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        ProtectedRegion r = rgm.getRegion(psID);
-        if (ProtectionStones.hasNoAccess(r, p, wg.wrapPlayer(p), false)) {
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
 
-        r.setFlag(FlagHandler.PS_HOME, p.getLocation().getBlockX() + " " + p.getLocation().getBlockY() + " " + p.getLocation().getBlockZ());
-        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", psID));
+        r.setHome(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
+        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getID()));
         return true;
     }
 }

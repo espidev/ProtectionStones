@@ -31,7 +31,6 @@ import dev.espi.ProtectionStones.event.PSCreateEvent;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -45,9 +44,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
-import org.bukkit.inventory.meta.tags.ItemTagType;
-import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -121,8 +117,8 @@ public class ListenerClass implements Listener {
         if (!p.hasPermission("protectionstones.admin")) {
 
             // check if player has limit on protection stones
-            HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerPSBlockLimits(p);
-            int maxPS = ProtectionStones.getPlayerPSGlobalBlockLimits(p);
+            HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerRegionLimits(p);
+            int maxPS = ProtectionStones.getPlayerGlobalRegionLimits(p);
 
             if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
                 // count player's protection stones

@@ -3,7 +3,9 @@ package dev.espi.ProtectionStones.utils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSLocation;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -28,23 +30,24 @@ public class WGUtils {
         return new PSLocation(psx, psy, psz);
     }
 
-    // Find the id of the current region the player is in and get WorldGuard player object for use later
-    public static String playerToPSID(Player p) {
-        BlockVector3 v = BlockVector3.at(p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
+    public static String matchLocationToPSID(Location l) {
+        BlockVector3 v = BlockVector3.at(l.getX(), l.getY(), l.getZ());
         String currentPSID = "";
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
         if (idList.size() == 1) {
-            if (idList.get(0).startsWith("ps")) currentPSID = idList.get(0);
+            if (idList.get(0).startsWith("ps") && rgm.getRegion(idList.get(0)).getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
+                currentPSID = idList.get(0);
+            }
         } else {
             // Get nearest protection stone if in overlapping region
-            double distanceToPS = 10000D, tempToPS;
+            double distanceToPS = -1, tempToPS;
             for (String currentID : idList) {
-                if (currentID.substring(0, 2).equals("ps")) {
+                if (currentID.startsWith("ps") && rgm.getRegion(currentID).getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
                     PSLocation psl = WGUtils.parsePSRegionToLocation(currentID);
-                    Location psLocation = new Location(p.getWorld(), psl.x, psl.y, psl.z);
-                    tempToPS = p.getLocation().distance(psLocation);
-                    if (tempToPS < distanceToPS) {
+                    Location psLocation = new Location(l.getWorld(), psl.x, psl.y, psl.z);
+                    tempToPS = l.distance(psLocation);
+                    if (distanceToPS == -1 || tempToPS < distanceToPS) {
                         distanceToPS = tempToPS;
                         currentPSID = currentID;
                     }
@@ -52,5 +55,10 @@ public class WGUtils {
             }
         }
         return currentPSID;
+    }
+
+    // Find the id of the current region the player is in
+    public static String playerToPSID(Player p) {
+        return matchLocationToPSID(p.getLocation());
     }
 }

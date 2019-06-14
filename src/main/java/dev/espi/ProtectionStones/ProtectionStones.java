@@ -16,10 +16,11 @@
 
 package dev.espi.ProtectionStones;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.commands.PSCommandArg;
@@ -144,6 +145,23 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
+     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
+     * @param l the location
+     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     */
+    public static PSRegion getPSRegion(Location l) {
+        checkNotNull(checkNotNull(l).getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        String psID = WGUtils.matchLocationToPSID(l);
+        ProtectedRegion r = rgm.getRegion(psID);
+        if (r == null) {
+            return null;
+        } else {
+            return new PSRegion(r, rgm, l.getWorld());
+        }
+    }
+
+    /**
      * Removes a protection stone region given its ID, and the region manager it is stored in
      * Note: Does not remove the PS block.
      *
@@ -152,8 +170,8 @@ public class ProtectionStones extends JavaPlugin {
      * @return whether or not the event was cancelled
      */
     public static boolean removePSRegion(World w, String psID) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm.getRegion(psID)));
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, checkNotNull(rgm.getRegion(psID))));
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return false;
@@ -172,8 +190,8 @@ public class ProtectionStones extends JavaPlugin {
      * @return whether or not the event was cancelled
      */
     public static boolean removePSRegion(World w, String psID, Player cause) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, rgm.getRegion(psID)), cause);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
+        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, checkNotNull(rgm.getRegion(psID))), cause);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return false;
@@ -247,7 +265,7 @@ public class ProtectionStones extends JavaPlugin {
      * Get a protection block item from a protect block config object.
      *
      * @param b the config options for the protection block
-     * @return the item with NBT and other metdata to signify that it was created by protection stones
+     * @return the item with NBT and other metadata to signify that it was created by protection stones
      */
 
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
@@ -278,7 +296,7 @@ public class ProtectionStones extends JavaPlugin {
      * @return a hashmap containing a psprotectblock object to an integer, which is the number of protection regions of that type the player is allowed to place
      */
 
-    public static HashMap<PSProtectBlock, Integer> getPlayerPSBlockLimits(Player p) {
+    public static HashMap<PSProtectBlock, Integer> getPlayerRegionLimits(Player p) {
         HashMap<PSProtectBlock, Integer> regionLimits = new HashMap<>();
         for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
             String perm = rawperm.getPermission();
@@ -299,7 +317,7 @@ public class ProtectionStones extends JavaPlugin {
      * @return the number of protection regions the player can have, or -1 if there is no limit set.
      */
 
-    public static int getPlayerPSGlobalBlockLimits(Player p) {
+    public static int getPlayerGlobalRegionLimits(Player p) {
         int max = -1;
         for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
             String perm = rawperm.getPermission();
@@ -308,7 +326,8 @@ public class ProtectionStones extends JavaPlugin {
                 if (spl.length == 3) {
                     try {
                         max = Math.max(max, Integer.parseInt(spl[2]));
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             }
         }

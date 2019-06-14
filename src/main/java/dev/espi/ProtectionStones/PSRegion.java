@@ -5,6 +5,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.event.PSRemoveEvent;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -35,10 +36,72 @@ public class PSRegion {
     }
 
     /**
+     * Get the WorldGuard ID of the region. Note that this is not guaranteed to be unique between worlds.
+     * @return the id of the region
+     */
+    public String getID() {
+        return wgregion.getId();
+    }
+
+    /**
+     * Get the location of the set home the region has (for /ps tp).
+     * @return the location of the home, or null if the ps_home flag is not set.
+     */
+    public Location getHome() {
+        String oPos = wgregion.getFlag(FlagHandler.PS_HOME);
+        if (oPos == null) return null;
+        String[] pos = oPos.split(" ");
+        return new Location(world, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+    }
+
+    /**
+     * Set the home of the region (internally changes the flag).
+     * @param blockX block x location
+     * @param blockY block y location
+     * @param blockZ block z location
+     */
+    public void setHome(int blockX, int blockY, int blockZ) {
+        wgregion.setFlag(FlagHandler.PS_HOME, blockX + " " + blockY + " " + blockZ);
+    }
+
+    /**
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {
         return this.getProtectBlock().getType().toString().equals(this.getType());
+    }
+
+    /**
+     * Hides the protection block, if it is not hidden.
+     * @return whether or not the block was hidden
+     */
+    public boolean hide() {
+        if (!isHidden()) {
+            getProtectBlock().setType(Material.AIR);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Unhides the protection block, if it is hidden.
+     * @return whether or not the block was unhidden
+     */
+    public boolean unhide() {
+        if (isHidden()) {
+            getProtectBlock().setType(Material.getMaterial(getType()));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Toggle whether or not the protection block is hidden.
+     */
+    public void toggleHide() {
+        if (!hide()) unhide();
     }
 
     /**
@@ -92,7 +155,7 @@ public class PSRegion {
             return false;
         }
 
-        if (deleteBlock &&!this.isHidden()) {
+        if (deleteBlock && !this.isHidden()) {
             this.getProtectBlock().setType(Material.AIR);
         }
         rgmanager.removeRegion(wgregion.getId());

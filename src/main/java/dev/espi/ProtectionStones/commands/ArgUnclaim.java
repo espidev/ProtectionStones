@@ -46,47 +46,30 @@ public class ArgUnclaim implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p); // id of the current region the player is in
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         if (!p.hasPermission("protectionstones.unclaim")) {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
-        if (psID.equals("")) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            return true;
-        }
-        ProtectedRegion region = rgm.getRegion(psID);
-
-        if (region == null) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            return true;
-        }
-        if (!psID.substring(0, 2).equals("ps")) {
+        if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
 
-        if (!region.isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.getWGRegion().isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return true;
         }
 
-        // check if block is hidden first
-        PSLocation psl = WGUtils.parsePSRegionToLocation(psID);
-        Block blockToUnhide = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-
-        String type = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-        PSProtectBlock cpb = ProtectionStones.getBlockOptions(type);
-
         // remove region
         // check if removing the region and firing region remove event blocked it
-        if (!ProtectionStones.removePSRegion(p.getWorld(), psID, p)) {
+        if (!r.deleteRegion(true)) {
             return true;
         }
 
+        PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
             if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
@@ -94,11 +77,6 @@ public class ArgUnclaim implements PSCommandArg {
                 PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
             }
-        }
-
-        // remove block if ps is unhidden
-        if (region.getFlag(FlagHandler.PS_BLOCK_MATERIAL).equalsIgnoreCase(blockToUnhide.getType().toString())) {
-            blockToUnhide.setType(Material.AIR);
         }
 
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
