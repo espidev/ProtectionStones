@@ -70,7 +70,7 @@ public class PSRegion {
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {
-        return this.getProtectBlock().getType().toString().equals(this.getType());
+        return !this.getProtectBlock().getType().toString().equals(this.getType());
     }
 
     /**

@@ -69,13 +69,13 @@ public class ArgHideUnhide implements PSCommandArg {
                 PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
-            r.hide();
+            r.unhide();
         } else {
             if (arg[0].equals("unhide")) {
                 PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
             }
-            r.unhide();
+            r.hide();
         }
         return true;
     }

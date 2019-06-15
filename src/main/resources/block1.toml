@@ -38,8 +38,8 @@ worlds = [
     # Specify the default flags to be set when a new protected region is created.
     flags = [
         "pvp deny",
-        "greeting &lEntering &b&l%player%'s &r&lprotected area",
-        "farewell &lLeaving &b&l%player%'s &r&lprotected area",
+        "greeting &lEntering &b&l%player%'s &f&lprotected area",
+        "farewell &lLeaving &b&l%player%'s &f&lprotected area",
         "creeper-explosion deny",
     ]
 
