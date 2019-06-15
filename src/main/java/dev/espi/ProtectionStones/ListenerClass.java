@@ -29,6 +29,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.espi.ProtectionStones.event.PSCreateEvent;
 import dev.espi.ProtectionStones.utils.UUIDCache;
+import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -45,6 +46,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -127,8 +129,8 @@ public class ListenerClass implements Listener {
                 for (World w : Bukkit.getWorlds()) {
                     RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
                     for (ProtectedRegion r : rgm.getRegions().values()) {
-                        String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-                        if (r.getOwners().contains(lp) && r.getId().startsWith("ps") && f != null) {
+                        if (ProtectionStones.isPSRegion(r)) {
+                            String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
                             total++;
                             int num = regionFound.containsKey(ProtectionStones.getBlockOptions(f).alias) ? regionFound.get(ProtectionStones.getBlockOptions(f).alias) + 1 : 1;
                             regionFound.put(ProtectionStones.getBlockOptions(f).alias, num);
@@ -209,37 +211,18 @@ public class ListenerClass implements Listener {
         }
 
         // check if new region overlaps more powerful region
-        if (rm.overlapsUnownedRegion(region, lp)) {
-            ApplicableRegionSet rp = rm.getApplicableRegions(region);
-            boolean powerfulOverLap = false;
-            for (ProtectedRegion rg : rp) {
-                if (!rg.isOwner(lp) && rg.getPriority() >= region.getPriority()) { // if protection priority < overlap priority
-                    powerfulOverLap = true;
-                    break;
-                }
-            }
-            if (powerfulOverLap) { // if we overlap a more powerful region
-                rm.removeRegion(id);
-                p.updateInventory();
-                PSL.msg(p, PSL.REGION_OVERLAP.msg());
-                e.setCancelled(true);
-                return;
-            }
+        if (WGUtils.overlapsStrongerRegion(rm, region, lp)) {
+            rm.removeRegion(id);
+            PSL.msg(p, PSL.REGION_OVERLAP.msg());
+            e.setCancelled(true);
+            return;
         }
 
         // add corresponding flags to new region by cloning blockOptions default flags
         HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
 
         // replace greeting and farewell messages with player name
-        Flag<?> greeting = WorldGuard.getInstance().getFlagRegistry().get("greeting");
-        Flag<?> farewell = WorldGuard.getInstance().getFlagRegistry().get("farewell");
-
-        if (flags.containsKey(greeting)) {
-            flags.put(greeting, ((String) flags.get(greeting)).replaceAll("%player%", p.getName()));
-        }
-        if (flags.containsKey(farewell)) {
-            flags.put(farewell, ((String) flags.get(farewell)).replaceAll("%player%", p.getName()));
-        }
+        FlagHandler.initDefaultFlagPlaceholders(flags, p);
 
         // set flags
         region.setFlags(flags);
@@ -284,7 +267,6 @@ public class ListenerClass implements Listener {
                 }
                 e.setDropItems(false);
             }
-
             return;
         }
 
@@ -304,7 +286,7 @@ public class ListenerClass implements Listener {
 
         // return protection stone if no drop option is off
         if (!blockOptions.noDrop) {
-            if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(blockOptions)).isEmpty()) {
+            if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 e.setCancelled(true);

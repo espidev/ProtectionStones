@@ -69,7 +69,7 @@ public class ArgGet implements PSCommandArg {
         }
 
         // check if item was able to be added (inventory not full)
-        if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cp)).isEmpty()) {
+        if (!p.getInventory().addItem(cp.createItem()).isEmpty()) {
             PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
             return true;
         }

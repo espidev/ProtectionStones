@@ -2,8 +2,11 @@ package dev.espi.ProtectionStones.utils;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSLocation;
 import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Location;
@@ -27,6 +30,22 @@ public class WGUtils {
         int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
         int psz = Integer.parseInt(regionName.substring(regionName.indexOf("y") + 1, regionName.length() - 1));
         return new PSLocation(psx, psy, psz);
+    }
+
+    public static boolean overlapsStrongerRegion(RegionManager rgm, ProtectedRegion r, LocalPlayer lp) {
+        if (rgm.overlapsUnownedRegion(r, lp)) {
+            ApplicableRegionSet rp = rgm.getApplicableRegions(r);
+            boolean powerfulOverLap = false;
+            for (ProtectedRegion rg : rp) {
+                if (!rg.isOwner(lp) && rg.getPriority() >= r.getPriority()) { // if protection priority < overlap priority
+                    powerfulOverLap = true;
+                    break;
+                }
+            }
+            // if we overlap a more powerful region
+            return powerfulOverLap;
+        }
+        return false;
     }
 
     public static String matchLocationToPSID(Location l) {

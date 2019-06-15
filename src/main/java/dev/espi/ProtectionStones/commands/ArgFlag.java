@@ -88,6 +88,10 @@ public class ArgFlag implements PSCommandArg {
             region.setFlag(flag, flag.getDefault());
             region.setFlag(flag.getRegionGroupFlag(), null);
             PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+        } else if (args[2].equalsIgnoreCase("null")) {
+            region.setFlag(flag, null);
+            region.setFlag(flag.getRegionGroupFlag(), null);
+            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
         } else {
             String settings = "";
             if (args[1].equalsIgnoreCase("-g")) {

@@ -187,7 +187,7 @@ public class PSConfig {
                     for (Recipe r : recipes) Bukkit.addRecipe(r);
 
                     // create item
-                    ItemStack item = ProtectionStones.createProtectBlockItem(b);
+                    ItemStack item = b.createItem();
                     item.setAmount(b.recipeAmount);
 
                     // create recipe

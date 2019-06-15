@@ -23,8 +23,11 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FlagHandler {
 
@@ -54,6 +57,19 @@ public class FlagHandler {
         region.setFlag(PS_HOME, home);
 
         region.setFlag(PS_BLOCK_MATERIAL, cpb.type);
+    }
+
+    static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
+        List<Flag<?>> replaceFlags = new ArrayList<>();
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting"));
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-title"));
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell"));
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-title"));
+        for (Flag<?> f : replaceFlags) {
+            if (flags.get(f) != null) {
+                flags.put(f, ((String) flags.get(f)).replaceAll("%player%", p.getName()));
+            }
+        }
     }
 
     // Initializes user defined default flags for block

@@ -47,7 +47,7 @@ public class ArgGive implements PSCommandArg {
         }
 
         // check if item was able to be added (inventory not full)
-        if (!Bukkit.getPlayer(args[2]).getInventory().addItem(ProtectionStones.createProtectBlockItem(cp)).isEmpty()) {
+        if (!Bukkit.getPlayer(args[2]).getInventory().addItem(cp.createItem()).isEmpty()) {
             PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
             return true;
         }

@@ -40,6 +40,8 @@ worlds = [
         "pvp deny",
         "greeting &lEntering &b&l%player%'s &f&lprotected area",
         "farewell &lLeaving &b&l%player%'s &f&lprotected area",
+        "greeting-title Entering &b%player%'s &fprotected area",
+        "farewell-title Leaving &b%player%'s &fprotected area",
         "creeper-explosion deny",
     ]
 
@@ -48,7 +50,9 @@ worlds = [
         "use",
         "pvp",
         "greeting",
+        "greeting-title",
         "farewell",
+        "farewell-title",
         "mob-spawning",
         "creeper-explosion",
     ]

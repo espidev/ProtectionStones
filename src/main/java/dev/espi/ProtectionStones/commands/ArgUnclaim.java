@@ -72,7 +72,7 @@ public class ArgUnclaim implements PSCommandArg {
         PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
-            if (!p.getInventory().addItem(ProtectionStones.createProtectBlockItem(cpb)).isEmpty()) {
+            if (!p.getInventory().addItem(cpb.createItem()).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 return true;
