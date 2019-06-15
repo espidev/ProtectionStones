@@ -86,7 +86,7 @@ public class ArgRegion implements PSCommandArg {
             boolean found = false;
             for (String str : rgm.getRegions().keySet()) {
                 if (str.startsWith("ps") && rgm.getRegions().get(str).getOwners().contains(lp)) {
-                    regionMessage.append(s).append(", ");
+                    regionMessage.append(str).append(", ");
                     found = true;
                 }
             }
