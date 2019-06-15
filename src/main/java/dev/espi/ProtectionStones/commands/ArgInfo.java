@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import dev.espi.ProtectionStones.utils.WGUtils;
@@ -51,22 +52,13 @@ public class ArgInfo implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-
-        if (psID.equals("")) {
+        if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        ProtectedRegion region = rgm.getRegion(psID);
-        if (region == null) {
-            PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
-            return true;
-        }
-
-        if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
@@ -78,15 +70,14 @@ public class ArgInfo implements PSCommandArg {
             }
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
-            PSL.msg(p, PSL.INFO_REGION.msg() + psID + ", " + PSL.INFO_PRIORITY.msg() + rgm.getRegion(psID).getPriority());
+            PSL.msg(p, PSL.INFO_REGION.msg() + r.getID() + ", " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
 
+            displayFlags(p, r.getWGRegion());
+            displayOwners(p, r.getWGRegion());
+            displayMembers(p, r.getWGRegion());
 
-            displayFlags(p, region);
-            displayOwners(p, region);
-            displayMembers(p, region);
-
-            BlockVector3 min = region.getMinimumPoint();
-            BlockVector3 max = region.getMaximumPoint();
+            BlockVector3 min = r.getWGRegion().getMinimumPoint();
+            BlockVector3 max = r.getWGRegion().getMaximumPoint();
             PSL.msg(p, PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
 
         } else if (args.length == 2) { // get specific information on current region
@@ -97,21 +88,21 @@ public class ArgInfo implements PSCommandArg {
                         PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
                         return true;
                     }
-                    displayMembers(p, region);
+                    displayMembers(p, r.getWGRegion());
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners")) {
                         PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
                         return true;
                     }
-                    displayOwners(p, region);
+                    displayOwners(p, r.getWGRegion());
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags")) {
                         PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
-                    displayFlags(p, region);
+                    displayFlags(p, r.getWGRegion());
                     break;
                 default:
                     PSL.msg(p, PSL.INFO_HELP.msg());

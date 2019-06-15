@@ -145,6 +145,25 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
+     * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region.
+     * @param r the region to check
+     * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
+     */
+    public static boolean isPSRegion(ProtectedRegion r) {
+        return r.getId().startsWith("ps") && r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null;
+    }
+
+    /**
+     * Get the protection stone region with the world and region.
+     * @param w the world
+     * @param r the WorldGuard region
+     * @return the {@link PSRegion} based on the parameters
+     */
+    public static PSRegion getPSRegion(World w, ProtectedRegion r) {
+        return new PSRegion(r, WGUtils.getRegionManagerWithWorld(w), w);
+    }
+
+    /**
      * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
      * @param l the location
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region

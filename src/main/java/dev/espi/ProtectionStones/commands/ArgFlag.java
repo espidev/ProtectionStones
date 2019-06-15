@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
@@ -49,20 +50,17 @@ public class ArgFlag implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p);
-
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         if (!p.hasPermission("protectionstones.flags")) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
             return true;
         }
-        if (psID.equals("")) {
+        if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
@@ -70,9 +68,8 @@ public class ArgFlag implements PSCommandArg {
         if (args.length < 3) {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
-            String blockType = rgm.getRegion(psID).getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-            if (ProtectionStones.getBlockOptions(blockType).allowed_flags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
-                setFlag(args, rgm.getRegion(psID), p);
+            if (r.getTypeOptions().allowed_flags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
+                setFlag(args, r.getWGRegion(), p);
             } else {
                 PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
             }

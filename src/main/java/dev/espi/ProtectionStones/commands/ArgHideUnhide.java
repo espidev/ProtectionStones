@@ -19,10 +19,7 @@ package dev.espi.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.ProtectionStones.FlagHandler;
-import dev.espi.ProtectionStones.PSL;
-import dev.espi.ProtectionStones.PSLocation;
-import dev.espi.ProtectionStones.ProtectionStones;
+import dev.espi.ProtectionStones.*;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -47,11 +44,7 @@ public class ArgHideUnhide implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] arg) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p);
-
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-        ProtectedRegion r = rgm.getRegion(psID);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         // preliminary checks
         if (arg.equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
@@ -62,32 +55,27 @@ public class ArgHideUnhide implements PSCommandArg {
             PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(r, p, wg.wrapPlayer(p), false)) {
+        if (r == null) {
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
+            return true;
+        }
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
-        if (!psID.startsWith("ps")) {
-            PSL.msg(p, PSL.NOT_PS_REGION.msg());
-            return true;
-        }
 
-        PSLocation psl = WGUtils.parsePSRegionToLocation(psID);
-        Block blockToEdit = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-
-        Material currentType = blockToEdit.getType();
-
-        if (ProtectionStones.isProtectBlockType(currentType.toString())) {
-            if (arg.equals("unhide")) {
-                PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
-                return true;
-            }
-            blockToEdit.setType(Material.AIR);
-        } else {
+        if (r.isHidden()) {
             if (arg.equals("hide")) {
                 PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
-            blockToEdit.setType(Material.getMaterial(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL)));
+            r.hide();
+        } else {
+            if (arg.equals("unhide")) {
+                PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
+                return true;
+            }
+            r.unhide();
         }
         return true;
     }

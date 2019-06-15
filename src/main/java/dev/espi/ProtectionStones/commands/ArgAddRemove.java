@@ -18,7 +18,9 @@ package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import dev.espi.ProtectionStones.utils.WGUtils;
@@ -31,17 +33,17 @@ import java.util.UUID;
 
 public class ArgAddRemove implements PSCommandArg {
 
-    private static UUID checks(Player p, String args[], String psID, RegionManager rgm, WorldGuardPlugin wg, String permType) {
+    private static UUID checks(Player p, String args[], PSRegion r, RegionManager rgm, WorldGuardPlugin wg, String permType) {
         if (permType.equals("members") && !p.hasPermission("protectionstones.members")) {
             PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
             return null;
         } else if (permType.equals("owners") && !p.hasPermission("protectionstones.owners")) {
             PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
             return null;
-        } else if (psID.equals("")) {
+        } else if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return null;
-        } else if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
+        } else if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return null;
         } else if (args.length < 2) {
@@ -63,26 +65,26 @@ public class ArgAddRemove implements PSCommandArg {
     //   removeowner: remove owner
 
     public static boolean template(Player p, String[] args, String type) {
-        String psID = WGUtils.playerToPSID(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-        UUID uuid = checks(p, args, psID, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
+        UUID uuid = checks(p, args, r, rgm, wg, (type.equals("add") || type.equals("remove")) ? "members" : "owners"); // validate permissions and stuff
         if (uuid == null) return true;
         switch (type) {
             case "add":
-                rgm.getRegion(psID).getMembers().addPlayer(uuid);
+                r.getWGRegion().getMembers().addPlayer(uuid);
                 break;
             case "remove":
-                rgm.getRegion(psID).getMembers().removePlayer(uuid);
-                rgm.getRegion(psID).getMembers().removePlayer(uuid);
+                r.getWGRegion().getMembers().removePlayer(uuid);
+                r.getWGRegion().getMembers().removePlayer(uuid);
                 break;
             case "addowner":
-                rgm.getRegion(psID).getOwners().addPlayer(uuid);
+                r.getWGRegion().getOwners().addPlayer(uuid);
                 break;
             case "removeowner":
-                rgm.getRegion(psID).getOwners().removePlayer(uuid);
-                rgm.getRegion(psID).getOwners().removePlayer(uuid);
+                r.getWGRegion().getOwners().removePlayer(uuid);
+                r.getWGRegion().getOwners().removePlayer(uuid);
                 break;
         }
 

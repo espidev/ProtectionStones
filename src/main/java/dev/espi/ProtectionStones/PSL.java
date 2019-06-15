@@ -64,7 +64,7 @@ public enum PSL {
 
     ADDED_TO_REGION("psregion.added_to_region",  ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
-    NOT_IN_REGION("psregion.not_in_region", ChatColor.RED + "You are not in a protection stone region!"),
+    NOT_IN_REGION("psregion.not_in_region", ChatColor.RED + "You are not in a protection stones region!"),
     PLAYER_NOT_FOUND("psregion.player_not_found", ChatColor.RED + "Player not found."),
     NOT_PS_REGION("psregion.not_ps_region", ChatColor.RED + "Not a protection stones region."),
     REGION_DOES_NOT_EXIST("psregion.region_does_not_exist", ChatColor.RED + "Region does not exist."),

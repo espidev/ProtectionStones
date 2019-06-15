@@ -19,10 +19,8 @@ package dev.espi.ProtectionStones.commands;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import dev.espi.ProtectionStones.FlagHandler;
-import dev.espi.ProtectionStones.PSL;
-import dev.espi.ProtectionStones.PSLocation;
-import dev.espi.ProtectionStones.ProtectionStones;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.ProtectionStones.*;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -55,29 +53,18 @@ class ArgAdminHide {
             w = Bukkit.getWorld(args[2]);
             mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
         }
-        List<String> regionIDList = new ArrayList<>();
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            // add all protection stone regions to regions map
-            for (String idname : mgr.getRegions().keySet()) {
-                if (idname.length() >= 9 && idname.substring(0, 2).equals("ps")) {
-                    regionIDList.add(idname);
-                }
-            }
-
             // loop through regions that are protection stones and hide or unhide the block
-            for (String regionID : regionIDList) {
-                PSLocation psl = WGUtils.parsePSRegionToLocation(regionID);
-                Block blockToChange = w.getBlockAt(psl.x, psl.y, psl.z);
-
-                if (args[1].equalsIgnoreCase("unhide")) {
-                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToChange.setType(Material.getMaterial(mgr.getRegion(regionID).getFlag(FlagHandler.PS_BLOCK_MATERIAL))));
-                } else if (args[1].equalsIgnoreCase("hide")) {
-                    if (ProtectionStones.isProtectBlockType(blockToChange.getType().toString())) {
-                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToChange.setType(Material.AIR));
+            for (ProtectedRegion r : mgr.getRegions().values()) {
+                if (ProtectionStones.isPSRegion(r)) {
+                    PSRegion region = ProtectionStones.getPSRegion(w, r);
+                    if (args[1].equalsIgnoreCase("hide")) {
+                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), region::hide);
+                    } else if (args[1].equalsIgnoreCase("unhide")){
+                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), region::unhide);
                     }
                 }
-
             }
 
             String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";

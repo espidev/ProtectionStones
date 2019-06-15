@@ -13,6 +13,8 @@ import org.bukkit.block.Block;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Represents an instance of a protectionstones protected region.
  */
@@ -23,9 +25,9 @@ public class PSRegion {
     private World world;
 
     PSRegion (ProtectedRegion wgregion, RegionManager rgmanager, World world) {
-        this.wgregion = wgregion;
-        this.rgmanager = rgmanager;
-        this.world = world;
+        this.wgregion = checkNotNull(wgregion);
+        this.rgmanager = checkNotNull(rgmanager);
+        this.world = checkNotNull(world);
     }
 
     /**

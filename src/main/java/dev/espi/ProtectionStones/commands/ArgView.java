@@ -19,7 +19,9 @@ package dev.espi.ProtectionStones.commands;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -52,16 +54,13 @@ public class ArgView implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
 
-        String psID = WGUtils.playerToPSID(p);
-
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         if (!p.hasPermission("protectionstones.view")) {
             PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), true)) {
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
@@ -76,8 +75,8 @@ public class ArgView implements PSCommandArg {
         cooldown.add(p.getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.getInstance().getConfigOptions().psViewCooldown);
 
-        BlockVector3 minVector = rgm.getRegion(psID).getMinimumPoint();
-        BlockVector3 maxVector = rgm.getRegion(psID).getMaximumPoint();
+        BlockVector3 minVector = r.getWGRegion().getMinimumPoint();
+        BlockVector3 maxVector = r.getWGRegion().getMaximumPoint();
         final int minX = minVector.getBlockX();
         final int minY = minVector.getBlockY();
         final int minZ = minVector.getBlockZ();

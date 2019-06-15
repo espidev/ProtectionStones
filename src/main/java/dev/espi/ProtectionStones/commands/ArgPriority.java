@@ -19,12 +19,14 @@ package dev.espi.ProtectionStones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
+import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,35 +45,31 @@ public class ArgPriority implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        String psID = WGUtils.playerToPSID(p);
-
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
+        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         if (!p.hasPermission("protectionstones.priority")) {
             PSL.msg(p, PSL.NO_PERMISSION_PRIORITY.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(rgm.getRegion(psID), p, wg.wrapPlayer(p), false)) {
+        if (r == null) {
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
+            return true;
+        }
+        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
         if (args.length < 2) {
-            int priority = rgm.getRegion(psID).getPriority();
+            int priority = r.getWGRegion().getPriority();
             PSL.msg(p, PSL.PRIORITY_INFO.msg().replace("%priority%", "" + priority));
             return true;
         }
 
         try {
             int priority = Integer.parseInt(args[1]);
-            rgm.getRegion(psID).setPriority(priority);
-            try {
-                rgm.save();
-            } catch (Exception e) {
-                Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
-            }
+            r.getWGRegion().setPriority(priority);
             PSL.msg(p, PSL.PRIORITY_SET.msg());
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             PSL.msg(p, PSL.PRIORITY_ERROR.msg());
         }
         return true;
