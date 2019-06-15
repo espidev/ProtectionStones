@@ -162,7 +162,7 @@ public class ArgTp implements PSCommandArg {
                         // increment seconds
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
                         // if the player moved cancel it
-                        if (l.getX() != pl.getLocation().getX() || l.getY() != pl.getLocation().getY() || l.getZ() != pl.getLocation().getZ()) {
+                        if (l.getBlockX() != pl.getLocation().getBlockX() || l.getBlockY() != pl.getLocation().getBlockY() || l.getBlockZ() != pl.getLocation().getBlockZ()) {
                             PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
                             removeUUIDTimer(uuid);
                         } else if (waitCounter.get(uuid) == r.getTypeOptions().tpWaitingSeconds * 4) { // * 4 since this loops 4 times a second

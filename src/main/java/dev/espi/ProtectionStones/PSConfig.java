@@ -24,13 +24,17 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 
+import javax.xml.stream.events.Namespace;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -164,6 +168,54 @@ public class PSConfig {
                 Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
+
+                // add custom recipes to Bukkit
+                if (b.allowCraftWithCustomRecipe) {
+
+                    // remove previous protectionstones recipes (/ps reload)
+                    List<Recipe> recipes = new ArrayList<>();
+                    Iterator<Recipe> iter = Bukkit.recipeIterator();
+                    while (iter.hasNext()) {
+                        Recipe r = iter.next();
+                        if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
+                            continue;
+                        }
+                        recipes.add(r);
+                    }
+                    // restore recipes without protectionstones ones
+                    Bukkit.clearRecipes();
+                    for (Recipe r : recipes) Bukkit.addRecipe(r);
+
+                    // create item
+                    ItemStack item = ProtectionStones.createProtectBlockItem(b);
+                    item.setAmount(b.recipeAmount);
+
+                    // create recipe
+                    ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.alias), item);
+                    HashMap<String, Character> items = new HashMap<>();
+                    List<String> recipeLine = new ArrayList<>();
+                    char id = 'a';
+                    for (int i = 0; i < b.customRecipe.size(); i++) {
+                        recipeLine.add("");
+                        for (String mat : b.customRecipe.get(i)) {
+                            if (mat.equals("")) {
+                                recipeLine.set(i, recipeLine.get(i) + " ");
+                            } else {
+                                if (items.get(mat) == null) {
+                                    items.put(mat, id++);
+                                }
+                                recipeLine.set(i, recipeLine.get(i) + items.get(mat));
+                            }
+                        }
+                    }
+
+                    // recipe
+                    recipe.shape(recipeLine.toArray(new String[0]));
+                    for (String mat : items.keySet()) {
+                        recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
+                    }
+                    Bukkit.addRecipe(recipe);
+                }
             }
 
             // cleanup temp file

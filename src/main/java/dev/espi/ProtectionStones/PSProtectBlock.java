@@ -66,7 +66,7 @@ public class PSProtectBlock {
     @Path("region.flags")
     public List<String> flags;
     @Path("region.allowed_flags")
-    public List<String> allowed_flags;
+    public List<String> allowedFlags;
     @Path("region.priority")
     public int priority;
 
@@ -78,6 +78,13 @@ public class PSProtectBlock {
     @Path("block_data.price")
     @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
     public double price;
+    @Path("block_data.allow_craft_with_custom_recipe")
+    public boolean allowCraftWithCustomRecipe;
+    @Path("block_data.custom_recipe")
+    public List<List<String>> customRecipe;
+    @Path("block_data.recipe_amount")
+    @SpecIntInRange(min = 0, max = 64)
+    public int recipeAmount;
 
     // behaviour section
     @Path("behaviour.auto_hide")

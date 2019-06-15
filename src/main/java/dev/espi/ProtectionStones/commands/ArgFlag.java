@@ -22,13 +22,10 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
-import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -68,7 +65,7 @@ public class ArgFlag implements PSCommandArg {
         if (args.length < 3) {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
-            if (r.getTypeOptions().allowed_flags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
+            if (r.getTypeOptions().allowedFlags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
                 setFlag(args, r.getWGRegion(), p);
             } else {
                 PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
