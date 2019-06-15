@@ -47,11 +47,11 @@ public class ArgHideUnhide implements PSCommandArg {
         PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
 
         // preliminary checks
-        if (arg.equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
+        if (arg[0].equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
             PSL.msg(p, PSL.NO_PERMISSION_UNHIDE.msg());
             return true;
         }
-        if (arg.equals("hide") && !p.hasPermission("protectionstones.hide")) {
+        if (arg[0].equals("hide") && !p.hasPermission("protectionstones.hide")) {
             PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
             return true;
         }
@@ -65,13 +65,13 @@ public class ArgHideUnhide implements PSCommandArg {
         }
 
         if (r.isHidden()) {
-            if (arg.equals("hide")) {
+            if (arg[0].equals("hide")) {
                 PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
                 return true;
             }
             r.hide();
         } else {
-            if (arg.equals("unhide")) {
+            if (arg[0].equals("unhide")) {
                 PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
                 return true;
             }

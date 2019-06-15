@@ -3,10 +3,9 @@ package dev.espi.ProtectionStones.utils;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSLocation;
+import dev.espi.ProtectionStones.ProtectionStones;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -36,14 +35,14 @@ public class WGUtils {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
         if (idList.size() == 1) {
-            if (idList.get(0).startsWith("ps") && rgm.getRegion(idList.get(0)).getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
+            if (ProtectionStones.isPSRegion(rgm.getRegion(idList.get(0)))) {
                 currentPSID = idList.get(0);
             }
         } else {
             // Get nearest protection stone if in overlapping region
             double distanceToPS = -1, tempToPS;
             for (String currentID : idList) {
-                if (currentID.startsWith("ps") && rgm.getRegion(currentID).getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
+                if (ProtectionStones.isPSRegion(rgm.getRegion(currentID))) {
                     PSLocation psl = WGUtils.parsePSRegionToLocation(currentID);
                     Location psLocation = new Location(l.getWorld(), psl.x, psl.y, psl.z);
                     tempToPS = l.distance(psLocation);
@@ -55,10 +54,5 @@ public class WGUtils {
             }
         }
         return currentPSID;
-    }
-
-    // Find the id of the current region the player is in
-    public static String playerToPSID(Player p) {
-        return matchLocationToPSID(p.getLocation());
     }
 }
