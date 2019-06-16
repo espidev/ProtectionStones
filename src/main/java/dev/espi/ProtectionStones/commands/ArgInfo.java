@@ -72,7 +72,7 @@ public class ArgInfo implements PSCommandArg {
             if (r.getName() == null) {
                 PSL.msg(p, PSL.INFO_REGION.msg() + r.getID() + ", " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             } else {
-                PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + "(" + r.getID() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
+                PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getID() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             }
 
             displayFlags(p, r.getWGRegion());

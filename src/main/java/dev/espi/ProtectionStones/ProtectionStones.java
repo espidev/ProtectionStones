@@ -51,7 +51,7 @@ import java.util.*;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 5;
+    static final int CONFIG_VERSION = 6;
 
     static File configLocation, blockDataFolder;
     static FileConfig config;
@@ -157,6 +157,30 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
+     * Check if a ProtectionStones name is already used by a region globally (from /ps name)
+     *
+     * @param name the name to search for
+     * @return whether or not there is a region with this name
+     */
+
+    public static boolean isPSNameAlreadyUsed(String name) {
+        for (World w : regionNameToID.keySet()) {
+            List<String> l = regionNameToID.get(w).get(name);
+            if (l == null) {
+                return true;
+            }
+            for (int i = 0; i < l.size(); i++) { // remove outdated cache
+                if (WGUtils.getRegionManagerWithWorld(w).getRegion(l.get(i)) == null) {
+                    l.remove(i);
+                    i--;
+                }
+            }
+            if (l.isEmpty()) return true;
+        }
+        return false;
+    }
+
+    /**
      * Get the protection stone regions that have the given name as their set nickname (/ps name)
      *
      * @param w the world to look for regions in
@@ -164,8 +188,10 @@ public class ProtectionStones extends JavaPlugin {
      * @return the list of regions that have that name
      */
 
-    public static List<PSRegion> getPSRegionFromName(World w, String name) {
+    public static List<PSRegion> getPSRegionsFromName(World w, String name) {
         List<PSRegion> l = new ArrayList<>();
+
+        if (regionNameToID.get(w).get(name) == null) return l;
 
         for (int i = 0; i < regionNameToID.get(w).get(name).size(); i++) {
             String id = regionNameToID.get(w).get(name).get(i);

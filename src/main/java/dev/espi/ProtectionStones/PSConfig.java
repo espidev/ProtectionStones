@@ -53,6 +53,8 @@ public class PSConfig {
     public Boolean uuidupdated;
     @Path("placing_cooldown")
     public int placingCooldown;
+    @Path("allow_duplicate_region_names")
+    public Boolean allowDuplicateRegionNames;
     @Path("async_load_uuid_cache")
     public Boolean asyncLoadUUIDCache;
     @Path("ps_view_cooldown")
@@ -238,6 +240,9 @@ public class PSConfig {
                 ProtectionStones.config.set("config_version", 5);
                 ProtectionStones.config.set("async_load_uuid_cache", false);
                 ProtectionStones.config.set("ps_view_cooldown", 20);
+                break;
+            case 5:
+                ProtectionStones.config.set("allow_duplicate_region_names", false);
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

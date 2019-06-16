@@ -18,6 +18,10 @@ placing_cooldown = -1
 # /ps add and /ps remove will not work for offline players until the cache is finished loading.
 async_load_uuid_cache = false
 
+# Whether or not to allow regions to have identical names (from /ps name).
+# If this is set to true, players will have to use numbers after the name if they encounter duplicates.
+allow_duplicate_region_names = false
+
 # Time in seconds between /ps view attempts.
 # Can prevent lag from spamming the command.
 ps_view_cooldown = 20

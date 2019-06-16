@@ -218,8 +218,11 @@ public enum PSL {
     LIST_OWNER("list.owner", ChatColor.GRAY + "Owner of:"),
     LIST_MEMBER("list.member", ChatColor.GRAY + "Member of:"),
 
-    NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name]"),
+    NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name|none]"),
     NAME_HELP_DESC("name.help_desc", "Use this command to give a nickname to your region, to make identifying your region easier."),
+    NAME_REMOVED("name.removed", ChatColor.GRAY + "Removed the name for %id%."),
+    NAME_SET_NAME("name.set_name", ChatColor.GRAY + "Set the name of %id% to " + ChatColor.AQUA + "%name%" + ChatColor.GRAY + "."),
+    NAME_TAKEN("name.taken", ChatColor.GRAY + "The region name " + ChatColor.AQUA + "%name%" + ChatColor.GRAY + " has already been taken! Try another one."),
 
     SETPARENT_HELP("setparent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps setparent [region|none]"),
     SETPARENT_HELP_DESC("setparent.help_desc", "Use this command to allow this region to inherit properties from another region (owners, members, flags, etc.).")
