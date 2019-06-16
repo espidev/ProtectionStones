@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class WGUtils {
+
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
     }
@@ -74,4 +75,5 @@ public class WGUtils {
         }
         return currentPSID;
     }
+
 }

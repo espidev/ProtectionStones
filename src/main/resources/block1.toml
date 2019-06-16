@@ -24,6 +24,10 @@ worlds = [
 ]
 
 [region]
+    # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
+    # Set to -1 for no minimum, but will still check for overlapping regions
+    distance_between_claims = -1
+
     # Protection radius of block
     # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
     x_radius = 64

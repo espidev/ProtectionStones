@@ -61,7 +61,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Must be one word (no spaces)
     alias = "64"
     
-    # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give.
+    # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give and custom crafting recipes.
     # Other ways to obtain this block (ex. mining) will not work as a protection stone.
     # Useful to allow the protection block to only be obtained from a shop or command.
     # Set to "false" if you want to allow players to obtain a protection stone naturally
@@ -78,6 +78,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     ]
     
     [region]
+        # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
+        # Set to -1 for no minimum, but will still check for overlapping regions
+        distance_between_claims = -1
+    
         # Protection radius of block
         # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
         x_radius = 64
@@ -92,8 +96,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Specify the default flags to be set when a new protected region is created.
         flags = [
             "pvp deny",
-            "greeting &lEntering &b&l%player%'s &r&lprotected area",
-            "farewell &lLeaving &b&l%player%'s &r&lprotected area",
+            "greeting &lEntering &b&l%player%'s &f&lprotected area",
+            "farewell &lLeaving &b&l%player%'s &f&lprotected area",
+            "greeting-title Entering &b%player%'s &fprotected area",
+            "farewell-title Leaving &b%player%'s &fprotected area",
             "creeper-explosion deny",
         ]
     
@@ -102,7 +108,9 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
             "use",
             "pvp",
             "greeting",
+            "greeting-title",
             "farewell",
+            "farewell-title",
             "mob-spawning",
             "creeper-explosion",
         ]
@@ -124,6 +132,20 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Add price when using /ps get
         # Must have compatible economy plugin (requires Vault, ie. Essentials)
         price = 0.0
+    
+        # Whether or not to allow crafting this item using a custom recipe
+        # Useful to allow crafting the item when restrict_obtaining is set to true
+        allow_craft_with_custom_recipe = false
+        # Specify the custom crafting recipe below
+        # You must fill the item spots with names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+        # If you want air, you can just leave the spot as ""
+        custom_recipe = [
+            ["", "STONE", ""],
+            ["STONE", "EMERALD", "STONE"],
+            ["", "STONE", ""]
+        ]
+        # Amount of the protection item to give when crafted
+        recipe_amount = 1
     
     [behaviour]
         # Hide protection stone right away when placed?

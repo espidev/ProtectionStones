@@ -45,6 +45,8 @@ public class PSProtectBlock {
     public List<String> worlds;
 
     // region section
+    @Path("region.distance_between_claims")
+    public int distanceBetweenClaims;
     @Path("region.x_radius")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int xRadius;
