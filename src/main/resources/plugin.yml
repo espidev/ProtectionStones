@@ -1,7 +1,7 @@
 name: ProtectionStones
 version: ${version}
 description: ${description}
-authors: [AxelDios,Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins,EspiDev]
+authors: [EspiDev,AxelDios,Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
 softdepend: [Vault]

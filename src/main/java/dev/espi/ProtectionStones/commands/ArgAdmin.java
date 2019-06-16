@@ -73,6 +73,8 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminLastlogon.argumentAdminLastLogon(s, args);
             case "lastlogons":
                 return ArgAdminLastlogon.argumentAdminLastLogons(s, args);
+            case "flag":
+                return ArgAdminFlag.argumentAdminFlag(s, args);
             case "fixregions":
                 s.sendMessage(ChatColor.YELLOW + "Fixing...");
                 LegacyUpgrade.upgradeRegions();

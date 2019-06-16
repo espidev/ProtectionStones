@@ -66,7 +66,16 @@ public class ArgFlag implements PSCommandArg {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
             if (r.getTypeOptions().allowedFlags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
-                setFlag(args, r.getWGRegion(), p);
+                String flag, value = "", gee = "";
+                if (args[1].equalsIgnoreCase("-g")) {
+                    flag = args[3];
+                    for (int i = 4; i < args.length; i++) value += args[i] + " ";
+                    gee = args[2];
+                } else {
+                    flag = args[1];
+                    for (int i = 2; i < args.length; i++) value += args[i] + " ";
+                }
+                setFlag(r.getWGRegion(), p, flag, value.trim(), gee);
             } else {
                 PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
             }
@@ -75,43 +84,30 @@ public class ArgFlag implements PSCommandArg {
     }
 
     // /ps flag logic (utilizing WG internal /region flag logic)
-    private void setFlag(String[] args, ProtectedRegion region, Player p) {
-        Flag flag;
+    static void setFlag(ProtectedRegion region, CommandSender p, String flagName, String value, String groupValue) {
+        Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
 
-        if (args[1].equalsIgnoreCase("-g")) {
-            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[3]);
-        } else {
-            flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), args[1]);
-        }
-
-        if (args[2].equalsIgnoreCase("default")) {
-            region.setFlag(flag, flag.getDefault());
-            region.setFlag(flag.getRegionGroupFlag(), null);
-            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
-        } else if (args[2].equalsIgnoreCase("null")) {
-            region.setFlag(flag, null);
-            region.setFlag(flag.getRegionGroupFlag(), null);
-            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
-        } else {
-            String settings = "";
-            if (args[1].equalsIgnoreCase("-g")) {
-                for (int i = 4; i < args.length; i++) settings += args[i] + " ";
+        try {
+            if (value.equalsIgnoreCase("default")) {
+                region.setFlag(flag, flag.getDefault());
+                region.setFlag(flag.getRegionGroupFlag(), null);
+                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
+            } else if (value.equalsIgnoreCase("null")) {
+                region.setFlag(flag, null);
+                region.setFlag(flag.getRegionGroupFlag(), null);
+                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
             } else {
-                for (int i = 2; i < args.length; i++) settings += args[i] + " ";
+                FlagContext fc = FlagContext.create().setInput(value).build();
+                region.setFlag(flag, flag.parseInput(fc));
+                if (!groupValue.equals("")) {
+                    region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(groupValue));
+                }
+                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
             }
 
-            FlagContext fc = FlagContext.create().setInput(settings.trim()).build();
-            try {
-                region.setFlag(flag, flag.parseInput(fc));
-                if (args[1].equalsIgnoreCase("-g")) {
-                    region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(args[2]));
-                }
-            } catch (InvalidFlagFormat invalidFlagFormat) {
-                //invalidFlagFormat.printStackTrace();
-                PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", args[1]));
-                return;
-            }
-            PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", args[1]));
+        } catch (InvalidFlagFormat invalidFlagFormat) {
+            //invalidFlagFormat.printStackTrace();
+            PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", flagName));
         }
     }
 
