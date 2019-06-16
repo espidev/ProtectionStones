@@ -166,16 +166,14 @@ public class ProtectionStones extends JavaPlugin {
     public static boolean isPSNameAlreadyUsed(String name) {
         for (World w : regionNameToID.keySet()) {
             List<String> l = regionNameToID.get(w).get(name);
-            if (l == null) {
-                return true;
-            }
+            if (l == null) continue;
             for (int i = 0; i < l.size(); i++) { // remove outdated cache
                 if (WGUtils.getRegionManagerWithWorld(w).getRegion(l.get(i)) == null) {
                     l.remove(i);
                     i--;
                 }
             }
-            if (l.isEmpty()) return true;
+            if (!l.isEmpty()) return true;
         }
         return false;
     }

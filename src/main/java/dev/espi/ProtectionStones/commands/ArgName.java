@@ -63,7 +63,7 @@ public class ArgName implements PSCommandArg {
             r.setName(null);
             PSL.msg(p, PSL.NAME_REMOVED.msg().replace("%id%", r.getID()));
         } else {
-            if (ProtectionStones.isPSNameAlreadyUsed(args[1])) {
+            if (!ProtectionStones.getInstance().getConfigOptions().allowDuplicateRegionNames && ProtectionStones.isPSNameAlreadyUsed(args[1])) {
                 PSL.msg(p, PSL.NAME_TAKEN.msg().replace("%name%", args[1]));
                 return true;
             }

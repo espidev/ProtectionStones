@@ -94,7 +94,7 @@ public class PSConfig {
 
         // create config object
         if (ProtectionStones.config == null) {
-            ProtectionStones.config = CommentedFileConfig.builder(ProtectionStones.configLocation).build();
+            ProtectionStones.config = CommentedFileConfig.builder(ProtectionStones.configLocation).sync().build();
         }
 
         // loop upgrades until the config has been updated to the latest version
@@ -242,6 +242,7 @@ public class PSConfig {
                 ProtectionStones.config.set("ps_view_cooldown", 20);
                 break;
             case 5:
+                ProtectionStones.config.set("config_version", 6);
                 ProtectionStones.config.set("allow_duplicate_region_names", false);
                 break;
             case ProtectionStones.CONFIG_VERSION:
