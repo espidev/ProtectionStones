@@ -36,11 +36,26 @@ permissions:
   protectionstones.count.others:
     description: Allows players the use of /ps count [player].
     default: op
+  protectionstones.list:
+    description: Allows players the use of /ps list.
+    default: op
+  protectionstones.list.others:
+    description: Allows players to do /ps list [player].
+    default: op
   protectionstones.hide:
     description: Allow players to hide their ProtectionStones block.
     default: op
   protectionstones.unhide:
     description: Allow players to unhide their ProtectionStones block.
+    default: op
+  protectionstones.setparent:
+    description: Allow access to /ps setparent.
+    default: op
+  protectionstones.setparent.others:
+    description: Allow players to set their region to inherit properties from other regions they don't own.
+    default: op
+  protectionstones.name:
+    description: Access to the /ps name command.
     default: op
   protectionstones.home:
     description: Access to the /ps home command.

@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-public class ArgAdminFlag {
+class ArgAdminFlag {
     static boolean argumentAdminFlag(CommandSender p, String[] args) {
         String flag, value = "", gee = "";
         if (args[2].equalsIgnoreCase("-g")) {
@@ -20,15 +20,17 @@ public class ArgAdminFlag {
             for (int i = 3; i < args.length; i++) value += args[i] + " ";
         }
 
-        // TODO async
-        for (World w : Bukkit.getWorlds()) {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-            for (ProtectedRegion r : rgm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    ArgFlag.setFlag(r, p, flag, value.trim(), gee);
+        final String fValue = value, fGee = gee;
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            for (World w : Bukkit.getWorlds()) {
+                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+                for (ProtectedRegion r : rgm.getRegions().values()) {
+                    if (ProtectionStones.isPSRegion(r)) {
+                        ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
+                    }
                 }
             }
-        }
+        });
         return true;
     }
 }

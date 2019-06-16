@@ -74,14 +74,7 @@ public class ArgRegion implements PSCommandArg {
 
         LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[2])));
 
-        if (args[1].equalsIgnoreCase("count")) { // count player's regions
-            int count = ArgCount.countRegionsOfPlayer(lp, rgm);
-
-            PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
-                    .replace("%player%", args[2])
-                    .replace("%num%", "" + count));
-
-        } else if (args[1].equalsIgnoreCase("list")) { // list player's regions
+        if (args[1].equalsIgnoreCase("list")) { // list player's regions TODO GET RID OF
             StringBuilder regionMessage = new StringBuilder();
             boolean found = false;
             for (String str : rgm.getRegions().keySet()) {

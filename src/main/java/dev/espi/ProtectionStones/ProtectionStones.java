@@ -146,6 +146,7 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region.
+     *
      * @param r the region to check
      * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
      */
@@ -155,6 +156,7 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Get the protection stone region with the world and region.
+     *
      * @param w the world
      * @param r the WorldGuard region
      * @return the {@link PSRegion} based on the parameters
@@ -165,6 +167,7 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
+     *
      * @param l the location
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
      */
@@ -237,7 +240,7 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Get the config options for a protect block based on its alias
      *
-     * @param name the alias fo the protection block
+     * @param name the alias of the protection block
      * @return the protect block options, or null if it wasn't found
      */
     public static PSProtectBlock getProtectBlockFromAlias(String name) {
@@ -353,6 +356,25 @@ public class ProtectionStones extends JavaPlugin {
         return max;
     }
 
+    /**
+     * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
+     * since the query can be slow.
+     *
+     * @param w world to search for regions in
+     * @param uuid uuid of the player
+     * @return list of regions that the player owns
+     */
+
+    public static List<ProtectedRegion> getPlayerPSRegions(World w, UUID uuid) {
+        List<ProtectedRegion> regions = new ArrayList<>();
+        for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+            if (isPSRegion(r) && (r.getOwners().contains(uuid) || r.getMembers().contains(uuid))) {
+                regions.add(r);
+            }
+        }
+        return regions;
+    }
+
     // called on first start, and /ps reload
     public static void loadConfig(boolean isReload) {
         // init config
@@ -448,13 +470,6 @@ public class ProtectionStones extends JavaPlugin {
         if (configOptions.uuidupdated == null || !configOptions.uuidupdated) LegacyUpgrade.convertToUUID();
 
         getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
-    }
-
-    public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        // Region is not valid
-        if (region == null) return true;
-
-        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
 }

@@ -198,6 +198,8 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps addowner|removeowner [playername] - Use this command to add or remove an owner of your protected region.
     /ps flag [flagname] [setting|default] - Use this command to set a flag in your protected region.
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.
+    /ps setparent [region|none] - Set the region you are in to inherit properties from another region you own (https://worldguard.enginehub.org/en/latest/regions/priorities/)
+    /ps name [name] - Nickname your region to help identify it easily.
     /ps home [num] - Teleports you to one of your protected regions.
     /ps sethome - Set the home location of an owned region.
     /ps tp [player] [num] - Teleports you to one of a given player's regions.
@@ -205,8 +207,9 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps view - Use this command to view the borders of a protected region.
     /ps unclaim - Use this command to pickup a placed protection stone and remove the region.
     /ps priority [number|null] - Use this command to set your region's priority.
-    /ps region count|list|remove|disown [playername] - Use this command to find
+    /ps region remove|disown [playername] - Use this command to find
     information or edit other players' (or your own) protected regions.
+    /ps list [playername (optional)] - List the regions you or another player owns.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
     /ps admin [version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
@@ -222,8 +225,13 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.count - Allows players the use of /ps count.
     protectionstones.count.others - Allows players the use of /ps count [player].
+    protectionstones.list - Allows players the use of /ps list.
+    protectionstones.list.others - Allows players to do /ps list [player].
     protectionstones.hide - Allow players to hide their ProtectionStones block.
     protectionstones.unhide - Allow players to unhide their ProtectionStones block.
+    protectionstones.setparent - Allow access to /ps setparent.
+    protectionstones.setparent.others - Allow players to set their region to inherit properties from other regions they don't own.
+    protectionstones.name - Access to the /ps name command.
     protectionstones.home - Access to the /ps home command.
     protectionstones.sethome - Access to /ps sethome.
     protectionstones.tp - Access to /ps tp command.
@@ -239,6 +247,6 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     protectionstones.limit.alias.x - Replace alias with the protection block alias and x with the limit of that protection block the player can place.
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
-    protectionstones.superowner - Allows players to override region permissions.
+    protectionstones.superowner - Allows players to override region permissions, and use ps commands without being the owner of a region.
 
 This plugin is licensed under the **Apache 2.0 License**.

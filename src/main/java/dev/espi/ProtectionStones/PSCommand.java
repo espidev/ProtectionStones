@@ -22,10 +22,13 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgHideUnhide());
         ProtectionStones.getInstance().addCommandArgument(new ArgHome());
         ProtectionStones.getInstance().addCommandArgument(new ArgInfo());
+        ProtectionStones.getInstance().addCommandArgument(new ArgList());
+        ProtectionStones.getInstance().addCommandArgument(new ArgName());
         ProtectionStones.getInstance().addCommandArgument(new ArgPriority());
         ProtectionStones.getInstance().addCommandArgument(new ArgRegion());
         ProtectionStones.getInstance().addCommandArgument(new ArgReload());
         ProtectionStones.getInstance().addCommandArgument(new ArgSethome());
+        ProtectionStones.getInstance().addCommandArgument(new ArgSetparent());
         ProtectionStones.getInstance().addCommandArgument(new ArgToggle());
         ProtectionStones.getInstance().addCommandArgument(new ArgTp());
         ProtectionStones.getInstance().addCommandArgument(new ArgUnclaim());
@@ -44,7 +47,7 @@ public class PSCommand extends Command {
                 if (command.allowNonPlayersToExecute() || s instanceof Player) {
                     return command.executeArgument(s, args);
                 } else if (!command.allowNonPlayersToExecute()) {
-                    s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin and /ps give from console.");
+                    s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin, /ps give and /ps list from console.");
                     return true;
                 }
             }

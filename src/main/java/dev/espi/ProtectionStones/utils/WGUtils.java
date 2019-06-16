@@ -76,4 +76,10 @@ public class WGUtils {
         return currentPSID;
     }
 
+    public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
+        // Region is not valid
+        if (region == null) return true;
+
+        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
+    }
 }

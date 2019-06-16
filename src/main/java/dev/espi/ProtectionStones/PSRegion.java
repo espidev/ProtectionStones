@@ -24,7 +24,7 @@ public class PSRegion {
     private RegionManager rgmanager;
     private World world;
 
-    PSRegion (ProtectedRegion wgregion, RegionManager rgmanager, World world) {
+    PSRegion(ProtectedRegion wgregion, RegionManager rgmanager, World world) {
         this.wgregion = checkNotNull(wgregion);
         this.rgmanager = checkNotNull(rgmanager);
         this.world = checkNotNull(world);
@@ -39,6 +39,7 @@ public class PSRegion {
 
     /**
      * Get the WorldGuard ID of the region. Note that this is not guaranteed to be unique between worlds.
+     *
      * @return the id of the region
      */
     public String getID() {
@@ -47,6 +48,7 @@ public class PSRegion {
 
     /**
      * Get the location of the set home the region has (for /ps tp).
+     *
      * @return the location of the home, or null if the ps_home flag is not set.
      */
     public Location getHome() {
@@ -58,6 +60,7 @@ public class PSRegion {
 
     /**
      * Set the home of the region (internally changes the flag).
+     *
      * @param blockX block x location
      * @param blockY block y location
      * @param blockZ block z location
@@ -75,6 +78,7 @@ public class PSRegion {
 
     /**
      * Hides the protection block, if it is not hidden.
+     *
      * @return whether or not the block was hidden
      */
     public boolean hide() {
@@ -88,6 +92,7 @@ public class PSRegion {
 
     /**
      * Unhides the protection block, if it is hidden.
+     *
      * @return whether or not the block was unhidden
      */
     public boolean unhide() {
@@ -109,6 +114,7 @@ public class PSRegion {
     /**
      * This method returns the block that is supposed to contain the protection block.
      * Warning: If the protection stone is hidden, this will give the block that took its place!
+     *
      * @return returns the block that may contain the protection stone
      */
     public Block getProtectBlock() {
@@ -146,6 +152,7 @@ public class PSRegion {
 
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
+     *
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
      * @return whether or not the region was able to be successfully removed
      */

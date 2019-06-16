@@ -17,16 +17,13 @@
 package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,7 +52,7 @@ public class ArgPriority implements PSCommandArg {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
+        if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }

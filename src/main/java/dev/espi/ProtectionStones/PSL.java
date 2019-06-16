@@ -61,6 +61,11 @@ public enum PSL {
     NO_PERMISSION_GIVE("no_permission_give", ChatColor.RED + "You do not have permission to use the give command."),
     NO_PERMISSION_GET("no_permission_get", ChatColor.RED + "You do not have permission to use the get command."),
     NO_PERMISSION_SETHOME("no_permission_sethome", ChatColor.RED + "You do not have permission to use the sethome command."),
+    NO_PERMISSION_LIST("no_permission_list", ChatColor.RED + "You do not have permission to use the list command."),
+    NO_PERMISSION_LIST_OTHERS("no_permission_list_others", ChatColor.RED + "You do not have permission to use the list command for others."),
+    NO_PERMISSION_NAME("no_permission_name", ChatColor.RED + "You do not have permission to use the name command."),
+    NO_PERMISSION_SETPARENT("no_permission_setparent", ChatColor.RED + "You do not have permission to use the setparent command."),
+    NO_PERMISSION_SETPARENT_OTHERS("no_permission_setparent_others", ChatColor.RED + "You do not have permission to inherit from regions you don't own."),
 
     ADDED_TO_REGION("psregion.added_to_region",  ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
@@ -127,7 +132,7 @@ public enum PSL {
     PRIORITY_ERROR("priority.error", ChatColor.RED + "Error parsing input, check it again?"),
 
     // ps region
-    REGION_HELP("region.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps region [count|list|remove|disown] [playername]"),
+    REGION_HELP("region.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps region [remove|disown] [playername]"),
     REGION_HELP_DESC("region.help_desc", "Use this command to find information or edit other players' (or your own) protected regions."),
     REGION_NOT_FOUND_FOR_PLAYER("region.not_found_for_player", ChatColor.GRAY + "No regions found for %player% in this world."),
     REGION_LIST("region.list", ChatColor.GRAY + "%player%'s regions in this world: " + ChatColor.AQUA + "%regions%"),
@@ -205,6 +210,15 @@ public enum PSL {
     SETHOME_HELP("sethome.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sethome"),
     SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
     SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for " + ChatColor.AQUA + "%psid%" + ChatColor.GRAY + " has been set to your location."),
+
+    LIST_HELP("list.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps list"),
+    LIST_HELP_DESC("list.help_desc", "Use this command to list the regions you own."),
+
+    NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name]"),
+    NAME_HELP_DESC("name.help_desc", "Use this command to give a nickname to your region, to make identifying your region easier."),
+
+    SETPARENT_HELP("setparent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps setparent [region|none]"),
+    SETPARENT_HELP_DESC("setparent.help_desc", "Use this command to allow this region to inherit properties from another region (owners, members, flags, etc.).")
 
     ;
 

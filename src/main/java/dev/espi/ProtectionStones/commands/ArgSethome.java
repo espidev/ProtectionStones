@@ -1,9 +1,6 @@
 package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.ProtectionStones.FlagHandler;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
@@ -42,7 +39,7 @@ public class ArgSethome implements PSCommandArg {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        if (ProtectionStones.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false)) {
+        if (WGUtils.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
