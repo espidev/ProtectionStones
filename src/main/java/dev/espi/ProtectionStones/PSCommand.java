@@ -47,7 +47,7 @@ public class PSCommand extends Command {
                 if (command.allowNonPlayersToExecute() || s instanceof Player) {
                     return command.executeArgument(s, args);
                 } else if (!command.allowNonPlayersToExecute()) {
-                    s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin, /ps give and /ps list from console.");
+                    s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin, /ps give from console.");
                     return true;
                 }
             }

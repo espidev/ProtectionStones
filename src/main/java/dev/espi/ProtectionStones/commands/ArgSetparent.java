@@ -2,12 +2,13 @@ package dev.espi.ProtectionStones.commands;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ArgSetparent implements PSCommandArg {
     @Override
     public List<String> getNames() {
-        return null;
+        return Collections.singletonList("setparent");
     }
 
     @Override

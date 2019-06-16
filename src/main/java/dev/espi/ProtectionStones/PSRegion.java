@@ -10,8 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,6 +43,34 @@ public class PSRegion {
      */
     public String getID() {
         return wgregion.getId();
+    }
+
+    /**
+     * Get the name (nickname) of the region from /ps name.
+     *
+     * @return the name of the region, or null if the region does not have a name
+     */
+
+    public String getName() {
+        return wgregion.getFlag(FlagHandler.PS_NAME);
+    }
+
+    /**
+     * Set the name of the region (from /ps name).
+     * @param name new name, or null to remove the name
+     */
+
+    public void setName(String name) {
+        HashMap<String, ArrayList<String>> m = ProtectionStones.regionNameToID.get(getWorld());
+        m.get(getName()).remove(getID());
+        if (name != null) {
+            if (m.containsKey(name)) {
+                m.get(name).add(getID());
+            } else {
+                m.put(name, new ArrayList<>(Collections.singletonList(getID())));
+            }
+        }
+        wgregion.setFlag(FlagHandler.PS_NAME, name);
     }
 
     /**
@@ -134,6 +161,28 @@ public class PSRegion {
      */
     public String getType() {
         return wgregion.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+    }
+
+    /**
+     * Get whether or not a player is an owner of this region.
+     *
+     * @param uuid the player's uuid
+     * @return whether or not the player is a member
+     */
+
+    public boolean isOwner(UUID uuid) {
+        return wgregion.getOwners().contains(uuid);
+    }
+
+    /**
+     * Get whether or not a player is a member of this region.
+     *
+     * @param uuid the player's uuid
+     * @return whether or not the player is a member
+     */
+
+    public boolean isMember(UUID uuid) {
+        return wgregion.getMembers().contains(uuid);
     }
 
     /**

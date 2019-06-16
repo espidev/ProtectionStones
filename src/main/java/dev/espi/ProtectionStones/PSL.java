@@ -34,6 +34,7 @@ public enum PSL {
     INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
     NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
     INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),
+    MUST_BE_PLAYER("must_be_player", ChatColor.RED + "You must be a player to execute this command."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -132,7 +133,7 @@ public enum PSL {
     PRIORITY_ERROR("priority.error", ChatColor.RED + "Error parsing input, check it again?"),
 
     // ps region
-    REGION_HELP("region.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps region [remove|disown] [playername]"),
+    REGION_HELP("region.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps region [list|remove|disown] [playername]"),
     REGION_HELP_DESC("region.help_desc", "Use this command to find information or edit other players' (or your own) protected regions."),
     REGION_NOT_FOUND_FOR_PLAYER("region.not_found_for_player", ChatColor.GRAY + "No regions found for %player% in this world."),
     REGION_LIST("region.list", ChatColor.GRAY + "%player%'s regions in this world: " + ChatColor.AQUA + "%regions%"),
@@ -211,8 +212,11 @@ public enum PSL {
     SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
     SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for " + ChatColor.AQUA + "%psid%" + ChatColor.GRAY + " has been set to your location."),
 
-    LIST_HELP("list.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps list"),
-    LIST_HELP_DESC("list.help_desc", "Use this command to list the regions you own."),
+    LIST_HELP("list.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps list [player (optional)]"),
+    LIST_HELP_DESC("list.help_desc", "Use this command to list the regions you, or another player owns."),
+    LIST_HEADER("list.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " %player%'s Regions " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    LIST_OWNER("list.owner", ChatColor.GRAY + "Owner of:"),
+    LIST_MEMBER("list.member", ChatColor.GRAY + "Member of:"),
 
     NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name]"),
     NAME_HELP_DESC("name.help_desc", "Use this command to give a nickname to your region, to make identifying your region easier."),

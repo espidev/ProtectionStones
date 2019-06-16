@@ -35,6 +35,7 @@ public class FlagHandler {
     // Added to blocks on BlockPlaceEvent Listener
     public static final Flag<String> PS_HOME = new StringFlag("ps-home");
     public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
+    public static final Flag<String> PS_NAME = new StringFlag("ps-name");
 
     // called on initial start
     static void registerFlags() {

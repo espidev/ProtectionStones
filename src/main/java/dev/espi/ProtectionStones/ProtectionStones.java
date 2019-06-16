@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.commands.PSCommandArg;
@@ -63,6 +62,9 @@ public class ProtectionStones extends JavaPlugin {
     // all configuration file options are stored in here
     private PSConfig configOptions;
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
+
+    // ps alias to id cache
+    static HashMap<World, HashMap<String, ArrayList<String>>> regionNameToID = new HashMap<>();
 
     // vault economy integration
     private boolean vaultSupportEnabled = false;
@@ -155,7 +157,30 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Get the protection stone region with the world and region.
+     * Get the protection stone regions that have the given name as their set nickname (/ps name)
+     *
+     * @param w the world to look for regions in
+     * @param name the nickname of the region
+     * @return the list of regions that have that name
+     */
+
+    public static List<PSRegion> getPSRegionFromName(World w, String name) {
+        List<PSRegion> l = new ArrayList<>();
+
+        for (int i = 0; i < regionNameToID.get(w).get(name).size(); i++) {
+            String id = regionNameToID.get(w).get(name).get(i);
+            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) {
+                regionNameToID.get(w).get(name).remove(i);
+                i--;
+            } else {
+                l.add(getPSRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
+            }
+        }
+        return l;
+    }
+
+    /**
+     * Get the protection stone region with the world and region, without checks.
      *
      * @param w the world
      * @param r the WorldGuard region
@@ -230,8 +255,8 @@ public class ProtectionStones extends JavaPlugin {
      * @return a {@link PSRegion} object if it is a protectionstones region, and null if it isn't
      */
     public static PSRegion getPSRegionFromWGRegion(World w, ProtectedRegion region) {
-        if (region.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null) {
-            return new PSRegion(region, WGUtils.getRegionManagerWithWorld(w), w);
+        if (isPSRegion(region)) {
+            return getPSRegion(w, region);
         } else {
             return null;
         }
@@ -365,11 +390,11 @@ public class ProtectionStones extends JavaPlugin {
      * @return list of regions that the player owns
      */
 
-    public static List<ProtectedRegion> getPlayerPSRegions(World w, UUID uuid) {
-        List<ProtectedRegion> regions = new ArrayList<>();
+    public static List<PSRegion> getPlayerPSRegions(World w, UUID uuid) {
+        List<PSRegion> regions = new ArrayList<>();
         for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
             if (isPSRegion(r) && (r.getOwners().contains(uuid) || r.getMembers().contains(uuid))) {
-                regions.add(r);
+                regions.add(getPSRegionFromWGRegion(w, r));
             }
         }
         return regions;
@@ -446,6 +471,23 @@ public class ProtectionStones extends JavaPlugin {
 
         // Load configuration
         loadConfig(false);
+
+        // build up region cache
+        getServer().getConsoleSender().sendMessage("Building region cache...");
+        for (World w : Bukkit.getWorlds()) {
+            HashMap<String, ArrayList<String>> m = new HashMap<>();
+            for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+                String name = r.getFlag(FlagHandler.PS_NAME);
+                if (isPSRegion(r) && name != null) {
+                    if (m.containsKey(name)) {
+                        m.get(name).add(r.getId());
+                    } else {
+                        m.put(name, new ArrayList<>(Collections.singletonList(r.getId())));
+                    }
+                }
+            }
+            regionNameToID.put(w, m);
+        }
 
         // uuid cache
         getServer().getConsoleSender().sendMessage("Building UUID cache... (if slow change async-load-uuid-cache in the config to true)");
