@@ -16,7 +16,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 5
+    config_version = 6
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -35,6 +35,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Set to true to not block server startup for loading the UUID cache.
     # /ps add and /ps remove will not work for offline players until the cache is finished loading.
     async_load_uuid_cache = false
+    
+    # Whether or not to allow regions to have identical names (from /ps name).
+    # If this is set to true, players will have to use numbers after the name if they encounter duplicates.
+    allow_duplicate_region_names = false
     
     # Time in seconds between /ps view attempts.
     # Can prevent lag from spamming the command.
@@ -79,6 +83,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
     [region]
         # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
+        # You will probably have to change this between blocks, since the region sizes will be different
         # Set to -1 for no minimum, but will still check for overlapping regions
         distance_between_claims = -1
     
