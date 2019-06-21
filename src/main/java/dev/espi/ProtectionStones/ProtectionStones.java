@@ -18,6 +18,7 @@ package dev.espi.ProtectionStones;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -476,6 +477,7 @@ public class ProtectionStones extends JavaPlugin {
     @Override
     public void onEnable() {
         TomlFormat.instance();
+        Config.setInsertionOrderPreserved(true); // make sure that config upgrades aren't a complete mess
 
         plugin = this;
         configLocation = new File(this.getDataFolder() + "/config.toml");

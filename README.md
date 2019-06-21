@@ -202,7 +202,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps name [name|none] - Nickname your region to help identify it easily.
     /ps home [name/id] - Teleports you to one of your protected regions.
     /ps sethome - Set the home location of an owned region.
-    /ps tp [player] [num] - Teleports you to one of a given player's regions.
+    /ps tp [player] [num] or /ps tp [name/id] - Teleports you to a region, or one of a given player's regions.
     /ps toggle - Use this command to turn on or off placement of protection stones blocks.
     /ps view - Use this command to view the borders of a protected region.
     /ps unclaim - Use this command to pickup a placed protection stone and remove the region.

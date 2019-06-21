@@ -128,14 +128,14 @@ public class PSConfig {
                 e.printStackTrace();
                 return;
             }
-            FileConfig template = FileConfig.of(tempFile);
+            CommentedFileConfig template = CommentedFileConfig.of(tempFile);
             template.load();
 
             // iterate over block files and load into map
             Bukkit.getLogger().info("Protection Stone Blocks:");
             for (File file : ProtectionStones.blockDataFolder.listFiles()) {
 
-                CommentedFileConfig c = CommentedFileConfig.of(file);
+                CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();
                 c.load();
 
                 // check to make sure all options are not null
@@ -143,6 +143,7 @@ public class PSConfig {
                 for (String str : template.valueMap().keySet()) {
                     if (c.get(str) == null) {
                         c.set(str, template.get(str));
+                        c.setComment(str, template.getComment(str));
                         updated = true;
                     } else if (c.get(str) instanceof CommentedConfig) {
                         // no DFS for now (since there's only 2 layers of config)
@@ -150,7 +151,8 @@ public class PSConfig {
                         CommentedConfig c2 = c.get(str);
                         for (String str2 : template2.valueMap().keySet()) {
                             if (c2.get(str2) == null) {
-                                c2.set(str2, template2.get(str2));
+                                c2.add(str2, template2.get(str2));
+                                c2.setComment(str2, template2.getComment(str2));
                                 updated = true;
                             }
                         }
@@ -173,50 +175,7 @@ public class PSConfig {
 
                 // add custom recipes to Bukkit
                 if (b.allowCraftWithCustomRecipe) {
-
-                    // remove previous protectionstones recipes (/ps reload)
-                    List<Recipe> recipes = new ArrayList<>();
-                    Iterator<Recipe> iter = Bukkit.recipeIterator();
-                    while (iter.hasNext()) {
-                        Recipe r = iter.next();
-                        if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
-                            continue;
-                        }
-                        recipes.add(r);
-                    }
-                    // restore recipes without protectionstones ones
-                    Bukkit.clearRecipes();
-                    for (Recipe r : recipes) Bukkit.addRecipe(r);
-
-                    // create item
-                    ItemStack item = b.createItem();
-                    item.setAmount(b.recipeAmount);
-
-                    // create recipe
-                    ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.alias), item);
-                    HashMap<String, Character> items = new HashMap<>();
-                    List<String> recipeLine = new ArrayList<>();
-                    char id = 'a';
-                    for (int i = 0; i < b.customRecipe.size(); i++) {
-                        recipeLine.add("");
-                        for (String mat : b.customRecipe.get(i)) {
-                            if (mat.equals("")) {
-                                recipeLine.set(i, recipeLine.get(i) + " ");
-                            } else {
-                                if (items.get(mat) == null) {
-                                    items.put(mat, id++);
-                                }
-                                recipeLine.set(i, recipeLine.get(i) + items.get(mat));
-                            }
-                        }
-                    }
-
-                    // recipe
-                    recipe.shape(recipeLine.toArray(new String[0]));
-                    for (String mat : items.keySet()) {
-                        recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
-                    }
-                    Bukkit.addRecipe(recipe);
+                    setupRecipe(b);
                 }
             }
 
@@ -225,6 +184,52 @@ public class PSConfig {
             tempFile.delete();
         }
 
+    }
+
+    private static void setupRecipe(PSProtectBlock b) {
+        // remove previous protectionstones recipes (/ps reload)
+        List<Recipe> recipes = new ArrayList<>();
+        Iterator<Recipe> iter = Bukkit.recipeIterator();
+        while (iter.hasNext()) {
+            Recipe r = iter.next();
+            if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
+                continue;
+            }
+            recipes.add(r);
+        }
+        // restore recipes without protectionstones ones
+        Bukkit.clearRecipes();
+        for (Recipe r : recipes) Bukkit.addRecipe(r);
+
+        // create item
+        ItemStack item = b.createItem();
+        item.setAmount(b.recipeAmount);
+
+        // create recipe
+        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.alias), item);
+        HashMap<String, Character> items = new HashMap<>();
+        List<String> recipeLine = new ArrayList<>();
+        char id = 'a';
+        for (int i = 0; i < b.customRecipe.size(); i++) {
+            recipeLine.add("");
+            for (String mat : b.customRecipe.get(i)) {
+                if (mat.equals("")) {
+                    recipeLine.set(i, recipeLine.get(i) + " ");
+                } else {
+                    if (items.get(mat) == null) {
+                        items.put(mat, id++);
+                    }
+                    recipeLine.set(i, recipeLine.get(i) + items.get(mat));
+                }
+            }
+        }
+
+        // recipe
+        recipe.shape(recipeLine.toArray(new String[0]));
+        for (String mat : items.keySet()) {
+            recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
+        }
+        Bukkit.addRecipe(recipe);
     }
 
     // Upgrade the config one version up (ex. 3 -> 4)

@@ -21,6 +21,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
+import dev.espi.ProtectionStones.utils.ChatUtils;
 import dev.espi.ProtectionStones.utils.UUIDCache;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -56,60 +57,75 @@ public class ArgTp implements PSCommandArg {
         if (!p.hasPermission("protectionstones.tp")) {
             PSL.msg(p, PSL.NO_PERMISSION_TP.msg());
             return true;
-        } else if (args.length != 3) {
+        } else if (args.length < 2 || args.length > 3) {
             PSL.msg(p, PSL.TP_HELP.msg());
             return true;
         }
 
-        //
+        if (args.length == 2) { // /ps tp [name/id]
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                // get regions from the query
+                List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
 
-        // get the region id the player wants to teleport to
-        int regionNumber;
-        try {
-            regionNumber = Integer.parseInt(args[2]);
-            if (regionNumber <= 0) {
-                PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
+                if (regions.isEmpty()) {
+                    PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
+                    return;
+                }
+                if (regions.size() > 1) {
+                    ChatUtils.displayDuplicateRegionAliases(p, regions);
+                    return;
+                }
+                teleportPlayer(p, regions.get(0));
+            });
+        } else { // /ps tp [player] [num]
+            // get the region id the player wants to teleport to
+            int regionNumber;
+            try {
+                regionNumber = Integer.parseInt(args[2]);
+                if (regionNumber <= 0) {
+                    PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
                 return true;
             }
-        } catch (NumberFormatException e) {
-            PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
-            return true;
-        }
 
-        LocalPlayer rlp;
-        // region checks, and set lp to offline player
-        if (!UUIDCache.nameToUUID.containsKey(args[1])) {
-            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
-            return true;
-        }
-        try {
-            rlp = WorldGuardPlugin.inst().wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
-        } catch (Exception e) {
-            PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
-                    .replace("%player%", args[1]));
-            return true;
-        }
-
-        LocalPlayer lp = rlp;
-        // run region search asynchronously to avoid blocking server thread
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            List<ProtectedRegion> regions = getRegionsPlayerHas(lp, WGUtils.getRegionManagerWithPlayer(p));
-
-            // check if region was found
-            if (regions.isEmpty()) {
-                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
-                        .replace("%player%", lp.getName()));
-                return;
-            } else if (regionNumber > regions.size()) {
-                PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
-                        .replace("%player%", lp.getName())
-                        .replace("%num%", "" + regionNumber));
-                return;
+            LocalPlayer rlp;
+            // region checks, and set lp to offline player
+            if (!UUIDCache.nameToUUID.containsKey(args[1])) {
+                PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
+                return true;
+            }
+            try {
+                rlp = WorldGuardPlugin.inst().wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
+            } catch (Exception e) {
+                PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
+                        .replace("%player%", args[1]));
+                return true;
             }
 
-            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber - 1));
-            teleportPlayer(p, r);
-        });
+            LocalPlayer lp = rlp;
+            // run region search asynchronously to avoid blocking server thread
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                List<ProtectedRegion> regions = getRegionsPlayerHas(lp, WGUtils.getRegionManagerWithPlayer(p));
+
+                // check if region was found
+                if (regions.isEmpty()) {
+                    PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                            .replace("%player%", lp.getName()));
+                    return;
+                } else if (regionNumber > regions.size()) {
+                    PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
+                            .replace("%player%", lp.getName())
+                            .replace("%num%", "" + regionNumber));
+                    return;
+                }
+
+                PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber - 1));
+                teleportPlayer(p, r);
+            });
+        }
 
         return true;
     }
