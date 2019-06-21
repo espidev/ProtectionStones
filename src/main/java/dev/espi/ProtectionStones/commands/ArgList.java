@@ -25,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -72,26 +73,33 @@ public class ArgList implements PSCommandArg {
     }
 
     private void display(CommandSender s, List<PSRegion> regions, String pName, UUID pUUID) {
-        PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", pName));
-        PSL.msg(s, PSL.LIST_OWNER.msg());
+        List<String> ownerOf = new ArrayList<>(), memberOf = new ArrayList<>();
         for (PSRegion r : regions) {
             if (r.isOwner(pUUID)) {
                 if (r.getName() == null) {
-                    s.sendMessage(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
+                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
                 } else {
-                    s.sendMessage(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
+                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
+                }
+            }
+            if (r.isMember(pUUID)) {
+                if (r.getName() == null) {
+                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
+                } else {
+                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
                 }
             }
         }
-        PSL.msg(s, PSL.LIST_MEMBER.msg());
-        for (PSRegion r : regions) {
-            if (r.isMember(pUUID)) {
-                if (r.getName() == null) {
-                    s.sendMessage(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
-                } else {
-                    s.sendMessage(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
-                }
-            }
+
+        PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", pName));
+
+        if (!ownerOf.isEmpty()) {
+            PSL.msg(s, PSL.LIST_OWNER.msg());
+            for (String str : ownerOf) s.sendMessage(str);
+        }
+        if (!memberOf.isEmpty()) {
+            PSL.msg(s, PSL.LIST_MEMBER.msg());
+            for (String str : memberOf) s.sendMessage(str);
         }
     }
 

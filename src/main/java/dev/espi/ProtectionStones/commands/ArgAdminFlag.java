@@ -18,6 +18,7 @@ package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -26,24 +27,29 @@ import org.bukkit.command.CommandSender;
 
 class ArgAdminFlag {
     static boolean argumentAdminFlag(CommandSender p, String[] args) {
+
+        if (args.length < 5) {
+            PSL.msg(p, PSL.ADMIN_FLAG_HELP.msg());
+            return true;
+        }
+
         String flag, value = "", gee = "";
-        if (args[2].equalsIgnoreCase("-g")) {
-            flag = args[4];
-            for (int i = 5; i < args.length; i++) value += args[i] + " ";
-            gee = args[3];
+        World w = Bukkit.getWorld(args[2]);
+        if (args[3].equalsIgnoreCase("-g")) {
+            flag = args[5];
+            for (int i = 6; i < args.length; i++) value += args[i] + " ";
+            gee = args[4];
         } else {
-            flag = args[2];
-            for (int i = 3; i < args.length; i++) value += args[i] + " ";
+            flag = args[3];
+            for (int i = 4; i < args.length; i++) value += args[i] + " ";
         }
 
         final String fValue = value, fGee = gee;
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            for (World w : Bukkit.getWorlds()) {
-                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-                for (ProtectedRegion r : rgm.getRegions().values()) {
-                    if (ProtectionStones.isPSRegion(r)) {
-                        ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
-                    }
+            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+            for (ProtectedRegion r : rgm.getRegions().values()) {
+                if (ProtectionStones.isPSRegion(r)) {
+                    ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
                 }
             }
         });

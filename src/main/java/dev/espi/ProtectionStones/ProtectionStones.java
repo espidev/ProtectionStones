@@ -206,7 +206,7 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Get protection stone regions using an ID or alias.
      *
-     * @param w  the world to search in
+     * @param w  the world to search in (if it is an id, aliases are global)
      * @param id id or alias of the region
      * @return a list of psregions that match the id or alias; will be empty if no regions were found
      */

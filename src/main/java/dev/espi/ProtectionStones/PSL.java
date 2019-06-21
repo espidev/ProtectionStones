@@ -155,9 +155,8 @@ public enum PSL {
     TP_CANCELLED_MOVED("tp.cancelled_moved", ChatColor.RED + "Teleport cancelled. You moved!"),
 
     // ps home,
-    HOME_HELP("home.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps home [num]"),
+    HOME_HELP("home.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps home [name/id]"),
     HOME_HELP_DESC("home.help_desc", "Teleports you to one of your protected regions."),
-    HOME_ONLY("home.only", ChatColor.RED + "You only have %num% total regions in this world!"),
 
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),
@@ -185,6 +184,7 @@ public enum PSL {
     ADMIN_LASTLOGONS_HEADER("admin.lastlogons_header", ChatColor.YELLOW + "%days% Days Plus:\n================"),
     ADMIN_LASTLOGONS_LINE("admin.lastlogons_line", ChatColor.YELLOW + "%player% %time% days"),
     ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),
+    ADMIN_FLAG_HELP("admin.flag_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]"),
 
     // ps reload
     RELOAD_HELP("reload.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps reload"),

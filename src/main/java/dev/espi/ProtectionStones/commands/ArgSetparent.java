@@ -56,7 +56,7 @@ public class ArgSetparent implements PSCommandArg {
             PSL.msg(s, PSL.NO_ACCESS.msg());
             return true;
         }
-        if (args.length < 2) {
+        if (args.length != 2) {
             PSL.msg(s, PSL.SETPARENT_HELP.msg());
             return true;
         }

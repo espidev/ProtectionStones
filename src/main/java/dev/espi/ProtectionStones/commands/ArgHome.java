@@ -16,13 +16,10 @@
 
 package dev.espi.ProtectionStones.commands;
 
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
-import dev.espi.ProtectionStones.utils.WGUtils;
+import dev.espi.ProtectionStones.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,6 +53,32 @@ public class ArgHome implements PSCommandArg {
             return true;
         }
 
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            // get regions from the query
+            List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
+
+            // remove regions not owned by the player
+            for (int i = 0; i < regions.size(); i++) {
+                if (!regions.get(i).isOwner(p.getUniqueId())) {
+                    regions.remove(i);
+                    i--;
+                }
+            }
+
+            if (regions.isEmpty()) {
+                PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
+                return;
+            }
+            if (regions.size() > 1) {
+                ChatUtils.displayDuplicateRegionAliases(p, regions);
+                return;
+            }
+
+            ArgTp.teleportPlayer(p, regions.get(0));
+        });
+
+
+        /* OLD NUMBER BASED SYSTEM
         // get the region id the player wants to teleport to
         int regionNumber;
         try {
@@ -84,7 +107,7 @@ public class ArgHome implements PSCommandArg {
             PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber-1));
 
             ArgTp.teleportPlayer(p, r);
-        });
+        });*/
 
         return true;
     }
