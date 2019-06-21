@@ -20,6 +20,7 @@ import dev.espi.ProtectionStones.PSL;
 import dev.espi.ProtectionStones.PSRegion;
 import dev.espi.ProtectionStones.ProtectionStones;
 import dev.espi.ProtectionStones.utils.UUIDCache;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -54,17 +55,19 @@ public class ArgList implements PSCommandArg {
             return true;
         }
 
-        Player p = (Player) s;
-        if (args.length == 1) {
-            List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId());
-            display(s, regions, p.getName(), p.getUniqueId());
-        } else if (args.length == 2) {
-            List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), UUIDCache.nameToUUID.get(args[1]));
-            display(s, regions, args[1], UUIDCache.nameToUUID.get(args[1]));
-        } else {
-            PSL.msg(s, PSL.LIST_HELP.msg());
-        }
-
+        // run query async to reduce load
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            Player p = (Player) s;
+            if (args.length == 1) {
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId());
+                display(s, regions, p.getName(), p.getUniqueId());
+            } else if (args.length == 2) {
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), UUIDCache.nameToUUID.get(args[1]));
+                display(s, regions, args[1], UUIDCache.nameToUUID.get(args[1]));
+            } else {
+                PSL.msg(s, PSL.LIST_HELP.msg());
+            }
+        });
         return true;
     }
 

@@ -94,20 +94,20 @@ public class PSRegion {
     /**
      * Set the parent of this region.
      * @param r the region to be the parent, or null for no parent
-     * @throws ProtectedRegion.CircularInheritanceException
+     * @throws ProtectedRegion.CircularInheritanceException thrown when the parent already inherits from the child
      */
 
-    public void setParent(ProtectedRegion r) throws ProtectedRegion.CircularInheritanceException {
-        wgregion.setParent(r);
+    public void setParent(PSRegion r) throws ProtectedRegion.CircularInheritanceException {
+        wgregion.setParent(r == null ? null : r.getWGRegion());
     }
 
     /**
      * Get the parent of this region, if there is one.
-     * @param r the parent region of this region, or null if there isn't one
+     * @return the parent of the region, or null if there isn't one
      */
 
-    public void getParent(ProtectedRegion r) {
-        wgregion.getParent();
+    public PSRegion getParent() {
+        return ProtectionStones.getPSRegionFromWGRegion(world, wgregion.getParent());
     }
 
     /**

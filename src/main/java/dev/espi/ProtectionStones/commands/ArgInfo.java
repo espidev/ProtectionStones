@@ -79,6 +79,14 @@ public class ArgInfo implements PSCommandArg {
             displayOwners(p, r.getWGRegion());
             displayMembers(p, r.getWGRegion());
 
+            if (r.getParent() != null) {
+                if (r.getName() != null) {
+                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getName() + " (" + r.getParent().getID() + ")");
+                } else {
+                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getID());
+                }
+            }
+
             BlockVector3 min = r.getWGRegion().getMinimumPoint();
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             PSL.msg(p, PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");

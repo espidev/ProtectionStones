@@ -91,7 +91,7 @@ public class ArgSetparent implements PSCommandArg {
             }
 
             try {
-                r.setParent(parent.get(0).getWGRegion());
+                r.setParent(parent.get(0));
             } catch (ProtectedRegion.CircularInheritanceException e) {
                 PSL.msg(s, PSL.SETPARENT_CIRCULAR_INHERITANCE.msg());
                 return true;

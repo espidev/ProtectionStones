@@ -74,21 +74,18 @@ public class ArgTp implements PSCommandArg {
             return true;
         }
 
-        LocalPlayer rlp = null;
+        LocalPlayer rlp;
         // region checks, and set lp to offline player
-        if (args[0].equalsIgnoreCase("tp")) {
-            if (!UUIDCache.nameToUUID.containsKey(args[1])) {
-                PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
-                return true;
-            }
-            try {
-                rlp = WorldGuardPlugin.inst().wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
-            } catch (Exception e) {
-                PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
-                        .replace("%player%", args[1]));
-                return true;
-            }
-
+        if (!UUIDCache.nameToUUID.containsKey(args[1])) {
+            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
+            return true;
+        }
+        try {
+            rlp = WorldGuardPlugin.inst().wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
+        } catch (Exception e) {
+            PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
+                    .replace("%player%", args[1]));
+            return true;
         }
 
         LocalPlayer lp = rlp;
@@ -108,7 +105,7 @@ public class ArgTp implements PSCommandArg {
                 return;
             }
 
-            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber-1));
+            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber - 1));
             teleportPlayer(p, r);
         });
 

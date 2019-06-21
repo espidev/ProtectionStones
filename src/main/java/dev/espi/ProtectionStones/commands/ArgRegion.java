@@ -74,7 +74,7 @@ public class ArgRegion implements PSCommandArg {
 
         LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[2])));
 
-        if (args[1].equalsIgnoreCase("list")) { // list player's regions TODO GET RID OF
+        if (args[1].equalsIgnoreCase("list")) { // list player's regions
             StringBuilder regionMessage = new StringBuilder();
             boolean found = false;
             for (String str : rgm.getRegions().keySet()) {

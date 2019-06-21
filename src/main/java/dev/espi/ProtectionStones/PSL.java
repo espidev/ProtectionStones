@@ -124,6 +124,7 @@ public enum PSL {
     INFO_FLAGS("info.flags", ChatColor.BLUE + "Flags: " + ChatColor.GRAY),
     INFO_REGION("info.region", ChatColor.BLUE + "Region: " + ChatColor.AQUA),
     INFO_PRIORITY("info.priority", ChatColor.BLUE + "Priority: " + ChatColor.AQUA),
+    INFO_PARENT("info.parent", ChatColor.BLUE + "Parent: " + ChatColor.AQUA),
     INFO_BOUNDS("info.bounds", ChatColor.BLUE + "Bounds: " + ChatColor.AQUA),
 
     // ps priority

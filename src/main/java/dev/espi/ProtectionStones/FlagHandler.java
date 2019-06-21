@@ -43,6 +43,7 @@ public class FlagHandler {
         try {
             registry.register(PS_HOME);
             registry.register(PS_BLOCK_MATERIAL);
+            registry.register(PS_NAME);
         } catch (FlagConflictException e ) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();
