@@ -25,6 +25,7 @@ worlds = [
 
 [region]
     # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
+    # You will probably have to change this between blocks, since the region sizes will be different
     # Set to -1 for no minimum, but will still check for overlapping regions
     distance_between_claims = -1
 
