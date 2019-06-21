@@ -17,12 +17,7 @@
 package dev.espi.ProtectionStones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
-import dev.espi.ProtectionStones.utils.WGUtils;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -46,7 +41,7 @@ public class ArgUnclaim implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
+        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (!p.hasPermission("protectionstones.unclaim")) {

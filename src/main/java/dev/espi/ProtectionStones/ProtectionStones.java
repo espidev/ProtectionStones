@@ -153,7 +153,7 @@ public class ProtectionStones extends JavaPlugin {
      * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
      */
     public static boolean isPSRegion(ProtectedRegion r) {
-        return r.getId().startsWith("ps") && r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null;
+        return r != null && r.getId().startsWith("ps") && r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null;
     }
 
     /**
@@ -181,7 +181,7 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Get the protection stone regions that have the given name as their set nickname (/ps name)
      *
-     * @param w the world to look for regions in
+     * @param w    the world to look for regions in
      * @param name the nickname of the region
      * @return the list of regions that have that name
      */
@@ -193,14 +193,31 @@ public class ProtectionStones extends JavaPlugin {
 
         for (int i = 0; i < regionNameToID.get(w).get(name).size(); i++) {
             String id = regionNameToID.get(w).get(name).get(i);
-            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) {
+            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) { // cleanup cache
                 regionNameToID.get(w).get(name).remove(i);
                 i--;
             } else {
-                l.add(getPSRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
+                l.add(toPSRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
             }
         }
         return l;
+    }
+
+    /**
+     * Get protection stone regions using an ID or alias.
+     *
+     * @param w  the world to search in
+     * @param id id or alias of the region
+     * @return a list of psregions that match the id or alias; will be empty if no regions were found
+     */
+    public static List<PSRegion> getPSRegions(World w, String id) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        PSRegion r = getPSRegionFromWGRegion(w, rgm.getRegion(id));
+        if (r != null) { // return id based query
+            return Collections.singletonList(r);
+        } else { // return alias based query
+            return getPSRegionsFromName(w, id);
+        }
     }
 
     /**
@@ -210,7 +227,7 @@ public class ProtectionStones extends JavaPlugin {
      * @param r the WorldGuard region
      * @return the {@link PSRegion} based on the parameters
      */
-    public static PSRegion getPSRegion(World w, ProtectedRegion r) {
+    public static PSRegion toPSRegion(World w, ProtectedRegion r) {
         return new PSRegion(r, WGUtils.getRegionManagerWithWorld(w), w);
     }
 
@@ -220,7 +237,7 @@ public class ProtectionStones extends JavaPlugin {
      * @param l the location
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
      */
-    public static PSRegion getPSRegion(Location l) {
+    public static PSRegion toPSRegion(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         String psID = WGUtils.matchLocationToPSID(l);
@@ -280,7 +297,7 @@ public class ProtectionStones extends JavaPlugin {
      */
     public static PSRegion getPSRegionFromWGRegion(World w, ProtectedRegion region) {
         if (isPSRegion(region)) {
-            return getPSRegion(w, region);
+            return toPSRegion(w, region);
         } else {
             return null;
         }
@@ -409,7 +426,7 @@ public class ProtectionStones extends JavaPlugin {
      * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
      * since the query can be slow.
      *
-     * @param w world to search for regions in
+     * @param w    world to search for regions in
      * @param uuid uuid of the player
      * @return list of regions that the player owns
      */

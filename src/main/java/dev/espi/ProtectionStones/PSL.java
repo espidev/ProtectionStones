@@ -85,6 +85,7 @@ public enum PSL {
     REGION_OVERLAP("psregion.region_overlap", ChatColor.RED + "You can not place a protection block here as it overlaps another region."),
     REGION_TOO_CLOSE("psregion.region_too_close", ChatColor.RED + "Your protection block must be a minimum of %num% blocks from the edge of other regions!"),
     REGION_CANT_TELEPORT("psregion.cant_teleport", ChatColor.RED + "Your teleportation was blocked by a protection region!"),
+    SPECIFY_ID_INSTEAD_OF_ALIAS("psregion.specify_id_instead_of_alias", ChatColor.GRAY + "There were multiple regions found with this name! Please use an ID instead.\n Regions with this name: " + ChatColor.AQUA + "%regions%"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
@@ -225,7 +226,10 @@ public enum PSL {
     NAME_TAKEN("name.taken", ChatColor.GRAY + "The region name " + ChatColor.AQUA + "%name%" + ChatColor.GRAY + " has already been taken! Try another one."),
 
     SETPARENT_HELP("setparent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps setparent [region|none]"),
-    SETPARENT_HELP_DESC("setparent.help_desc", "Use this command to allow this region to inherit properties from another region (owners, members, flags, etc.).")
+    SETPARENT_HELP_DESC("setparent.help_desc", "Use this command to allow this region to inherit properties from another region (owners, members, flags, etc.)."),
+    SETPARENT_SUCCESS("setparent.success", ChatColor.GRAY + "Successfully set the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%parent%" + ChatColor.GRAY + "."),
+    SETPARENT_SUCCESS_REMOVE("setparent.success_remove", ChatColor.GRAY + "Successfully removed the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + "."),
+    SETPARENT_CIRCULAR_INHERITANCE("setparent.circular_inheritance", ChatColor.RED + "Detected circular inheritance (the parent already inherits from this region?). Parent not set."),
 
     ;
 

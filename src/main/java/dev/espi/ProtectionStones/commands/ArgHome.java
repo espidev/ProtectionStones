@@ -81,7 +81,7 @@ public class ArgHome implements PSCommandArg {
                 return;
             }
 
-            PSRegion r = ProtectionStones.getPSRegion(p.getWorld(), regions.get(regionNumber-1));
+            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber-1));
 
             ArgTp.teleportPlayer(p, r);
         });

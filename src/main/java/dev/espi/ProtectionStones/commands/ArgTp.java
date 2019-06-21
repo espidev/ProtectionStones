@@ -108,7 +108,7 @@ public class ArgTp implements PSCommandArg {
                 return;
             }
 
-            PSRegion r = ProtectionStones.getPSRegion(p.getWorld(), regions.get(regionNumber-1));
+            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber-1));
             teleportPlayer(p, r);
         });
 

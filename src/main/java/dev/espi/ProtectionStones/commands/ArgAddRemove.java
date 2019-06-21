@@ -64,7 +64,7 @@ public class ArgAddRemove implements PSCommandArg {
     //   removeowner: remove owner
 
     public static boolean template(Player p, String[] args, String type) {
-        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
+        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);

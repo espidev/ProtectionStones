@@ -92,6 +92,25 @@ public class PSRegion {
     }
 
     /**
+     * Set the parent of this region.
+     * @param r the region to be the parent, or null for no parent
+     * @throws ProtectedRegion.CircularInheritanceException
+     */
+
+    public void setParent(ProtectedRegion r) throws ProtectedRegion.CircularInheritanceException {
+        wgregion.setParent(r);
+    }
+
+    /**
+     * Get the parent of this region, if there is one.
+     * @param r the parent region of this region, or null if there isn't one
+     */
+
+    public void getParent(ProtectedRegion r) {
+        wgregion.getParent();
+    }
+
+    /**
      * Get the location of the set home the region has (for /ps tp).
      *
      * @return the location of the home, or null if the ps_home flag is not set.

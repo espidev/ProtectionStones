@@ -23,14 +23,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.ProtectionStones.*;
 import dev.espi.ProtectionStones.utils.WGUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class ArgAdminHide {
 
@@ -58,7 +53,7 @@ class ArgAdminHide {
             // loop through regions that are protection stones and hide or unhide the block
             for (ProtectedRegion r : mgr.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion region = ProtectionStones.getPSRegion(w, r);
+                    PSRegion region = ProtectionStones.toPSRegion(w, r);
                     if (args[1].equalsIgnoreCase("hide")) {
                         Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), region::hide);
                     } else if (args[1].equalsIgnoreCase("unhide")){

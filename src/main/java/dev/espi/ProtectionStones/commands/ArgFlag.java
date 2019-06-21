@@ -48,7 +48,7 @@ public class ArgFlag implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.getPSRegion(p.getLocation());
+        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
 
         if (!p.hasPermission("protectionstones.flags")) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
