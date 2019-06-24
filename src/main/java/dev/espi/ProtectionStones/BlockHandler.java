@@ -73,13 +73,13 @@ class BlockHandler {
                 }
             }
             // check if player has passed region limit
-            if (total >= maxPS && maxPS != -1) {
+            if (total > maxPS && maxPS != -1) {
                 return PSL.REACHED_REGION_LIMIT.msg();
             }
 
             // check if player has passed per block limit
             for (PSProtectBlock ps : regionLimits.keySet()) {
-                if (regionFound.containsKey(ps.alias) && regionLimits.get(ps) <= regionFound.get(ps.alias)) {
+                if (regionFound.containsKey(ps.alias) && regionLimits.get(ps) < regionFound.get(ps.alias)) {
                     return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
                 }
             }
