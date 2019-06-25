@@ -9,7 +9,7 @@ This plugin is based off the original ProtectionStones plugin by AxelDios.
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.1.1
+* ProtectionStones 2.1.2
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)

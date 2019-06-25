@@ -389,10 +389,16 @@ public class ProtectionStones extends JavaPlugin {
         HashMap<PSProtectBlock, Integer> regionLimits = new HashMap<>();
         for (PermissionAttachmentInfo rawperm : p.getEffectivePermissions()) {
             String perm = rawperm.getPermission();
+
             if (perm.startsWith("protectionstones.limit")) {
                 String[] spl = perm.split("\\.");
+
                 if (spl.length == 4) {
-                    regionLimits.put(ProtectionStones.getProtectBlockFromAlias(spl[2]), Integer.parseInt(spl[3]));
+                    PSProtectBlock block = ProtectionStones.getProtectBlockFromAlias(spl[2]);
+                    int limit = Integer.parseInt(spl[3]);
+                    if (regionLimits.get(block) == null || regionLimits.get(block) < limit) { // only use max limit
+                        regionLimits.put(ProtectionStones.getProtectBlockFromAlias(spl[2]), Integer.parseInt(spl[3]));
+                    }
                 }
             }
         }

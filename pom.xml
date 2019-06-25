@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.espi</groupId>
     <artifactId>protectionstones</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
     <name>ProtectionStones</name>
     <description>A grief prevention plugin for Spigot Minecraft servers.</description>
     <url>https://github.com/espidev/ProtectionStones</url>
@@ -29,6 +29,35 @@
       <developerConnection>scm:git:ssh://github.com:espidev/ProtectionStones.git</developerConnection>
       <url>http://github.com/espidev/ProtectionStones/tree/master</url>
     </scm>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <build>
         <resources>
@@ -113,20 +142,6 @@
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -18,6 +18,7 @@ package dev.espi.ProtectionStones;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -64,7 +65,7 @@ class BlockHandler {
             for (World w : Bukkit.getWorlds()) {
                 RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
-                    if (ProtectionStones.isPSRegion(r)) {
+                    if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
                         String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
                         total++;
                         int num = regionFound.containsKey(ProtectionStones.getBlockOptions(f).alias) ? regionFound.get(ProtectionStones.getBlockOptions(f).alias) + 1 : 1;
@@ -73,13 +74,13 @@ class BlockHandler {
                 }
             }
             // check if player has passed region limit
-            if (total > maxPS && maxPS != -1) {
+            if (total >= maxPS && maxPS != -1) {
                 return PSL.REACHED_REGION_LIMIT.msg();
             }
 
             // check if player has passed per block limit
             for (PSProtectBlock ps : regionLimits.keySet()) {
-                if (regionFound.containsKey(ps.alias) && regionLimits.get(ps) < regionFound.get(ps.alias)) {
+                if (regionFound.containsKey(ps.alias) && regionLimits.get(ps) <= regionFound.get(ps.alias)) {
                     return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
                 }
             }
