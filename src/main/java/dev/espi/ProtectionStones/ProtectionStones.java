@@ -393,7 +393,7 @@ public class ProtectionStones extends JavaPlugin {
             if (perm.startsWith("protectionstones.limit")) {
                 String[] spl = perm.split("\\.");
 
-                if (spl.length == 4) {
+                if (spl.length == 4 && ProtectionStones.isProtectBlockType(spl[2])) {
                     PSProtectBlock block = ProtectionStones.getProtectBlockFromAlias(spl[2]);
                     int limit = Integer.parseInt(spl[3]);
                     if (regionLimits.get(block) == null || regionLimits.get(block) < limit) { // only use max limit
