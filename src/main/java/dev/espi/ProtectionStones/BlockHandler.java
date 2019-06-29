@@ -53,22 +53,20 @@ class BlockHandler {
         return null;
     }
 
-    private static String hasPlayerPassedRegionLimit(Player p) {
+    private static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
         HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerRegionLimits(p);
         int maxPS = ProtectionStones.getPlayerGlobalRegionLimits(p);
 
         if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
             // count player's protection stones
-            HashMap<String, Integer> regionFound = new HashMap<>();
-            int total = 0;
+            int total = 0, bFound = 0;
             for (World w : Bukkit.getWorlds()) {
                 RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
                     if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
                         String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
                         total++;
-                        int num = regionFound.containsKey(ProtectionStones.getBlockOptions(f).alias) ? regionFound.get(ProtectionStones.getBlockOptions(f).alias) + 1 : 1;
-                        regionFound.put(ProtectionStones.getBlockOptions(f).alias, num);
+                        if (f.equals(b.type)) bFound++; // if the specific block was found
                     }
                 }
             }
@@ -78,10 +76,8 @@ class BlockHandler {
             }
 
             // check if player has passed per block limit
-            for (PSProtectBlock ps : regionLimits.keySet()) {
-                if (regionFound.containsKey(ps.alias) && regionLimits.get(ps) <= regionFound.get(ps.alias)) {
-                    return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
-                }
+            if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
+                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
             }
         }
         return "";
@@ -133,7 +129,7 @@ class BlockHandler {
         // non-admin checks
         if (!p.hasPermission("protectionstones.admin")) {
             // check if player has limit on protection stones
-            String msg = hasPlayerPassedRegionLimit(p);
+            String msg = hasPlayerPassedRegionLimit(p, blockOptions);
             if (!msg.equals("")) {
                 PSL.msg(p, msg);
                 e.setCancelled(true);
