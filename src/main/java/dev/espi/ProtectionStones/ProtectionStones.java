@@ -398,7 +398,6 @@ public class ProtectionStones extends JavaPlugin {
                     int limit = Integer.parseInt(spl[3]);
                     if (regionLimits.get(block) == null || regionLimits.get(block) < limit) { // only use max limit
                         regionLimits.put(block, limit);
-                        Bukkit.getLogger().info(block + " " + limit); // TODO
                     }
                 }
             }
