@@ -200,15 +200,6 @@ class BlockHandler {
             return;
         }
 
-        // fire event and check if cancelled
-        PSCreateEvent event = new PSCreateEvent(ProtectionStones.getPSRegionFromWGRegion(p.getWorld(), region), p);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            e.setCancelled(true);
-            rm.removeRegion(id);
-            return;
-        }
-
         // add corresponding flags to new region by cloning blockOptions default flags
         HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
 
@@ -218,6 +209,15 @@ class BlockHandler {
         // set flags
         region.setFlags(flags);
         FlagHandler.initCustomFlagsForPS(region, b, blockOptions);
+
+        // fire event and check if cancelled
+        PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            e.setCancelled(true);
+            rm.removeRegion(id);
+            return;
+        }
 
         p.sendMessage(PSL.PROTECTED.msg());
 

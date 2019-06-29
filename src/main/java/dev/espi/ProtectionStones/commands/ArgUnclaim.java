@@ -41,7 +41,7 @@ public class ArgUnclaim implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
+        PSRegion r = PSRegion.fromLocation(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (!p.hasPermission("protectionstones.unclaim")) {

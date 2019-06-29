@@ -53,7 +53,7 @@ class ArgAdminHide {
             // loop through regions that are protection stones and hide or unhide the block
             for (ProtectedRegion r : mgr.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion region = ProtectionStones.toPSRegion(w, r);
+                    PSRegion region = PSRegion.fromWGRegion(w, r);
                     if (args[1].equalsIgnoreCase("hide")) {
                         Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), region::hide);
                     } else if (args[1].equalsIgnoreCase("unhide")){

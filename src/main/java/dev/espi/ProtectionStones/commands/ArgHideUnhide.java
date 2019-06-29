@@ -40,7 +40,7 @@ public class ArgHideUnhide implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] arg) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
+        PSRegion r = PSRegion.fromLocation(p.getLocation());
 
         // preliminary checks
         if (arg[0].equals("unhide") && !p.hasPermission("protectionstones.unhide")) {

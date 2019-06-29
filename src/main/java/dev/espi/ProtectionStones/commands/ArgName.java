@@ -45,7 +45,7 @@ public class ArgName implements PSCommandArg {
             return true;
         }
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
+        PSRegion r = PSRegion.fromLocation(p.getLocation());
         if (r == null) {
             PSL.msg(s, PSL.NOT_IN_REGION.msg());
             return true;

@@ -108,7 +108,7 @@ public class ArgTp implements PSCommandArg {
             LocalPlayer lp = rlp;
             // run region search asynchronously to avoid blocking server thread
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                List<ProtectedRegion> regions = getRegionsPlayerHas(lp, WGUtils.getRegionManagerWithPlayer(p));
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId());
 
                 // check if region was found
                 if (regions.isEmpty()) {
@@ -122,23 +122,11 @@ public class ArgTp implements PSCommandArg {
                     return;
                 }
 
-                PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber - 1));
-                teleportPlayer(p, r);
+                teleportPlayer(p, regions.get(regionNumber - 1));
             });
         }
 
         return true;
-    }
-
-    // find regions that the player has
-    static List<ProtectedRegion> getRegionsPlayerHas(LocalPlayer lp, RegionManager rgm) {
-        List<ProtectedRegion> ret = new ArrayList<>();
-        for (ProtectedRegion region : rgm.getRegions().values()) {
-            if (ProtectionStones.isPSRegion(region) && region.getOwners().contains(lp)) {
-                ret.add(region);
-            }
-        }
-        return ret;
     }
 
     static void teleportPlayer(Player p, PSRegion r) {

@@ -45,6 +45,65 @@ public class PSRegion {
         this.world = checkNotNull(world);
     }
 
+    // ~~~~~~~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~~
+
+    /**
+     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
+     *
+     * @param l the location
+     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     */
+    public static PSRegion fromLocation(Location l) {
+        checkNotNull(checkNotNull(l).getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        String psID = WGUtils.matchLocationToPSID(l);
+        ProtectedRegion r = rgm.getRegion(psID);
+        if (r == null) {
+            return null;
+        } else {
+            return new PSRegion(r, rgm, l.getWorld());
+        }
+    }
+
+    /**
+     * Get the protection stone region with the world and region.
+     *
+     * @param w the world
+     * @param r the WorldGuard region
+     * @return the {@link PSRegion} based on the parameters, or null if the region given is not a protectionstones region
+     */
+    public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
+        if (!ProtectionStones.isPSRegion(checkNotNull(r))) return null;
+        return new PSRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
+    }
+
+    /**
+     * Get the protection stone regions that have the given name as their set nickname (/ps name)
+     *
+     * @param w    the world to look for regions in
+     * @param name the nickname of the region
+     * @return the list of regions that have that name
+     */
+
+    public static List<PSRegion> fromName(World w, String name) {
+        List<PSRegion> l = new ArrayList<>();
+
+        if (ProtectionStones.regionNameToID.get(w).get(name) == null) return l;
+
+        for (int i = 0; i < ProtectionStones.regionNameToID.get(w).get(name).size(); i++) {
+            String id = ProtectionStones.regionNameToID.get(w).get(name).get(i);
+            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) { // cleanup cache
+                ProtectionStones.regionNameToID.get(w).get(name).remove(i);
+                i--;
+            } else {
+                l.add(fromWGRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
+            }
+        }
+        return l;
+    }
+
+    // ~~~~~~~~~~~ instance ~~~~~~~~~~~~~~~~
+
     /**
      * @return gets the world that the region is in
      */
@@ -107,7 +166,7 @@ public class PSRegion {
      */
 
     public PSRegion getParent() {
-        return ProtectionStones.getPSRegionFromWGRegion(world, wgregion.getParent());
+        return fromWGRegion(world, wgregion.getParent());
     }
 
     /**

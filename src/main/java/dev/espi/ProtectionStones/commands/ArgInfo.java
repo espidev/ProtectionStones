@@ -51,7 +51,7 @@ public class ArgInfo implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
+        PSRegion r = PSRegion.fromLocation(p.getLocation());
 
         if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());

@@ -180,73 +180,20 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Get the protection stone regions that have the given name as their set nickname (/ps name)
-     *
-     * @param w    the world to look for regions in
-     * @param name the nickname of the region
-     * @return the list of regions that have that name
-     */
-
-    public static List<PSRegion> getPSRegionsFromName(World w, String name) {
-        List<PSRegion> l = new ArrayList<>();
-
-        if (regionNameToID.get(w).get(name) == null) return l;
-
-        for (int i = 0; i < regionNameToID.get(w).get(name).size(); i++) {
-            String id = regionNameToID.get(w).get(name).get(i);
-            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) { // cleanup cache
-                regionNameToID.get(w).get(name).remove(i);
-                i--;
-            } else {
-                l.add(toPSRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
-            }
-        }
-        return l;
-    }
-
-    /**
      * Get protection stone regions using an ID or alias.
      *
-     * @param w  the world to search in (if it is an id, aliases are global)
-     * @param id id or alias of the region
+     * @param w          the world to search in (if it is an id, aliases are global)
+     * @param identifier id or alias of the region
      * @return a list of psregions that match the id or alias; will be empty if no regions were found
      */
-    public static List<PSRegion> getPSRegions(World w, String id) {
+
+    public static List<PSRegion> getPSRegions(World w, String identifier) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        PSRegion r = getPSRegionFromWGRegion(w, rgm.getRegion(id));
+        PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
         if (r != null) { // return id based query
             return Collections.singletonList(r);
         } else { // return alias based query
-            return getPSRegionsFromName(w, id);
-        }
-    }
-
-    /**
-     * Get the protection stone region with the world and region, without checks.
-     *
-     * @param w the world
-     * @param r the WorldGuard region
-     * @return the {@link PSRegion} based on the parameters
-     */
-    public static PSRegion toPSRegion(World w, ProtectedRegion r) {
-        return new PSRegion(r, WGUtils.getRegionManagerWithWorld(w), w);
-    }
-
-    /**
-     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
-     *
-     * @param l the location
-     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
-     */
-    public static PSRegion toPSRegion(Location l) {
-        checkNotNull(checkNotNull(l).getWorld());
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
-        String psID = WGUtils.matchLocationToPSID(l);
-        ProtectedRegion r = rgm.getRegion(psID);
-        if (r == null) {
-            return null;
-        } else {
-            return new PSRegion(r, rgm, l.getWorld());
+            return PSRegion.fromName(w, identifier);
         }
     }
 
@@ -258,9 +205,10 @@ public class ProtectionStones extends JavaPlugin {
      * @param psID the worldguard region ID of the region
      * @return whether or not the event was cancelled
      */
+
     public static boolean removePSRegion(World w, String psID) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, checkNotNull(rgm.getRegion(psID))));
+        PSRemoveEvent event = new PSRemoveEvent(PSRegion.fromWGRegion(w, checkNotNull(rgm.getRegion(psID))));
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return false;
@@ -278,9 +226,10 @@ public class ProtectionStones extends JavaPlugin {
      * @param cause the player that caused the removal
      * @return whether or not the event was cancelled
      */
+
     public static boolean removePSRegion(World w, String psID, Player cause) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
-        PSRemoveEvent event = new PSRemoveEvent(getPSRegionFromWGRegion(w, checkNotNull(rgm.getRegion(psID))), cause);
+        PSRemoveEvent event = new PSRemoveEvent(PSRegion.fromWGRegion(w, checkNotNull(rgm.getRegion(psID))), cause);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return false;
@@ -290,26 +239,12 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Get a PSRegion object from a WorldGuard protected region
-     *
-     * @param w      world that the worldguard region is in
-     * @param region worldguard region
-     * @return a {@link PSRegion} object if it is a protectionstones region, and null if it isn't
-     */
-    public static PSRegion getPSRegionFromWGRegion(World w, ProtectedRegion region) {
-        if (isPSRegion(region)) {
-            return toPSRegion(w, region);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Get the config options for a protect block based on its alias
      *
      * @param name the alias of the protection block
      * @return the protect block options, or null if it wasn't found
      */
+
     public static PSProtectBlock getProtectBlockFromAlias(String name) {
         for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
             if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) return cpb;
@@ -326,6 +261,7 @@ public class ProtectionStones extends JavaPlugin {
      * @param checkNBT whether or not to check if the plugin signed off on the item (restrict-obtaining)
      * @return whether or not the item is a valid protection block item, and was created by protection stones
      */
+
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
         if (!ProtectionStones.isProtectBlockType(item.getType().toString())) return false;
         if (!checkNBT) return true; // if not checking nbt, you only need to check type
@@ -442,7 +378,7 @@ public class ProtectionStones extends JavaPlugin {
         List<PSRegion> regions = new ArrayList<>();
         for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
             if (isPSRegion(r) && (r.getOwners().contains(uuid) || r.getMembers().contains(uuid))) {
-                regions.add(getPSRegionFromWGRegion(w, r));
+                regions.add(PSRegion.fromWGRegion(w, r));
             }
         }
         return regions;

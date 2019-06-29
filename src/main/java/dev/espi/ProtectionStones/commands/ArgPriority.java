@@ -42,7 +42,7 @@ public class ArgPriority implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
-        PSRegion r = ProtectionStones.toPSRegion(p.getLocation());
+        PSRegion r = PSRegion.fromLocation(p.getLocation());
 
         if (!p.hasPermission("protectionstones.priority")) {
             PSL.msg(p, PSL.NO_PERMISSION_PRIORITY.msg());
