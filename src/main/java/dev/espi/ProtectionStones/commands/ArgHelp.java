@@ -39,8 +39,7 @@ public class ArgHelp implements PSCommandArg{
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
-        Player p = (Player) s;
+    public boolean executeArgument(CommandSender p, String[] args) {
         p.sendMessage(PSL.HELP.msg());
         sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info", "protectionstones.info");
         sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps", "protectionstones.members");
@@ -67,7 +66,7 @@ public class ArgHelp implements PSCommandArg{
         return true;
     }
 
-    private static void sendWithPerm(Player p, String msg, String desc, String cmd, String... permission) {
+    private static void sendWithPerm(CommandSender p, String msg, String desc, String cmd, String... permission) {
         if (msg.equals("")) return;
         for (String perm : permission) {
             if (p.hasPermission(perm)) {

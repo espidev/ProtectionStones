@@ -35,6 +35,9 @@ class ArgAdminFlag {
 
         String flag, value = "", gee = "";
         World w = Bukkit.getWorld(args[2]);
+        if (w == null) {
+            PSL.msg(p, PSL.INVALID_WORLD.msg());
+        }
         if (args[3].equalsIgnoreCase("-g")) {
             flag = args[5];
             for (int i = 6; i < args.length; i++) value += args[i] + " ";
@@ -45,14 +48,12 @@ class ArgAdminFlag {
         }
 
         final String fValue = value, fGee = gee;
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-            for (ProtectedRegion r : rgm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
-                }
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        for (ProtectedRegion r : rgm.getRegions().values()) {
+            if (ProtectionStones.isPSRegion(r)) {
+                ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
             }
-        });
+        }
         return true;
     }
 }

@@ -169,6 +169,15 @@ public class PSConfig {
                     continue;
                 }
 
+                if (ProtectionStones.isProtectBlockType(b.type)) {
+                    Bukkit.getLogger().info("Duplicate block type found! Ignoring the extra block " + b.type);
+                    continue;
+                }
+                if (ProtectionStones.getProtectBlockFromAlias(b.alias) != null) {
+                    Bukkit.getLogger().info("Duplicate block alias found! Ignoring the extra block " + b.alias);
+                    continue;
+                }
+
                 Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
