@@ -73,7 +73,7 @@ public class PSRegion {
      * @return the {@link PSRegion} based on the parameters, or null if the region given is not a protectionstones region
      */
     public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
-        if (!ProtectionStones.isPSRegion(checkNotNull(r))) return null;
+        if (!ProtectionStones.isPSRegion(r)) return null;
         return new PSRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
     }
 
