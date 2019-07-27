@@ -24,6 +24,9 @@ permissions:
   protectionstones.info:
     description: Allows players the use of /ps info.
     default: op
+  protectionstones.info.others:
+    description: Allows players to use /ps info in unowned regions.
+    default: op
   protectionstones.get:
     description: Allows players the use of /ps get.
     default: op

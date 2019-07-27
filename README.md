@@ -226,6 +226,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
     protectionstones.view - Allows players the use of /ps view.
     protectionstones.info - Allows players the use of /ps info.
+    protectionstones.info.others - Allows players the use of /ps info in unowned regions.
     protectionstones.get - Allows players the use of /ps get.
     protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.count - Allows players the use of /ps count.

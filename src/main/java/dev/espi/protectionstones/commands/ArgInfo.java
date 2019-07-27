@@ -56,7 +56,7 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
+        if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
