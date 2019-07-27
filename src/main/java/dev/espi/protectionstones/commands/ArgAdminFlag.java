@@ -16,6 +16,7 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
@@ -37,6 +38,7 @@ class ArgAdminFlag {
         World w = Bukkit.getWorld(args[2]);
         if (w == null) {
             PSL.msg(p, PSL.INVALID_WORLD.msg());
+            return true;
         }
         if (args[3].equalsIgnoreCase("-g")) {
             flag = args[5];
@@ -45,6 +47,11 @@ class ArgAdminFlag {
         } else {
             flag = args[3];
             for (int i = 4; i < args.length; i++) value += args[i] + " ";
+        }
+
+        if (WorldGuard.getInstance().getFlagRegistry().get(flag) == null) {
+            PSL.msg(p, PSL.FLAG_NOT_SET.msg());
+            return true;
         }
 
         final String fValue = value, fGee = gee;
