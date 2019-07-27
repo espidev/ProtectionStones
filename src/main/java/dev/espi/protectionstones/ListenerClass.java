@@ -25,6 +25,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.espi.protectionstones.utils.UUIDCache;
+import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -134,7 +136,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
             PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
-            if (cpb != null && rgm.getRegion("ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z") != null && cpb.preventPistonPush) {
+            if (cpb != null && rgm.getRegion("ps" + (long) b.getX() + "x" + (long) b.getY() + "y" + (long) b.getZ() + "z") != null && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -150,7 +152,7 @@ public class ListenerClass implements Listener {
             Block b = e.blockList().get(i);
 
             if (ProtectionStones.isProtectBlockType(b.getType().toString())) {
-                String id = "ps" + b.getX() + "x" + b.getY() + "y" + b.getZ() + "z";
+                String id = "ps" + (long) b.getX() + "x" + (long) b.getY() + "y" + (long) b.getZ() + "z";
                 if (rgm.getRegion(id) != null) {
                     if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
                         // remove block from exploded list if prevent_explode is enabled
@@ -176,6 +178,15 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPistonRetract(BlockPistonRetractEvent e) {
         pistonUtil(e.getBlocks(), e);
+    }
+
+    @EventHandler
+    public void onSpongeAbsorb(SpongeAbsorbEvent event) {
+        String id = "ps" + (long) event.getBlock().getX() + "x" + (long) event.getBlock().getY() + "y" + (long) event.getBlock().getZ() + "z";
+        ProtectedRegion r = WGUtils.getRegionManagerWithWorld(event.getBlock().getWorld()).getRegion(id);
+        if (ProtectionStones.isPSRegion(r)) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
