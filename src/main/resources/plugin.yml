@@ -5,7 +5,7 @@ authors: [EspiDev,AxelDios,Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
 softdepend: [Vault]
-main: dev.espi.ProtectionStones.ProtectionStones
+main: dev.espi.protectionstones.ProtectionStones
 api-version: 1.13
 
 permissions:
@@ -23,6 +23,9 @@ permissions:
     default: op
   protectionstones.info:
     description: Allows players the use of /ps info.
+    default: op
+  protectionstones.info.others:
+    description: Allows players to use /ps info in unowned regions.
     default: op
   protectionstones.get:
     description: Allows players the use of /ps get.

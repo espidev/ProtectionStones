@@ -9,7 +9,7 @@ This plugin is based off the original ProtectionStones plugin by AxelDios.
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.1.3
+* ProtectionStones 2.2.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
@@ -216,7 +216,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     information or edit other players' (or your own) protected regions.
     /ps list [playername (optional)] - List the regions you or another player owns.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
-    /ps admin [version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
+    /ps admin [version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|recreate|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
 ## Permissions
@@ -226,6 +226,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
     protectionstones.view - Allows players the use of /ps view.
     protectionstones.info - Allows players the use of /ps info.
+    protectionstones.info.others - Allows players the use of /ps info in unowned regions.
     protectionstones.get - Allows players the use of /ps get.
     protectionstones.give - Allows players the use of /ps give (give protectionstones to others as admin).
     protectionstones.count - Allows players the use of /ps count.
