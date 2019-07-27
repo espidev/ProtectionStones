@@ -58,6 +58,10 @@ public class ArgView implements PSCommandArg {
             PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());
             return true;
         }
+        if (r == null) {
+            PSL.msg(p, PSL.NOT_IN_REGION.msg());
+            return true;
+        }
         if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;

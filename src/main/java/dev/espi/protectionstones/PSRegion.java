@@ -166,7 +166,7 @@ public class PSRegion {
      */
 
     public PSRegion getParent() {
-        return fromWGRegion(world, wgregion.getParent());
+        return wgregion.getParent() == null ? null : fromWGRegion(world, wgregion.getParent());
     }
 
     /**
