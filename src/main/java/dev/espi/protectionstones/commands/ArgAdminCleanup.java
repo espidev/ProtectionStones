@@ -87,9 +87,11 @@ class ArgAdminCleanup {
                     ProtectedRegion region = regions.get(idname);
                     // remove inactive players from being owner
                     for (LocalPlayer lp : inactivePlayers) {
-                        if (region.isOwner(lp)) {
-                            region.getOwners().removePlayer(lp);
-                        }
+                        try {
+                            if (region.isOwner(lp)) {
+                                region.getOwners().removePlayer(lp);
+                            }
+                        } catch (NullPointerException ignored){}
                     }
 
                     // remove region if there are no owners left
