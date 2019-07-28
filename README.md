@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
+
 This project was originally forked from https://github.com/vik1395/ProtectionStones-Minecraft.
 
 ProtectionStones is a grief prevention and land claiming plugin.
@@ -190,6 +192,30 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Extra permission required to place this specific protection block (you still need protectionstones.create)
         # '' for no extra permission
         permission = ''
+    [event]
+
+        # Events section
+        # ~~~~~~~~~~~~~~
+        # For each line on events, it is the format 'type: action'
+        # The following are accepted types:
+        # player_command - Execute command by player that caused event (won't execute if not applicable)
+        # console_command - Execute command by console
+        # message - Send message to player or console if applicable (colour support with &)
+        # global_message - Send message to all players and console (colour support with &)
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Whether or not to enable event tracking (API events will still be enabled)
+        enable = false
+
+        # Execute commands when a region is created (ex. player place protection block)
+        on_region_create = [
+            'global_message: &l%player% created the region %region%!',
+        ]
+
+        # Execute commands when a region is destroyed (ex. when player destroy protection block)
+        on_region_destroy = [
+            'console_command: say %player% has destroyed region %region%!',
+        ]
 
 
 
