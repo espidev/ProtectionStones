@@ -1,3 +1,4 @@
+# ProtectionStones
 [![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
 
 This project was originally forked from https://github.com/vik1395/ProtectionStones-Minecraft.
