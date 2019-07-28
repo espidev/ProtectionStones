@@ -132,3 +132,28 @@ worlds = [
     # Extra permission required to place this specific protection block (you still need protectionstones.create)
     # '' for no extra permission
     permission = ''
+
+[event]
+
+    # Events section
+    # ~~~~~~~~~~~~~~
+    # For each line on events, it is the format 'type: action'
+    # The following are accepted types:
+    # player_command - Execute command by player that caused event (won't execute if not applicable)
+    # console_command - Execute command by console
+    # message - Send message to player or console if applicable (colour support with &)
+    # global_message - Send message to all players and console (colour support with &)
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Whether or not to enable event tracking (API events will still be enabled)
+    enable = false
+
+    # Execute commands when a region is created (ex. player place protection block)
+    on_region_create = [
+        'global_message: &l%player% created the region %region%!',
+    ]
+
+    # Execute commands when a region is destroyed (ex. when player destroy protection block)
+    on_region_destroy = [
+        'console_command: say %player% has destroyed region %region%!',
+    ]

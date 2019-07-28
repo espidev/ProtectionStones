@@ -73,4 +73,7 @@ public class PSRemoveEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 }

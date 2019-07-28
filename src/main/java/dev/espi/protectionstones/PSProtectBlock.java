@@ -113,6 +113,15 @@ public class PSProtectBlock {
     @Path("player.permission")
     public String permission;
 
+    // event section
+    @Path("event.enable")
+    public boolean eventsEnabled;
+    @Path("event.on_region_create")
+    List<String> regionCreateCommands;
+    @Path("event.on_region_destroy")
+    List<String> regionDestroyCommands;
+
+
     // non-config items
     public HashMap<Flag<?>, Object> regionFlags = new HashMap<>();
 
