@@ -24,11 +24,14 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.espi.protectionstones.event.PSCreateEvent;
+import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -213,6 +216,53 @@ public class ListenerClass implements Listener {
         if (foundNoTeleport) {
             PSL.msg(event.getPlayer(), PSL.REGION_CANT_TELEPORT.msg());
             event.setCancelled(true);
+        }
+    }
+
+    private void execEvent(String action, CommandSender s, String player, String region) {
+        if (player == null) player = "";
+
+        String[] sp = action.split(": ");
+        if (sp.length == 0) return;
+
+        String act = sp[1];
+        for (int i = 2; i < sp.length; i++) act += ": " + sp[i];
+
+        act = act.replace("%player%", player).replace("%region%", region);
+
+        switch (sp[0]) {
+            case "player_command":
+                Bukkit.getServer().dispatchCommand(s, act);
+                break;
+            case "console_command":
+                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act);
+                break;
+            case "message":
+                s.sendMessage(act.replace('&', '§'));
+                break;
+            case "global_message":
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    p.sendMessage(act.replace('&', '§'));
+                }
+                break;
+        }
+    }
+
+    @EventHandler
+    public void onPSCreate(PSCreateEvent event) {
+        if (!event.getRegion().getTypeOptions().eventsEnabled) return;
+
+        for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
+            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+        }
+    }
+
+    @EventHandler
+    public void onPSRemove(PSRemoveEvent event) {
+        if (!event.getRegion().getTypeOptions().eventsEnabled) return;
+
+        for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
+            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
         }
     }
 
