@@ -25,6 +25,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -302,8 +303,18 @@ public class PSRegion {
      * @return whether or not the region was able to be successfully removed
      */
     public boolean deleteRegion(boolean deleteBlock) {
+        return deleteRegion(deleteBlock, null);
+    }
 
-        PSRemoveEvent event = new PSRemoveEvent(this);
+    /**
+     * Deletes the region forever. Can be cancelled by event cancellation.
+     *
+     * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
+     * @param cause the player that caused the region to break
+     * @return whether or not the region was able to be successfully removed
+     */
+    public boolean deleteRegion(boolean deleteBlock, Player cause) {
+        PSRemoveEvent event = new PSRemoveEvent(this, cause);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) { // if event was cancelled, prevent execution
             return false;

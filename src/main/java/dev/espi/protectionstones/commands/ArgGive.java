@@ -5,6 +5,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,9 +48,15 @@ public class ArgGive implements PSCommandArg {
         }
 
         // check if item was able to be added (inventory not full)
-        if (!Bukkit.getPlayer(args[2]).getInventory().addItem(cp.createItem()).isEmpty()) {
-            PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
-            return true;
+        Player ps = Bukkit.getPlayer(args[2]);
+        if (!ps.getInventory().addItem(cp.createItem()).isEmpty()) {
+            if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                PSL.msg(ps, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                ps.getWorld().dropItem(ps.getLocation(), cp.createItem());
+            } else {
+                PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
+                return true;
+            }
         }
 
         PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));

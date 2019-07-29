@@ -61,6 +61,8 @@ public class PSConfig {
     public String base_command;
     @Path("aliases")
     public List<String> aliases;
+    @Path("drop_item_when_inventory_full")
+    public Boolean dropItemWhenInventoryFull;
 
 
     static void initConfig() {
@@ -256,6 +258,10 @@ public class PSConfig {
             case 5:
                 ProtectionStones.config.set("config_version", 6);
                 ProtectionStones.config.set("allow_duplicate_region_names", false);
+                break;
+            case 6:
+                ProtectionStones.config.set("config_version", 7);
+                ProtectionStones.config.set("drop_item_when_inventory_full", true);
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

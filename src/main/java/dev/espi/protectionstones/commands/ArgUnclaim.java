@@ -58,20 +58,25 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
-        // remove region
-        // check if removing the region and firing region remove event blocked it
-        if (!r.deleteRegion(true)) {
-            return true;
-        }
-
         PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
             if (!p.getInventory().addItem(cpb.createItem()).isEmpty()) {
                 // method will return not empty if item couldn't be added
-                PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
-                return true;
+                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                    p.getWorld().dropItem(p.getLocation(), cpb.createItem());
+                } else {
+                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                    return true;
+                }
             }
+        }
+
+        // remove region
+        // check if removing the region and firing region remove event blocked it
+        if (!r.deleteRegion(true, p)) {
+            return true;
         }
 
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());

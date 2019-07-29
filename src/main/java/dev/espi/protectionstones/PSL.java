@@ -31,6 +31,7 @@ public enum PSL {
     NO_SUCH_COMMAND("no_such_command", ChatColor.RED + "No such command. please type /ps help for more info"),
     NO_ACCESS("no_access", ChatColor.RED + "You are not allowed to do that here."),
     NO_ROOM_IN_INVENTORY("no_room_in_inventory", ChatColor.RED + "You don't have enough room in your inventory."),
+    NO_ROOM_DROPPING_ON_FLOOR("no_room_dropping_on_floor", ChatColor.RED + "You don't have enough room in your inventory. Dropping item on floor."),
     INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
     NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
     INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),

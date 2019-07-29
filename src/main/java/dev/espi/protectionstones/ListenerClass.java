@@ -114,9 +114,14 @@ public class ListenerClass implements Listener {
         if (!blockOptions.noDrop) {
             if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
                 // method will return not empty if item couldn't be added
-                PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
-                e.setCancelled(true);
-                return;
+                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                    p.getWorld().dropItem(pb.getLocation(), blockOptions.createItem());
+                } else {
+                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
 
@@ -232,13 +237,13 @@ public class ListenerClass implements Listener {
 
         switch (sp[0]) {
             case "player_command":
-                Bukkit.getServer().dispatchCommand(s, act);
+                if (s != null) Bukkit.getServer().dispatchCommand(s, act);
                 break;
             case "console_command":
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act);
                 break;
             case "message":
-                s.sendMessage(act.replace('&', '§'));
+                if (s != null) s.sendMessage(act.replace('&', '§'));
                 break;
             case "global_message":
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -262,7 +267,11 @@ public class ListenerClass implements Listener {
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
-            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+            if (event.getPlayer() == null) {
+                execEvent(action, null, null, event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+            } else {
+                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+            }
         }
     }
 

@@ -70,7 +70,19 @@ public class ArgGet implements PSCommandArg {
 
         // check if item was able to be added (inventory not full)
         if (!p.getInventory().addItem(cp.createItem()).isEmpty()) {
-            PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+            if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) { // drop on floor
+                PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                p.getWorld().dropItem(p.getLocation(), cp.createItem());
+            } else { // cancel event
+                PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
+                    EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().depositPlayer(p, cp.price);
+                    if (!er.transactionSuccess()) {
+                        PSL.msg(p, er.errorMessage);
+                        return true;
+                    }
+                }
+            }
             return true;
         }
 

@@ -52,7 +52,7 @@ import java.util.*;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 6;
+    static final int CONFIG_VERSION = 7;
 
     static File configLocation, blockDataFolder;
     static FileConfig config;
