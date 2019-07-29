@@ -19,7 +19,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 6
+    config_version = 7
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -56,6 +56,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         "protectionstone",
         "protectionstones"
     ]
+    
+    # Whether or not to drop items on the ground if the inventory is full (ex. during /ps unclaim)
+    # If set to false, the event will be prevented from happening, and say that inventory is full
+    drop_item_when_inventory_full = true
 
 ## Default Configuration (block1.toml)
 

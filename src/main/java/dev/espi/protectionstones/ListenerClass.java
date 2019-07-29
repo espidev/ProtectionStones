@@ -257,6 +257,7 @@ public class ListenerClass implements Listener {
     public void onPSCreate(PSCreateEvent event) {
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
+        // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
             execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
         }
@@ -266,6 +267,7 @@ public class ListenerClass implements Listener {
     public void onPSRemove(PSRemoveEvent event) {
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
+        // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
             if (event.getPlayer() == null) {
                 execEvent(action, null, null, event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");

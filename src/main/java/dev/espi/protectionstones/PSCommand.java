@@ -20,7 +20,12 @@ import dev.espi.protectionstones.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PSCommand extends Command {
 
@@ -51,6 +56,16 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgView());
         ProtectionStones.getInstance().addCommandArgument(new ArgHelp());
     }
+
+    /*
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        List<String> l = new ArrayList<>();
+        for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
+            l.add(ps.getNames().get(0));
+        }
+        return (args.length > 0) ? StringUtil.copyPartialMatches(args[0], l, new ArrayList<>()) : null;
+    }*/
 
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {

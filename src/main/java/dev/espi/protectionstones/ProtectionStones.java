@@ -16,8 +16,6 @@
 
 package dev.espi.protectionstones;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
@@ -43,6 +41,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -369,8 +369,8 @@ public class ProtectionStones extends JavaPlugin {
      * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
      * since the query can be slow.
      *
-     * @param w    world to search for regions in
-     * @param uuid uuid of the player
+     * @param w           world to search for regions in
+     * @param uuid        uuid of the player
      * @param canBeMember whether or not to add regions where the player is a member, not owner
      * @return list of regions that the player owns (or is a part of if canBeMember is true)
      */
@@ -405,9 +405,11 @@ public class ProtectionStones extends JavaPlugin {
                     psc.getAliases().add(command);
                 }
                 commandMap.register(getInstance().configOptions.base_command, psc); // register command
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
     }
 
