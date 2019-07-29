@@ -371,13 +371,14 @@ public class ProtectionStones extends JavaPlugin {
      *
      * @param w    world to search for regions in
      * @param uuid uuid of the player
-     * @return list of regions that the player owns
+     * @param canBeMember whether or not to add regions where the player is a member, not owner
+     * @return list of regions that the player owns (or is a part of if canBeMember is true)
      */
 
-    public static List<PSRegion> getPlayerPSRegions(World w, UUID uuid) {
+    public static List<PSRegion> getPlayerPSRegions(World w, UUID uuid, boolean canBeMember) {
         List<PSRegion> regions = new ArrayList<>();
         for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
-            if (isPSRegion(r) && (r.getOwners().contains(uuid) || r.getMembers().contains(uuid))) {
+            if (isPSRegion(r) && (r.getOwners().contains(uuid) || (canBeMember && r.getMembers().contains(uuid)))) {
                 regions.add(PSRegion.fromWGRegion(w, r));
             }
         }

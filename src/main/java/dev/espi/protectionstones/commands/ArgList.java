@@ -60,10 +60,10 @@ public class ArgList implements PSCommandArg {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             Player p = (Player) s;
             if (args.length == 1) {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId());
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), true);
                 display(s, regions, p.getName(), p.getUniqueId());
             } else if (args.length == 2) {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), UUIDCache.nameToUUID.get(args[1]));
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), UUIDCache.nameToUUID.get(args[1]), true);
                 display(s, regions, args[1], UUIDCache.nameToUUID.get(args[1]));
             } else {
                 PSL.msg(s, PSL.LIST_HELP.msg());
