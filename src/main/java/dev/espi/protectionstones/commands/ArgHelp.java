@@ -17,6 +17,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.ProtectionStones;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -39,29 +40,31 @@ public class ArgHelp implements PSCommandArg{
 
     @Override
     public boolean executeArgument(CommandSender p, String[] args) {
+        String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
+
         p.sendMessage(PSL.HELP.msg());
-        sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), "/ps info", "protectionstones.info");
-        sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), "/ps", "protectionstones.members");
-        sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), "/ps", "protectionstones.owners");
-        sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), "/ps get", "protectionstones.get");
-        sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), "/ps give", "protectionstones.give");
-        sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), "/ps count", "protectionstones.count", "protectionstones.count.others");
-        sendWithPerm(p, PSL.LIST_HELP.msg(), PSL.LIST_HELP_DESC.msg(), "/ps list", "protectionstones.list", "protectionstones.list.others");
-        sendWithPerm(p, PSL.NAME_HELP.msg(), PSL.NAME_HELP_DESC.msg(), "/ps name", "protectionstones.name");
-        sendWithPerm(p, PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), "/ps setparent", "protectionstones.setparent", "protectionstones.setparent.others");
-        sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), "/ps flag", "protectionstones.flags");
-        sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), "/ps home", "protectionstones.home");
-        sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), "/ps sethome", "protectionstones.sethome");
-        sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), "/ps tp", "protectionstones.tp");
-        sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), "/ps hide", "protectionstones.hide");
-        sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), "/ps unhide", "protectionstones.unhide");
-        sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), "/ps toggle", "protectionstones.toggle");
-        sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), "/ps view", "protectionstones.view");
-        sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), "/ps unclaim", "protectionstones.unclaim");
-        sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), "/ps priority", "protectionstones.priority");
-        sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), "/ps region", "protectionstones.region");
-        sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), "/ps admin", "protectionstones.admin");
-        sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), "/ps reload", "protectionstones.admin");
+        sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), base + "info", "protectionstones.info");
+        sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), base, "protectionstones.members");
+        sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), base, "protectionstones.owners");
+        sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), base + "get", "protectionstones.get");
+        sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), base + "give", "protectionstones.give");
+        sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), base + "count", "protectionstones.count", "protectionstones.count.others");
+        sendWithPerm(p, PSL.LIST_HELP.msg(), PSL.LIST_HELP_DESC.msg(), base + "list", "protectionstones.list", "protectionstones.list.others");
+        sendWithPerm(p, PSL.NAME_HELP.msg(), PSL.NAME_HELP_DESC.msg(), base + "name", "protectionstones.name");
+        sendWithPerm(p, PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent", "protectionstones.setparent", "protectionstones.setparent.others");
+        sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag", "protectionstones.flags");
+        sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home", "protectionstones.home");
+        sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), base + "sethome", "protectionstones.sethome");
+        sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), base + "tp", "protectionstones.tp");
+        sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), base + "hide", "protectionstones.hide");
+        sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), base + "unhide", "protectionstones.unhide");
+        sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), base + "toggle", "protectionstones.toggle");
+        sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), base + "view", "protectionstones.view");
+        sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), base + "unclaim", "protectionstones.unclaim");
+        sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), base + "priority", "protectionstones.priority");
+        sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region", "protectionstones.region");
+        sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), base + "admin", "protectionstones.admin");
+        sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), base + "reload", "protectionstones.admin");
         return true;
     }
 
