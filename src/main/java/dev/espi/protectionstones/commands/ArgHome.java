@@ -21,6 +21,8 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.ChatUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -67,7 +69,8 @@ public class ArgHome implements PSCommandArg {
                     msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
                 }
                 TextComponent tc = new TextComponent(msg);
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
+                tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
                 p.spigot().sendMessage(tc);
             }
         } else {// /ps home [id]

@@ -155,10 +155,11 @@ public enum PSL {
     TP_IN_SECONDS("tp.in_seconds", ChatColor.GRAY + "Teleporting in " + ChatColor.AQUA + "%seconds%" + ChatColor.GRAY + " seconds."),
     TP_CANCELLED_MOVED("tp.cancelled_moved", ChatColor.RED + "Teleport cancelled. You moved!"),
 
-    // ps home,
+    // ps home
     HOME_HELP("home.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps home [name/id]"),
     HOME_HELP_DESC("home.help_desc", "Teleports you to one of your protected regions."),
-    HOME_HEADER("list.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Homes (click to teleport) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    HOME_HEADER("home.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Homes (click to teleport) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    HOME_CLICK_TO_TP("home.click_to_tp", "Click to teleport!"),
 
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),
