@@ -20,7 +20,10 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.ChatUtils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -48,35 +51,50 @@ public class ArgHome implements PSCommandArg {
             PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
             return true;
         }
-        if (args.length != 2) {
+        if (args.length != 2 && args.length != 1) {
             PSL.msg(p, PSL.HOME_HELP.msg());
             return true;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            // get regions from the query
-            List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
-
-            // remove regions not owned by the player
-            for (int i = 0; i < regions.size(); i++) {
-                if (!regions.get(i).isOwner(p.getUniqueId())) {
-                    regions.remove(i);
-                    i--;
+        if (args.length == 1) { // /ps home
+            List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(),false);
+            PSL.msg(p, PSL.HOME_HEADER.msg());
+            for (PSRegion r : regions) {
+                String msg;
+                if (r.getName() == null) {
+                    msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
+                } else {
+                    msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
                 }
+                TextComponent tc = new TextComponent(msg);
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
+                p.spigot().sendMessage(tc);
             }
+        } else {// /ps home [id]
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                // get regions from the query
+                List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
 
-            if (regions.isEmpty()) {
-                PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
-                return;
-            }
-            if (regions.size() > 1) {
-                ChatUtils.displayDuplicateRegionAliases(p, regions);
-                return;
-            }
+                // remove regions not owned by the player
+                for (int i = 0; i < regions.size(); i++) {
+                    if (!regions.get(i).isOwner(p.getUniqueId())) {
+                        regions.remove(i);
+                        i--;
+                    }
+                }
 
-            ArgTp.teleportPlayer(p, regions.get(0));
-        });
+                if (regions.isEmpty()) {
+                    PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
+                    return;
+                }
+                if (regions.size() > 1) {
+                    ChatUtils.displayDuplicateRegionAliases(p, regions);
+                    return;
+                }
 
+                ArgTp.teleportPlayer(p, regions.get(0));
+            });
+        }
 
         /* OLD NUMBER BASED SYSTEM
         // get the region id the player wants to teleport to

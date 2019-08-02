@@ -236,7 +236,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.
     /ps setparent [region|none] - Set the region you are in to inherit properties from another region you own (https://worldguard.enginehub.org/en/latest/regions/priorities/)
     /ps name [name|none] - Nickname your region to help identify it easily.
-    /ps home [name/id] - Teleports you to one of your protected regions.
+    /ps home [name/id (optional)] - Teleports you to one of your protected regions.
     /ps sethome - Set the home location of an owned region.
     /ps tp [player] [num] or /ps tp [name/id] - Teleports you to a region, or one of a given player's regions.
     /ps toggle - Use this command to turn on or off placement of protection stones blocks.
