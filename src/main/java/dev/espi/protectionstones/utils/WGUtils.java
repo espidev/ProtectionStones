@@ -24,7 +24,9 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSLocation;
+import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -32,6 +34,8 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class WGUtils {
+
+    private static final int MAX_BUILD_HEIGHT = 256;
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
@@ -65,12 +69,13 @@ public class WGUtils {
         return false;
     }
 
+    // returns "" if there is no psregion
     public static String matchLocationToPSID(Location l) {
         BlockVector3 v = BlockVector3.at(l.getX(), l.getY(), l.getZ());
         String currentPSID = "";
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
-        if (idList.size() == 1) {
+        if (idList.size() == 1) { // if the location is only in one region
             if (ProtectionStones.isPSRegion(rgm.getRegion(idList.get(0)))) {
                 currentPSID = idList.get(0);
             }
@@ -90,6 +95,27 @@ public class WGUtils {
             }
         }
         return currentPSID;
+    }
+
+    public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
+        if (yRadius == -1) {
+            return BlockVector3.at(bx - xRadius, 0, bz - zRadius);
+        } else {
+            return BlockVector3.at(bx - xRadius, by - yRadius, bz - zRadius);
+        }
+    }
+
+    public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
+        if (yRadius == -1) {
+            return BlockVector3.at(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);
+        } else {
+            return BlockVector3.at(bx + xRadius, by + yRadius, bz + zRadius);
+        }
+    }
+
+    // create PS ids without making the numbers have scientific notation (addressed with long)
+    public static String createPSID(double bx, double by, double bz) {
+        return "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {

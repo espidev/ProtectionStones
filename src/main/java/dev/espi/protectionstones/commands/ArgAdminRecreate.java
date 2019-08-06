@@ -45,20 +45,12 @@ public class ArgAdminRecreate {
             for (ProtectedRegion r : rgm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion wr = PSRegion.fromWGRegion(w, r);
-
                     double bx = wr.getProtectBlock().getLocation().getX();
                     double by = wr.getProtectBlock().getLocation().getY();
                     double bz = wr.getProtectBlock().getLocation().getZ();
-                    BlockVector3 min, max;
                     PSProtectBlock blockOptions = wr.getTypeOptions();
-
-                    if (blockOptions.yRadius == -1) {
-                        min = BlockVector3.at(bx - blockOptions.xRadius, 0, bz - blockOptions.zRadius);
-                        max = BlockVector3.at(bx + blockOptions.xRadius, w.getMaxHeight(), bz + blockOptions.zRadius);
-                    } else {
-                        min = BlockVector3.at(bx - blockOptions.xRadius, by - blockOptions.yRadius, bz - blockOptions.zRadius);
-                        max = BlockVector3.at(bx + blockOptions.xRadius, by + blockOptions.yRadius, bz + blockOptions.zRadius);
-                    }
+                    BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
+                    BlockVector3 max = WGUtils.getMinVector(bx, by, bz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
 
                     ProtectedRegion nr = new ProtectedCuboidRegion(r.getId(), min, max);
                     nr.setMembers(r.getMembers());

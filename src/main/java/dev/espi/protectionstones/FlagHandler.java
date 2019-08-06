@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -51,16 +52,16 @@ public class FlagHandler {
     }
 
     // Add the correct flags for the ps region
-    static void initCustomFlagsForPS(ProtectedRegion region, Block block, PSProtectBlock cpb) {
-
-        String home = block.getLocation().getBlockX() + cpb.homeXOffset + " ";
-        home += (block.getLocation().getBlockY() + cpb.homeYOffset) + " ";
-        home += (block.getLocation().getBlockZ() + cpb.homeZOffset);
+    static void initCustomFlagsForPS(ProtectedRegion region, Location l, PSProtectBlock cpb) {
+        String home = l.getBlockX() + cpb.homeXOffset + " ";
+        home += (l.getBlockY() + cpb.homeYOffset) + " ";
+        home += (l.getBlockZ() + cpb.homeZOffset);
         region.setFlag(PS_HOME, home);
 
         region.setFlag(PS_BLOCK_MATERIAL, cpb.type);
     }
 
+    // Edit flags that require placeholders (variables)
     static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
         List<Flag<?>> replaceFlags = new ArrayList<>();
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting"));
