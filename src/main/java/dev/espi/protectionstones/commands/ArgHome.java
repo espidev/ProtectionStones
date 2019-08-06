@@ -99,37 +99,6 @@ public class ArgHome implements PSCommandArg {
             });
         }
 
-        /* OLD NUMBER BASED SYSTEM
-        // get the region id the player wants to teleport to
-        int regionNumber;
-        try {
-            regionNumber = Integer.parseInt(args[1]);
-            if (regionNumber <= 0) {
-                PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
-            return true;
-        }
-
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
-            List<ProtectedRegion> regions = ArgTp.getRegionsPlayerHas(lp, WGUtils.getRegionManagerWithPlayer(p));
-            if (regions.isEmpty()) {
-                PSL.msg(p, PSL.NO_REGIONS_OWNED.msg());
-                return;
-            }
-            if (regionNumber > regions.size()) {
-                PSL.msg(p, PSL.HOME_ONLY.msg().replace("%num%", "" + regions.size()));
-                return;
-            }
-
-            PSRegion r = ProtectionStones.toPSRegion(p.getWorld(), regions.get(regionNumber-1));
-
-            ArgTp.teleportPlayer(p, r);
-        });*/
-
         return true;
     }
 }

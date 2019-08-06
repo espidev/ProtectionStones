@@ -58,6 +58,15 @@ public class PSProtectBlock {
     @Path("region.z_radius")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int zRadius;
+    @Path("region.x_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int xOffset;
+    @Path("region.y_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int yOffset;
+    @Path("region.z_offset")
+    @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
+    public int zOffset;
     @Path("region.home_x_offset")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int homeXOffset;

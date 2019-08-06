@@ -97,6 +97,7 @@ public class WGUtils {
         return currentPSID;
     }
 
+    // remember to call with offsets
     public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
         if (yRadius == -1) {
             return BlockVector3.at(bx - xRadius, 0, bz - zRadius);
@@ -105,6 +106,7 @@ public class WGUtils {
         }
     }
 
+    // remember to call with offsets
     public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
         if (yRadius == -1) {
             return BlockVector3.at(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);

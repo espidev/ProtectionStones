@@ -39,6 +39,13 @@ prevent_block_place_in_restricted_world = true
     y_radius = -1
     z_radius = 64
 
+    # Offset the protection block
+    # If you would like to make the protection block not be at the center of new regions, you can offset it here
+    # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
+    x_offset = 0
+    y_offset = 0
+    z_offset = 0
+
     # How many blocks to offset the default location of /ps home from the protection block
     home_x_offset = 0
     home_y_offset = 1
