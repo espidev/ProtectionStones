@@ -16,12 +16,16 @@ restrict_obtaining = true
 # Enable or disable the use of this protection stone in specific worlds
 # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
 # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
-# Can override with protectionstones.admin permission
+# Can be overriden with protectionstones.admin permission (including OP)!
 world_list_type = "blacklist"
 worlds = [
     "exampleworld1",
     "exampleworld2"
 ]
+
+# Whether or not to actually restrict the protection stone from being placed when the world is restricted (in blacklist/whitelist)
+# The block will place normally, without PS behaviour.
+prevent_block_place_in_restricted_world = true
 
 [region]
     # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region

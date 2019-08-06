@@ -147,15 +147,14 @@ class BlockHandler {
                 return false;
             }
             // check if in world blacklist or not in world whitelist
-            if (blockOptions.worldListType.equalsIgnoreCase("blacklist")) {
-                if (blockOptions.worlds.contains(p.getLocation().getWorld().getName())) {
+            boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
+
+            if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
+                if (blockOptions.preventBlockPlaceInRestrictedWorld) {
                     PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
                     return false;
-                }
-            } else if (blockOptions.worldListType.equalsIgnoreCase("whitelist")) {
-                if (!blockOptions.worlds.contains(p.getLocation().getWorld().getName())) {
-                    PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
-                    return false;
+                } else {
+                    return true;
                 }
             }
 

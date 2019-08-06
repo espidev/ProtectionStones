@@ -43,6 +43,8 @@ public class PSProtectBlock {
     public String worldListType;
     @Path("worlds")
     public List<String> worlds;
+    @Path("prevent_block_place_in_restricted_world")
+    public boolean preventBlockPlaceInRestrictedWorld;
 
     // region section
     @Path("region.distance_between_claims")
