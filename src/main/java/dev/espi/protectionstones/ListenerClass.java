@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
@@ -54,6 +55,7 @@ public class ListenerClass implements Listener {
         UUIDCache.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
         UUIDCache.nameToUUID.remove(e.getPlayer().getName());
         UUIDCache.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+        WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
     }
 
     @EventHandler(priority = EventPriority.HIGH)

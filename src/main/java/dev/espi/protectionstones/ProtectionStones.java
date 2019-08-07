@@ -19,8 +19,10 @@ package dev.espi.protectionstones;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -482,12 +484,14 @@ public class ProtectionStones extends JavaPlugin {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                     UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
                     UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
+                    if (op.getName() != null) WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
                 }
             });
         } else { // sync load
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                 UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
                 UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
+                if (op.getName() != null) WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
             }
         }
 
