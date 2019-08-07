@@ -119,6 +119,14 @@ public class ProtectionStones extends JavaPlugin {
         this.configOptions = conf;
     }
 
+    /**
+     * Returns the list of PSProtectBlocks configured through the config.
+     * @return the list of PSProtectBlocks configured
+     */
+    public List<PSProtectBlock> getConfiguredBlocks() {
+        return new ArrayList<>(protectionStonesOptions.values());
+    }
+
 
     /* ~~~~~~~~~~ Static methods ~~~~~~~~~~~~~~ */
 

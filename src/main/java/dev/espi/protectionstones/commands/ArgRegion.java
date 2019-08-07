@@ -31,11 +31,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ArgRegion implements PSCommandArg {
 
@@ -144,6 +142,6 @@ public class ArgRegion implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        return null;
+        return args.length == 2 ? StringUtil.copyPartialMatches(args[1], Arrays.asList("disown", "remove", "list"), new ArrayList<>()) : null;
     }
 }

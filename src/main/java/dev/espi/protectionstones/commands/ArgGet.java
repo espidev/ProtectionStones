@@ -7,7 +7,9 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,9 +93,12 @@ public class ArgGet implements PSCommandArg {
         return true;
     }
 
+    // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        return null;
+        List<String> l = new ArrayList<>();
+        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) l.add(b.alias);
+        return args.length == 2 ? StringUtil.copyPartialMatches(args[1], l, new ArrayList<>()) : null;
     }
 
 }
