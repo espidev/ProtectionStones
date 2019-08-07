@@ -17,6 +17,7 @@
 package dev.espi.protectionstones;
 
 import dev.espi.protectionstones.commands.*;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -62,14 +63,15 @@ public class PSCommand extends Command {
         if (args.length == 1) {
             List<String> l = new ArrayList<>();
             for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
-                l.add(ps.getNames().get(0));
+                // TODO CHECK PERMISSION
+                l.addAll(ps.getNames());
             }
             return StringUtil.copyPartialMatches(args[0], l, new ArrayList<>());
         } else if (args.length >= 2) {
             for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
                 for (String arg : ps.getNames()) {
                     if (arg.equalsIgnoreCase(args[0])) {
-                        ps.tabComplete(sender, alias, args);
+                        return ps.tabComplete(sender, alias, args);
                     }
                 }
             }

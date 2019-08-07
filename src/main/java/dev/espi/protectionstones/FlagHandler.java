@@ -62,7 +62,7 @@ public class FlagHandler {
     }
 
     // Edit flags that require placeholders (variables)
-    static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
+    public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
         List<Flag<?>> replaceFlags = new ArrayList<>();
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting"));
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-title"));

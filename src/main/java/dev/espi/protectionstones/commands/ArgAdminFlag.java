@@ -20,6 +20,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -57,8 +58,8 @@ class ArgAdminFlag {
         final String fValue = value, fGee = gee;
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         for (ProtectedRegion r : rgm.getRegions().values()) {
-            if (ProtectionStones.isPSRegion(r)) {
-                ArgFlag.setFlag(r, p, flag, fValue.trim(), fGee);
+            if (ProtectionStones.isPSRegion(r) && PSRegion.fromWGRegion(w, r) != null) {
+                ArgFlag.setFlag(PSRegion.fromWGRegion(w, r), p, flag, fValue.trim(), fGee);
             }
         }
         return true;
