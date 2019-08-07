@@ -28,11 +28,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgHome implements PSCommandArg {
+
+    private static HashMap<UUID, List<String>> tabCache = new HashMap<>();
 
     @Override
     public List<String> getNames() {
@@ -42,6 +44,30 @@ public class ArgHome implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        if (!(sender instanceof Player)) return null;
+        Player p = (Player) sender;
+        if (args.length == 2) {
+            if (tabCache.get(p.getUniqueId()) == null) {
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+                List<String> regionNames = new ArrayList<>();
+                for (PSRegion r : regions) {
+                    if (r.getName() != null) regionNames.add(r.getName());
+                    regionNames.add(r.getID());
+                }
+                tabCache.put(p.getUniqueId(), regionNames);
+
+                Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
+                    tabCache.remove(p.getUniqueId());
+                }, 200);
+            }
+
+            return StringUtil.copyPartialMatches(args[1], tabCache.get(p.getUniqueId()), new ArrayList<>());
+        }
+        return null;
     }
 
     @Override
@@ -58,23 +84,23 @@ public class ArgHome implements PSCommandArg {
             return true;
         }
 
-        if (args.length == 1) { // /ps home
-            List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(),false);
-            PSL.msg(p, PSL.HOME_HEADER.msg());
-            for (PSRegion r : regions) {
-                String msg;
-                if (r.getName() == null) {
-                    msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
-                } else {
-                    msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            if (args.length == 1) { // /ps home
+                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+                PSL.msg(p, PSL.HOME_HEADER.msg());
+                for (PSRegion r : regions) {
+                    String msg;
+                    if (r.getName() == null) {
+                        msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
+                    } else {
+                        msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
+                    }
+                    TextComponent tc = new TextComponent(msg);
+                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
+                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
+                    p.spigot().sendMessage(tc);
                 }
-                TextComponent tc = new TextComponent(msg);
-                tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
-                p.spigot().sendMessage(tc);
-            }
-        } else {// /ps home [id]
-            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            } else {// /ps home [id]
                 // get regions from the query
                 List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
 
@@ -96,14 +122,9 @@ public class ArgHome implements PSCommandArg {
                 }
 
                 ArgTp.teleportPlayer(p, regions.get(0));
-            });
-        }
+            }
+        });
 
         return true;
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        return null;
     }
 }

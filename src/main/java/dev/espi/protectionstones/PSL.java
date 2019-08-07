@@ -144,7 +144,7 @@ public enum PSL {
     REGION_ERROR_SEARCH("region.error_search", ChatColor.RED + "Error while searching for %player%'s regions. Please make sure you have entered the correct name."),
 
     // ps tp
-    TP_HELP("tp.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tp [player] [num]"),
+    TP_HELP("tp.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tp [id/player] [num (optional)]"),
     TP_HELP_DESC("tp.help_desc", "Teleports you to one of a given player's regions."),
     NUMBER_ABOVE_ZERO("tp.number_above_zero", ChatColor.RED + "Please enter a number above 0."),
     TP_VALID_NUMBER("tp.valid_number", ChatColor.RED + "Please enter a valid number."),
