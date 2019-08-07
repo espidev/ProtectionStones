@@ -79,7 +79,7 @@ public class ListenerClass implements Listener {
         RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
 
-        String id = "ps" + (long) pb.getLocation().getX() + "x" + (long) pb.getLocation().getY() + "y" + (long) pb.getLocation().getZ() + "z";
+        String id = WGUtils.createPSID(pb.getLocation());
 
         // check if that is actually a protection stone block (owns a region)
         if (rgm.getRegion(id) == null) {
@@ -144,7 +144,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
             PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
-            if (cpb != null && rgm.getRegion("ps" + (long) b.getX() + "x" + (long) b.getY() + "y" + (long) b.getZ() + "z") != null && cpb.preventPistonPush) {
+            if (cpb != null && rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -160,7 +160,7 @@ public class ListenerClass implements Listener {
             Block b = e.blockList().get(i);
 
             if (ProtectionStones.isProtectBlockType(b.getType().toString())) {
-                String id = "ps" + (long) b.getX() + "x" + (long) b.getY() + "y" + (long) b.getZ() + "z";
+                String id = WGUtils.createPSID(b.getLocation());
                 if (rgm.getRegion(id) != null) {
                     if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
                         // remove block from exploded list if prevent_explode is enabled
@@ -190,7 +190,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
-        String id = "ps" + (long) event.getBlock().getX() + "x" + (long) event.getBlock().getY() + "y" + (long) event.getBlock().getZ() + "z";
+        String id = WGUtils.createPSID(event.getBlock().getLocation());
         ProtectedRegion r = WGUtils.getRegionManagerWithWorld(event.getBlock().getWorld()).getRegion(id);
         if (ProtectionStones.isPSRegion(r)) {
             event.setCancelled(true);

@@ -195,7 +195,7 @@ public class PSConfig {
 
     }
 
-    private static void setupRecipe(PSProtectBlock b) {
+    static void removePSRecipes() {
         // remove previous protectionstones recipes (/ps reload)
         List<Recipe> recipes = new ArrayList<>();
         Iterator<Recipe> iter = Bukkit.recipeIterator();
@@ -209,7 +209,9 @@ public class PSConfig {
         // restore recipes without protectionstones ones
         Bukkit.clearRecipes();
         for (Recipe r : recipes) Bukkit.addRecipe(r);
+    }
 
+    private static void setupRecipe(PSProtectBlock b) {
         // create item
         ItemStack item = b.createItem();
         item.setAmount(b.recipeAmount);

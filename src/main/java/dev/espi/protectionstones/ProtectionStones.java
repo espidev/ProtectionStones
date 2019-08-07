@@ -22,7 +22,6 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.PSCommandArg;
-import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -215,14 +214,8 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
-        PSRemoveEvent event = new PSRemoveEvent(PSRegion.fromWGRegion(w, checkNotNull(rgm.getRegion(psID))));
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-        rgm.removeRegion(psID);
-        return true;
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        return r != null && r.deleteRegion(false);
     }
 
     /**
@@ -236,14 +229,8 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID, Player cause) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(checkNotNull(w));
-        PSRemoveEvent event = new PSRemoveEvent(PSRegion.fromWGRegion(w, checkNotNull(rgm.getRegion(psID))), cause);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-        rgm.removeRegion(psID);
-        return true;
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        return r != null && r.deleteRegion(false, cause);
     }
 
     /**
@@ -395,6 +382,9 @@ public class ProtectionStones extends JavaPlugin {
 
     // called on first start, and /ps reload
     public static void loadConfig(boolean isReload) {
+        // remove old ps crafting recipes
+        PSConfig.removePSRecipes();
+
         // init config
         PSConfig.initConfig();
 

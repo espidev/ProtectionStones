@@ -120,6 +120,10 @@ public class WGUtils {
         return "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
     }
 
+    public static String createPSID(Location l) {
+        return createPSID(l.getX(), l.getY(), l.getZ());
+    }
+
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
         // Region is not valid
         if (region == null) return true;

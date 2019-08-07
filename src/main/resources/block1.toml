@@ -78,10 +78,12 @@ prevent_block_place_in_restricted_world = true
 
 [block_data]
     # Name given to protection block when obtained with /ps give or /ps get
+    # Also affects custom crafted items (see custom_recipe)
     # Leave as '' for no name
     display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
 
     # Lore given to protection block when obtained with /ps give or /ps get
+    # Also affects custom crafted items (see custom_recipe)
     # Leave as [] for no lore
     lore = [
         "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
