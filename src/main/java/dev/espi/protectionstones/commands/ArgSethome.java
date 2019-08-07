@@ -63,4 +63,9 @@ public class ArgSethome implements PSCommandArg {
         PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getID()));
         return true;
     }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
 }

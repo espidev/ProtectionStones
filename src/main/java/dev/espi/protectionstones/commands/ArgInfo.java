@@ -124,6 +124,11 @@ public class ArgInfo implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     private static void displayFlags(Player p, ProtectedRegion region) {
         StringBuilder myFlag = new StringBuilder();
         String myFlagValue;

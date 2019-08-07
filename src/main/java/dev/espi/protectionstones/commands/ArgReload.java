@@ -49,4 +49,9 @@ public class ArgReload implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
 }

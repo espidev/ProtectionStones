@@ -323,6 +323,16 @@ public class PSRegion {
         if (deleteBlock && !this.isHidden()) {
             this.getProtectBlock().setType(Material.AIR);
         }
+
+        if (getName() != null) { // remove name from cache
+            if (ProtectionStones.regionNameToID.get(getWorld()).containsKey(getName())) {
+                if (ProtectionStones.regionNameToID.get(getWorld()).get(getName()).size() == 1) {
+                    ProtectionStones.regionNameToID.get(getWorld()).remove(getName());
+                } else {
+                    ProtectionStones.regionNameToID.get(getWorld()).get(getName()).remove(getID());
+                }
+            }
+        }
         rgmanager.removeRegion(wgregion.getId());
         return true;
     }

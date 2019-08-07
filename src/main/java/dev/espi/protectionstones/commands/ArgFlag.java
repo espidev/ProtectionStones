@@ -83,6 +83,11 @@ public class ArgFlag implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     // /ps flag logic (utilizing WG internal /region flag logic)
     static void setFlag(ProtectedRegion region, CommandSender p, String flagName, String value, String groupValue) {
         Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);

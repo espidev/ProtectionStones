@@ -126,6 +126,11 @@ public class ArgTp implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     static void teleportPlayer(Player p, PSRegion r) {
         // teleport player
         if (r.getTypeOptions().tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) {

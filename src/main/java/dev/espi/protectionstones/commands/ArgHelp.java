@@ -68,6 +68,11 @@ public class ArgHelp implements PSCommandArg{
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     private static void sendWithPerm(CommandSender p, String msg, String desc, String cmd, String... permission) {
         if (msg.equals("")) return;
         for (String perm : permission) {

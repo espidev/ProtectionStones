@@ -153,6 +153,11 @@ public class ArgView implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
         Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
             if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {

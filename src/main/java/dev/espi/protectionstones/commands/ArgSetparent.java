@@ -102,4 +102,9 @@ public class ArgSetparent implements PSCommandArg {
         }
         return false;
     }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
 }

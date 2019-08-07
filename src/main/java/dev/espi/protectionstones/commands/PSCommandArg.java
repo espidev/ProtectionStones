@@ -24,4 +24,5 @@ public interface PSCommandArg {
     List<String> getNames();
     boolean allowNonPlayersToExecute();
     boolean executeArgument(CommandSender s, String[] args);
+    List<String> tabComplete(CommandSender sender, String alias, String[] args);
 }

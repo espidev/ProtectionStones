@@ -57,15 +57,25 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgHelp());
     }
 
-    /*
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> l = new ArrayList<>();
-        for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
-            l.add(ps.getNames().get(0));
+        if (args.length == 1) {
+            List<String> l = new ArrayList<>();
+            for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
+                l.add(ps.getNames().get(0));
+            }
+            return StringUtil.copyPartialMatches(args[0], l, new ArrayList<>());
+        } else if (args.length >= 2) {
+            for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
+                for (String arg : ps.getNames()) {
+                    if (arg.equalsIgnoreCase(args[0])) {
+                        ps.tabComplete(sender, alias, args);
+                    }
+                }
+            }
         }
-        return (args.length > 0) ? StringUtil.copyPartialMatches(args[0], l, new ArrayList<>()) : null;
-    }*/
+        return null;
+    }
 
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {

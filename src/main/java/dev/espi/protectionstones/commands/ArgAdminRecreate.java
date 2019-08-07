@@ -33,7 +33,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArgAdminRecreate {
+class ArgAdminRecreate {
     static boolean argumentAdminRecreate(CommandSender s, String[] args) {
         s.sendMessage(ChatColor.YELLOW + "Recreating...");
 

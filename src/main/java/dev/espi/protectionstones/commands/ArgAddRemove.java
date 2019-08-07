@@ -22,9 +22,12 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -108,6 +111,32 @@ public class ArgAddRemove implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args) {
         template((Player) s, args, args[0]);
         return true;
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        switch (args[0].toLowerCase()) {
+            case "add":
+            case "addowner":
+                List<String> names = new ArrayList<>();
+                for (Player p : Bukkit.getOnlinePlayers()) names.add(p.getName());
+                return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
+            case "remove":
+            case "removeowner":
+                if (sender instanceof Player) {
+                    Player p = (Player) sender;
+                    PSRegion r = PSRegion.fromLocation(p.getLocation());
+                    if (r != null) {
+                        names = new ArrayList<>();
+                        for (UUID uuid : args[0].equalsIgnoreCase("remove") ? r.getMembers() : r.getOwners()) {
+                            names.add(UUIDCache.uuidToName.get(uuid));
+                        }
+                        return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
+                    }
+                }
+                break;
+        }
+        return null;
     }
 
 }

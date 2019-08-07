@@ -72,6 +72,11 @@ public class ArgList implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+
     private void display(CommandSender s, List<PSRegion> regions, String pName, UUID pUUID) {
         List<String> ownerOf = new ArrayList<>(), memberOf = new ArrayList<>();
         for (PSRegion r : regions) {
