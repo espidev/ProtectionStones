@@ -193,7 +193,7 @@ class BlockHandler {
         rm.addRegion(region);
 
         // check if new region overlaps more powerful region
-        if (WGUtils.overlapsStrongerRegion(rm, region, lp)) {
+        if (!blockOptions.allowOverlapUnownedRegions && WGUtils.overlapsStrongerRegion(rm, region, lp)) {
             rm.removeRegion(id);
             PSL.msg(p, PSL.REGION_OVERLAP.msg());
             return false;

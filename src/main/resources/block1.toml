@@ -76,6 +76,9 @@ prevent_block_place_in_restricted_world = true
     # Default priority type for this block type protection stone
     priority = 0
 
+    # Whether or not to allow creation of regions that overlap other regions you don't own
+    allow_overlap_unowned_regions = false
+
 [block_data]
     # Name given to protection block when obtained with /ps give or /ps get
     # Also affects custom crafted items (see custom_recipe)
