@@ -27,6 +27,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -197,18 +198,14 @@ public class PSConfig {
 
     static void removePSRecipes() {
         // remove previous protectionstones recipes (/ps reload)
-        List<Recipe> recipes = new ArrayList<>();
         Iterator<Recipe> iter = Bukkit.recipeIterator();
         while (iter.hasNext()) {
             Recipe r = iter.next();
             if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
-                continue;
+                iter.remove();
             }
-            recipes.add(r);
         }
-        // restore recipes without protectionstones ones
-        Bukkit.clearRecipes();
-        for (Recipe r : recipes) Bukkit.addRecipe(r);
+        Bukkit.reloadData();
     }
 
     private static void setupRecipe(PSProtectBlock b) {
