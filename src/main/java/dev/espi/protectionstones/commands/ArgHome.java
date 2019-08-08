@@ -46,11 +46,15 @@ public class ArgHome implements PSCommandArg {
         return false;
     }
 
+    // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (!(sender instanceof Player)) return null;
         Player p = (Player) sender;
+
         if (args.length == 2) {
+
+            // add to cache if not already
             if (tabCache.get(p.getUniqueId()) == null) {
                 List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
                 List<String> regionNames = new ArrayList<>();
@@ -58,11 +62,12 @@ public class ArgHome implements PSCommandArg {
                     if (r.getName() != null) regionNames.add(r.getName());
                     regionNames.add(r.getID());
                 }
+                // cache home regions
                 tabCache.put(p.getUniqueId(), regionNames);
 
                 Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                     tabCache.remove(p.getUniqueId());
-                }, 200);
+                }, 200); // remove cache after 10 seconds
             }
 
             return StringUtil.copyPartialMatches(args[1], tabCache.get(p.getUniqueId()), new ArrayList<>());

@@ -3,12 +3,17 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +30,31 @@ public class ArgGet implements PSCommandArg {
         return false;
     }
 
+    private boolean openGetGUI(Player p) {
+        PSL.msg(p, PSL.GET_HEADER.msg());
+        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            String price = new DecimalFormat("#.##").format(b.price);
+
+            TextComponent tc = new TextComponent(PSL.GET_GUI_BLOCK.msg()
+                    .replace("%alias%", b.alias)
+                    .replace("%price%", price)
+                    .replace("%xradius%", ""+b.xRadius)
+                    .replace("%yradius%", ""+b.yRadius)
+                    .replace("%zradius%", ""+b.zRadius));
+
+            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GET_GUI_HOVER.msg()
+                    .replace("%alias%", b.alias)
+                    .replace("%price%", price)
+                    .replace("%xradius%", ""+b.xRadius)
+                    .replace("%yradius%", ""+b.yRadius)
+                    .replace("%zradius%", ""+b.zRadius)).create()));
+            tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " get " + b.alias));
+
+            p.spigot().sendMessage(tc);
+        }
+        return true;
+    }
+
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
@@ -32,6 +62,9 @@ public class ArgGet implements PSCommandArg {
             PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
             return true;
         }
+
+        // /ps get (for GUI)
+        if (args.length == 1) return openGetGUI(p);
 
         if (args.length != 2) {
             PSL.msg(p, PSL.GET_HELP.msg());
