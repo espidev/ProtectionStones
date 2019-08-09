@@ -36,6 +36,8 @@ public enum PSL {
     NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
     INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),
     MUST_BE_PLAYER("must_be_player", ChatColor.RED + "You must be a player to execute this command."),
+    GO_BACK_PAGE("go_back_page", "Go back a page."),
+    GO_NEXT_PAGE("go_next_page", "Go to next page."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
 
@@ -105,6 +107,7 @@ public enum PSL {
     FLAG_HELP_DESC("flag.help_desc", "Use this command to set a flag in your protected region."),
     FLAG_SET("flag.flag_set", ChatColor.AQUA + "%flag%" + ChatColor.GRAY + " flag has been set."),
     FLAG_NOT_SET("flag.flag_not_set", ChatColor.AQUA + "%flag%" + ChatColor.GRAY + " flag has " + ChatColor.RED + "not" + ChatColor.GRAY + " been set. Check your values again."),
+    FLAG_GUI_HEADER("flag.gui_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Flags (click to change) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),

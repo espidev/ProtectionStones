@@ -23,8 +23,15 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -41,6 +48,41 @@ public class ArgFlag implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    private static final int GUI_SIZE = 18;
+
+    // flag gui that has ability to use pages
+    private boolean openFlagGUI(Player p, PSRegion r, int page) {
+        PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
+
+        // send flags
+        for (int i = GUI_SIZE * page; i < GUI_SIZE * page + GUI_SIZE; i++) {
+            if (i >= r.getTypeOptions().allowedFlags.size()) {
+                PSL.msg(p, ChatColor.WHITE + "");
+            } else {
+                PSL.msg(p, r.getTypeOptions().allowedFlags.get(i));
+            }
+        }
+
+        // create footer
+        TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
+        backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
+        nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
+        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page - 1)));
+        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page + 1)));
+        TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
+        if (page != 0) {
+            footer.addExtra(backPage);
+        }
+        footer.addExtra(new TextComponent(ChatColor.WHITE + " " + (page + 1) + " "));
+        if (page * GUI_SIZE + GUI_SIZE < r.getTypeOptions().allowedFlags.size()) {
+            footer.addExtra(nextPage);
+        }
+        footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
+
+        p.spigot().sendMessage(footer);
+        return true;
     }
 
     @Override
@@ -61,28 +103,39 @@ public class ArgFlag implements PSCommandArg {
             return true;
         }
 
+        // /ps flag GUI
+        if (args.length == 1) return openFlagGUI(p, r, 0);
+        // go to GUI page
+        if (args.length == 2 && StringUtils.isNumeric(args[1])) return openFlagGUI(p, r, Integer.parseInt(args[1]));
+
         if (args.length < 3) {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         } else {
             if (r.getTypeOptions().allowedFlags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
-                String flag, value = "", gee = "";
-                if (args[1].equalsIgnoreCase("-g")) {
-                    if (args.length < 5) {
-                        PSL.msg(p, PSL.FLAG_HELP.msg());
-                        return true;
-                    }
-                    flag = args[3];
-                    for (int i = 4; i < args.length; i++) value += args[i] + " ";
-                    gee = args[2];
-                } else {
-                    flag = args[1];
-                    for (int i = 2; i < args.length; i++) value += args[i] + " ";
-                }
-                setFlag(r, p, flag, value.trim(), gee);
+                return parseFlag(args, p, r);
             } else {
                 PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
             }
         }
+        return true;
+    }
+
+    // parse flag out from argument
+    private boolean parseFlag(String[] args, Player p, PSRegion r) {
+        String flag, value = "", gee = "";
+        if (args[1].equalsIgnoreCase("-g")) {
+            if (args.length < 5) {
+                PSL.msg(p, PSL.FLAG_HELP.msg());
+                return true;
+            }
+            flag = args[3];
+            for (int i = 4; i < args.length; i++) value += args[i] + " ";
+            gee = args[2];
+        } else {
+            flag = args[1];
+            for (int i = 2; i < args.length; i++) value += args[i] + " ";
+        }
+        setFlag(r, p, flag, value.trim(), gee);
         return true;
     }
 
@@ -138,11 +191,10 @@ public class ArgFlag implements PSCommandArg {
     // /ps flag logic (utilizing WG internal /region flag logic)
     static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
         Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
-
         ProtectedRegion region = r.getWGRegion();
 
         try {
-            if (value.equalsIgnoreCase("default")) {
+            if (value.equalsIgnoreCase("default")) { // get default from config, or from WG
 
                 HashMap<Flag<?>, Object> flags = new HashMap<>(r.getTypeOptions().regionFlags);
                 FlagHandler.initDefaultFlagPlaceholders(flags, (Player) p);
@@ -153,13 +205,14 @@ public class ArgFlag implements PSCommandArg {
                 }
                 region.setFlag(flag.getRegionGroupFlag(), null);
                 PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
-            } else if (value.equalsIgnoreCase("null")) {
+
+            } else if (value.equalsIgnoreCase("null")) { // null flag (remove)
 
                 region.setFlag(flag, null);
                 region.setFlag(flag.getRegionGroupFlag(), null);
                 PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
 
-            } else {
+            } else { // custom set flag using WG internal
                 FlagContext fc = FlagContext.create().setInput(value).build();
                 region.setFlag(flag, flag.parseInput(fc));
                 if (!groupValue.equals("")) {

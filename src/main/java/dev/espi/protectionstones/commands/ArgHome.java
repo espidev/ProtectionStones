@@ -75,6 +75,23 @@ public class ArgHome implements PSCommandArg {
         return null;
     }
 
+    private void openHomeGUI(Player p) {
+        List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+        PSL.msg(p, PSL.HOME_HEADER.msg());
+        for (PSRegion r : regions) {
+            String msg;
+            if (r.getName() == null) {
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
+            } else {
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
+            }
+            TextComponent tc = new TextComponent(msg);
+            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
+            tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
+            p.spigot().sendMessage(tc);
+        }
+    }
+
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
@@ -90,21 +107,8 @@ public class ArgHome implements PSCommandArg {
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            if (args.length == 1) { // /ps home
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
-                PSL.msg(p, PSL.HOME_HEADER.msg());
-                for (PSRegion r : regions) {
-                    String msg;
-                    if (r.getName() == null) {
-                        msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
-                    } else {
-                        msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
-                    }
-                    TextComponent tc = new TextComponent(msg);
-                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
-                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
-                    p.spigot().sendMessage(tc);
-                }
+            if (args.length == 1) { // /ps home GUI
+                openHomeGUI(p);
             } else {// /ps home [id]
                 // get regions from the query
                 List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
