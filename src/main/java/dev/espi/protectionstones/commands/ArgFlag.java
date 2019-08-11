@@ -60,14 +60,14 @@ public class ArgFlag implements PSCommandArg {
     // flag gui that has ability to use pages
     private boolean openFlagGUI(Player p, PSRegion r, int page) {
         // add blank space if gui not long enough
-        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page); i++) {
+        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (Math.min(r.getTypeOptions().allowedFlags.size(), GUI_SIZE * page + GUI_SIZE) - GUI_SIZE * page); i++) {
             PSL.msg(p, ChatColor.WHITE + "");
         }
 
         PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
 
         // send actual flags
-        for (int i = GUI_SIZE * page; i < Math.min(r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page, GUI_SIZE * page + GUI_SIZE); i++) {
+        for (int i = GUI_SIZE * page; i < Math.min(r.getTypeOptions().allowedFlags.size(), GUI_SIZE * page + GUI_SIZE); i++) {
             if (i >= r.getTypeOptions().allowedFlags.size()) {
                 PSL.msg(p, ChatColor.WHITE + "");
             } else {
@@ -106,17 +106,10 @@ public class ArgFlag implements PSCommandArg {
                     flagLine.addExtra(" ");
                     flagLine.addExtra(deny);
                     flagLine.addExtra(getDots(5));
-                } else if (f instanceof StringFlag) {
-                    TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
-                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
-                            .replace("%value%", (String) fValue)).create()));
-                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
-
-                    flagLine.addExtra(edit);
-                    flagLine.addExtra(getDots(22));
                 } else {
                     TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
-                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
+                            .replace("%value%", fValue == null ? "none" : fValue.toString())).create()));
                     edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
                     flagLine.addExtra(edit);
                     flagLine.addExtra(getDots(22));
@@ -126,8 +119,8 @@ public class ArgFlag implements PSCommandArg {
                 String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
                         toLowerCase().
                         replace("_", "");
-                TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY +" ]");
-                String nextGroup = REGION_GROUPS.get((REGION_GROUPS.indexOf(groupfValue)+1) % REGION_GROUPS.size());
+                TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
+                String nextGroup = REGION_GROUPS.get((REGION_GROUPS.indexOf(groupfValue) + 1) % REGION_GROUPS.size());
 
                 BaseComponent[] hover;
                 if (fValue == null) {
@@ -136,11 +129,11 @@ public class ArgFlag implements PSCommandArg {
                     hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
                 }
                 groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
-                groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " "  + page + ":" + flag + " " + fValue));
+                groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
 
                 flagLine.addExtra(groupChange);
                 // send message
-                flagLine.addExtra(getDots(40-REGION_GROUP_KERNING_LENGTHS[REGION_GROUPS.indexOf(groupfValue)]) +ChatColor.AQUA + " " + flag);
+                flagLine.addExtra(getDots(40 - REGION_GROUP_KERNING_LENGTHS[REGION_GROUPS.indexOf(groupfValue)]) + ChatColor.AQUA + " " + flag);
 
                 p.spigot().sendMessage(flagLine);
             }
