@@ -110,7 +110,9 @@ public enum PSL {
     FLAG_GUI_HEADER("flag.gui_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Flags (click to change) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     FLAG_GUI_HOVER_GROUP("flag.gui_hover_group", "Edit flags that apply to %group%."),
     FLAG_GUI_HOVER_SET("flag.gui_hover_set", ChatColor.AQUA + "Click to set."),
-    FLAG_GUI_HOVER_SET_TEXT("flag.gui_hover_set_text", ChatColor.AQUA + "Click to change.\nCurrent value:\n%value%"),
+    FLAG_GUI_HOVER_SET_TEXT("flag.gui_hover_set_text", ChatColor.AQUA + "Click to change." + ChatColor.WHITE + "\nCurrent value:\n%value%"),
+    FLAG_GUI_HOVER_CHANGE_GROUP("flag.hover_change_group", "Click to set this flag to apply to only %group%."),
+    FLAG_GUI_HOVER_CHANGE_GROUP_NULL("flag.hover_change_group_null", ChatColor.RED + "You must set this flag to a value before changing the group."),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),

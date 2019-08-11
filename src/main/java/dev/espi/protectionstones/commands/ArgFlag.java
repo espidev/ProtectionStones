@@ -49,38 +49,22 @@ public class ArgFlag implements PSCommandArg {
 
     private static final int GUI_SIZE = 18;
     private static final List<String> REGION_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
+    private static final int[] REGION_GROUP_KERNING_LENGTHS = {2, 17, 14, 26, 23};
+
+    private String getDots(int num) {
+        StringBuilder str = new StringBuilder(" " + ChatColor.DARK_GRAY);
+        for (int i = 0; i < num; i++) str.append(".");
+        return str.toString();
+    }
 
     // flag gui that has ability to use pages
-    private boolean openFlagGUI(Player p, PSRegion r, int page, String mode) {
-        // check if group is valid
-        if (!REGION_GROUPS.contains(mode)) {
-            PSL.msg(p, PSL.FLAG_HELP.msg());
-            return true;
-        }
-
+    private boolean openFlagGUI(Player p, PSRegion r, int page) {
         // add blank space if gui not long enough
-        for (int i = 0; i < (GUI_SIZE*page+GUI_SIZE) - (r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page); i++) {
-            PSL.msg(p, ChatColor.WHITE+"");
+        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page); i++) {
+            PSL.msg(p, ChatColor.WHITE + "");
         }
 
         PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
-        // show group header
-        /*TextComponent modes = new TextComponent(ChatColor.DARK_GRAY + "[ " + ChatColor.RESET);
-        for (String group : REGION_GROUPS) {
-            if (group.equals(mode)) { // currently selected group
-                modes.addExtra(ChatColor.WHITE + group);
-            } else { // other clickable groups
-                TextComponent g = new TextComponent(ChatColor.GRAY + group);
-                g.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + group + ":" + page));
-                g.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_GROUP.msg().replace("%group%", group)).create()));
-                modes.addExtra(g);
-            }
-            // add divider |
-            if (!group.equals(REGION_GROUPS.get(REGION_GROUPS.size() - 1)))
-                modes.addExtra(ChatColor.WHITE + " | ");
-        }
-        modes.addExtra(ChatColor.DARK_GRAY + " ]");
-        p.spigot().sendMessage(modes);*/
 
         // send actual flags
         for (int i = GUI_SIZE * page; i < Math.min(r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page, GUI_SIZE * page + GUI_SIZE); i++) {
@@ -91,35 +75,72 @@ public class ArgFlag implements PSCommandArg {
                 TextComponent flagLine = new TextComponent();
 
                 // calculate flag command
-                String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag -g " + mode + " ";
+                String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
                 Flag<?> f = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flag);
+                Object fValue = r.getWGRegion().getFlag(f);
 
                 // add line based on flag type
                 if (f instanceof StateFlag) {
-                    TextComponent allow = new TextComponent((r.getWGRegion().getFlag(f) == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
-                            deny = new TextComponent((r.getWGRegion().getFlag(f) == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
+                    TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
+                            deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
 
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + mode + ":" + page + ":" + flag + " allow"));
-                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + mode + ":" + page + ":" + flag + " deny"));
+                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
+                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
 
                     flagLine.addExtra(allow);
                     flagLine.addExtra(" ");
                     flagLine.addExtra(deny);
+                    flagLine.addExtra(getDots(5));
+                } else if (f instanceof BooleanFlag) {
+                    TextComponent allow = new TextComponent((fValue == Boolean.TRUE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "True"),
+                            deny = new TextComponent((fValue == Boolean.FALSE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "False");
+
+                    allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
+                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+
+                    flagLine.addExtra(allow);
+                    flagLine.addExtra(" ");
+                    flagLine.addExtra(deny);
+                    flagLine.addExtra(getDots(5));
+                } else if (f instanceof StringFlag) {
+                    TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
+                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
+                            .replace("%value%", (String) fValue)).create()));
+                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
+
+                    flagLine.addExtra(edit);
+                    flagLine.addExtra(getDots(22));
                 } else {
-                    TextComponent edit = new TextComponent("Edit");
+                    TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
                     edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
                     flagLine.addExtra(edit);
+                    flagLine.addExtra(getDots(22));
                 }
 
-                flagLine.addExtra(" " + ChatColor.DARK_GRAY);
-                // add ...... between flag and edits
-                for (int j = flagLine.getText().length(); j < 50; j++) flagLine.addExtra(".");
-                flagLine.addExtra(" ");
+                // put group it applies to
+                String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
+                        toLowerCase().
+                        replace("_", "");
+                TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY +" ]");
+                String nextGroup = REGION_GROUPS.get((REGION_GROUPS.indexOf(groupfValue)+1) % REGION_GROUPS.size());
 
-                flagLine.addExtra(ChatColor.AQUA + " " + flag);
+                BaseComponent[] hover;
+                if (fValue == null) {
+                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create();
+                } else {
+                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
+                }
+                groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " "  + page + ":" + flag + " " + fValue));
+
+                flagLine.addExtra(groupChange);
+                // send message
+                flagLine.addExtra(getDots(40-REGION_GROUP_KERNING_LENGTHS[REGION_GROUPS.indexOf(groupfValue)]) +ChatColor.AQUA + " " + flag);
 
                 p.spigot().sendMessage(flagLine);
             }
@@ -129,8 +150,8 @@ public class ArgFlag implements PSCommandArg {
         TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
         backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
         nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
-        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + mode + ":" + (page - 1)));
-        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + mode + ":" + (page + 1)));
+        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page - 1)));
+        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page + 1)));
 
         TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
         // add back page button if the page isn't 0
@@ -164,25 +185,19 @@ public class ArgFlag implements PSCommandArg {
         }
 
         // /ps flag GUI
-        if (args.length == 1) return openFlagGUI(p, r, 0, "all");
+        if (args.length == 1) return openFlagGUI(p, r, 0);
         // go to GUI page
-        if (args.length == 2) {
-            String[] sp = args[1].split(":");
-            if (StringUtils.isNumeric(sp[1]) && REGION_GROUPS.contains(sp[0])) {
-                return openFlagGUI(p, r, Integer.parseInt(sp[1]), sp[0]);
-            } else {
-                PSL.msg(p, PSL.FLAG_HELP.msg());
-                return true;
-            }
+        if (args.length == 2 && StringUtils.isNumeric(args[1])) {
+            return openFlagGUI(p, r, Integer.parseInt(args[1]));
         }
 
         // beyond 2 args (set flag)
         String flagName = args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase();
         String gui = "";
         String[] flagSplit = flagName.split(":");
-        if (flagSplit.length == 3) { // check if there is a GUI that needs to be reshown
-            gui = flagSplit[0] + ":" + flagSplit[1];
-            flagName = flagSplit[2];
+        if (flagSplit.length == 2) { // check if there is a GUI that needs to be reshown
+            gui = flagSplit[0];
+            flagName = flagSplit[1];
         }
 
         if (r.getTypeOptions().allowedFlags.contains(flagName)) {
@@ -268,7 +283,7 @@ public class ArgFlag implements PSCommandArg {
     static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
         // correct the flag if gui flags are there
         String[] flagSplit = flagName.split(":");
-        if (flagSplit.length == 3) flagName = flagSplit[2];
+        if (flagSplit.length == 2) flagName = flagSplit[1];
 
         Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
         ProtectedRegion region = r.getWGRegion();
