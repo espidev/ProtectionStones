@@ -25,10 +25,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,17 +48,80 @@ public class ArgFlag implements PSCommandArg {
     }
 
     private static final int GUI_SIZE = 18;
+    private static final List<String> REGION_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
 
     // flag gui that has ability to use pages
-    private boolean openFlagGUI(Player p, PSRegion r, int page) {
-        PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
+    private boolean openFlagGUI(Player p, PSRegion r, int page, String mode) {
+        // check if group is valid
+        if (!REGION_GROUPS.contains(mode)) {
+            PSL.msg(p, PSL.FLAG_HELP.msg());
+            return true;
+        }
 
-        // send flags
-        for (int i = GUI_SIZE * page; i < GUI_SIZE * page + GUI_SIZE; i++) {
+        // add blank space if gui not long enough
+        for (int i = 0; i < (GUI_SIZE*page+GUI_SIZE) - (r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page); i++) {
+            PSL.msg(p, ChatColor.WHITE+"");
+        }
+
+        PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
+        // show group header
+        /*TextComponent modes = new TextComponent(ChatColor.DARK_GRAY + "[ " + ChatColor.RESET);
+        for (String group : REGION_GROUPS) {
+            if (group.equals(mode)) { // currently selected group
+                modes.addExtra(ChatColor.WHITE + group);
+            } else { // other clickable groups
+                TextComponent g = new TextComponent(ChatColor.GRAY + group);
+                g.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + group + ":" + page));
+                g.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_GROUP.msg().replace("%group%", group)).create()));
+                modes.addExtra(g);
+            }
+            // add divider |
+            if (!group.equals(REGION_GROUPS.get(REGION_GROUPS.size() - 1)))
+                modes.addExtra(ChatColor.WHITE + " | ");
+        }
+        modes.addExtra(ChatColor.DARK_GRAY + " ]");
+        p.spigot().sendMessage(modes);*/
+
+        // send actual flags
+        for (int i = GUI_SIZE * page; i < Math.min(r.getTypeOptions().allowedFlags.size() - GUI_SIZE * page, GUI_SIZE * page + GUI_SIZE); i++) {
             if (i >= r.getTypeOptions().allowedFlags.size()) {
                 PSL.msg(p, ChatColor.WHITE + "");
             } else {
-                PSL.msg(p, r.getTypeOptions().allowedFlags.get(i));
+                String flag = r.getTypeOptions().allowedFlags.get(i);
+                TextComponent flagLine = new TextComponent();
+
+                // calculate flag command
+                String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag -g " + mode + " ";
+                Flag<?> f = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flag);
+
+                // add line based on flag type
+                if (f instanceof StateFlag) {
+                    TextComponent allow = new TextComponent((r.getWGRegion().getFlag(f) == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
+                            deny = new TextComponent((r.getWGRegion().getFlag(f) == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
+
+                    allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + mode + ":" + page + ":" + flag + " allow"));
+                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + mode + ":" + page + ":" + flag + " deny"));
+
+                    flagLine.addExtra(allow);
+                    flagLine.addExtra(" ");
+                    flagLine.addExtra(deny);
+                } else {
+                    TextComponent edit = new TextComponent("Edit");
+                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
+                    flagLine.addExtra(edit);
+                }
+
+                flagLine.addExtra(" " + ChatColor.DARK_GRAY);
+                // add ...... between flag and edits
+                for (int j = flagLine.getText().length(); j < 50; j++) flagLine.addExtra(".");
+                flagLine.addExtra(" ");
+
+                flagLine.addExtra(ChatColor.AQUA + " " + flag);
+
+                p.spigot().sendMessage(flagLine);
             }
         }
 
@@ -69,16 +129,16 @@ public class ArgFlag implements PSCommandArg {
         TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
         backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
         nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
-        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page - 1)));
-        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page + 1)));
+        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + mode + ":" + (page - 1)));
+        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + mode + ":" + (page + 1)));
+
         TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
-        if (page != 0) {
-            footer.addExtra(backPage);
-        }
+        // add back page button if the page isn't 0
+        if (page != 0) footer.addExtra(backPage);
+        // add page number
         footer.addExtra(new TextComponent(ChatColor.WHITE + " " + (page + 1) + " "));
-        if (page * GUI_SIZE + GUI_SIZE < r.getTypeOptions().allowedFlags.size()) {
-            footer.addExtra(nextPage);
-        }
+        // add forward page button if the page isn't last
+        if (page * GUI_SIZE + GUI_SIZE < r.getTypeOptions().allowedFlags.size()) footer.addExtra(nextPage);
         footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
 
         p.spigot().sendMessage(footer);
@@ -104,29 +164,46 @@ public class ArgFlag implements PSCommandArg {
         }
 
         // /ps flag GUI
-        if (args.length == 1) return openFlagGUI(p, r, 0);
+        if (args.length == 1) return openFlagGUI(p, r, 0, "all");
         // go to GUI page
-        if (args.length == 2 && StringUtils.isNumeric(args[1])) return openFlagGUI(p, r, Integer.parseInt(args[1]));
-
-        if (args.length < 3) {
-            PSL.msg(p, PSL.FLAG_HELP.msg());
-        } else {
-            if (r.getTypeOptions().allowedFlags.contains((args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase()))) {
-                return parseFlag(args, p, r);
+        if (args.length == 2) {
+            String[] sp = args[1].split(":");
+            if (StringUtils.isNumeric(sp[1]) && REGION_GROUPS.contains(sp[0])) {
+                return openFlagGUI(p, r, Integer.parseInt(sp[1]), sp[0]);
             } else {
-                PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
+                PSL.msg(p, PSL.FLAG_HELP.msg());
+                return true;
             }
+        }
+
+        // beyond 2 args (set flag)
+        String flagName = args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase();
+        String gui = "";
+        String[] flagSplit = flagName.split(":");
+        if (flagSplit.length == 3) { // check if there is a GUI that needs to be reshown
+            gui = flagSplit[0] + ":" + flagSplit[1];
+            flagName = flagSplit[2];
+        }
+
+        if (r.getTypeOptions().allowedFlags.contains(flagName)) {
+            parseFlag(args, p, r);
+            // reshow GUI
+            if (!gui.equals("")) {
+                Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
+            }
+        } else {
+            PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
         }
         return true;
     }
 
     // parse flag out from argument
-    private boolean parseFlag(String[] args, Player p, PSRegion r) {
+    private void parseFlag(String[] args, Player p, PSRegion r) {
         String flag, value = "", gee = "";
         if (args[1].equalsIgnoreCase("-g")) {
             if (args.length < 5) {
                 PSL.msg(p, PSL.FLAG_HELP.msg());
-                return true;
+                return;
             }
             flag = args[3];
             for (int i = 4; i < args.length; i++) value += args[i] + " ";
@@ -136,7 +213,6 @@ public class ArgFlag implements PSCommandArg {
             for (int i = 2; i < args.length; i++) value += args[i] + " ";
         }
         setFlag(r, p, flag, value.trim(), gee);
-        return true;
     }
 
     // tab completion
@@ -190,6 +266,10 @@ public class ArgFlag implements PSCommandArg {
 
     // /ps flag logic (utilizing WG internal /region flag logic)
     static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
+        // correct the flag if gui flags are there
+        String[] flagSplit = flagName.split(":");
+        if (flagSplit.length == 3) flagName = flagSplit[2];
+
         Flag flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
         ProtectedRegion region = r.getWGRegion();
 
