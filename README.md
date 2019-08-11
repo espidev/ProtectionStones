@@ -81,12 +81,16 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Enable or disable the use of this protection stone in specific worlds
     # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
     # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
-    # Can override with protectionstones.admin permission
+    # Can be overriden with protectionstones.admin permission (including OP)!
     world_list_type = "blacklist"
     worlds = [
         "exampleworld1",
         "exampleworld2"
     ]
+    
+    # Whether or not to actually restrict the protection stone from being placed when the world is restricted (in blacklist/whitelist)
+    # The block will place normally, without PS behaviour.
+    prevent_block_place_in_restricted_world = true
     
     [region]
         # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
@@ -100,12 +104,20 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         y_radius = -1
         z_radius = 64
     
+        # Offset the protection block
+        # If you would like to make the protection block not be at the center of new regions, you can offset it here
+        # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
+        x_offset = 0
+        y_offset = 0
+        z_offset = 0
+    
         # How many blocks to offset the default location of /ps home from the protection block
         home_x_offset = 0
         home_y_offset = 1
         home_z_offset = 0
     
         # Specify the default flags to be set when a new protected region is created.
+        # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
         flags = [
             "pvp deny",
             "greeting &lEntering &b&l%player%'s &f&lprotected area",
@@ -130,12 +142,17 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Default priority type for this block type protection stone
         priority = 0
     
+        # Whether or not to allow creation of regions that overlap other regions you don't own
+        allow_overlap_unowned_regions = false
+    
     [block_data]
         # Name given to protection block when obtained with /ps give or /ps get
+        # Also affects custom crafted items (see custom_recipe)
         # Leave as '' for no name
         display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
     
         # Lore given to protection block when obtained with /ps give or /ps get
+        # Also affects custom crafted items (see custom_recipe)
         # Leave as [] for no lore
         lore = [
             "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
@@ -194,11 +211,17 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         no_moving_when_tp_waiting = true
         tp_waiting_seconds = 0
     
+        # Whether or not to prevent obtaining this block through /ps get.
+        # Ignored with protectionstones.admin
+        prevent_ps_get = false
+    
         # Extra permission required to place this specific protection block (you still need protectionstones.create)
+        # Also applies to /ps get (you still need protectionstones.get)
         # '' for no extra permission
         permission = ''
+    
     [event]
-
+    
         # Events section
         # ~~~~~~~~~~~~~~
         # For each line on events, it is the format 'type: action'
@@ -207,22 +230,20 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # console_command - Execute command by console
         # message - Send message to player or console if applicable (colour support with &)
         # global_message - Send message to all players and console (colour support with &)
-
+    
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Whether or not to enable event tracking (API events will still be enabled)
         enable = false
-
+    
         # Execute commands when a region is created (ex. player place protection block)
         on_region_create = [
             'global_message: &l%player% created the region %region%!',
         ]
-
+    
         # Execute commands when a region is destroyed (ex. when player destroy protection block)
         on_region_destroy = [
             'console_command: say %player% has destroyed region %region%!',
         ]
-
-
 
 ## Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone

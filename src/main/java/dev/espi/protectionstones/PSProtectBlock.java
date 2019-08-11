@@ -123,6 +123,8 @@ public class PSProtectBlock {
     @Path("player.tp_waiting_seconds")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int tpWaitingSeconds;
+    @Path("player.prevent_ps_get")
+    public boolean preventPsGet;
     @Path("player.permission")
     public String permission;
 

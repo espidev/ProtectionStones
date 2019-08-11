@@ -33,6 +33,10 @@ public class ArgGet implements PSCommandArg {
     private boolean openGetGUI(Player p) {
         PSL.msg(p, PSL.GET_HEADER.msg());
         for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            if ((!b.permission.equals("") && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
+                continue; // no permission
+            }
+
             String price = new DecimalFormat("#.##").format(b.price);
 
             TextComponent tc = new TextComponent(PSL.GET_GUI_BLOCK.msg()
@@ -78,8 +82,15 @@ public class ArgGet implements PSCommandArg {
             return true;
         }
 
+        // check for block permission (custom)
         if (!cp.permission.equals("") && !p.hasPermission(cp.permission)) {
-            PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
+            PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
+            return true;
+        }
+
+        // check if /ps get is disabled on this
+        if (cp.preventPsGet && !p.hasPermission("protectionstones.admin")) {
+            PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
             return true;
         }
 
@@ -130,7 +141,10 @@ public class ArgGet implements PSCommandArg {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         List<String> l = new ArrayList<>();
-        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) l.add(b.alias);
+        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            if ((!b.permission.equals("") && !sender.hasPermission(b.permission)) || (b.preventPsGet && !sender.hasPermission("protectionstones.admin"))) continue; // no permission
+            l.add(b.alias);
+        }
         return args.length == 2 ? StringUtil.copyPartialMatches(args[1], l, new ArrayList<>()) : null;
     }
 
