@@ -45,7 +45,7 @@ public class FlagHandler {
             registry.register(PS_HOME);
             registry.register(PS_BLOCK_MATERIAL);
             registry.register(PS_NAME);
-        } catch (FlagConflictException e ) {
+        } catch (FlagConflictException e) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();
         }
@@ -80,14 +80,26 @@ public class FlagHandler {
         b.regionFlags = new HashMap<>();
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
-            String settings = "";
-            for (int i = 1; i < split.length; i++) settings += split[i] + " ";
+            String settings = "", group = "";
+
+            if (split[0].equals("-g")) { // if it's a group flag
+                group = split[1];
+                for (int i = 3; i < split.length; i++) settings += split[i] + " ";
+            } else { // not group flag
+                for (int i = 1; i < split.length; i++) settings += split[i] + " ";
+            }
+
             settings = settings.trim();
 
-            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), split[0]);
+            String f = split[0];
+            if (split[0].equals("-g")) f = split[2];
+            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), f);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
                 b.regionFlags.put(flag, flag.parseInput(fc));
+                if (!group.equals("")) {
+                    b.regionFlags.put(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(group));
+                }
             } catch (Exception e) {
                 Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
                 e.printStackTrace();

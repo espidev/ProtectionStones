@@ -86,8 +86,16 @@ public class ArgFlag implements PSCommandArg {
 
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
-                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
+                    if (fValue == StateFlag.State.ALLOW) {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
+                    } else if (fValue == StateFlag.State.DENY) {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                    } else {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
+                    }
 
                     flagLine.addExtra(allow);
                     flagLine.addExtra(" ");
@@ -99,8 +107,16 @@ public class ArgFlag implements PSCommandArg {
 
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
-                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+                    if (fValue == Boolean.TRUE) {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+                    } else if (fValue == Boolean.FALSE) {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                    } else {
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+                    }
 
                     flagLine.addExtra(allow);
                     flagLine.addExtra(" ");

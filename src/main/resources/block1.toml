@@ -52,6 +52,7 @@ prevent_block_place_in_restricted_world = true
     home_z_offset = 0
 
     # Specify the default flags to be set when a new protected region is created.
+    # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
     flags = [
         "pvp deny",
         "greeting &lEntering &b&l%player%'s &f&lprotected area",
@@ -146,6 +147,7 @@ prevent_block_place_in_restricted_world = true
     tp_waiting_seconds = 0
 
     # Extra permission required to place this specific protection block (you still need protectionstones.create)
+    # Also applies to /ps get (you still need protectionstones.get)
     # '' for no extra permission
     permission = ''
 
