@@ -63,8 +63,18 @@ public class PSCommand extends Command {
         if (args.length == 1) {
             List<String> l = new ArrayList<>();
             for (PSCommandArg ps : ProtectionStones.getInstance().getCommandArguments()) {
-                // TODO CHECK PERMISSION
-                l.addAll(ps.getNames());
+                boolean hasPerm = false;
+                if (ps.getPermissionsToExecute() == null) {
+                    hasPerm = true;
+                } else {
+                    for (String perm : ps.getPermissionsToExecute()) {
+                        if (sender.hasPermission(perm)) {
+                            hasPerm = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasPerm) l.addAll(ps.getNames());
             }
             return StringUtil.copyPartialMatches(args[0], l, new ArrayList<>());
         } else if (args.length >= 2) {

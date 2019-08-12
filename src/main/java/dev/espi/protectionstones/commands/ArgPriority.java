@@ -23,6 +23,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +37,11 @@ public class ArgPriority implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.priority");
     }
 
     @Override

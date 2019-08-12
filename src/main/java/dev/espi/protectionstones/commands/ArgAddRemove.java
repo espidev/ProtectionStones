@@ -108,6 +108,11 @@ public class ArgAddRemove implements PSCommandArg {
     }
 
     @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.members", "protectionstones.owners");
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         template((Player) s, args, args[0]);
         return true;

@@ -46,6 +46,11 @@ public class ArgHome implements PSCommandArg {
         return false;
     }
 
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.home");
+    }
+
     // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {

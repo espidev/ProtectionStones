@@ -50,6 +50,11 @@ public class ArgRegion implements PSCommandArg {
     }
 
     @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.region");
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
         WorldGuardPlugin wg = WorldGuardPlugin.inst();

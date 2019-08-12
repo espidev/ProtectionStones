@@ -47,6 +47,11 @@ public class ArgFlag implements PSCommandArg {
         return false;
     }
 
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Collections.singletonList("protectionstones.flags");
+    }
+
     private static final int GUI_SIZE = 18;
     private static final List<String> REGION_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
     private static final int[] REGION_GROUP_KERNING_LENGTHS = {2, 17, 14, 26, 23};
@@ -201,22 +206,26 @@ public class ArgFlag implements PSCommandArg {
         }
 
         // beyond 2 args (set flag)
-        String flagName = args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase();
-        String gui = "";
-        String[] flagSplit = flagName.split(":");
-        if (flagSplit.length == 2) { // check if there is a GUI that needs to be reshown
-            gui = flagSplit[0];
-            flagName = flagSplit[1];
-        }
-
-        if (r.getTypeOptions().allowedFlags.contains(flagName)) {
-            parseFlag(args, p, r);
-            // reshow GUI
-            if (!gui.equals("")) {
-                Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
+        try {
+            String flagName = args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase();
+            String gui = "";
+            String[] flagSplit = flagName.split(":");
+            if (flagSplit.length == 2) { // check if there is a GUI that needs to be reshown
+                gui = flagSplit[0];
+                flagName = flagSplit[1];
             }
-        } else {
-            PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
+
+            if (r.getTypeOptions().allowedFlags.contains(flagName)) {
+                parseFlag(args, p, r);
+                // reshow GUI
+                if (!gui.equals("")) {
+                    Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
+                }
+            } else {
+                PSL.msg(p, PSL.NO_PERMISSION_PER_FLAG.msg());
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            PSL.msg(p, PSL.FLAG_HELP.msg());
         }
         return true;
     }

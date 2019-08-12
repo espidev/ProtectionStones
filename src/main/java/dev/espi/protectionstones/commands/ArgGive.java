@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class ArgGive implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return true;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Collections.singletonList("protectionstones.give");
     }
 
     @Override

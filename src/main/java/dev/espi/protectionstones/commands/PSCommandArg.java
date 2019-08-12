@@ -23,6 +23,7 @@ import java.util.List;
 public interface PSCommandArg {
     List<String> getNames();
     boolean allowNonPlayersToExecute();
+    List<String> getPermissionsToExecute();
     boolean executeArgument(CommandSender s, String[] args);
     List<String> tabComplete(CommandSender sender, String alias, String[] args);
 }

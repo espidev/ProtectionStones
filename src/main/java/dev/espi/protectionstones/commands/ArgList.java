@@ -25,10 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ArgList implements PSCommandArg {
     @Override
@@ -39,6 +36,11 @@ public class ArgList implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.list");
     }
 
     @Override

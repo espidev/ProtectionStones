@@ -29,10 +29,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ArgView implements PSCommandArg {
 
@@ -46,6 +43,11 @@ public class ArgView implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.view");
     }
 
     @Override

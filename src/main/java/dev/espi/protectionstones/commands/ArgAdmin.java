@@ -43,6 +43,11 @@ public class ArgAdmin implements PSCommandArg {
         return true;
     }
 
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Collections.singletonList("protectionstones.admin");
+    }
+
     // /ps admin [arg]
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {

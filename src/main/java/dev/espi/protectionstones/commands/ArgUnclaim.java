@@ -21,6 +21,7 @@ import dev.espi.protectionstones.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +37,11 @@ public class ArgUnclaim implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return false;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Collections.singletonList("protectionstones.unclaim");
     }
 
     @Override

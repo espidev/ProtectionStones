@@ -38,6 +38,11 @@ public class ArgHideUnhide implements PSCommandArg {
     }
 
     @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.hide", "protectionstones.unhide");
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] arg) {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocation(p.getLocation());

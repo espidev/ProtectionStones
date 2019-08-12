@@ -20,6 +20,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,11 @@ public class ArgReload implements PSCommandArg {
     @Override
     public boolean allowNonPlayersToExecute() {
         return true;
+    }
+
+    @Override
+    public List<String> getPermissionsToExecute() {
+        return Arrays.asList("protectionstones.admin");
     }
 
     @Override

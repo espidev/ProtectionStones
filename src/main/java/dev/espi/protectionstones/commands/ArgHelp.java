@@ -39,6 +39,11 @@ public class ArgHelp implements PSCommandArg{
     }
 
     @Override
+    public List<String> getPermissionsToExecute() {
+        return null;
+    }
+
+    @Override
     public boolean executeArgument(CommandSender p, String[] args) {
         String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
 

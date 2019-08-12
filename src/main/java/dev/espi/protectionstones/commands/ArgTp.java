@@ -47,6 +47,11 @@ public class ArgTp implements PSCommandArg {
     }
 
     @Override
+    public List<String> getPermissionsToExecute() {
+        return Collections.singletonList("protectionstones.tp");
+    }
+
+    @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         Player p = (Player) s;
 
