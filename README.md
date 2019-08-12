@@ -9,6 +9,8 @@ This plugin uses a specified type of minecraft block/blocks as a protection bloc
 
 This plugin is based off the original ProtectionStones plugin by AxelDios.
 
+The current Spigot page: https://www.spigotmc.org/resources/protectionstones-updated-for-1-13-2-1-14-wg7.61797/
+
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
@@ -19,7 +21,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 7
+    config_version = 8
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -60,6 +62,12 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Whether or not to drop items on the ground if the inventory is full (ex. during /ps unclaim)
     # If set to false, the event will be prevented from happening, and say that inventory is full
     drop_item_when_inventory_full = true
+    
+    # Whether or not regions placed have to be either next to or overlapping existing regions the player already owns.
+    # This can make the world cleaner and have less scattered regions.
+    # Set the number of regions of non-adjacent regions with the permission protectionstones.region.adjacent.x (default is 1, -1 to bypass)
+    # Also can bypass with protectionstones.admin
+    regions_must_be_adjacent = false
 
 ## Default Configuration (block1.toml)
 

@@ -122,6 +122,7 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Returns the list of PSProtectBlocks configured through the config.
+     *
      * @return the list of PSProtectBlocks configured
      */
     public List<PSProtectBlock> getConfiguredBlocks() {
@@ -484,14 +485,16 @@ public class ProtectionStones extends JavaPlugin {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                     UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
                     UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
-                    if (op.getName() != null) WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
+                    if (op.getName() != null)
+                        WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
                 }
             });
         } else { // sync load
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                 UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
                 UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
-                if (op.getName() != null) WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
+                if (op.getName() != null)
+                    WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
             }
         }
 

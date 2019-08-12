@@ -199,14 +199,13 @@ public class PSConfig {
 
     static void removePSRecipes() {
         // remove previous protectionstones recipes (/ps reload)
-        Iterator<Recipe> iter = Bukkit.recipeIterator();
+        Iterator<Recipe> iter = Bukkit.getServer().recipeIterator();
         while (iter.hasNext()) {
             Recipe r = iter.next();
             if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
                 iter.remove();
             }
         }
-        Bukkit.reloadData();
     }
 
     private static void setupRecipe(PSProtectBlock b) {
@@ -238,7 +237,11 @@ public class PSConfig {
         for (String mat : items.keySet()) {
             recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
         }
-        Bukkit.addRecipe(recipe);
+        try {
+            Bukkit.addRecipe(recipe);
+        } catch (IllegalStateException e) {
+            Bukkit.getLogger().warning("Reloading custom recipes does not work right now, you have to restart the server for updated recipes.");
+        }
     }
 
     // Upgrade the config one version up (ex. 3 -> 4)
