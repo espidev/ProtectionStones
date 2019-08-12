@@ -1,4 +1,4 @@
-config_version = 7
+config_version = 8
 uuidupdated = true
 # Please do not change the config version unless you know what you are doing!
 
@@ -39,3 +39,9 @@ aliases = [
 # Whether or not to drop items on the ground if the inventory is full (ex. during /ps unclaim)
 # If set to false, the event will be prevented from happening, and say that inventory is full
 drop_item_when_inventory_full = true
+
+# Whether or not regions placed have to be either next to or overlapping existing regions the player already owns.
+# This can make the world cleaner and have less scattered regions.
+# Set the number of regions of non-adjacent regions with the permission protectionstones.region.adjacent.x (default is 1, -1 to bypass)
+# Also can bypass with protectionstones.admin
+regions_must_be_adjacent = false

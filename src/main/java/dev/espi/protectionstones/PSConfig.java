@@ -64,7 +64,8 @@ public class PSConfig {
     public List<String> aliases;
     @Path("drop_item_when_inventory_full")
     public Boolean dropItemWhenInventoryFull;
-
+    @Path("regions_must_be_adjacent")
+    public Boolean regionsMustBeAdjacent;
 
     static void initConfig() {
 
@@ -261,6 +262,10 @@ public class PSConfig {
             case 6:
                 ProtectionStones.config.set("config_version", 7);
                 ProtectionStones.config.set("drop_item_when_inventory_full", true);
+                break;
+            case 7:
+                ProtectionStones.config.set("config_version", 8);
+                ProtectionStones.config.set("regions_must_be_adjacent", false);
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

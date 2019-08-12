@@ -19,11 +19,14 @@ package dev.espi.protectionstones;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSCreateEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,7 +36,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.HashMap;
+import java.util.*;
 
 class BlockHandler {
     private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
@@ -87,7 +90,7 @@ class BlockHandler {
         BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
         BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
-        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (bx * by * bz), min, max);
+        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long)(bx + by + bz), min, max);
         td.setPriority(blockOptions.priority);
         return !WGUtils.overlapsStrongerRegion(rm, td, lp);
     }
@@ -208,6 +211,72 @@ class BlockHandler {
         // set flags
         region.setFlags(flags);
         FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
+
+        // check for player's adjacent regions
+        if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent && MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
+            List<PSRegion> pRegions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+            HashMap<String, String> idToGroup = new HashMap<>();
+            HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
+
+            for (PSRegion r : pRegions) {
+                // create fake region to test overlap (to check for adjacent since borders will need to be 1 block larger)
+                double fbx = r.getProtectBlock().getLocation().getX(),
+                        fby = r.getProtectBlock().getLocation().getY(),
+                        fbz = r.getProtectBlock().getLocation().getZ();
+
+                BlockVector3 minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+                BlockVector3 maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+
+                ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", minT, maxT);
+                ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
+
+                // algorithm to find adjacent regions (oooh boy)
+                String adjacentGroup = idToGroup.get(r.getID());
+                for (ProtectedRegion pr : overlapping) {
+                    if (ProtectionStones.isPSRegion(pr) && pr.isOwner(lp) && !pr.getId().equals(r.getID())) {
+
+                        if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
+
+                            if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
+                                idToGroup.put(pr.getId(), r.getID());
+                                idToGroup.put(r.getID(), r.getID());
+                                groupToIDs.put(r.getID(), new ArrayList<>(Arrays.asList(pr.getId(), r.getID()))); // create new group
+                            } else { // if the overlapped region is part of a group
+                                String groupID = idToGroup.get(pr.getId());
+                                idToGroup.put(r.getID(), groupID);
+                                groupToIDs.get(groupID).add(r.getID());
+                            }
+
+                            adjacentGroup = idToGroup.get(r.getID());
+                        } else { // if the region is part of a group already
+
+                            if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
+                                idToGroup.put(pr.getId(), adjacentGroup);
+                                groupToIDs.get(adjacentGroup).add(pr.getId());
+                            } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)){ // if the overlapped region is part of a group, merge the groups
+                                String mergeGroupID = idToGroup.get(pr.getId());
+                                for (String gid : groupToIDs.get(mergeGroupID)) {
+                                    idToGroup.put(gid, adjacentGroup);
+                                }
+                                groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
+                                groupToIDs.remove(mergeGroupID);
+                            }
+
+                        }
+                    }
+                }
+                if (adjacentGroup == null) {
+                    idToGroup.put(r.getID(), r.getID());
+                    groupToIDs.put(r.getID(), new ArrayList<>(Collections.singletonList(r.getID())));
+                }
+            }
+
+            if (groupToIDs.size() > MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1)) {
+                PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
+                rm.removeRegion(id);
+                return false;
+            }
+        }
 
         // fire event and check if cancelled
         PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);

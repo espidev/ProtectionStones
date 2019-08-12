@@ -43,7 +43,7 @@ public class ArgSetparent implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args) {
         if (!s.hasPermission("protectionstones.setparent")) {
-            PSL.msg(s, PSL.NO_PERMISSION_NAME.msg());
+            PSL.msg(s, PSL.NO_PERMISSION_SETPARENT.msg());
             return true;
         }
         Player p = (Player) s;
@@ -71,18 +71,12 @@ public class ArgSetparent implements PSCommandArg {
         } else {
             List<PSRegion> parent = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
 
-            if (!p.hasPermission("protectionstones.setparent.others")) {
-                // remove regions not owned by the player
-                for (int i = 0; i < parent.size(); i++) {
-                    if (!parent.get(i).isOwner(p.getUniqueId())) {
-                        parent.remove(i);
-                        i--;
-                    }
-                }
-            }
-
             if (parent.isEmpty()) {
                 PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
+                return true;
+            }
+            if (!p.hasPermission("protectionstones.setparent.others") && !parent.get(0).isOwner(p.getUniqueId())) {
+                PSL.msg(s, PSL.NO_PERMISSION_SETPARENT_OTHERS.msg());
                 return true;
             }
             if (parent.size() > 1) {
