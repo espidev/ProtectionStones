@@ -90,7 +90,7 @@ class BlockHandler {
         BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
         BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
-        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long)(bx + by + bz), min, max);
+        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), min, max);
         td.setPriority(blockOptions.priority);
         return !WGUtils.overlapsStrongerRegion(rm, td, lp);
     }
@@ -212,69 +212,16 @@ class BlockHandler {
         region.setFlags(flags);
         FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
 
-        // check for player's adjacent regions
-        if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent && MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
-            List<PSRegion> pRegions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
-            HashMap<String, String> idToGroup = new HashMap<>();
-            HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
+        // check for player's number of adjacent region groups
+        if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
+            if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
+                HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
 
-            for (PSRegion r : pRegions) {
-                // create fake region to test overlap (to check for adjacent since borders will need to be 1 block larger)
-                double fbx = r.getProtectBlock().getLocation().getX(),
-                        fby = r.getProtectBlock().getLocation().getY(),
-                        fbz = r.getProtectBlock().getLocation().getZ();
-
-                BlockVector3 minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
-                BlockVector3 maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
-
-                ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", minT, maxT);
-                ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
-
-                // algorithm to find adjacent regions (oooh boy)
-                String adjacentGroup = idToGroup.get(r.getID());
-                for (ProtectedRegion pr : overlapping) {
-                    if (ProtectionStones.isPSRegion(pr) && pr.isOwner(lp) && !pr.getId().equals(r.getID())) {
-
-                        if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
-
-                            if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
-                                idToGroup.put(pr.getId(), r.getID());
-                                idToGroup.put(r.getID(), r.getID());
-                                groupToIDs.put(r.getID(), new ArrayList<>(Arrays.asList(pr.getId(), r.getID()))); // create new group
-                            } else { // if the overlapped region is part of a group
-                                String groupID = idToGroup.get(pr.getId());
-                                idToGroup.put(r.getID(), groupID);
-                                groupToIDs.get(groupID).add(r.getID());
-                            }
-
-                            adjacentGroup = idToGroup.get(r.getID());
-                        } else { // if the region is part of a group already
-
-                            if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
-                                idToGroup.put(pr.getId(), adjacentGroup);
-                                groupToIDs.get(adjacentGroup).add(pr.getId());
-                            } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)){ // if the overlapped region is part of a group, merge the groups
-                                String mergeGroupID = idToGroup.get(pr.getId());
-                                for (String gid : groupToIDs.get(mergeGroupID)) {
-                                    idToGroup.put(gid, adjacentGroup);
-                                }
-                                groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
-                                groupToIDs.remove(mergeGroupID);
-                            }
-
-                        }
-                    }
+                if (adjGroups.size() > MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1)) {
+                    PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
+                    rm.removeRegion(id);
+                    return false;
                 }
-                if (adjacentGroup == null) {
-                    idToGroup.put(r.getID(), r.getID());
-                    groupToIDs.put(r.getID(), new ArrayList<>(Collections.singletonList(r.getID())));
-                }
-            }
-
-            if (groupToIDs.size() > MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1)) {
-                PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
-                rm.removeRegion(id);
-                return false;
             }
         }
 

@@ -16,7 +16,6 @@
 
 package dev.espi.protectionstones.event;
 
-import com.sun.istack.internal.NotNull;
 import dev.espi.protectionstones.PSRegion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

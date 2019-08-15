@@ -20,18 +20,21 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSLocation;
 import dev.espi.protectionstones.PSProtectBlock;
+import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.List;
+import java.util.*;
 
 public class WGUtils {
 
@@ -129,5 +132,65 @@ public class WGUtils {
         if (region == null) return true;
 
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
+    }
+
+    public static HashMap<String, ArrayList<String>> getPlayerAdjacentRegionGroups(Player p, RegionManager rm) {
+        List<PSRegion> pRegions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+        HashMap<String, String> idToGroup = new HashMap<>();
+        HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
+
+        for (PSRegion r : pRegions) {
+            // create fake region to test overlap (to check for adjacent since borders will need to be 1 block larger)
+            double fbx = r.getProtectBlock().getLocation().getX(),
+                    fby = r.getProtectBlock().getLocation().getY(),
+                    fbz = r.getProtectBlock().getLocation().getZ();
+
+            BlockVector3 minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+            BlockVector3 maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+
+            ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", minT, maxT);
+            ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
+
+            // algorithm to find adjacent regions (oooh boy)
+            String adjacentGroup = idToGroup.get(r.getID());
+            for (ProtectedRegion pr : overlapping) {
+                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getID())) {
+
+                    if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
+
+                        if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
+                            idToGroup.put(pr.getId(), r.getID());
+                            idToGroup.put(r.getID(), r.getID());
+                            groupToIDs.put(r.getID(), new ArrayList<>(Arrays.asList(pr.getId(), r.getID()))); // create new group
+                        } else { // if the overlapped region is part of a group
+                            String groupID = idToGroup.get(pr.getId());
+                            idToGroup.put(r.getID(), groupID);
+                            groupToIDs.get(groupID).add(r.getID());
+                        }
+
+                        adjacentGroup = idToGroup.get(r.getID());
+                    } else { // if the region is part of a group already
+
+                        if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
+                            idToGroup.put(pr.getId(), adjacentGroup);
+                            groupToIDs.get(adjacentGroup).add(pr.getId());
+                        } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)){ // if the overlapped region is part of a group, merge the groups
+                            String mergeGroupID = idToGroup.get(pr.getId());
+                            for (String gid : groupToIDs.get(mergeGroupID)) {
+                                idToGroup.put(gid, adjacentGroup);
+                            }
+                            groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
+                            groupToIDs.remove(mergeGroupID);
+                        }
+
+                    }
+                }
+            }
+            if (adjacentGroup == null) {
+                idToGroup.put(r.getID(), r.getID());
+                groupToIDs.put(r.getID(), new ArrayList<>(Collections.singletonList(r.getID())));
+            }
+        }
+        return groupToIDs;
     }
 }
