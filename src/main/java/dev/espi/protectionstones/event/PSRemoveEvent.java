@@ -22,6 +22,8 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Event that is called when a protection stones region is removed
  */
@@ -34,12 +36,12 @@ public class PSRemoveEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
 
     public PSRemoveEvent(PSRegion psr, Player player) {
-        this.region = psr;
+        this.region = checkNotNull(psr);
         this.p = player;
     }
 
     public PSRemoveEvent(PSRegion psr) {
-        this.region = psr;
+        this.region = checkNotNull(psr);
     }
 
     /**

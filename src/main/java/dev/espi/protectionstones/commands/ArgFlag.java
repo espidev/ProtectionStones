@@ -82,6 +82,7 @@ public class ArgFlag implements PSCommandArg {
                 // calculate flag command
                 String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
                 Flag<?> f = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flag);
+                // null check
                 if (f == null) continue;
                 Object fValue = r.getWGRegion().getFlag(f);
 

@@ -16,11 +16,14 @@
 
 package dev.espi.protectionstones.event;
 
+import com.sun.istack.internal.NotNull;
 import dev.espi.protectionstones.PSRegion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Event that is called when a protectionstones region is created, either by a player, or by the plugin.
@@ -34,12 +37,12 @@ public class PSCreateEvent extends Event implements Cancellable {
     private boolean isCancelled = false;
 
     public PSCreateEvent(PSRegion psr, Player player) {
-        this.region = psr;
+        this.region = checkNotNull(psr);
         this.p = player;
     }
 
     public PSCreateEvent(PSRegion psr) {
-        this.region = psr;
+        this.region = checkNotNull(psr);
     }
 
     /**
