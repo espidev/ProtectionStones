@@ -276,6 +276,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     information or edit other players' (or your own) protected regions.
     /ps list [playername (optional)] - List the regions you or another player owns.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
+    /ps merge - Open the merge menu to merge regions with ones you own.
     /ps admin [version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|recreate|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
@@ -310,6 +311,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
     protectionstones.adjacent.x - Sets the number of non-adjacent regions players can have if "regions_must_be_adjacent" is true. Unlimited with -1.
+    protectionstones.merge - Allows players to merge their regions with other regions they own.
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     protectionstones.limit.alias.x - Replace alias with the protection block alias and x with the limit of that protection block the player can place.

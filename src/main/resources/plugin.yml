@@ -93,6 +93,9 @@ permissions:
   protectionstones.region:
     description: Allows players to use the /ps region commands.
     default: op
+  protectionstones.merge:
+    description: Allows players to merge their regions with other regions they own.
+    default: op
   protectionstones.admin:
     description: This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     default: op

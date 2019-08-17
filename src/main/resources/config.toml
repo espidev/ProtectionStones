@@ -47,7 +47,8 @@ drop_item_when_inventory_full = true
 regions_must_be_adjacent = false
 
 # Whether or not to give players the option to merge new regions with ones they already own (overlapping)
-# to create a new large region.
+# to create a new large region. Can merge any regions with protectionstones.admin
+# Requires the permission protectionstones.merge to use (with /ps merge)
 # Note: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
 # since polygon regions can only be 2D, not 3D
 allow_merging_regions = true

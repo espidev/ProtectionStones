@@ -265,6 +265,13 @@ public class WGUtils {
 
     }
 
+    public static void mergeRegions(RegionManager rm, ProtectedRegion root, ProtectedRegion merge) {
+        ProtectedRegion nRegion = mergeRegions(root, merge);
+        rm.removeRegion(root.getId());
+        rm.removeRegion(merge.getId());
+        rm.addRegion(nRegion);
+    }
+
     // returns a merged region; root and merge must be overlapping
     public static ProtectedRegion mergeRegions(ProtectedRegion root, ProtectedRegion merge) {
         List<BlockVector2> points = new ArrayList<>();

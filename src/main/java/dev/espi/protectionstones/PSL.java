@@ -70,6 +70,7 @@ public enum PSL {
     NO_PERMISSION_NAME("no_permission_name", ChatColor.RED + "You do not have permission to use the name command."),
     NO_PERMISSION_SETPARENT("no_permission_setparent", ChatColor.RED + "You do not have permission to use the setparent command."),
     NO_PERMISSION_SETPARENT_OTHERS("no_permission_setparent_others", ChatColor.RED + "You do not have permission to inherit from regions you don't own."),
+    NO_PERMISSION_MERGE("no_permission_merge", ChatColor.RED + "You do not have permission to use /ps merge."),
 
     ADDED_TO_REGION("psregion.added_to_region",  ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been added to this region."),
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
@@ -246,6 +247,11 @@ public enum PSL {
     SETPARENT_SUCCESS("setparent.success", ChatColor.GRAY + "Successfully set the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%parent%" + ChatColor.GRAY + "."),
     SETPARENT_SUCCESS_REMOVE("setparent.success_remove", ChatColor.GRAY + "Successfully removed the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + "."),
     SETPARENT_CIRCULAR_INHERITANCE("setparent.circular_inheritance", ChatColor.RED + "Detected circular inheritance (the parent already inherits from this region?). Parent not set."),
+
+    MERGE_HELP("merge.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps merge"),
+    MERGE_HELP_DESC("merge.help_desc", "Use this command to merge the region you are in with other overlapping regions."),
+    MERGE_DISABLED("merge.disabled", "Merging regions is disabled in the config!"),
+    MERGE_MERGED("merge.merged", ChatColor.AQUA + "Regions were successfully merged!"),
 
     ;
 
