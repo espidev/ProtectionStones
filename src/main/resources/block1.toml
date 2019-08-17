@@ -62,7 +62,7 @@ prevent_block_place_in_restricted_world = true
         "creeper-explosion deny",
     ]
 
-    # List all the flags that can be set by region owners. Separate them with a comma, no space.
+    # List all the flags that can be set by region owners. 
     allowed_flags = [
         "use",
         "pvp",

@@ -490,12 +490,18 @@ public class ProtectionStones extends JavaPlugin {
                 }
             });
         } else { // sync load
+            List<Profile> profiles = new ArrayList<>();
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                 UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
                 UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
-                if (op.getName() != null)
-                    WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
+                if (op.getName() != null) profiles.add(new Profile(op.getUniqueId(), op.getName()));
             }
+
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                for (Profile p : profiles) {
+                    WorldGuard.getInstance().getProfileCache().put(p);
+                }
+            });
         }
 
         // check if uuids have been upgraded already
