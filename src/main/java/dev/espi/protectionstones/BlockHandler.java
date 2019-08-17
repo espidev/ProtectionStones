@@ -90,7 +90,7 @@ class BlockHandler {
         BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
         BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
-        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), min, max);
+        ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), true, min, max);
         td.setPriority(blockOptions.priority);
         return !WGUtils.overlapsStrongerRegion(rm, td, lp);
     }
@@ -233,7 +233,7 @@ class BlockHandler {
             return false;
         }
 
-        p.sendMessage(PSL.PROTECTED.msg());
+        PSL.msg(p, PSL.PROTECTED.msg());
 
         // hide block if auto hide is enabled
         if (blockOptions.autoHide) l.getBlock().setType(Material.AIR);

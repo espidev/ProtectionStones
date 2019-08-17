@@ -35,6 +35,7 @@ prevent_block_place_in_restricted_world = true
 
     # Protection radius of block
     # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+    # Turn "allow_merging_regions" in config.toml to false if editing the y_radius to not be -1
     x_radius = 64
     y_radius = -1
     z_radius = 64
@@ -55,6 +56,7 @@ prevent_block_place_in_restricted_world = true
     # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
     flags = [
         "pvp deny",
+        "tnt deny",
         "greeting &lEntering &b&l%player%'s &f&lprotected area",
         "farewell &lLeaving &b&l%player%'s &f&lprotected area",
         "greeting-title Entering &b%player%'s &fprotected area",
@@ -62,9 +64,8 @@ prevent_block_place_in_restricted_world = true
         "creeper-explosion deny",
     ]
 
-    # List all the flags that can be set by region owners. 
+    # List all the flags that can be set by region owners.
     allowed_flags = [
-        "use",
         "pvp",
         "greeting",
         "greeting-title",

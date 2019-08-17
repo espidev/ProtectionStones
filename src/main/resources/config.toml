@@ -1,4 +1,4 @@
-config_version = 8
+config_version = 9
 uuidupdated = true
 # Please do not change the config version unless you know what you are doing!
 
@@ -45,3 +45,9 @@ drop_item_when_inventory_full = true
 # Set the number of regions of non-adjacent regions with the permission protectionstones.region.adjacent.x (default is 1, -1 to bypass)
 # Also can bypass with protectionstones.admin
 regions_must_be_adjacent = false
+
+# Whether or not to give players the option to merge new regions with ones they already own (overlapping)
+# to create a new large region.
+# Note: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
+# since polygon regions can only be 2D, not 3D
+allow_merging_regions = true

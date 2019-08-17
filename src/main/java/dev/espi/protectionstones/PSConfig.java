@@ -66,6 +66,8 @@ public class PSConfig {
     public Boolean dropItemWhenInventoryFull;
     @Path("regions_must_be_adjacent")
     public Boolean regionsMustBeAdjacent;
+    @Path("allow_merging_regions")
+    public Boolean allowMergingRegions;
 
     static void initConfig() {
 
@@ -270,6 +272,9 @@ public class PSConfig {
                 ProtectionStones.config.set("config_version", 8);
                 ProtectionStones.config.set("regions_must_be_adjacent", false);
                 break;
+            case 8:
+                ProtectionStones.config.set("config_version", 9);
+                ProtectionStones.config.set("allow_merging_regions", false);
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;
