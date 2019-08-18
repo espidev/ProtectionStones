@@ -45,6 +45,7 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgHome());
         ProtectionStones.getInstance().addCommandArgument(new ArgInfo());
         ProtectionStones.getInstance().addCommandArgument(new ArgList());
+        ProtectionStones.getInstance().addCommandArgument(new ArgMerge());
         ProtectionStones.getInstance().addCommandArgument(new ArgName());
         ProtectionStones.getInstance().addCommandArgument(new ArgPriority());
         ProtectionStones.getInstance().addCommandArgument(new ArgRegion());

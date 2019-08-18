@@ -56,6 +56,7 @@ public class ArgHelp implements PSCommandArg{
         sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), base + "count", "protectionstones.count", "protectionstones.count.others");
         sendWithPerm(p, PSL.LIST_HELP.msg(), PSL.LIST_HELP_DESC.msg(), base + "list", "protectionstones.list", "protectionstones.list.others");
         sendWithPerm(p, PSL.NAME_HELP.msg(), PSL.NAME_HELP_DESC.msg(), base + "name", "protectionstones.name");
+        sendWithPerm(p, PSL.MERGE_HELP.msg(), PSL.MERGE_HELP_DESC.msg(), base + "merge", "protectionstones.merge");
         sendWithPerm(p, PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent", "protectionstones.setparent", "protectionstones.setparent.others");
         sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag", "protectionstones.flags");
         sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home", "protectionstones.home");
