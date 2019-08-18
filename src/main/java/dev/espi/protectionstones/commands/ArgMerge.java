@@ -1,10 +1,14 @@
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,7 +39,9 @@ public class ArgMerge implements PSCommandArg {
         }
 
         Player p = (Player) s;
+        LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
         if (args.length == 1) { // GUI
+
             PSRegion r = PSRegion.fromLocation(p.getLocation());
             if (r == null) {
                 PSL.msg(s, PSL.NOT_IN_REGION.msg());
@@ -45,12 +51,25 @@ public class ArgMerge implements PSCommandArg {
         } else if (args.length == 3) { // /ps merge [region] [root]
             RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
+
             if (region == null || root == null) {
                 PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
-            } else {
+                return true;
+            }
+            if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp))) {
+                PSL.msg(p, PSL.NO_ACCESS.msg());
+                return true;
+            }
+            if (!rm.getApplicableRegions(region).getRegions().contains(root)) {
+                // TODO overlapping message
+                return true;
+            }
+
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                 WGUtils.mergeRegions(rm, root, region);
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
-            }
+            });
+
         } else {
             PSL.msg(s, PSL.MERGE_HELP.msg());
         }
