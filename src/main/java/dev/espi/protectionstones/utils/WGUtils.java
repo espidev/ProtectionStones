@@ -206,6 +206,8 @@ public class WGUtils {
     private static final ArrayList<Vector2> DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(0, 1), Vector2.at(1, 0), Vector2.at(-1, 0), Vector2.at(0, -1)));
     private static final ArrayList<Vector2> CORNER_DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(1, 1), Vector2.at(-1, -1), Vector2.at(-1, 1), Vector2.at(1, -1)));
 
+
+
     private static boolean isInRegion(BlockVector2 point, List<ProtectedRegion> regions) {
         for (ProtectedRegion r : regions) {
             if (r.contains(point)) return true;
@@ -215,10 +217,8 @@ public class WGUtils {
 
     // i need to find a faster way to do this
     // doesn't do so well with 1 block wide segments jutting out
-    private static void dfsRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, List<ProtectedRegion> regions, List<BlockVector2> vertex) {
+    private static void dfsRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, HashSet<BlockVector2> points, List<ProtectedRegion> regions, List<BlockVector2> vertex) {
         if (!first && v.equals(start)) return;
-
-        Bukkit.getLogger().info(v.getX() + " " + v.getZ()); // TODO
 
         int exposedEdges = 0;
         List<BlockVector2> insideVertex = new ArrayList<>();
@@ -230,38 +230,50 @@ public class WGUtils {
                 insideVertex.add(test);
             }
         }
-        Bukkit.getLogger().info("" + exposedEdges); // TODO
+        points.remove(v); // remove current point if it exists
 
         switch (exposedEdges) {
             case 1: // normal edge
-                // note: will fail if previous is null? possible todo
-                dfsRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, regions, vertex);
+                if (previous == null) { // if this is the first node we need to determine a direction to go to (that isn't into the polygon, but is on edge)
+                    if (insideVertex.get(0).getX() == insideVertex.get(1).getZ() || insideVertex.get(0).getZ() == insideVertex.get(1).getZ() || insideVertex.get(0).getX() == insideVertex.get(2).getZ() || insideVertex.get(0).getZ() == insideVertex.get(2).getZ()) {
+                        previous = insideVertex.get(0);
+                    } else {
+                        previous = insideVertex.get(1);
+                    }
+                }
+                dfsRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, vertex);
                 break;
             case 2: // convex vertex
                 // possibly also 1 block wide segment with 2 edges opposite, but we'll ignore that
                 vertex.add(v);
                 if (insideVertex.get(0).equals(previous)) {
-                    dfsRegionEdge(insideVertex.get(1), v, start, false, regions, vertex);
+                    dfsRegionEdge(insideVertex.get(1), v, start, false, points, regions, vertex);
                 } else {
-                    dfsRegionEdge(insideVertex.get(0), v, start, false, regions, vertex);
+                    dfsRegionEdge(insideVertex.get(0), v, start, false, points, regions, vertex);
                 }
                 break;
             case 3: // random 1x1 jutting out
                 // ignore
                 ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region merge, please notify the developers that you saw this message!");
                 break;
-            case 0: // concave vertex
-                vertex.add(v);
+            case 0: // concave vertex, or point in middle of region
+                boolean foundEmpty = false;
                 for (Vector2 dir : CORNER_DIRECTIONS) {
                     BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
                     if (!isInRegion(test, regions)) {
-                        if (previous.equals(BlockVector2.at(v.getX() + dir.getX(), v.getZ()))) {
-                            dfsRegionEdge(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, start, false, regions, vertex);
+                        vertex.add(v);
+                        foundEmpty = true;
+                        if (previous == null || previous.equals(BlockVector2.at(v.getX() + dir.getX(), v.getZ()))) {
+                            dfsRegionEdge(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, start, false, points, regions, vertex);
                         } else {
-                            dfsRegionEdge(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, start, false, regions, vertex);
+                            dfsRegionEdge(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, start, false, points, regions, vertex);
                         }
+                        break;
                     }
                 }
+
+                // point was in middle of region
+                if (!foundEmpty) return;
                 break;
         }
 
@@ -276,24 +288,16 @@ public class WGUtils {
 
     // returns a merged region; root and merge must be overlapping
     public static ProtectedRegion mergeRegions(ProtectedRegion root, ProtectedRegion merge) {
-        List<BlockVector2> points = new ArrayList<>();
+        HashSet<BlockVector2> points = new HashSet<>();
         points.addAll(root.getPoints());
         points.addAll(merge.getPoints());
 
-        // find starting point
-        BlockVector2 start = null;
-        for (BlockVector2 p : points) {
-            if (!(root.contains(p) && merge.contains(p))) {
-                start = p;
-            }
-        }
-
-        // the 2 regions are exactly intersecting
-        if (start == null) return root;
-
         List<BlockVector2> vertex = new ArrayList<>();
 
-        dfsRegionEdge(start, null, start, true, Arrays.asList(root, merge), vertex);
+        while (!points.isEmpty()) {
+            BlockVector2 start = points.iterator().next();
+            dfsRegionEdge(start, null, start, true, points, Arrays.asList(root, merge), vertex);
+        }
 
         for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
