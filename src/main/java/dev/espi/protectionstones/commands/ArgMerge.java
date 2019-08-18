@@ -48,7 +48,7 @@ public class ArgMerge implements PSCommandArg {
             if (region == null || root == null) {
                 PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
             } else {
-                WGUtils.mergeRegions(root, region);
+                WGUtils.mergeRegions(rm, root, region);
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
             }
         } else {

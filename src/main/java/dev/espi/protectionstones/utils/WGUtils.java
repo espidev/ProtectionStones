@@ -29,7 +29,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSLocation;
-import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
@@ -204,8 +203,8 @@ public class WGUtils {
         copyTo.setPriority(root.getPriority());
     }
 
-    private static final ArrayList<Vector2> DIRECTIONS = (ArrayList<Vector2>) Arrays.asList(Vector2.at(0, 1), Vector2.at(1, 0), Vector2.at(-1, 0), Vector2.at(0, -1));
-    private static final ArrayList<Vector2> CORNER_DIRECTIONS = (ArrayList<Vector2>) Arrays.asList(Vector2.at(1, 1), Vector2.at(-1, -1), Vector2.at(-1, 1), Vector2.at(1, -1));
+    private static final ArrayList<Vector2> DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(0, 1), Vector2.at(1, 0), Vector2.at(-1, 0), Vector2.at(0, -1)));
+    private static final ArrayList<Vector2> CORNER_DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(1, 1), Vector2.at(-1, -1), Vector2.at(-1, 1), Vector2.at(1, -1)));
 
     private static boolean isInRegion(BlockVector2 point, List<ProtectedRegion> regions) {
         for (ProtectedRegion r : regions) {
@@ -219,6 +218,8 @@ public class WGUtils {
     private static void dfsRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, List<ProtectedRegion> regions, List<BlockVector2> vertex) {
         if (!first && v.equals(start)) return;
 
+        Bukkit.getLogger().info(v.getX() + " " + v.getZ()); // TODO
+
         int exposedEdges = 0;
         List<BlockVector2> insideVertex = new ArrayList<>();
         for (Vector2 dir : DIRECTIONS) {
@@ -229,6 +230,7 @@ public class WGUtils {
                 insideVertex.add(test);
             }
         }
+        Bukkit.getLogger().info("" + exposedEdges); // TODO
 
         switch (exposedEdges) {
             case 1: // normal edge
@@ -248,7 +250,7 @@ public class WGUtils {
                 // ignore
                 ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region merge, please notify the developers that you saw this message!");
                 break;
-            case 4: // concave vertex
+            case 0: // concave vertex
                 vertex.add(v);
                 for (Vector2 dir : CORNER_DIRECTIONS) {
                     BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
@@ -292,6 +294,8 @@ public class WGUtils {
         List<BlockVector2> vertex = new ArrayList<>();
 
         dfsRegionEdge(start, null, start, true, Arrays.asList(root, merge), vertex);
+
+        for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
         ProtectedRegion r = new ProtectedPolygonalRegion(root.getId(), vertex, 0, MAX_BUILD_HEIGHT);
         copyRegionValues(root, r);
