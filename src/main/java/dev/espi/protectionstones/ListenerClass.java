@@ -96,7 +96,6 @@ public class ListenerClass implements Listener {
                 e.setDropItems(false);
             }
 
-
             return;
         }
 

@@ -215,10 +215,12 @@ public class WGUtils {
         String id = createPSID(l);
         for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
             if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && r.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(id)) {
-                if (r.getId().equals(id)) {
 
-                } else {
-
+                r.getFlag(FlagHandler.PS_MERGED_REGIONS).remove(id);
+                if (r.getId().equals(id)) { // it is the root
+                    // TODO
+                } else { // it is not the root
+                    mergeRegions(w, rm, r, Arrays.asList(r));
                 }
             }
         }
@@ -231,6 +233,9 @@ public class WGUtils {
 
         // decompose merged regions into their bases
         for (ProtectedRegion r : merge) {
+            PSRegion psr = PSRegion.fromWGRegion(w, r);
+            if (psr != null) psr.unhide();
+
             if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
                 for (String merged : r.getFlag(FlagHandler.PS_MERGED_REGIONS)) {
                     PSLocation l = parsePSRegionToLocation(merged);

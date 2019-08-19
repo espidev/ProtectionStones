@@ -35,13 +35,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Represents an instance of a protectionstones protected region.
  */
 
-public class PSRegion {
-    private ProtectedRegion wgregion;
-    private RegionManager rgmanager;
-    private World world;
+public abstract class PSRegion {
+    RegionManager rgmanager;
+    World world;
 
-    PSRegion(ProtectedRegion wgregion, RegionManager rgmanager, World world) {
-        this.wgregion = checkNotNull(wgregion);
+    PSRegion(RegionManager rgmanager, World world) {
         this.rgmanager = checkNotNull(rgmanager);
         this.world = checkNotNull(world);
     }
@@ -117,9 +115,7 @@ public class PSRegion {
      *
      * @return the id of the region
      */
-    public String getID() {
-        return wgregion.getId();
-    }
+    public abstract String getID();
 
     /**
      * Get the name (nickname) of the region from /ps name.
@@ -127,29 +123,14 @@ public class PSRegion {
      * @return the name of the region, or null if the region does not have a name
      */
 
-    public String getName() {
-        return wgregion.getFlag(FlagHandler.PS_NAME);
-    }
+    public abstract String getName();
 
     /**
      * Set the name of the region (from /ps name).
      * @param name new name, or null to remove the name
      */
 
-    public void setName(String name) {
-        HashMap<String, ArrayList<String>> m = ProtectionStones.regionNameToID.get(getWorld());
-        if (m.get(getName()) != null) {
-            m.get(getName()).remove(getID());
-        }
-        if (name != null) {
-            if (m.containsKey(name)) {
-                m.get(name).add(getID());
-            } else {
-                m.put(name, new ArrayList<>(Collections.singletonList(getID())));
-            }
-        }
-        wgregion.setFlag(FlagHandler.PS_NAME, name);
-    }
+    public abstract void setName(String name);
 
     /**
      * Set the parent of this region.
@@ -157,30 +138,21 @@ public class PSRegion {
      * @throws ProtectedRegion.CircularInheritanceException thrown when the parent already inherits from the child
      */
 
-    public void setParent(PSRegion r) throws ProtectedRegion.CircularInheritanceException {
-        wgregion.setParent(r == null ? null : r.getWGRegion());
-    }
+    public abstract void setParent(PSRegion r) throws ProtectedRegion.CircularInheritanceException;
 
     /**
      * Get the parent of this region, if there is one.
      * @return the parent of the region, or null if there isn't one
      */
 
-    public PSRegion getParent() {
-        return wgregion.getParent() == null ? null : fromWGRegion(world, wgregion.getParent());
-    }
+    public abstract PSRegion getParent();
 
     /**
      * Get the location of the set home the region has (for /ps tp).
      *
      * @return the location of the home, or null if the ps_home flag is not set.
      */
-    public Location getHome() {
-        String oPos = wgregion.getFlag(FlagHandler.PS_HOME);
-        if (oPos == null) return null;
-        String[] pos = oPos.split(" ");
-        return new Location(world, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-    }
+    public abstract Location getHome();
 
     /**
      * Set the home of the region (internally changes the flag).
@@ -189,44 +161,26 @@ public class PSRegion {
      * @param blockY block y location
      * @param blockZ block z location
      */
-    public void setHome(int blockX, int blockY, int blockZ) {
-        wgregion.setFlag(FlagHandler.PS_HOME, blockX + " " + blockY + " " + blockZ);
-    }
+    public abstract void setHome(int blockX, int blockY, int blockZ);
 
     /**
      * @return whether or not the protection block is hidden (/ps hide)
      */
-    public boolean isHidden() {
-        return !this.getProtectBlock().getType().toString().equals(this.getType());
-    }
+    public abstract boolean isHidden();
 
     /**
      * Hides the protection block, if it is not hidden.
      *
      * @return whether or not the block was hidden
      */
-    public boolean hide() {
-        if (!isHidden()) {
-            getProtectBlock().setType(Material.AIR);
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public abstract boolean hide();
 
     /**
      * Unhides the protection block, if it is hidden.
      *
      * @return whether or not the block was unhidden
      */
-    public boolean unhide() {
-        if (isHidden()) {
-            getProtectBlock().setType(Material.getMaterial(getType()));
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public abstract boolean unhide();
 
     /**
      * Toggle whether or not the protection block is hidden.
@@ -241,24 +195,17 @@ public class PSRegion {
      *
      * @return returns the block that may contain the protection stone
      */
-    public Block getProtectBlock() {
-        PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
-        return world.getBlockAt(psl.x, psl.y, psl.z);
-    }
+    public abstract Block getProtectBlock();
 
     /**
      * @return returns the type
      */
-    public PSProtectBlock getTypeOptions() {
-        return ProtectionStones.getBlockOptions(wgregion.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
-    }
+    public abstract PSProtectBlock getTypeOptions();
 
     /**
      * @return returns the protect block type that the region is
      */
-    public String getType() {
-        return wgregion.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-    }
+    public abstract String getType();
 
     /**
      * Get whether or not a player is an owner of this region.
@@ -267,9 +214,7 @@ public class PSRegion {
      * @return whether or not the player is a member
      */
 
-    public boolean isOwner(UUID uuid) {
-        return wgregion.getOwners().contains(uuid);
-    }
+    public abstract boolean isOwner(UUID uuid);
 
     /**
      * Get whether or not a player is a member of this region.
@@ -278,23 +223,17 @@ public class PSRegion {
      * @return whether or not the player is a member
      */
 
-    public boolean isMember(UUID uuid) {
-        return wgregion.getMembers().contains(uuid);
-    }
+    public abstract boolean isMember(UUID uuid);
 
     /**
      * @return returns a list of the owners of the protected region
      */
-    public ArrayList<UUID> getOwners() {
-        return new ArrayList<>(wgregion.getOwners().getUniqueIds());
-    }
+    public abstract ArrayList<UUID> getOwners();
 
     /**
      * @return returns a list of the members of the protected region
      */
-    public ArrayList<UUID> getMembers() {
-        return new ArrayList<>(wgregion.getMembers().getUniqueIds());
-    }
+    public abstract ArrayList<UUID> getMembers();
 
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
@@ -302,9 +241,7 @@ public class PSRegion {
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
      * @return whether or not the region was able to be successfully removed
      */
-    public boolean deleteRegion(boolean deleteBlock) {
-        return deleteRegion(deleteBlock, null);
-    }
+    public abstract boolean deleteRegion(boolean deleteBlock);
 
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
@@ -313,36 +250,12 @@ public class PSRegion {
      * @param cause the player that caused the region to break
      * @return whether or not the region was able to be successfully removed
      */
-    public boolean deleteRegion(boolean deleteBlock, Player cause) {
-        PSRemoveEvent event = new PSRemoveEvent(this, cause);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) { // if event was cancelled, prevent execution
-            return false;
-        }
-
-        if (deleteBlock && !this.isHidden()) {
-            this.getProtectBlock().setType(Material.AIR);
-        }
-
-        if (getName() != null) { // remove name from cache
-            if (ProtectionStones.regionNameToID.get(getWorld()).containsKey(getName())) {
-                if (ProtectionStones.regionNameToID.get(getWorld()).get(getName()).size() == 1) {
-                    ProtectionStones.regionNameToID.get(getWorld()).remove(getName());
-                } else {
-                    ProtectionStones.regionNameToID.get(getWorld()).get(getName()).remove(getID());
-                }
-            }
-        }
-        rgmanager.removeRegion(wgregion.getId());
-        return true;
-    }
+    public abstract boolean deleteRegion(boolean deleteBlock, Player cause);
 
     /**
      * @return returns the WorldGuard region object directly
      */
-    public ProtectedRegion getWGRegion() {
-        return wgregion;
-    }
+    public abstract ProtectedRegion getWGRegion();
 
     /**
      * @return returns the WorldGuard region manager that stores this region
