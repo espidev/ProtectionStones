@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class FlagHandler {
 
@@ -37,6 +38,7 @@ public class FlagHandler {
     public static final Flag<String> PS_HOME = new StringFlag("ps-home");
     public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
     public static final Flag<String> PS_NAME = new StringFlag("ps-name");
+    public static final Flag<Set<String>> PS_MERGED_REGIONS = new SetFlag<>("ps-merged-regions", new StringFlag("ps-merged-region"));
 
     // called on initial start
     static void registerFlags() {
@@ -45,6 +47,7 @@ public class FlagHandler {
             registry.register(PS_HOME);
             registry.register(PS_BLOCK_MATERIAL);
             registry.register(PS_NAME);
+            registry.register(PS_MERGED_REGIONS);
         } catch (FlagConflictException e) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();

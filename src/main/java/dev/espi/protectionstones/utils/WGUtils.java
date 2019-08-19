@@ -28,10 +28,10 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSLocation;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -203,108 +203,37 @@ public class WGUtils {
         copyTo.setPriority(root.getPriority());
     }
 
-    private static final ArrayList<Vector2> DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(0, 1), Vector2.at(1, 0), Vector2.at(-1, 0), Vector2.at(0, -1)));
-    private static final ArrayList<Vector2> CORNER_DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(1, 1), Vector2.at(-1, -1), Vector2.at(-1, 1), Vector2.at(1, -1)));
-
-    private static boolean isInRegion(BlockVector2 point, List<ProtectedRegion> regions) {
-        for (ProtectedRegion r : regions) {
-            if (r.contains(point)) return true;
-        }
-        return false;
-    }
-
-    // i need to find a faster way to do this
-    // doesn't do so well with 1 block wide segments jutting out
-
-    // TODO test 1x1 corners
-    private static void dfsRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, HashSet<BlockVector2> points, List<ProtectedRegion> regions, List<BlockVector2> vertex) {
-        if (!first && v.equals(start)) return;
-
-        int exposedEdges = 0;
-        List<BlockVector2> insideVertex = new ArrayList<>();
-        for (Vector2 dir : DIRECTIONS) {
-            BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
-            if (!isInRegion(test, regions)) {
-                exposedEdges++;
-            } else {
-                insideVertex.add(test);
-            }
-        }
-        points.remove(v); // remove current point if it exists
-
-        switch (exposedEdges) {
-            case 1: // normal edge
-                if (previous == null) { // if this is the first node we need to determine a direction to go to (that isn't into the polygon, but is on edge)
-                    if (insideVertex.get(0).getX() == insideVertex.get(1).getZ() || insideVertex.get(0).getZ() == insideVertex.get(1).getZ() || insideVertex.get(0).getX() == insideVertex.get(2).getZ() || insideVertex.get(0).getZ() == insideVertex.get(2).getZ()) {
-                        previous = insideVertex.get(0);
-                    } else {
-                        previous = insideVertex.get(1);
-                    }
-                }
-                dfsRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, vertex);
-                break;
-            case 2: // convex vertex
-                // possibly also 1 block wide segment with 2 edges opposite, but we'll ignore that
-                vertex.add(v);
-                if (insideVertex.get(0).equals(previous)) {
-                    dfsRegionEdge(insideVertex.get(1), v, start, false, points, regions, vertex);
-                } else {
-                    dfsRegionEdge(insideVertex.get(0), v, start, false, points, regions, vertex);
-                }
-                break;
-            case 3: // random 1x1 jutting out
-                ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region merge, please notify the developers that you saw this message!");
-                break;
-            case 0: // concave vertex, or point in middle of region
-                List<Vector2> cornersNotIn = new ArrayList<>();
-                for (Vector2 dir : CORNER_DIRECTIONS) {
-                    BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
-
-                    if (!isInRegion(test, regions)) cornersNotIn.add(dir);
-                }
-
-                if (cornersNotIn.size() == 1) { // concave vertex
-                    vertex.add(v);
-                    Vector2 dir = cornersNotIn.get(0);
-                    if (previous == null || previous.equals(BlockVector2.at(v.getX() + dir.getX(), v.getZ()))) {
-                        dfsRegionEdge(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, start, false, points, regions, vertex);
-                    } else {
-                        dfsRegionEdge(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, start, false, points, regions, vertex);
-                    }
-                } else if (cornersNotIn.size() == 2) { // 1 block diagonal perfect overlap
-                    if (previous == null) previous = insideVertex.get(0);
-                    dfsRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, vertex);
-                }
-                // ignore if in middle of region (cornersNotIn size = 0)
-                break;
-        }
-
-    }
-
-    public static void mergeRegions(RegionManager rm, ProtectedRegion root, ProtectedRegion merge) {
+    public static void mergeRegions(RegionManager rm, ProtectedRegion root, List<ProtectedRegion> merge) {
         ProtectedRegion nRegion = mergeRegions(root, merge);
         rm.removeRegion(root.getId());
-        rm.removeRegion(merge.getId());
+        for (ProtectedRegion r : merge) rm.removeRegion(r.getId());
         rm.addRegion(nRegion);
     }
 
     // returns a merged region; root and merge must be overlapping
-    public static ProtectedRegion mergeRegions(ProtectedRegion root, ProtectedRegion merge) {
+    public static ProtectedRegion mergeRegions(ProtectedRegion root, List<ProtectedRegion> merge) {
         HashSet<BlockVector2> points = new HashSet<>();
         points.addAll(root.getPoints());
-        points.addAll(merge.getPoints());
+        for (ProtectedRegion r : merge) {
+            points.addAll(r.getPoints());
+        }
 
         List<BlockVector2> vertex = new ArrayList<>();
 
-        while (!points.isEmpty()) {
-            BlockVector2 start = points.iterator().next();
-            dfsRegionEdge(start, null, start, true, points, Arrays.asList(root, merge), vertex);
-        }
+        List<ProtectedRegion> regions = new ArrayList<>(Arrays.asList(root));
+        regions.addAll(merge);
+        RegionTraverse.traverseRegionEdge(points, regions, tr -> {
+            if (tr.isVertex) vertex.add(tr.point);
+        });
 
         //for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
+        Set<String> regionNames = new HashSet<>();
+        for (ProtectedRegion r : regions) regionNames.add(r.getId());
+
         ProtectedRegion r = new ProtectedPolygonalRegion(root.getId(), vertex, 0, MAX_BUILD_HEIGHT);
         copyRegionValues(root, r);
+        r.setFlag(FlagHandler.PS_MERGED_REGIONS, regionNames);
         return r;
     }
 }

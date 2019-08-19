@@ -16,13 +16,19 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.RegionTraverse;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -30,6 +36,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArgView implements PSCommandArg {
 
@@ -79,26 +86,36 @@ public class ArgView implements PSCommandArg {
         cooldown.add(p.getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> cooldown.remove(p.getUniqueId()), 20 * ProtectionStones.getInstance().getConfigOptions().psViewCooldown);
 
-        BlockVector3 minVector = r.getWGRegion().getMinimumPoint();
-        BlockVector3 maxVector = r.getWGRegion().getMaximumPoint();
-        final int minX = minVector.getBlockX();
-        final int minY = minVector.getBlockY();
-        final int minZ = minVector.getBlockZ();
-        final int maxX = maxVector.getBlockX();
-        final int maxY = maxVector.getBlockY();
-        final int maxZ = maxVector.getBlockZ();
-
-        int playerY = p.getLocation().getBlockY(), playerX = p.getLocation().getBlockX(), playerZ = p.getLocation().getBlockZ();
+        int playerY = p.getLocation().getBlockY(), minY = r.getWGRegion().getMinimumPoint().getBlockY(), maxY = r.getWGRegion().getMaximumPoint().getBlockY();
 
         BlockData tempBlock = Material.GLOWSTONE.createBlockData();
-        int[] xs = {Math.min(minX, maxX), Math.max(minX, maxX)}, ys = {playerY, Math.min(minY, maxY), Math.max(minY, maxY)}, zs = {Math.min(minZ, maxZ), Math.max(minZ, maxZ)};
 
         // send fake blocks to client
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
 
             List<Block> blocks = new ArrayList<>();
-            // base lines
+
+            AtomicInteger wait = new AtomicInteger(0), modU = new AtomicInteger(0);
+
+            RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
+                if (tr.isVertex) {
+                    handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                    for (int y = minY; y <= maxY; y += 10) {
+                        wait.incrementAndGet();
+                        handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                    }
+                } else {
+                    //if (modU.get() % 4 == 0) {
+                        handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
+                        handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
+                        handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
+                    //}
+                    modU.set((modU.get() + 1) % 7);
+                }
+            });
+
+            /*// base lines
             for (int x : xs)
                 for (int y : ys)
                     for (int z : zs) {
@@ -134,11 +151,11 @@ public class ArgView implements PSCommandArg {
                         handleFakeBlock(p, x, y, z, tempBlock, blocks, 1, wait);
                     }
                 }
-            }
+            }*/
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait);
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait.get());
 
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> {
                 PSL.msg(p, PSL.VIEW_REMOVING.msg());
                 for (Block b : blocks) {
                     if (b.getWorld().isChunkLoaded(b.getLocation().getBlockX() / 16, b.getLocation().getBlockZ() / 16)) {
@@ -161,6 +178,7 @@ public class ArgView implements PSCommandArg {
     }
 
     private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
+        if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100) return;
         Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
             if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
                 restore.add(p.getWorld().getBlockAt(x, y, z));

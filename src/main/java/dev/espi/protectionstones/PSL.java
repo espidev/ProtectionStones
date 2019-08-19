@@ -252,6 +252,7 @@ public enum PSL {
     MERGE_HELP_DESC("merge.help_desc", "Use this command to merge the region you are in with other overlapping regions."),
     MERGE_DISABLED("merge.disabled", "Merging regions is disabled in the config!"),
     MERGE_MERGED("merge.merged", ChatColor.AQUA + "Regions were successfully merged!"),
+    MERGE_HEADER("merge.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Merge %region% (click to merge) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
 
     ;
 

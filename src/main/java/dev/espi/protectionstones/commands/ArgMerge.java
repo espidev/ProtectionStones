@@ -8,7 +8,10 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -48,6 +51,15 @@ public class ArgMerge implements PSCommandArg {
                 return true;
             }
 
+            PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+            for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
+                if (!pr.getId().equals(r.getID()) && (pr.isOwner(lp) || p.hasPermission("protectionstones.admin"))) {
+                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + pr.getId());
+                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + pr.getId()));
+                    p.spigot().sendMessage(tc);
+                }
+            }
+
         } else if (args.length == 3) { // /ps merge [region] [root]
             RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
@@ -61,6 +73,7 @@ public class ArgMerge implements PSCommandArg {
                 return true;
             }
             if (!rm.getApplicableRegions(region).getRegions().contains(root)) {
+                PSL.msg(p, PSL.REGION_OVERLAP.msg());
                 // TODO overlapping message
                 return true;
             }
