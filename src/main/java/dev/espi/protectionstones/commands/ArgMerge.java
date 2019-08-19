@@ -79,7 +79,7 @@ public class ArgMerge implements PSCommandArg {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                WGUtils.mergeRegions(rm, root, region);
+                WGUtils.mergeRegions(p.getWorld(), rm, root, Arrays.asList(region, root));
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
             });
 
