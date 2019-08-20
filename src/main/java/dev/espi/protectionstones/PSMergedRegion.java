@@ -18,6 +18,7 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -51,6 +52,29 @@ public class PSMergedRegion extends PSRegion {
         PSLocation psl = WGUtils.parsePSRegionToLocation(id);
         block = world.getBlockAt(psl.x, psl.y, psl.z);
     }
+
+    // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
+
+    public static PSMergedRegion getMergedRegion(World w, Location l) {
+        String psID = WGUtils.createPSID(l);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+
+        for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
+            if (pr.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && pr.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(psID)) {
+                for (String s : pr.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
+                    String[] spl = s.split(" ");
+                    String id = spl[0], type = spl[1];
+                    if (id.equals(psID)) {
+                        return new PSMergedRegion(psID, ProtectionStones.getBlockOptions(type), new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // ~~~~~~~~~~~ instance ~~~~~~~~~~~~~~~~
 
     @Override
     public String getID() {

@@ -58,20 +58,24 @@ public abstract class PSRegion {
     public static PSRegion fromLocation(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
-        String psID = WGUtils.matchLocationToPSID(l);
+        String psID = WGUtils.createPSID(l);
         ProtectedRegion r = rgm.getRegion(psID);
+
+        // check exact location first
         if (r == null) {
-            // check if it is a PSMergedRegion
-            for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
-                if (pr.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && pr.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(psID)) {
-                    for (String s : pr.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
-                        String[] spl = s.split(" ");
-                        if (spl[0].equals(psID)) {
-                            return new PSMergedRegion(psID, ProtectionStones.getBlockOptions(spl[1]), new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
-                        }
-                    }
-                }
-            }
+            PSMergedRegion pr = PSMergedRegion.getMergedRegion(l.getWorld(), l);
+            if (pr != null) return pr;
+        } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
+            return new PSGroupRegion(r, rgm, l.getWorld());
+        } else {
+            return new PSStandardRegion(r, rgm, l.getWorld());
+        }
+
+        // check if location is in a region
+        psID = WGUtils.matchLocationToPSID(l);
+        r = rgm.getRegion(psID);
+
+        if (r == null) {
             return null;
         } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
             return new PSGroupRegion(r, rgm, l.getWorld());

@@ -20,7 +20,9 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,14 +69,26 @@ public class ArgUnclaim implements PSCommandArg {
         PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
-            if (!p.getInventory().addItem(cpb.createItem()).isEmpty()) {
-                // method will return not empty if item couldn't be added
-                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
-                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
-                    p.getWorld().dropItem(p.getLocation(), cpb.createItem());
-                } else {
-                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
-                    return true;
+            List<ItemStack> items = new ArrayList<>();
+
+            if (r instanceof PSGroupRegion) {
+                for (PSRegion rp : ((PSGroupRegion) r).getMergedRegions()) {
+                    items.add(rp.getTypeOptions().createItem());
+                }
+            } else {
+                items.add(cpb.createItem());
+            }
+
+            for (ItemStack item : items) {
+                if (!p.getInventory().addItem(item).isEmpty()) {
+                    // method will return not empty if item couldn't be added
+                    if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                        PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                        p.getWorld().dropItem(p.getLocation(), item);
+                    } else {
+                        PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                        return true;
+                    }
                 }
             }
         }
