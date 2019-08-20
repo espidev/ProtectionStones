@@ -203,6 +203,27 @@ public class WGUtils {
         return new ProtectedCuboidRegion(createPSID(bx, by, bz), min, max);
     }
 
+    public static List<BlockVector2> getPointsFromDecomposedRegion(PSRegion r) {
+        assert r.getPoints().size() == 4;
+        List<Integer> xs = new ArrayList<>(), zs = new ArrayList<>();
+        for (BlockVector2 p : r.getPoints()) {
+            if (!xs.contains(p.getX())) xs.add(p.getX());
+            if (!zs.contains(p.getZ())) zs.add(p.getZ());
+        }
+
+        List<BlockVector2> points = new ArrayList<>();
+        for (int x = xs.get(0); x != xs.get(1); x += (xs.get(0) > xs.get(1)) ? -1 : 1) {
+            points.add(BlockVector2.at(x, zs.get(0)));
+            points.add(BlockVector2.at(x, zs.get(1)));
+        }
+        for (int z = zs.get(0); z != zs.get(1); z += (zs.get(0) > zs.get(1)) ? -1 : 1) {
+            points.add(BlockVector2.at(xs.get(0), z));
+            points.add(BlockVector2.at(xs.get(1), z));
+        }
+
+        return points;
+    }
+
     public static void copyRegionValues(ProtectedRegion root, ProtectedRegion copyTo) {
         copyTo.copyFrom(root);
     }
@@ -229,11 +250,10 @@ public class WGUtils {
                     rm.removeRegion(r.getId());
                     rm.addRegion(nRegion);
                 } else { // otherwise, remove region
-
                     if (r.getId().equals(toUnmerge.getID())) { // it is the root
-                        // TODO
-                    } else { // it is not the root
-                        mergeRegions(w, rm, psr, Arrays.asList(psr));
+                        mergeRegions(((PSGroupRegion) psr).getMergedRegions().iterator().next().getID(), rm, psr, Arrays.asList(psr));
+                    } else {
+                        mergeRegions(rm, psr, Arrays.asList(psr));
                     }
                 }
                 break;
@@ -241,26 +261,29 @@ public class WGUtils {
         }
     }
 
+    public static void mergeRegions(RegionManager rm, PSRegion root, List<PSRegion> merge) {
+        mergeRegions(root.getID(), rm, root, merge);
+    }
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied
-    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) {
+    public static void mergeRegions(String newID, RegionManager rm, PSRegion root, List<PSRegion> merge) {
         List<PSRegion> decomposedMerge = new ArrayList<>();
 
         // decompose merged regions into their bases
         for (PSRegion r : merge) {
             if (r instanceof PSGroupRegion) {
-                decomposedMerge.add((PSRegion) ((PSGroupRegion) r).getMergedRegions());
+                decomposedMerge.addAll(((PSGroupRegion) r).getMergedRegions());
             } else {
                 decomposedMerge.add(r);
             }
         }
 
         // actually merge the base regions
-        ProtectedRegion nRegion = mergeRegions(root, decomposedMerge);
+        ProtectedRegion nRegion = mergeRegions(newID, root, decomposedMerge);
         for (PSRegion r : merge) {
             if (!r.getID().equals(root.getID())) {
-                r.deleteRegion(false);
+                Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> r.deleteRegion(false));
             } else {
                 rm.removeRegion(r.getID());
             }
@@ -269,23 +292,25 @@ public class WGUtils {
     }
 
     // returns a merged region; root and merge must be overlapping
-    public static ProtectedRegion mergeRegions(PSRegion root, List<PSRegion> merge) {
+    // merge parameter must all be decomposed regions (down to cuboids, no polygon)
+    private static ProtectedRegion mergeRegions(String newID, PSRegion root, List<PSRegion> merge) {
         HashSet<BlockVector2> points = new HashSet<>();
         List<ProtectedRegion> regions = new ArrayList<>();
 
         for (PSRegion r : merge) {
-            points.addAll(r.getPoints());
+            points.addAll(getPointsFromDecomposedRegion(r));
             regions.add(r.getWGRegion());
         }
 
         // points of new region
         List<BlockVector2> vertex = new ArrayList<>();
 
+        // traverse region edges for vertex
         RegionTraverse.traverseRegionEdge(points, regions, tr -> {
             if (tr.isVertex) vertex.add(tr.point);
         });
 
-        for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
+        // for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
         // merge sets of region name flag
         Set<String> regionNames = new HashSet<>(), regionLines = new HashSet<>();
@@ -299,7 +324,8 @@ public class WGUtils {
             }
         }
 
-        ProtectedRegion r = new ProtectedPolygonalRegion(root.getID(), vertex, 0, MAX_BUILD_HEIGHT);
+        // create new merged region
+        ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, 0, MAX_BUILD_HEIGHT);
         r.copyFrom(root.getWGRegion());
         r.setFlag(FlagHandler.PS_MERGED_REGIONS, regionNames);
         r.setFlag(FlagHandler.PS_MERGED_REGIONS_TYPES, regionLines);

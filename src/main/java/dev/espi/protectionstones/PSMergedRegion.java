@@ -43,7 +43,6 @@ public class PSMergedRegion extends PSRegion {
 
     private PSGroupRegion mergedGroup;
     private String id;
-    private Block block;
     private PSProtectBlock originalType;
 
     PSMergedRegion(String id, PSProtectBlock originalType, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
@@ -51,9 +50,6 @@ public class PSMergedRegion extends PSRegion {
         this.id = id;
         this.mergedGroup = mergedGroup;
         this.originalType = originalType;
-
-        PSLocation psl = WGUtils.parsePSRegionToLocation(id);
-        block = world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
     // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
@@ -116,12 +112,13 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public boolean isHidden() {
-        return block.getType().toString().equals(originalType.type);
+        return !getProtectBlock().getType().toString().equals(originalType.type);
     }
 
     @Override
     public Block getProtectBlock() {
-        return block;
+        PSLocation psl = WGUtils.parsePSRegionToLocation(id);
+        return world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ArgMerge implements PSCommandArg {
@@ -64,7 +65,7 @@ public class ArgMerge implements PSCommandArg {
             RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
 
-            if (region == null || root == null) {
+            if (!ProtectionStones.isPSRegion(region) || !ProtectionStones.isPSRegion(root)) {
                 PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
                 return true;
             }
@@ -72,14 +73,16 @@ public class ArgMerge implements PSCommandArg {
                 PSL.msg(p, PSL.NO_ACCESS.msg());
                 return true;
             }
-            if (!rm.getApplicableRegions(region).getRegions().contains(root)) {
+            if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region)) {
                 PSL.msg(p, PSL.REGION_OVERLAP.msg());
                 // TODO overlapping message
                 return true;
             }
 
+            PSRegion aRegion = PSRegion.fromWGRegion(p.getWorld(), region), aRoot = PSRegion.fromWGRegion(p.getWorld(), root);
+
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                WGUtils.mergeRegions(p.getWorld(), rm, root, Arrays.asList(region, root));
+                WGUtils.mergeRegions(rm, aRoot, Arrays.asList(aRegion, aRoot));
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
             });
 

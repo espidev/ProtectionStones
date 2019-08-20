@@ -19,7 +19,9 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +43,19 @@ public class PSGroupRegion extends PSStandardRegion {
     public boolean unhide() {
         for (PSMergedRegion r : getMergedRegions()) r.unhide();
         return true;
+    }
+
+    @Override
+    public boolean deleteRegion(boolean deleteBlock, Player cause) {
+        List<PSMergedRegion> l = getMergedRegions();
+        if (super.deleteRegion(deleteBlock, cause)) {
+            for (PSMergedRegion r : l) {
+                if (!r.isHidden() && deleteBlock) r.getProtectBlock().setType(Material.AIR);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public PSMergedRegion getRootRegion() {

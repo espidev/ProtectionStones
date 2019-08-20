@@ -62,14 +62,8 @@ public abstract class PSRegion {
         ProtectedRegion r = rgm.getRegion(psID);
 
         // check exact location first
-        if (r == null) {
-            PSMergedRegion pr = PSMergedRegion.getMergedRegion(l.getWorld(), l);
-            if (pr != null) return pr;
-        } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
-            return new PSGroupRegion(r, rgm, l.getWorld());
-        } else {
-            return new PSStandardRegion(r, rgm, l.getWorld());
-        }
+        PSMergedRegion pr = PSMergedRegion.getMergedRegion(l.getWorld(), l);
+        if (pr != null) return pr;
 
         // check if location is in a region
         psID = WGUtils.matchLocationToPSID(l);
@@ -151,6 +145,7 @@ public abstract class PSRegion {
 
     /**
      * Set the name of the region (from /ps name).
+     *
      * @param name new name, or null to remove the name
      */
 
@@ -158,6 +153,7 @@ public abstract class PSRegion {
 
     /**
      * Set the parent of this region.
+     *
      * @param r the region to be the parent, or null for no parent
      * @throws ProtectedRegion.CircularInheritanceException thrown when the parent already inherits from the child
      */
@@ -166,6 +162,7 @@ public abstract class PSRegion {
 
     /**
      * Get the parent of this region, if there is one.
+     *
      * @return the parent of the region, or null if there isn't one
      */
 
@@ -290,7 +287,7 @@ public abstract class PSRegion {
      * Deletes the region forever. Can be cancelled by event cancellation.
      *
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
-     * @param cause the player that caused the region to break
+     * @param cause       the player that caused the region to break
      * @return whether or not the region was able to be successfully removed
      */
     public abstract boolean deleteRegion(boolean deleteBlock, Player cause);
