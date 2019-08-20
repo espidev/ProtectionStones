@@ -208,43 +208,39 @@ public class WGUtils {
     }
 
     public static void unmergeRegion(World w, RegionManager rm, PSMergedRegion toUnmerge) {
-        for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(toUnmerge.getProtectBlock().getX(), toUnmerge.getProtectBlock().getY(), toUnmerge.getProtectBlock().getZ()))) {
-            if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && r.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(toUnmerge.getID())) {
-                r.getFlag(FlagHandler.PS_MERGED_REGIONS).remove(toUnmerge.getID());
 
-                // remove from ps merged region types
-                Iterator<String> i = r.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).iterator();
-                while (i.hasNext()) {
-                    String[] spl = i.next().split(" ");
-                    String id = spl[0];
-                    if (id.equals(toUnmerge.getID())) {
-                        i.remove();
-                        break;
-                    }
-                }
+        for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(toUnmerge.getProtectBlock().getX(), toUnmerge.getProtectBlock().getY(), toUnmerge.getProtectBlock().getZ()))) {
+
+            PSRegion psr = PSRegion.fromWGRegion(w, r);
+
+            if (psr instanceof PSGroupRegion && ((PSGroupRegion) psr).hasMergedRegion(toUnmerge.getID())) {
+                ((PSGroupRegion) psr).removeMergedRegionInfo(toUnmerge.getID());
 
                 // if there is only 1 region now, revert to standard region
                 if (r.getFlag(FlagHandler.PS_MERGED_REGIONS).size() == 1) {
                     String[] spl = r.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).iterator().next().split(" ");
                     String id = spl[0], type = spl[1];
+
                     ProtectedRegion nRegion = getDefaultProtectedRegion(ProtectionStones.getBlockOptions(type), parsePSRegionToLocation(id));
                     nRegion.copyFrom(r);
                     nRegion.setFlag(FlagHandler.PS_MERGED_REGIONS, null);
                     nRegion.setFlag(FlagHandler.PS_MERGED_REGIONS_TYPES, null);
+
                     rm.removeRegion(r.getId());
                     rm.addRegion(nRegion);
                 } else { // otherwise, remove region
 
-                    if (r.getId().equals(id)) { // it is the root
+                    if (r.getId().equals(toUnmerge.getID())) { // it is the root
                         // TODO
                     } else { // it is not the root
-                        mergeRegions(w, rm, r, Arrays.asList(r));
+                        mergeRegions(w, rm, psr, Arrays.asList(psr));
                     }
                 }
                 break;
             }
         }
     }
+
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied

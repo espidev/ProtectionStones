@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PSGroupRegion extends PSStandardRegion {
@@ -51,6 +52,26 @@ public class PSGroupRegion extends PSStandardRegion {
 
     public boolean hasMergedRegion(String id) {
         return getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).contains(id);
+    }
+
+    /**
+     * Removes the merged region's information from the object.
+     * Note: This DOES NOT remove the actual PSMergedRegion object, you have to call deleteRegion() on that as well.
+     * @param id the id of the merged region
+     */
+    public void removeMergedRegionInfo(String id) {
+        getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).remove(id);
+
+        // remove from ps merged region types
+        Iterator<String> i = getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).iterator();
+        while (i.hasNext()) {
+            String[] spl = i.next().split(" ");
+            String rid = spl[0];
+            if (rid.equals(id)) {
+                i.remove();
+                break;
+            }
+        }
     }
 
     /**

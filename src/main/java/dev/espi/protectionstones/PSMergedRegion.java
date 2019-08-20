@@ -21,8 +21,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -158,13 +161,24 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public boolean deleteRegion(boolean deleteBlock) {
-
-        return false;
+        return deleteRegion(deleteBlock, null);
     }
 
     @Override
     public boolean deleteRegion(boolean deleteBlock, Player cause) {
-        return false;
+        PSRemoveEvent event = new PSRemoveEvent(this, cause);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) { // if event was cancelled, prevent execution
+            return false;
+        }
+
+        if (deleteBlock && !this.isHidden()) {
+            this.getProtectBlock().setType(Material.AIR);
+        }
+
+        WGUtils.unmergeRegion(getWorld(), getWGRegionManager(), this);
+
+        return true;
     }
 
     @Override
