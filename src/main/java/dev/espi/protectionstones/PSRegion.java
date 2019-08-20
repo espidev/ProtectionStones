@@ -16,6 +16,8 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -48,6 +50,7 @@ public abstract class PSRegion {
 
     /**
      * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
+     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or {@link PSMergedRegion}.
      *
      * @param l the location
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
@@ -58,9 +61,22 @@ public abstract class PSRegion {
         String psID = WGUtils.matchLocationToPSID(l);
         ProtectedRegion r = rgm.getRegion(psID);
         if (r == null) {
+            // check if it is a PSMergedRegion
+            for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
+                if (pr.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && pr.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(psID)) {
+                    for (String s : pr.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
+                        String[] spl = s.split(" ");
+                        if (spl[0].equals(psID)) {
+                            return new PSMergedRegion(psID, ProtectionStones.getBlockOptions(spl[1]), new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
+                        }
+                    }
+                }
+            }
             return null;
+        } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
+            return new PSGroupRegion(r, rgm, l.getWorld());
         } else {
-            return new PSRegion(r, rgm, l.getWorld());
+            return new PSStandardRegion(r, rgm, l.getWorld());
         }
     }
 
@@ -73,7 +89,11 @@ public abstract class PSRegion {
      */
     public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
         if (!ProtectionStones.isPSRegion(r)) return null;
-        return new PSRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
+        if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
+            return new PSGroupRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
+        } else {
+            return new PSStandardRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
+        }
     }
 
     /**
@@ -173,14 +193,28 @@ public abstract class PSRegion {
      *
      * @return whether or not the block was hidden
      */
-    public abstract boolean hide();
+    public boolean hide() {
+        if (!isHidden()) {
+            getProtectBlock().setType(Material.AIR);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Unhides the protection block, if it is hidden.
      *
      * @return whether or not the block was unhidden
      */
-    public abstract boolean unhide();
+    public boolean unhide() {
+        if (isHidden()) {
+            getProtectBlock().setType(Material.getMaterial(getType()));
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Toggle whether or not the protection block is hidden.
@@ -234,6 +268,11 @@ public abstract class PSRegion {
      * @return returns a list of the members of the protected region
      */
     public abstract ArrayList<UUID> getMembers();
+
+    /**
+     * @return returns a list of the bounding points of the protected region
+     */
+    public abstract List<BlockVector2> getPoints();
 
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.

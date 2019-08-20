@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -101,26 +102,6 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public boolean hide() {
-        if (!isHidden()) {
-            getProtectBlock().setType(Material.AIR);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean unhide() {
-        if (isHidden()) {
-            getProtectBlock().setType(Material.getMaterial(getType()));
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
         return world.getBlockAt(psl.x, psl.y, psl.z);
@@ -154,6 +135,11 @@ public class PSStandardRegion extends PSRegion {
     @Override
     public ArrayList<UUID> getMembers() {
         return new ArrayList<>(wgregion.getMembers().getUniqueIds());
+    }
+
+    @Override
+    public List<BlockVector2> getPoints() {
+        return wgregion.getPoints();
     }
 
     @Override

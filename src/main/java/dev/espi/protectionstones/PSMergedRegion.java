@@ -17,14 +17,17 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,98 +37,104 @@ import java.util.UUID;
 
 public class PSMergedRegion extends PSRegion {
 
+    private PSGroupRegion mergedGroup;
+    private String id;
+    private Block block;
+    private PSProtectBlock originalType;
 
-    PSMergedRegion(RegionManager rgmanager, World world) {
+    PSMergedRegion(String id, PSProtectBlock originalType, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
         super(rgmanager, world);
+        this.id = id;
+        this.mergedGroup = mergedGroup;
+        this.originalType = originalType;
+
+        PSLocation psl = WGUtils.parsePSRegionToLocation(id);
+        block = world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
     @Override
     public String getID() {
-        return null;
+        return id;
     }
 
     @Override
     public String getName() {
-        return null;
+        return mergedGroup.getName();
     }
 
     @Override
     public void setName(String name) {
-
+        mergedGroup.setName(name);
     }
 
     @Override
     public void setParent(PSRegion r) throws ProtectedRegion.CircularInheritanceException {
-
+        mergedGroup.setParent(r);
     }
 
     @Override
     public PSRegion getParent() {
-        return null;
+        return mergedGroup.getParent();
     }
 
     @Override
     public Location getHome() {
-        return null;
+        return mergedGroup.getHome();
     }
 
     @Override
     public void setHome(int blockX, int blockY, int blockZ) {
-
+        mergedGroup.setHome(blockX, blockY, blockZ);
     }
 
     @Override
     public boolean isHidden() {
-        return false;
-    }
-
-    @Override
-    public boolean hide() {
-        return false;
-    }
-
-    @Override
-    public boolean unhide() {
-        return false;
+        return block.getType().toString().equals(originalType.type);
     }
 
     @Override
     public Block getProtectBlock() {
-        return null;
+        return block;
     }
 
     @Override
     public PSProtectBlock getTypeOptions() {
-        return null;
+        return originalType;
     }
 
     @Override
     public String getType() {
-        return null;
+        return originalType.type;
     }
 
     @Override
     public boolean isOwner(UUID uuid) {
-        return false;
+        return mergedGroup.isOwner(uuid);
     }
 
     @Override
     public boolean isMember(UUID uuid) {
-        return false;
+        return mergedGroup.isMember(uuid);
     }
 
     @Override
     public ArrayList<UUID> getOwners() {
-        return null;
+        return mergedGroup.getOwners();
     }
 
     @Override
     public ArrayList<UUID> getMembers() {
-        return null;
+        return mergedGroup.getMembers();
+    }
+
+    @Override
+    public List<BlockVector2> getPoints() {
+        return WGUtils.getDefaultProtectedRegion(originalType, WGUtils.parsePSRegionToLocation(id)).getPoints();
     }
 
     @Override
     public boolean deleteRegion(boolean deleteBlock) {
+
         return false;
     }
 
@@ -136,6 +145,6 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public ProtectedRegion getWGRegion() {
-        return null;
+        return WGUtils.getDefaultProtectedRegion(originalType, WGUtils.parsePSRegionToLocation(id));
     }
 }

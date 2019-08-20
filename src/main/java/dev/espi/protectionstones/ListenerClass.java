@@ -30,7 +30,6 @@ import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -70,22 +69,15 @@ public class ListenerClass implements Listener {
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
-        String blockType = pb.getType().toString();
-        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(blockType);
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(pb.getType().toString());
 
         // check if block broken is protection stone
         if (blockOptions == null) return;
 
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
-
-        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(p.getWorld()));
-
-        String id = WGUtils.createPSID(pb.getLocation());
+        PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
         // check if that is actually a protection stone block (owns a region)
-        if (rgm.getRegion(id) == null) {
-
+        if (r == null) {
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
                 ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
@@ -95,7 +87,6 @@ public class ListenerClass implements Listener {
                 }
                 e.setDropItems(false);
             }
-
             return;
         }
 
@@ -107,7 +98,7 @@ public class ListenerClass implements Listener {
         }
 
         // check if player is owner of region
-        if (!rgm.getRegion(id).isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             e.setCancelled(true);
             return;
@@ -129,12 +120,7 @@ public class ListenerClass implements Listener {
         }
 
         // check if removing the region and firing region remove event blocked it
-        if (!ProtectionStones.removePSRegion(p.getWorld(), id, p)) {
-            return;
-        }
-
-        // remove block
-        pb.setType(Material.AIR);
+        if (!r.deleteRegion(true, p)) return;
 
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
