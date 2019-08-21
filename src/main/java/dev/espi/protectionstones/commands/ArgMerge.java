@@ -42,6 +42,11 @@ public class ArgMerge implements PSCommandArg {
             return true;
         }
 
+        if (!ProtectionStones.getInstance().getConfigOptions().allowMergingRegions) {
+            PSL.msg(s, PSL.MERGE_DISABLED.msg());
+            return true;
+        }
+
         Player p = (Player) s;
         LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
         if (args.length == 1) { // GUI
@@ -66,7 +71,7 @@ public class ArgMerge implements PSCommandArg {
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
 
             if (!ProtectionStones.isPSRegion(region) || !ProtectionStones.isPSRegion(root)) {
-                PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
+                PSL.msg(p, PSL.MULTI_REGION_DOES_NOT_EXIST.msg());
                 return true;
             }
             if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp))) {
@@ -74,8 +79,7 @@ public class ArgMerge implements PSCommandArg {
                 return true;
             }
             if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region)) {
-                PSL.msg(p, PSL.REGION_OVERLAP.msg());
-                // TODO overlapping message
+                PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
                 return true;
             }
 

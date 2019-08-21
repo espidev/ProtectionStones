@@ -91,6 +91,8 @@ public enum PSL {
     REGION_CANT_TELEPORT("psregion.cant_teleport", ChatColor.RED + "Your teleportation was blocked by a protection region!"),
     SPECIFY_ID_INSTEAD_OF_ALIAS("psregion.specify_id_instead_of_alias", ChatColor.GRAY + "There were multiple regions found with this name! Please use an ID instead.\n Regions with this name: " + ChatColor.AQUA + "%regions%"),
     REGION_NOT_ADJACENT("psregion.region_not_adjacent", ChatColor.RED + "You've passed the limit of non-adjacent regions! Try putting your protection block closer to other regions you already own."),
+    REGION_NOT_OVERLAPPING("psregion.not_overlapping", ChatColor.RED + "These regions don't overlap each other!"),
+    MULTI_REGION_DOES_NOT_EXIST("psregion.multi_region_does_not_exist", "One of these regions don't exist!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
@@ -253,6 +255,7 @@ public enum PSL {
     MERGE_DISABLED("merge.disabled", "Merging regions is disabled in the config!"),
     MERGE_MERGED("merge.merged", ChatColor.AQUA + "Regions were successfully merged!"),
     MERGE_HEADER("merge.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Merge %region% (click to merge) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+
 
     ;
 

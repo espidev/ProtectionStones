@@ -35,10 +35,12 @@ public class RegionTraverse {
     public static class TraverseReturn {
         public BlockVector2 point;
         public boolean isVertex;
+        public int vertexGroupID;
         public int numberOfExposedEdges;
-        public TraverseReturn(BlockVector2 point, boolean isVertex, int numberOfExposedEdges) {
+        public TraverseReturn(BlockVector2 point, boolean isVertex, int vertexGroupID, int numberOfExposedEdges) {
             this.point = point;
             this.isVertex = isVertex;
+            this.vertexGroupID = vertexGroupID;
             this.numberOfExposedEdges = numberOfExposedEdges;
         }
     }
@@ -51,15 +53,17 @@ public class RegionTraverse {
     }
 
     public static void traverseRegionEdge(HashSet<BlockVector2> points, List<ProtectedRegion> regions, Consumer<TraverseReturn> run) {
+        int pointID = 0;
         while (!points.isEmpty()) {
             BlockVector2 start = points.iterator().next();
-            traverseRegionEdge(start, null, start, true, points, regions, run);
+            traverseRegionEdge(start, null, start, true, points, regions, pointID, run);
+            pointID++;
         }
     }
 
     // i need to find a faster way to do this
     // doesn't do so well with 1 block wide segments jutting out
-    private static void traverseRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, HashSet<BlockVector2> points, List<ProtectedRegion> regions, Consumer<TraverseReturn> run) {
+    private static void traverseRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, HashSet<BlockVector2> points, List<ProtectedRegion> regions, int pointID, Consumer<TraverseReturn> run) {
         if (!first && v.equals(start)) return;
 
         int exposedEdges = 0;
@@ -76,7 +80,7 @@ public class RegionTraverse {
 
         switch (exposedEdges) {
             case 1: // normal edge
-                run.accept(new TraverseReturn(v, false, exposedEdges)); // run consumer
+                run.accept(new TraverseReturn(v, false, pointID, exposedEdges)); // run consumer
 
                 if (previous == null) { // if this is the first node we need to determine a direction to go to (that isn't into the polygon, but is on edge)
                     if (insideVertex.get(0).getX() == insideVertex.get(1).getZ() || insideVertex.get(0).getZ() == insideVertex.get(1).getZ() || insideVertex.get(0).getX() == insideVertex.get(2).getZ() || insideVertex.get(0).getZ() == insideVertex.get(2).getZ()) {
@@ -85,15 +89,15 @@ public class RegionTraverse {
                         previous = insideVertex.get(1);
                     }
                 }
-                traverseRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, run);
+                traverseRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, pointID, run);
                 break;
             case 2: // convex vertex
                 // possibly also 1 block wide segment with 2 edges opposite, but we'll ignore that
-                run.accept(new TraverseReturn(v, true, exposedEdges)); // run consumer
+                run.accept(new TraverseReturn(v, true, pointID, exposedEdges)); // run consumer
                 if (insideVertex.get(0).equals(previous)) {
-                    traverseRegionEdge(insideVertex.get(1), v, start, false, points, regions, run);
+                    traverseRegionEdge(insideVertex.get(1), v, start, false, points, regions, pointID, run);
                 } else {
-                    traverseRegionEdge(insideVertex.get(0), v, start, false, points, regions, run);
+                    traverseRegionEdge(insideVertex.get(0), v, start, false, points, regions, pointID, run);
                 }
                 break;
             case 3: // random 1x1 jutting out
@@ -113,19 +117,19 @@ public class RegionTraverse {
                 }
 
                 if (cornersNotIn.size() == 1) { // concave vertex
-                    run.accept(new TraverseReturn(v, true, exposedEdges)); // run consumer
+                    run.accept(new TraverseReturn(v, true, pointID, exposedEdges)); // run consumer
 
                     Vector2 dir = cornersNotIn.get(0);
                     if (previous == null || previous.equals(BlockVector2.at(v.getX() + dir.getX(), v.getZ()))) {
-                        traverseRegionEdge(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, start, false, points, regions, run);
+                        traverseRegionEdge(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, start, false, points, regions, pointID, run);
                     } else {
-                        traverseRegionEdge(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, start, false, points, regions, run);
+                        traverseRegionEdge(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, start, false, points, regions, pointID, run);
                     }
                 } else if (cornersNotIn.size() == 2) { // 1 block diagonal perfect overlap
-                    run.accept(new TraverseReturn(v, false, exposedEdges)); // run consumer
+                    run.accept(new TraverseReturn(v, false, pointID, exposedEdges)); // run consumer
 
                     if (previous == null) previous = insideVertex.get(0);
-                    traverseRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, run);
+                    traverseRegionEdge(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, start, false, points, regions, pointID, run);
                 }
                 // ignore if in middle of region (cornersNotIn size = 0)
                 break;

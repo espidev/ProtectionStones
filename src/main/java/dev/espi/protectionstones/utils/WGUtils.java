@@ -33,6 +33,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class WGUtils {
@@ -304,13 +305,36 @@ public class WGUtils {
 
         // points of new region
         List<BlockVector2> vertex = new ArrayList<>();
+        HashMap<Integer, ArrayList<BlockVector2>> vertexGroups = new HashMap<>();
 
         // traverse region edges for vertex
         RegionTraverse.traverseRegionEdge(points, regions, tr -> {
-            if (tr.isVertex) vertex.add(tr.point);
+            if (tr.isVertex) {
+                if (vertexGroups.containsKey(tr.vertexGroupID)) {
+                    vertexGroups.get(tr.vertexGroupID).add(tr.point);
+                } else {
+                    vertexGroups.put(tr.vertexGroupID, new ArrayList<>(Arrays.asList(tr.point)));
+                }
+            }
         });
 
-        // for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
+        // assemble vertex group
+        boolean first = true;
+        BlockVector2 backPoint = null;
+        for (List<BlockVector2> l : vertexGroups.values()) {
+            if (first) {
+                first = false;
+                vertex.addAll(l);
+                backPoint = l.get(0);
+                vertex.add(backPoint);
+            } else {
+                vertex.addAll(l);
+                vertex.add(l.get(0));
+                vertex.add(backPoint);
+            }
+        }
+
+        for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
         // merge sets of region name flag
         Set<String> regionNames = new HashSet<>(), regionLines = new HashSet<>();
