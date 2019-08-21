@@ -37,7 +37,7 @@ import java.util.UUID;
 
 /**
  * Represents an instance of a PS region that has been merged into another region. There is no actual WG region that
- * this contains, and instead takes properties from its parent region.
+ * this contains, and instead takes properties from its parent region (see {@link PSGroupRegion}).
  */
 
 public class PSMergedRegion extends PSRegion {

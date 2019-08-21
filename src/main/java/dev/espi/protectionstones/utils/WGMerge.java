@@ -63,7 +63,6 @@ public class WGMerge {
                 } else { // otherwise, remove region
 
                     // check if unmerge will split the region into pieces
-
                     HashMap<String, String> idToGroup = new HashMap<>();
                     HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
 
@@ -97,9 +96,7 @@ public class WGMerge {
                                         groupToIDs.get(adjacentGroup).add(pr.getId());
                                     } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)) { // if the overlapped region is part of a group, merge the groups
                                         String mergeGroupID = idToGroup.get(pr.getId());
-                                        for (String gid : groupToIDs.get(mergeGroupID)) {
-                                            idToGroup.put(gid, adjacentGroup);
-                                        }
+                                        for (String gid : groupToIDs.get(mergeGroupID)) idToGroup.put(gid, adjacentGroup);
                                         groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
                                         groupToIDs.remove(mergeGroupID);
                                     }

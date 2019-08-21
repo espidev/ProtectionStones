@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Represents a region that exists but is a group of merged {@link PSStandardRegion}s.
+ * Contains multiple {@link PSMergedRegion} representing the individual merged regions (which don't technically exist).
+ */
+
 public class PSGroupRegion extends PSStandardRegion {
     PSGroupRegion(ProtectedRegion wgregion, RegionManager rgmanager, World world) {
         super(wgregion, rgmanager, world);
@@ -58,6 +63,11 @@ public class PSGroupRegion extends PSStandardRegion {
         }
     }
 
+    /**
+     * Get the merged region who's ID is the same as the group region ID
+     * @return the root region
+     */
+
     public PSMergedRegion getRootRegion() {
         for (PSMergedRegion r : getMergedRegions()) {
             if (r.getID().equals(getID())) return r;
@@ -65,6 +75,11 @@ public class PSGroupRegion extends PSStandardRegion {
         return null;
     }
 
+    /**
+     * Check if this region contains a specific merged region
+     * @param id the psID that would've been generated if the merged region was a standard region
+     * @return whether or not the id is a merged region
+     */
     public boolean hasMergedRegion(String id) {
         return getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).contains(id);
     }
