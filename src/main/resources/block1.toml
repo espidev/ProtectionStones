@@ -81,6 +81,10 @@ prevent_block_place_in_restricted_world = true
     # Whether or not to allow creation of regions that overlap other regions you don't own
     allow_overlap_unowned_regions = false
 
+    # Whether or not to allow this regions created with this block to merge with other regions
+    # allow_merging_regions must be set to true in config.toml
+    allow_merging = true
+
 [block_data]
     # Name given to protection block when obtained with /ps give or /ps get
     # Also affects custom crafted items (see custom_recipe)

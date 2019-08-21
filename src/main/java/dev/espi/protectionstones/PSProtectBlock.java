@@ -84,6 +84,8 @@ public class PSProtectBlock {
     public int priority;
     @Path("region.allow_overlap_unowned_regions")
     public boolean allowOverlapUnownedRegions;
+    @Path("region.allow_merging")
+    public boolean allowMerging;
 
     // block data section
     @Path("block_data.display_name")

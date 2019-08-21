@@ -33,7 +33,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class WGUtils {
@@ -298,6 +297,7 @@ public class WGUtils {
         HashSet<BlockVector2> points = new HashSet<>();
         List<ProtectedRegion> regions = new ArrayList<>();
 
+        // decompose regions down to their points
         for (PSRegion r : merge) {
             points.addAll(getPointsFromDecomposedRegion(r));
             regions.add(r.getWGRegion());
@@ -319,6 +319,7 @@ public class WGUtils {
         });
 
         // assemble vertex group
+        // draw in and out lines between holes
         boolean first = true;
         BlockVector2 backPoint = null;
         for (List<BlockVector2> l : vertexGroups.values()) {
@@ -334,7 +335,7 @@ public class WGUtils {
             }
         }
 
-        for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
+        //for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
 
         // merge sets of region name flag
         Set<String> regionNames = new HashSet<>(), regionLines = new HashSet<>();
