@@ -45,6 +45,12 @@ public class RegionTraverse {
         }
     }
 
+    private static class TraverseData {
+        BlockVector2 v, previous, start;
+        boolean first;
+
+    }
+
     private static boolean isInRegion(BlockVector2 point, List<ProtectedRegion> regions) {
         for (ProtectedRegion r : regions) {
             if (r.contains(point)) return true;
@@ -57,6 +63,11 @@ public class RegionTraverse {
         while (!points.isEmpty()) {
             BlockVector2 start = points.iterator().next();
             traverseRegionEdge(start, null, start, true, points, regions, pointID, run);
+
+            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
             pointID++;
         }
     }
@@ -101,7 +112,7 @@ public class RegionTraverse {
                 }
                 break;
             case 3: // random 1x1 jutting out
-                ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region edge traversal at " + v.getX() + " " + v.getZ() + ", please notify the developers that you saw this message!");
+                if (isInRegion(v, regions)) ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region edge traversal at " + v.getX() + " " + v.getZ() + ", please notify the developers that you saw this message!");
                 break;
             case 0: // concave vertex, or point in middle of region
                 List<Vector2> cornersNotIn = new ArrayList<>();

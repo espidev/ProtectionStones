@@ -19,8 +19,6 @@ package dev.espi.protectionstones.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -45,11 +43,13 @@ public class WGMerge {
 
             // if this is the holding region of the region to unmerge
             if (psr instanceof PSGroupRegion && ((PSGroupRegion) psr).hasMergedRegion(toUnmerge.getID())) {
+
                 PSGroupRegion psgr = (PSGroupRegion) psr;
                 psgr.removeMergedRegionInfo(toUnmerge.getID());
 
                 // if there is only 1 region now, revert to standard region
                 if (r.getFlag(FlagHandler.PS_MERGED_REGIONS).size() == 1) {
+
                     String[] spl = r.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).iterator().next().split(" ");
                     String id = spl[0], type = spl[1];
 
@@ -60,6 +60,7 @@ public class WGMerge {
 
                     rm.removeRegion(r.getId());
                     rm.addRegion(nRegion);
+
                 } else { // otherwise, remove region
 
                     // check if unmerge will split the region into pieces
@@ -67,41 +68,48 @@ public class WGMerge {
                     HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
 
                     List<ProtectedRegion> toCheck = new ArrayList<>();
+                    HashMap<String, PSMergedRegion> mergedRegions = new HashMap<>();
 
-                    for (PSRegion iter : psgr.getMergedRegions()) toCheck.add(WGUtils.getDefaultProtectedRegion(iter.getTypeOptions(), WGUtils.parsePSRegionToLocation(iter.getID())));
+                    // add decomposed regions
+                    for (PSMergedRegion ps : psgr.getMergedRegions()) {
+                        mergedRegions.put(ps.getID(), ps);
+                        toCheck.add(WGUtils.getDefaultProtectedRegion(ps.getTypeOptions(), WGUtils.parsePSRegionToLocation(ps.getID())));
+                    }
 
+                    // build set of groups of overlapping regions
                     for (ProtectedRegion iter : toCheck) {
                         List<ProtectedRegion> overlapping = iter.getIntersectingRegions(toCheck);
                         // algorithm to find adjacent regions (oooh boy)
                         String adjacentGroup = idToGroup.get(iter.getId());
                         for (ProtectedRegion pr : overlapping) {
 
-                                if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
+                            if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
 
-                                    if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
-                                        idToGroup.put(pr.getId(), iter.getId());
-                                        idToGroup.put(iter.getId(), iter.getId());
-                                        groupToIDs.put(iter.getId(), new ArrayList<>(Arrays.asList(pr.getId(), iter.getId()))); // create new group
-                                    } else { // if the overlapped region is part of a group
-                                        String groupID = idToGroup.get(pr.getId());
-                                        idToGroup.put(iter.getId(), groupID);
-                                        groupToIDs.get(groupID).add(iter.getId());
-                                    }
-
-                                    adjacentGroup = idToGroup.get(iter.getId());
-                                } else { // if the region is part of a group already
-
-                                    if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
-                                        idToGroup.put(pr.getId(), adjacentGroup);
-                                        groupToIDs.get(adjacentGroup).add(pr.getId());
-                                    } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)) { // if the overlapped region is part of a group, merge the groups
-                                        String mergeGroupID = idToGroup.get(pr.getId());
-                                        for (String gid : groupToIDs.get(mergeGroupID)) idToGroup.put(gid, adjacentGroup);
-                                        groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
-                                        groupToIDs.remove(mergeGroupID);
-                                    }
-
+                                if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
+                                    idToGroup.put(pr.getId(), iter.getId());
+                                    idToGroup.put(iter.getId(), iter.getId());
+                                    groupToIDs.put(iter.getId(), new ArrayList<>(Arrays.asList(pr.getId(), iter.getId()))); // create new group
+                                } else { // if the overlapped region is part of a group
+                                    String groupID = idToGroup.get(pr.getId());
+                                    idToGroup.put(iter.getId(), groupID);
+                                    groupToIDs.get(groupID).add(iter.getId());
                                 }
+
+                                adjacentGroup = idToGroup.get(iter.getId());
+                            } else { // if the region is part of a group already
+
+                                if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
+                                    idToGroup.put(pr.getId(), adjacentGroup);
+                                    groupToIDs.get(adjacentGroup).add(pr.getId());
+                                } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)) { // if the overlapped region is part of a group, merge the groups
+                                    String mergeGroupID = idToGroup.get(pr.getId());
+                                    for (String gid : groupToIDs.get(mergeGroupID))
+                                        idToGroup.put(gid, adjacentGroup);
+                                    groupToIDs.get(adjacentGroup).addAll(groupToIDs.get(mergeGroupID));
+                                    groupToIDs.remove(mergeGroupID);
+                                }
+
+                            }
                         }
                         if (adjacentGroup == null) {
                             idToGroup.put(iter.getId(), iter.getId());
@@ -109,27 +117,65 @@ public class WGMerge {
                         }
                     }
 
-                    // TODO REDO UNMERGE LOGIC WITH GROUPS
-
-                    // actually unmerge the regions
-                    if (r.getId().equals(toUnmerge.getID())) { // it is the root
-                        mergeRegions(psgr.getMergedRegions().iterator().next().getID(), rm, psr, Arrays.asList(psr));
-                    } else {
-                        mergeRegions(rm, psr, Arrays.asList(psr));
+                    // if there is no splitting
+                    if (groupToIDs.size() == 1) {
+                        // actually unmerge the regions
+                        if (r.getId().equals(toUnmerge.getID())) { // it is the root
+                            mergeRegions(psgr.getMergedRegions().iterator().next().getID(), w, rm, psr, Arrays.asList(psr));
+                        } else {
+                            mergeRegions(w, rm, psr, Arrays.asList(psr));
+                        }
+                        continue;
                     }
+
+                    // check how many groups there are and relabel the original root to be the head ID
+                    boolean foundOriginal = false;
+
+                    List<ProtectedRegion> regionsToAdd = new ArrayList<>();
+                    for (String key : groupToIDs.keySet()) {
+                        boolean found = false;
+                        List<PSRegion> l = new ArrayList<>();
+
+                        // add to cache and and also check if this set contains the original root region
+                        for (String id : groupToIDs.get(key)) {
+                            if (id.equals(psr.getID())) {
+                                found = true;
+                                foundOriginal = true;
+                                break;
+                            }
+                            l.add(mergedRegions.get(id));
+                        }
+
+                        if (!found) { // if this set does NOT contain the root ID region
+                            // remove id information from base region
+                            for (String id : groupToIDs.get(key)) psgr.removeMergedRegionInfo(id);
+                            regionsToAdd.add(mergeRegions(key, psr, l)); // create new region
+                        }
+                    }
+
+                    // recreate original region with the new set (of removed psmergedregions)
+                    if (foundOriginal) {
+                        mergeRegions(w, rm, psr, Arrays.asList(psr));
+                    } else {
+                        rm.removeRegion(psr.getID());
+                    }
+
+                    for (ProtectedRegion pr : regionsToAdd) rm.addRegion(pr);
+
                 }
                 break;
             }
         }
     }
 
-    public static void mergeRegions(RegionManager rm, PSRegion root, List<PSRegion> merge) {
-        mergeRegions(root.getID(), rm, root, merge);
+    // each region in merge must not be of type PSMergedRegion
+    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) {
+        mergeRegions(root.getID(), w, rm, root, merge);
     }
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied
-    public static void mergeRegions(String newID, RegionManager rm, PSRegion root, List<PSRegion> merge) {
+    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) {
         List<PSRegion> decomposedMerge = new ArrayList<>();
 
         // decompose merged regions into their bases
@@ -142,15 +188,18 @@ public class WGMerge {
         }
 
         // actually merge the base regions
-        ProtectedRegion nRegion = mergeRegions(newID, root, decomposedMerge);
+        PSRegion nRegion = PSRegion.fromWGRegion(w, mergeRegions(newID, root, decomposedMerge));
         for (PSRegion r : merge) {
-            if (!r.getID().equals(root.getID())) {
+            if (!r.getID().equals(newID)) {
+                // run delete event for non-root real regions
                 Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> r.deleteRegion(false));
             } else {
                 rm.removeRegion(r.getID());
             }
         }
-        rm.addRegion(nRegion);
+        nRegion.setName(nRegion.getName()); // reapply name cache
+
+        rm.addRegion(nRegion.getWGRegion());
     }
 
     // returns a merged region; root and merge must be overlapping

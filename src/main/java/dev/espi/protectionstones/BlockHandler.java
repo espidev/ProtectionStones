@@ -30,10 +30,7 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -246,9 +243,11 @@ class BlockHandler {
             if (r != null) {
                 List<TextComponent> tc = ArgMerge.getGUI(p, r);
                 if (!tc.isEmpty()) { // if there are regions you can merge into
+                    p.sendMessage(ChatColor.WHITE + ""); // send empty line
                     PSL.msg(p, PSL.MERGE_INTO.msg());
                     PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
                     for (TextComponent t : tc) p.spigot().sendMessage(t);
+                    p.sendMessage(ChatColor.WHITE + ""); // send empty line
                 }
             }
         }

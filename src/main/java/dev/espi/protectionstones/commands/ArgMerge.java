@@ -83,9 +83,11 @@ public class ArgMerge implements PSCommandArg {
             if (components.isEmpty()) {
                 PSL.msg(p, PSL.MERGE_NO_REGIONS.msg());
             } else {
+                p.sendMessage(ChatColor.WHITE + ""); // send empty line
                 PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
                 PSL.msg(p, PSL.MERGE_WARNING.msg());
                 for (TextComponent tc : components) p.spigot().sendMessage(tc);
+                p.sendMessage(ChatColor.WHITE + ""); // send empty line
             }
 
         } else if (args.length == 3) { // /ps merge [region] [root]
@@ -113,8 +115,13 @@ public class ArgMerge implements PSCommandArg {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                WGMerge.mergeRegions(rm, aRoot, Arrays.asList(aRegion, aRoot));
+                WGMerge.mergeRegions(p.getWorld(), rm, aRoot, Arrays.asList(aRegion, aRoot));
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
+
+                // show menu again if the new region still has overlapping regions
+                if (rm.getApplicableRegions(rm.getRegion(aRoot.getID())).size() > 1) {
+                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " merge"));
+                }
             });
 
         } else {
