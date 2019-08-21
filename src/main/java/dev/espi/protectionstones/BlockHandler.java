@@ -25,9 +25,11 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -237,6 +239,20 @@ class BlockHandler {
 
         // hide block if auto hide is enabled
         if (blockOptions.autoHide) l.getBlock().setType(Material.AIR);
+
+        // show merge menu
+        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
+            PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
+            if (r != null) {
+                List<TextComponent> tc = ArgMerge.getGUI(p, r);
+                if (!tc.isEmpty()) { // if there are regions you can merge into
+                    PSL.msg(p, PSL.MERGE_INTO.msg());
+                    PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                    for (TextComponent t : tc) p.spigot().sendMessage(t);
+                }
+            }
+        }
+
         return true;
     }
 }

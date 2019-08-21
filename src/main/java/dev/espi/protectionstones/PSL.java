@@ -257,6 +257,8 @@ public enum PSL {
     MERGE_HEADER("merge.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Merge %region% (click to merge) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     MERGE_WARNING("merge.warning", ChatColor.GRAY + "Note: This will delete all of the settings for the current region!"),
     MERGE_NOT_ALLOWED("merge.not_allowed", ChatColor.RED + "You are not allowed to merge this protection region type."),
+    MERGE_INTO("merge.into", ChatColor.AQUA + "This region overlaps other regions you can merge into!"),
+    MERGE_NO_REGIONS("merge.no_region", ChatColor.GRAY + "There are no overlapping regions to merge into."),
 
     ;
 

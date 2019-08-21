@@ -115,7 +115,6 @@ public class ArgView implements PSCommandArg {
 
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait.get());
 
-            /*
             Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> {
                 PSL.msg(p, PSL.VIEW_REMOVING.msg());
                 for (Block b : blocks) {
@@ -128,7 +127,7 @@ public class ArgView implements PSCommandArg {
                         }
                     }
                 }
-            }, 600L); // remove after 10 seconds*/
+            }, 600L); // remove after 10 seconds
         });
         return true;
     }
@@ -141,11 +140,11 @@ public class ArgView implements PSCommandArg {
     private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
         if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100) return;
         Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
-            p.spawnParticle(Particle.REDSTONE, new Location(p.getWorld(), x, y, z), 50, new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1));
-            /*if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
+            //p.spawnParticle(Particle.REDSTONE, new Location(p.getWorld(), x, y, z), 50, new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1));
+            if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
                 restore.add(p.getWorld().getBlockAt(x, y, z));
                 p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
-            }*/
+            }
         }, delay * multiplier);
     }
 }

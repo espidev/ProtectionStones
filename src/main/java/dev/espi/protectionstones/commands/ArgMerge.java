@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,23 @@ public class ArgMerge implements PSCommandArg {
     @Override
     public List<String> getPermissionsToExecute() {
         return Arrays.asList("protectionstones.merge");
+    }
+
+    public static List<TextComponent> getGUI(Player p, PSRegion r) {
+        List<TextComponent> ret = new ArrayList<>();
+        for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
+            PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
+            if (psr != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
+                TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + pr.getId());
+
+                if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")");
+                tc.addExtra(" (" + psr.getTypeOptions().alias + ")");
+
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + pr.getId()));
+                ret.add(tc);
+            }
+        }
+        return ret;
     }
 
     @Override
@@ -60,19 +78,13 @@ public class ArgMerge implements PSCommandArg {
                 return true;
             }
 
-            PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
-            PSL.msg(p, PSL.MERGE_WARNING.msg());
-            for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
-                PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
-                if (psr != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
-                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + pr.getId());
-
-                    if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")");
-                    tc.addExtra(" (" + psr.getTypeOptions().alias + ")");
-
-                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + pr.getId()));
-                    p.spigot().sendMessage(tc);
-                }
+            List<TextComponent> components = getGUI(p, r);
+            if (components.isEmpty()) {
+                PSL.msg(p, PSL.MERGE_NO_REGIONS.msg());
+            } else {
+                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                PSL.msg(p, PSL.MERGE_WARNING.msg());
+                for (TextComponent tc : components) p.spigot().sendMessage(tc);
             }
 
         } else if (args.length == 3) { // /ps merge [region] [root]
