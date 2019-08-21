@@ -22,6 +22,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -173,7 +174,7 @@ public class PSMergedRegion extends PSRegion {
             this.getProtectBlock().setType(Material.AIR);
         }
 
-        WGUtils.unmergeRegion(getWorld(), getWGRegionManager(), this);
+        WGMerge.unmergeRegion(getWorld(), getWGRegionManager(), this);
 
         return true;
     }

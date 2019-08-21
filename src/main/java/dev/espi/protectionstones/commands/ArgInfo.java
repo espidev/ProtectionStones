@@ -23,6 +23,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.utils.UUIDCache;
@@ -139,7 +140,7 @@ public class ArgInfo implements PSCommandArg {
         StringBuilder myFlag = new StringBuilder();
         String myFlagValue;
         for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
-            if (region.getFlag(flag) != null) {
+            if (region.getFlag(flag) != null && !flag.equals(FlagHandler.PS_MERGED_REGIONS) && !flag.equals(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
                 myFlagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 

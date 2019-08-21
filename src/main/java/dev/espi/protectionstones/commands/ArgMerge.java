@@ -7,6 +7,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -112,7 +113,7 @@ public class ArgMerge implements PSCommandArg {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                WGUtils.mergeRegions(rm, aRoot, Arrays.asList(aRegion, aRoot));
+                WGMerge.mergeRegions(rm, aRoot, Arrays.asList(aRegion, aRoot));
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
             });
 

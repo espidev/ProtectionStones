@@ -147,7 +147,7 @@ class BlockHandler {
         if (!p.hasPermission("protectionstones.admin")) {
             // check if player has limit on protection stones
             String msg = hasPlayerPassedRegionLimit(p, blockOptions);
-            if (!msg.equals("")) {
+            if (!msg.isEmpty()) {
                 PSL.msg(p, msg);
                 return false;
             }

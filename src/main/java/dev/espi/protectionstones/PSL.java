@@ -281,7 +281,7 @@ public enum PSL {
     // Sends a message to a commandsender if the string is not empty
 
     public static void msg(CommandSender p, String str) {
-        if (str != null && !str.equals("")) {
+        if (str != null && !str.isEmpty()) {
             p.sendMessage(str);
         }
     }
