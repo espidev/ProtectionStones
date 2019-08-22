@@ -28,7 +28,7 @@ public class Particles {
         for (int i = 0; i < occ; i++) {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                 if (p.isOnline()) p.spawnParticle(Particle.REDSTONE, l, 1, d);
-            }, i*10);
+            }, i*20);
         }
     }
 }

@@ -27,6 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArgView implements PSCommandArg {
 
@@ -84,21 +85,19 @@ public class ArgView implements PSCommandArg {
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
 
-            //List<Block> blocks = new ArrayList<>();
-
-            //AtomicInteger wait = new AtomicInteger(0), modU = new AtomicInteger(0);
+            AtomicInteger modU = new AtomicInteger(0);
 
             if (r instanceof PSGroupRegion) {
                 PSGroupRegion pr = (PSGroupRegion) r;
                 for (PSMergedRegion psmr : pr.getMergedRegions()) {
                     handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + psmr.getProtectBlock().getX(), 1.5 + psmr.getProtectBlock().getY(), 0.5 + psmr.getProtectBlock().getZ()));
-                    for (int y = minY; y <= maxY; y += 5) {
+                    for (int y = minY; y <= maxY; y += 10) {
                         handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + psmr.getProtectBlock().getX(), 0.5 + y, 0.5 + psmr.getProtectBlock().getZ()));
                     }
                 }
             } else {
                 handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + r.getProtectBlock().getX(), 1.5 + r.getProtectBlock().getY(), 0.5 + r.getProtectBlock().getZ()));
-                for (int y = minY; y <= maxY; y += 5) {
+                for (int y = minY; y <= maxY; y += 10) {
                     handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + r.getProtectBlock().getX(), 0.5 + y, 0.5 + r.getProtectBlock().getZ()));
                 }
             }
@@ -106,10 +105,10 @@ public class ArgView implements PSCommandArg {
             RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
                 if (tr.isVertex) {
                     // if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
-                    handleBlueParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()));
+                    handleBlueParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+playerY, 0.5+tr.point.getZ()));
                     for (int y = minY; y <= maxY; y += 5) {
                         //if (handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
-                        handleBlueParticle(p, new Location(p.getWorld(), tr.point.getX(), y, tr.point.getZ()));
+                        handleBlueParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+y, 0.5+tr.point.getZ()));
                     }
                 } else {
                     /*if (modU.get() % 4 == 0) {
@@ -117,11 +116,12 @@ public class ArgView implements PSCommandArg {
                         handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
                         handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
                     } else {*/
-                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()));
-                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), minY, tr.point.getZ()));
-                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), maxY, tr.point.getZ()));
-                    //}
-                    //modU.set((modU.get() + 1) % 4);
+                    if (modU.get() % 2 == 0) {
+                        handlePinkParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+playerY, 0.5+tr.point.getZ()));
+                        handlePinkParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+minY, 0.5+tr.point.getZ()));
+                        handlePinkParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+maxY, 0.5+tr.point.getZ()));
+                    }
+                    modU.set((modU.get() + 1) % 2);
                 }
             });
 
@@ -152,19 +152,19 @@ public class ArgView implements PSCommandArg {
 
     private static boolean handlePinkParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 10), 60);
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 2), 30);
         return true;
     }
 
     private static boolean handleBlueParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 10), 60);
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 2), 30);
         return true;
     }
 
     private static boolean handlePurpleParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 10), 60);
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 10), 30);
         return true;
     }
 

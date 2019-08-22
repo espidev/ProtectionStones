@@ -66,9 +66,19 @@ class BlockHandler {
                 RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
                     if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
-                        String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-                        total++;
-                        if (f.equals(b.type)) bFound++; // if the specific block was found
+                        PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
+
+                        if (psr instanceof PSGroupRegion) {
+                         for (PSMergedRegion psmr : ((PSGroupRegion) psr).getMergedRegions()) {
+                             String f = psmr.getType();
+                             total++;
+                             if (f.equals(b.type)) bFound++; // if the specific block was found
+                         }
+                        } else {
+                            String f = psr.getType();
+                            total++;
+                            if (f.equals(b.type)) bFound++; // if the specific block was found
+                        }
                     }
                 }
             }
