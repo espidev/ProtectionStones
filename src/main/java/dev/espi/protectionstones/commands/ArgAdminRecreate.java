@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.PSStandardRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -45,6 +46,7 @@ class ArgAdminRecreate {
             for (ProtectedRegion r : rgm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion wr = PSRegion.fromWGRegion(w, r);
+                    if (!(wr instanceof PSStandardRegion)) continue;
                     PSProtectBlock blockOptions = wr.getTypeOptions();
 
                     double bx = wr.getProtectBlock().getLocation().getX(), bxo = blockOptions.xOffset;
