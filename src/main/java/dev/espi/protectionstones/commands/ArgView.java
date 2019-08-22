@@ -16,12 +16,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
@@ -93,16 +88,17 @@ public class ArgView implements PSCommandArg {
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
 
-            List<Block> blocks = new ArrayList<>();
+            //List<Block> blocks = new ArrayList<>();
 
-            AtomicInteger wait = new AtomicInteger(0), modU = new AtomicInteger(0);
+            //AtomicInteger wait = new AtomicInteger(0), modU = new AtomicInteger(0);
 
             RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
                 if (tr.isVertex) {
-                    if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get()))
-                        wait.incrementAndGet();
-                    for (int y = minY; y <= maxY; y += 10) {
-                        handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                    // if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
+                    handleBlueParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()));
+                    for (int y = minY; y <= maxY; y += 5) {
+                        //if (handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
+                        handleBlueParticle(p, new Location(p.getWorld(), tr.point.getX(), y, tr.point.getZ()));
                     }
                 } else {
                     /*if (modU.get() % 4 == 0) {
@@ -110,14 +106,15 @@ public class ArgView implements PSCommandArg {
                         handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
                         handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
                     } else {*/
-                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
-                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), minY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
-                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), maxY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
+                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()));
+                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), minY, tr.point.getZ()));
+                        handlePinkParticle(p, new Location(p.getWorld(), tr.point.getX(), maxY, tr.point.getZ()));
                     //}
-                    modU.set((modU.get() + 1) % 4);
+                    //modU.set((modU.get() + 1) % 4);
                 }
             });
 
+            /*
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait.get());
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> {
@@ -132,7 +129,7 @@ public class ArgView implements PSCommandArg {
                         }
                     }
                 }
-            }, wait.get() + 600L); // remove after 10 seconds
+            }, wait.get() + 600L); // remove after 10 seconds */
         });
         return true;
     }
@@ -142,6 +139,19 @@ public class ArgView implements PSCommandArg {
         return null;
     }
 
+    private static boolean handlePinkParticle(Player p, Location l) {
+        if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 10), 60);
+        return true;
+    }
+
+    private static boolean handleBlueParticle(Player p, Location l) {
+        if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 128, 128), 10), 60);
+        return true;
+    }
+
+    /*
     private static boolean handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
         if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100 || Math.abs(y-p.getLocation().getY()) > 30) return false;
 
@@ -155,5 +165,5 @@ public class ArgView implements PSCommandArg {
             }
         }, delay * multiplier);
         return true;
-    }
+    }*/
 }
