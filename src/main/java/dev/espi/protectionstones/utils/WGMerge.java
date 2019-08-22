@@ -246,7 +246,7 @@ public class WGMerge {
             }
         }
 
-        //for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString()); // TODO
+        //for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString());
 
         // merge sets of region name flag
         Set<String> regionNames = new HashSet<>(), regionLines = new HashSet<>();

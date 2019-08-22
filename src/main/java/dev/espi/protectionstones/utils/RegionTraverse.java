@@ -21,7 +21,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.ProtectionStones;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.Traverse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,12 +64,12 @@ public class RegionTraverse {
 
 
     // can't use recursion because stack overflow
+    // doesn't do so well with 1 block wide segments jutting out
     public static void traverseRegionEdge(HashSet<BlockVector2> points, List<ProtectedRegion> regions, Consumer<TraverseReturn> run) {
         int pointID = 0;
         while (!points.isEmpty()) {
             BlockVector2 start = points.iterator().next();
             TraverseData td = new TraverseData(start, null, true);
-            //traverseRegionEdge(start, null, start, true, points, regions, pointID, run);
 
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ algorithm starts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -119,7 +118,8 @@ public class RegionTraverse {
                         }
                         break;
                     case 3: // random 1x1 jutting out
-                        if (isInRegion(v, regions)) ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region edge traversal at " + v.getX() + " " + v.getZ() + ", please notify the developers that you saw this message!");
+                        //if (isInRegion(v, regions)) ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region edge traversal at " + v.getX() + " " + v.getZ() + ", please notify the developers that you saw this message!");
+                        // TODO it's fine right now but it'd be nice if it worked
                         break;
                     case 0: // concave vertex, or point in middle of region
                         List<Vector2> cornersNotIn = new ArrayList<>();
@@ -159,8 +159,4 @@ public class RegionTraverse {
         }
     }
 
-    // i need to find a faster way to do this
-    // doesn't do so well with 1 block wide segments jutting out
-    //private static void traverseRegionEdge(BlockVector2 v, BlockVector2 previous, BlockVector2 start, boolean first, HashSet<BlockVector2> points, List<ProtectedRegion> regions, int pointID, Consumer<TraverseReturn> run) {
-    //}
 }

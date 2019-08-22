@@ -259,6 +259,7 @@ public enum PSL {
     MERGE_NOT_ALLOWED("merge.not_allowed", ChatColor.RED + "You are not allowed to merge this protection region type."),
     MERGE_INTO("merge.into", ChatColor.AQUA + "This region overlaps other regions you can merge into!"),
     MERGE_NO_REGIONS("merge.no_region", ChatColor.GRAY + "There are no overlapping regions to merge into."),
+    MERGE_CLICK_TO_MERGE("merge.click_to_merge", "Click to merge with %region%!"),
 
     ;
 

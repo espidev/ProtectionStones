@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Particles;
 import dev.espi.protectionstones.utils.RegionTraverse;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.*;
@@ -98,18 +99,22 @@ public class ArgView implements PSCommandArg {
 
             RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
                 if (tr.isVertex) {
-                    handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
-                    for (int y = minY; y <= maxY; y += 10) {
+                    if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get()))
                         wait.incrementAndGet();
+                    for (int y = minY; y <= maxY; y += 10) {
                         handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
                     }
                 } else {
-                    //if (modU.get() % 4 == 0) {
-                        handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
-                        handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
-                        handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get() / 2);
+                    /*if (modU.get() % 4 == 0) {
+                        handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                        handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                        handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
+                    } else {*/
+                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), playerY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
+                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), minY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
+                        Particles.persistRedstoneParticle(p, new Location(p.getWorld(), tr.point.getX(), maxY, tr.point.getZ()), new Particle.DustOptions(Color.fromRGB(233, 30, 99), 1), 60);
                     //}
-                    modU.set((modU.get() + 1) % 7);
+                    modU.set((modU.get() + 1) % 4);
                 }
             });
 
@@ -127,7 +132,7 @@ public class ArgView implements PSCommandArg {
                         }
                     }
                 }
-            }, 600L); // remove after 10 seconds
+            }, wait.get() + 600L); // remove after 10 seconds
         });
         return true;
     }
@@ -137,8 +142,11 @@ public class ArgView implements PSCommandArg {
         return null;
     }
 
-    private static void handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
-        if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100) return;
+    private static boolean handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
+        if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100 || Math.abs(y-p.getLocation().getY()) > 30) return false;
+
+        //Particles.persistRedstoneParticle(p, new Location(p.getWorld(), x, y, z), new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1), 30);
+
         Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
             //p.spawnParticle(Particle.REDSTONE, new Location(p.getWorld(), x, y, z), 50, new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1));
             if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
@@ -146,5 +154,6 @@ public class ArgView implements PSCommandArg {
                 p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
             }
         }, delay * multiplier);
+        return true;
     }
 }

@@ -10,6 +10,8 @@ import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -48,6 +50,7 @@ public class ArgMerge implements PSCommandArg {
                 tc.addExtra(" (" + psr.getTypeOptions().alias + ")");
 
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + pr.getId()));
+                tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", pr.getId())).create()));
                 ret.add(tc);
             }
         }
@@ -119,9 +122,11 @@ public class ArgMerge implements PSCommandArg {
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
 
                 // show menu again if the new region still has overlapping regions
-                if (rm.getApplicableRegions(rm.getRegion(aRoot.getID())).size() > 1) {
-                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " merge"));
-                }
+                Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+                    if (!getGUI(p, PSRegion.fromWGRegion(p.getWorld(), rm.getRegion(aRoot.getID()))).isEmpty()) {
+                        Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " merge");
+                    }
+                });
             });
 
         } else {

@@ -141,8 +141,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent e) {
-        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getEntity().getWorld()));
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(e.getEntity().getWorld());
 
         // loop through exploded blocks
         for (int i = 0; i < e.blockList().size(); i++) {
@@ -150,7 +149,7 @@ public class ListenerClass implements Listener {
 
             if (ProtectionStones.isProtectBlockType(b.getType().toString())) {
                 String id = WGUtils.createPSID(b.getLocation());
-                if (rgm.getRegion(id) != null) {
+                if (rgm.getRegion(id) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion) {
                     if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
                         // remove block from exploded list if prevent_explode is enabled
                         e.blockList().remove(i);
