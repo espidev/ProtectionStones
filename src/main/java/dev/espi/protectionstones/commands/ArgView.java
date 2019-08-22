@@ -17,20 +17,16 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.Particles;
 import dev.espi.protectionstones.utils.RegionTraverse;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArgView implements PSCommandArg {
 
@@ -92,6 +88,21 @@ public class ArgView implements PSCommandArg {
 
             //AtomicInteger wait = new AtomicInteger(0), modU = new AtomicInteger(0);
 
+            if (r instanceof PSGroupRegion) {
+                PSGroupRegion pr = (PSGroupRegion) r;
+                for (PSMergedRegion psmr : pr.getMergedRegions()) {
+                    handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + psmr.getProtectBlock().getX(), 1.5 + psmr.getProtectBlock().getY(), 0.5 + psmr.getProtectBlock().getZ()));
+                    for (int y = minY; y <= maxY; y += 5) {
+                        handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + psmr.getProtectBlock().getX(), 0.5 + y, 0.5 + psmr.getProtectBlock().getZ()));
+                    }
+                }
+            } else {
+                handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + r.getProtectBlock().getX(), 1.5 + r.getProtectBlock().getY(), 0.5 + r.getProtectBlock().getZ()));
+                for (int y = minY; y <= maxY; y += 5) {
+                    handlePurpleParticle(p, new Location(p.getWorld(), 0.5 + r.getProtectBlock().getX(), 0.5 + y, 0.5 + r.getProtectBlock().getZ()));
+                }
+            }
+
             RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
                 if (tr.isVertex) {
                     // if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
@@ -147,7 +158,13 @@ public class ArgView implements PSCommandArg {
 
     private static boolean handleBlueParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 128, 128), 10), 60);
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 10), 60);
+        return true;
+    }
+
+    private static boolean handlePurpleParticle(Player p, Location l) {
+        if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
+        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 10), 60);
         return true;
     }
 
