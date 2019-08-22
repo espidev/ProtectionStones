@@ -21,7 +21,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 8
+    config_version = 9
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -68,6 +68,13 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Set the number of regions of non-adjacent regions with the permission protectionstones.region.adjacent.x (default is 1, -1 to bypass)
     # Also can bypass with protectionstones.admin
     regions_must_be_adjacent = false
+    
+    # Whether or not to give players the option to merge new regions with ones they already own (overlapping)
+    # to create a new large region. Can merge any regions with protectionstones.admin
+    # Requires the permission protectionstones.merge to use (with /ps merge)
+    # Note: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
+    # since polygon regions can only be 2D, not 3D
+    allow_merging_regions = true
 
 ## Default Configuration (block1.toml)
 
@@ -108,6 +115,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
         # Protection radius of block
         # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+        # Turn "allow_merging_regions" in config.toml to false if editing the y_radius to not be -1
         x_radius = 64
         y_radius = -1
         z_radius = 64
@@ -128,6 +136,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
         flags = [
             "pvp deny",
+            "tnt deny",
             "greeting &lEntering &b&l%player%'s &f&lprotected area",
             "farewell &lLeaving &b&l%player%'s &f&lprotected area",
             "greeting-title Entering &b%player%'s &fprotected area",
@@ -135,9 +144,8 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
             "creeper-explosion deny",
         ]
     
-        # List all the flags that can be set by region owners. Separate them with a comma, no space.
+        # List all the flags that can be set by region owners.
         allowed_flags = [
-            "use",
             "pvp",
             "greeting",
             "greeting-title",
@@ -152,6 +160,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
         # Whether or not to allow creation of regions that overlap other regions you don't own
         allow_overlap_unowned_regions = false
+    
+        # Whether or not to allow this regions created with this block to merge with other regions
+        # allow_merging_regions must be set to true in config.toml
+        allow_merging = true
     
     [block_data]
         # Name given to protection block when obtained with /ps give or /ps get
@@ -252,6 +264,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         on_region_destroy = [
             'console_command: say %player% has destroyed region %region%!',
         ]
+
 
 ## Commands
 Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone

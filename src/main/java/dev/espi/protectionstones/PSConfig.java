@@ -275,6 +275,7 @@ public class PSConfig {
             case 8:
                 ProtectionStones.config.set("config_version", 9);
                 ProtectionStones.config.set("allow_merging_regions", false);
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;
