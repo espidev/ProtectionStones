@@ -297,6 +297,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
 
     protectionstones.create - Protect a region by placing a ProtectionStones block.
     protectionstones.destroy - Allow players to remove their own protected regions (block break).
+    protectionstones.merge - Allows players to merge their regions with other regions they own.
     protectionstones.unclaim - Allow players to unclaim their region using /ps unclaim.
     protectionstones.view - Allows players the use of /ps view.
     protectionstones.info - Allows players the use of /ps info.
@@ -324,7 +325,6 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
     protectionstones.adjacent.x - Sets the number of non-adjacent regions players can have if "regions_must_be_adjacent" is true. Unlimited with -1.
-    protectionstones.merge - Allows players to merge their regions with other regions they own.
     protectionstones.admin - This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     protectionstones.limit.x - Replace x with a limit for players' protected regions.
     protectionstones.limit.alias.x - Replace alias with the protection block alias and x with the limit of that protection block the player can place.

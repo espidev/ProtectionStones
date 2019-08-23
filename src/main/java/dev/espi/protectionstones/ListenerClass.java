@@ -133,7 +133,7 @@ public class ListenerClass implements Listener {
         RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
             PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
-            if (cpb != null && rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null && cpb.preventPistonPush) {
+            if (cpb != null && (rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion) && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -180,7 +180,7 @@ public class ListenerClass implements Listener {
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
         String id = WGUtils.createPSID(event.getBlock().getLocation());
         ProtectedRegion r = WGUtils.getRegionManagerWithWorld(event.getBlock().getWorld()).getRegion(id);
-        if (ProtectionStones.isPSRegion(r)) {
+        if (ProtectionStones.isPSRegion(r) || PSRegion.fromLocation(event.getBlock().getLocation()) instanceof PSMergedRegion) {
             event.setCancelled(true);
         }
     }
