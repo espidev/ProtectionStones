@@ -74,10 +74,8 @@ public class ListenerClass implements Listener {
         // check if block broken is protection stone
         if (blockOptions == null) return;
 
-        PSRegion r = PSRegion.fromLocation(pb.getLocation());
-
         // check if that is actually a protection stone block (owns a region)
-        if (r == null) {
+        if (!ProtectionStones.isProtectBlock(pb)) {
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
                 ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
@@ -89,6 +87,8 @@ public class ListenerClass implements Listener {
             }
             return;
         }
+
+        PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
         // check for destroy permission
         if (!p.hasPermission("protectionstones.destroy")) {
@@ -129,11 +129,9 @@ public class ListenerClass implements Listener {
     }
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
-        RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager rgm = regionContainer.get(BukkitAdapter.adapt(e.getBlock().getWorld()));
         for (Block b : pushedBlocks) {
             PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
-            if (cpb != null && (rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion) && cpb.preventPistonPush) {
+            if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -141,25 +139,21 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent e) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(e.getEntity().getWorld());
-
         // loop through exploded blocks
         for (int i = 0; i < e.blockList().size(); i++) {
             Block b = e.blockList().get(i);
 
-            if (ProtectionStones.isProtectBlockType(b.getType().toString())) {
+            if (ProtectionStones.isProtectBlock(b)) {
                 String id = WGUtils.createPSID(b.getLocation());
-                if (rgm.getRegion(id) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion) {
-                    if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
-                        // remove block from exploded list if prevent_explode is enabled
-                        e.blockList().remove(i);
-                        i--;
-                    } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
-                        // remove region from worldguard if destroy_region_when_explode is enabled
-                        // check if removing the region and firing region remove event blocked it
-                        if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), id)) {
-                            return;
-                        }
+                if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
+                    // remove block from exploded list if prevent_explode is enabled
+                    e.blockList().remove(i);
+                    i--;
+                } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
+                    // remove region from worldguard if destroy_region_when_explode is enabled
+                    // check if removing the region and firing region remove event blocked it
+                    if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), id)) {
+                        return;
                     }
                 }
             }
@@ -179,8 +173,7 @@ public class ListenerClass implements Listener {
     @EventHandler
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
         String id = WGUtils.createPSID(event.getBlock().getLocation());
-        ProtectedRegion r = WGUtils.getRegionManagerWithWorld(event.getBlock().getWorld()).getRegion(id);
-        if (ProtectionStones.isPSRegion(r) || PSRegion.fromLocation(event.getBlock().getLocation()) instanceof PSMergedRegion) {
+        if (ProtectionStones.isProtectBlock(event.getBlock())) {
             event.setCancelled(true);
         }
     }

@@ -29,6 +29,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -155,6 +156,17 @@ public class ProtectionStones extends JavaPlugin {
      */
     public static boolean isProtectBlockType(String material) {
         return protectionStonesOptions.containsKey(material);
+    }
+
+    /**
+     * Check whether or not a given block is a protection block, and actually protects a region.
+     * @param b the block to look at
+     * @return whether or not the block is a protection block responsible for a region.
+     */
+
+    public static boolean isProtectBlock(Block b) {
+        if (!isProtectBlockType(b.getType().toString())) return false;
+        return WGUtils.getRegionManagerWithWorld(b.getWorld()).getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion;
     }
 
     /**
