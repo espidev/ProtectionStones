@@ -169,6 +169,10 @@ public class ArgTp implements PSCommandArg {
                         }
 
                         Player pl = Bukkit.getPlayer(uuid);
+                        if (waitCounter.get(uuid) == null) {
+                            removeUUIDTimer(uuid);
+                            return;
+                        }
                         // increment seconds
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
                         // if the player moved cancel it
