@@ -191,7 +191,7 @@ public class ArgTp implements PSCommandArg {
     }
 
     private static void removeUUIDTimer(UUID uuid) {
-        taskCounter.get(uuid).cancel();
+        if (taskCounter.get(uuid) != null) taskCounter.get(uuid).cancel();
         waitCounter.remove(uuid);
         taskCounter.remove(uuid);
     }
