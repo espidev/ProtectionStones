@@ -18,10 +18,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgMerge implements PSCommandArg {
     @Override
@@ -37,6 +34,11 @@ public class ArgMerge implements PSCommandArg {
     @Override
     public List<String> getPermissionsToExecute() {
         return Arrays.asList("protectionstones.merge");
+    }
+
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
     }
 
     public static List<TextComponent> getGUI(Player p, PSRegion r) {
@@ -58,7 +60,7 @@ public class ArgMerge implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.merge")) {
             PSL.msg(s, PSL.NO_PERMISSION_MERGE.msg());
             return true;

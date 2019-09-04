@@ -28,10 +28,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ArgCount implements PSCommandArg {
 
@@ -65,9 +62,14 @@ public class ArgCount implements PSCommandArg {
         return Arrays.asList("protectionstones.count", "protectionstones.count.others");
     }
 
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
     // /ps count
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);

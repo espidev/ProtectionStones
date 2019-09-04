@@ -27,10 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ArgAddRemove implements PSCommandArg {
 
@@ -113,7 +110,12 @@ public class ArgAddRemove implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         template((Player) s, args, args[0]);
         return true;
     }

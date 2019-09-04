@@ -22,10 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgUnclaim implements PSCommandArg {
 
@@ -47,7 +44,12 @@ public class ArgUnclaim implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocation(p.getLocation());
 

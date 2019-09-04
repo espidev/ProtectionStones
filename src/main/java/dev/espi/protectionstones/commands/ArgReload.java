@@ -22,6 +22,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class ArgReload implements PSCommandArg {
@@ -44,7 +45,12 @@ public class ArgReload implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender p, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
         if (!p.hasPermission("protectionstones.admin")) {
             PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
             return true;

@@ -44,7 +44,12 @@ public class ArgList implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.list")) {
             PSL.msg(s, PSL.NO_PERMISSION_LIST.msg());
             return true;

@@ -26,10 +26,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgAdmin implements PSCommandArg {
 
@@ -48,9 +45,14 @@ public class ArgAdmin implements PSCommandArg {
         return Collections.singletonList("protectionstones.admin");
     }
 
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
     // /ps admin [arg]
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.admin")) {
             PSL.msg(s, PSL.NO_PERMISSION_ADMIN.msg());
             return true;

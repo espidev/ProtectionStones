@@ -25,9 +25,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-public class ArgHelp implements PSCommandArg{
+public class ArgHelp implements PSCommandArg {
     @Override
     public List<String> getNames() {
         return Collections.singletonList("help");
@@ -44,7 +45,12 @@ public class ArgHelp implements PSCommandArg{
     }
 
     @Override
-    public boolean executeArgument(CommandSender p, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
         String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
 
         p.sendMessage(PSL.HELP.msg());

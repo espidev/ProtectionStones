@@ -18,12 +18,14 @@ package dev.espi.protectionstones.commands;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface PSCommandArg {
     List<String> getNames();
     boolean allowNonPlayersToExecute();
     List<String> getPermissionsToExecute();
-    boolean executeArgument(CommandSender s, String[] args);
+    HashMap<String, Boolean> getRegisteredFlags();
+    boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags);
     List<String> tabComplete(CommandSender sender, String alias, String[] args);
 }

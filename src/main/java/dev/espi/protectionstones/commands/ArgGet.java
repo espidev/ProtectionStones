@@ -14,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgGet implements PSCommandArg {
 
@@ -34,6 +31,11 @@ public class ArgGet implements PSCommandArg {
     @Override
     public List<String> getPermissionsToExecute() {
         return Collections.singletonList("protectionstones.get");
+    }
+
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
     }
 
     private boolean openGetGUI(Player p) {
@@ -66,7 +68,7 @@ public class ArgGet implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         if (!p.hasPermission("protectionstones.get")) {
             PSL.msg(p, PSL.NO_PERMISSION_GET.msg());

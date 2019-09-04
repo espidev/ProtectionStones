@@ -51,6 +51,11 @@ public class ArgHome implements PSCommandArg {
         return Arrays.asList("protectionstones.home");
     }
 
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
     // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
@@ -98,7 +103,7 @@ public class ArgHome implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
 
         // prelim checks

@@ -52,6 +52,13 @@ public class ArgFlag implements PSCommandArg {
         return Collections.singletonList("protectionstones.flags");
     }
 
+    @Override
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        HashMap<String, Boolean> m = new HashMap<>();
+        m.put("-g", true); // group
+        return m;
+    }
+
     private static final int GUI_SIZE = 18;
     private static final List<String> REGION_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
     private static final int[] REGION_GROUP_KERNING_LENGTHS = {2, 17, 14, 26, 23};
@@ -183,7 +190,7 @@ public class ArgFlag implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocation(p.getLocation());
 
@@ -207,9 +214,14 @@ public class ArgFlag implements PSCommandArg {
             return openFlagGUI(p, r, Integer.parseInt(args[1]));
         }
 
+        if (args.length < 3) {
+            PSL.msg(p, PSL.FLAG_HELP.msg());
+            return true;
+        }
+
         // beyond 2 args (set flag)
         try {
-            String flagName = args[1].equals("-g") ? args[3].toLowerCase() : args[1].toLowerCase();
+            String flagName = args[1].toLowerCase();
             String gui = "";
             String[] flagSplit = flagName.split(":");
             if (flagSplit.length == 2) { // check if there is a GUI that needs to be reshown
@@ -218,7 +230,9 @@ public class ArgFlag implements PSCommandArg {
             }
 
             if (r.getTypeOptions().allowedFlags.contains(flagName)) {
-                parseFlag(args, p, r);
+                String value = "";
+                for (int i = 2; i < args.length; i++) value += args[i] + " ";
+                setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));
                 // reshow GUI
                 if (!gui.equals("")) {
                     Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
@@ -230,24 +244,6 @@ public class ArgFlag implements PSCommandArg {
             PSL.msg(p, PSL.FLAG_HELP.msg());
         }
         return true;
-    }
-
-    // parse flag out from argument
-    private void parseFlag(String[] args, Player p, PSRegion r) {
-        String flag, value = "", gee = "";
-        if (args[1].equalsIgnoreCase("-g")) {
-            if (args.length < 5) {
-                PSL.msg(p, PSL.FLAG_HELP.msg());
-                return;
-            }
-            flag = args[3];
-            for (int i = 4; i < args.length; i++) value += args[i] + " ";
-            gee = args[2];
-        } else {
-            flag = args[1];
-            for (int i = 2; i < args.length; i++) value += args[i] + " ";
-        }
-        setFlag(r, p, flag, value.trim(), gee);
     }
 
     // tab completion

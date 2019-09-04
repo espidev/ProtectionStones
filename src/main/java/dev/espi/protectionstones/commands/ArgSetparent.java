@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class ArgSetparent implements PSCommandArg {
@@ -47,7 +48,12 @@ public class ArgSetparent implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.setparent")) {
             PSL.msg(s, PSL.NO_PERMISSION_SETPARENT.msg());
             return true;

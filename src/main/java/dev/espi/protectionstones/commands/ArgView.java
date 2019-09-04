@@ -49,7 +49,12 @@ public class ArgView implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
 
         PSRegion r = PSRegion.fromLocation(p.getLocation());
@@ -79,9 +84,7 @@ public class ArgView implements PSCommandArg {
 
         int playerY = p.getLocation().getBlockY(), minY = r.getWGRegion().getMinimumPoint().getBlockY(), maxY = r.getWGRegion().getMaximumPoint().getBlockY();
 
-        BlockData tempBlock = Material.GLOWSTONE.createBlockData();
-
-        // send fake blocks to client
+        // send particles to client
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
 

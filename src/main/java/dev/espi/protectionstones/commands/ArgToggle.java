@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class ArgToggle implements PSCommandArg {
@@ -43,7 +44,12 @@ public class ArgToggle implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         if (p.hasPermission("protectionstones.toggle")) {
             if (!ProtectionStones.toggleList.contains(p.getUniqueId())) {

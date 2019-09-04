@@ -23,6 +23,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class ArgHideUnhide implements PSCommandArg {
@@ -43,7 +44,12 @@ public class ArgHideUnhide implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender s, String[] arg) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender s, String[] arg, HashMap<String, String> flags) {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocation(p.getLocation());
 

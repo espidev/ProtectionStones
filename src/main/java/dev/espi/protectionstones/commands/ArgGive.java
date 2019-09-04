@@ -8,10 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ArgGive implements PSCommandArg {
 
@@ -31,7 +28,12 @@ public class ArgGive implements PSCommandArg {
     }
 
     @Override
-    public boolean executeArgument(CommandSender p, String[] args) {
+    public HashMap<String, Boolean> getRegisteredFlags() {
+        return null;
+    }
+
+    @Override
+    public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
         if (!p.hasPermission("protectionstones.give")) {
             PSL.msg(p, PSL.NO_PERMISSION_GIVE.msg());
             return true;

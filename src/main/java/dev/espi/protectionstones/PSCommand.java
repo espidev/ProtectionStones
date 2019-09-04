@@ -17,15 +17,14 @@
 package dev.espi.protectionstones;
 
 import dev.espi.protectionstones.commands.*;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PSCommand extends Command {
@@ -99,7 +98,24 @@ public class PSCommand extends Command {
         for (PSCommandArg command : ProtectionStones.getInstance().getCommandArguments()) {
             if (command.getNames().contains(args[0])) {
                 if (command.allowNonPlayersToExecute() || s instanceof Player) {
-                    return command.executeArgument(s, args);
+
+                    // extract flags
+                    List<String> nArgs = new ArrayList<>();
+                    HashMap<String, String> flags = new HashMap<>();
+                    for (int i = 0; i < args.length; i++) {
+
+                        if (command.getRegisteredFlags() != null && command.getRegisteredFlags().containsKey(args[i])) {
+                            if (command.getRegisteredFlags().get(args[i])) { // has value after
+                                if (i != args.length-1) flags.put(args[i], args[++i]);
+                            } else {
+                                flags.put(args[i], null);
+                            }
+                        } else {
+                            nArgs.add(args[i]);
+                        }
+                    }
+
+                    return command.executeArgument(s, nArgs.toArray(new String[0]), flags);
                 } else if (!command.allowNonPlayersToExecute()) {
                     s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin, /ps give from console.");
                     return true;
