@@ -4,7 +4,7 @@ description: ${description}
 authors: [EspiDev,AxelDios,Vik1395,Dragoboss,Jarzean,Dylan-BukkitPlugins]
 
 depend: [WorldGuard, WorldEdit]
-softdepend: [Vault]
+softdepend: [Vault, PlaceholderAPI]
 main: dev.espi.protectionstones.ProtectionStones
 api-version: 1.13
 

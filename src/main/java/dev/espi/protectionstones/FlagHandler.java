@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -75,7 +76,11 @@ public class FlagHandler {
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-title"));
         for (Flag<?> f : replaceFlags) {
             if (flags.get(f) != null) {
-                flags.put(f, ((String) flags.get(f)).replaceAll("%player%", p.getName()));
+                String s = (String) flags.get(f);
+                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    s = PlaceholderAPI.setPlaceholders(p, s);
+                }
+                flags.put(f, s.replaceAll("%player%", p.getName()));
             }
         }
     }
