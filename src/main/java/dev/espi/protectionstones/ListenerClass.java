@@ -69,7 +69,7 @@ public class ListenerClass implements Listener {
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
-        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(pb.getType().toString());
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(pb);
 
         // check if block broken is protection stone
         if (blockOptions == null) return;
@@ -130,7 +130,7 @@ public class ListenerClass implements Listener {
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
         for (Block b : pushedBlocks) {
-            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b.getType().toString());
+            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b);
             if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
@@ -145,11 +145,11 @@ public class ListenerClass implements Listener {
 
             if (ProtectionStones.isProtectBlock(b)) {
                 String id = WGUtils.createPSID(b.getLocation());
-                if (ProtectionStones.getBlockOptions(b.getType().toString()).preventExplode) {
+                if (ProtectionStones.getBlockOptions(b).preventExplode) {
                     // remove block from exploded list if prevent_explode is enabled
                     e.blockList().remove(i);
                     i--;
-                } else if (ProtectionStones.getBlockOptions(b.getType().toString()).destroyRegionWhenExplode) {
+                } else if (ProtectionStones.getBlockOptions(b).destroyRegionWhenExplode) {
                     // remove region from worldguard if destroy_region_when_explode is enabled
                     // check if removing the region and firing region remove event blocked it
                     if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), id)) {

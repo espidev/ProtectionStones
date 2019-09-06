@@ -98,7 +98,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public boolean isHidden() {
-        return !this.getProtectBlock().getType().toString().equals(this.getType());
+        return !this.getType().startsWith(this.getProtectBlock().getType().toString());
     }
 
     @Override

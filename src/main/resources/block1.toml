@@ -1,5 +1,6 @@
 # Define your protection block below
 # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+# If you want to use player heads, use the format "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
 type = "EMERALD_ORE"
 
 # Another way to refer to the protection stone

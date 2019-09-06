@@ -70,14 +70,12 @@ class BlockHandler {
 
                         if (psr instanceof PSGroupRegion) {
                          for (PSMergedRegion psmr : ((PSGroupRegion) psr).getMergedRegions()) {
-                             String f = psmr.getType();
                              total++;
-                             if (f.equals(b.type)) bFound++; // if the specific block was found
+                             if (psmr.getType().equals(b.type)) bFound++; // if the specific block was found
                          }
                         } else {
-                            String f = psr.getType();
                             total++;
-                            if (f.equals(b.type)) bFound++; // if the specific block was found
+                            if (psr.getType().equals(b.type)) bFound++; // if the specific block was found
                         }
                     }
                 }
@@ -111,8 +109,10 @@ class BlockHandler {
         Block b = e.getBlock();
 
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlockType(b.getType().toString())) return;
-        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b.getType().toString());
+        if (!ProtectionStones.isProtectBlockType(b)) return;
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
+
+        Bukkit.getLogger().info("2"); // TODO
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
@@ -120,6 +120,8 @@ class BlockHandler {
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
+
+        Bukkit.getLogger().info("1"); // TODO
 
         // check if player can place block in that area
         if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {

@@ -30,10 +30,12 @@ import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -150,17 +152,51 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Gets the config options for the protection block type specified.
+     * Get the protection block config options for the block specified.
      *
-     * @param blockType the material type name (Bukkit) of the protect block to get the options for
+     * @param block the block to get the block options of
+     * @return the config options for the protect block specified (null if not found)
+     */
+
+    public static PSProtectBlock getBlockOptions(Block block) {
+        if (block.getType() == Material.PLAYER_HEAD || block.getType() == Material.PLAYER_WALL_HEAD) {
+            Skull s = (Skull) block.getState();
+            if (s.hasOwner()) {
+                return getBlockOptions(Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName());
+            } else {
+                return getBlockOptions(Material.PLAYER_HEAD.toString());
+            }
+        } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
+            return getBlockOptions(Material.CREEPER_HEAD.toString());
+        } else if (block.getType() == Material.DRAGON_WALL_HEAD) {
+            return getBlockOptions(Material.DRAGON_HEAD.toString());
+        } else if (block.getType() == Material.ZOMBIE_WALL_HEAD) {
+            return getBlockOptions(Material.ZOMBIE_HEAD.toString());
+        } else {
+            return getBlockOptions(block.getType().toString());
+        }
+    }
+
+    /**
+     * Gets the config options for the protection block type specified. It is recommended to use the block paramemter overloaded
+     * method instead if possible, since it deals better with heads.
+     *
+     * @param blockType the material type name (Bukkit) of the protect block to get the options for, or "PLAYER_HEAD name" for heads
      * @return the config options for the protect block specified (null if not found)
      */
     public static PSProtectBlock getBlockOptions(String blockType) {
         return protectionStonesOptions.get(blockType);
     }
 
+    public static boolean isProtectBlockType(Block b) {
+        return getBlockOptions(b) != null;
+    }
+
     /**
-     * @param material material type to check (Bukkit material name)
+     * Get whether or not a material is used as a protection block. It is recommended to use the block
+     * parameter overloaded method if possible since player heads have a different format.
+     *
+     * @param material material type to check (Bukkit material name), or "PLAYER_HEAD name" for heads
      * @return whether or not that material is being used for a protection block
      */
     public static boolean isProtectBlockType(String material) {
@@ -174,7 +210,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean isProtectBlock(Block b) {
-        if (!isProtectBlockType(b.getType().toString())) return false;
+        if (!isProtectBlockType(b)) return false;
         return WGUtils.getRegionManagerWithWorld(b.getWorld()).getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion;
     }
 
@@ -282,7 +318,16 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
-        if (!ProtectionStones.isProtectBlockType(item.getType().toString())) return false;
+        // check basic item
+        if (!ProtectionStones.isProtectBlockType(item.getType().toString())) {
+            if (item.getType() == Material.PLAYER_HEAD) { // is player head
+                // does not have player name associated
+                if (!ProtectionStones.isProtectBlockType(item.getType().toString() + ":" + ((SkullMeta)(item.getItemMeta())).getOwningPlayer().getName())) return false;
+            } else {
+                return false;
+            }
+        }
+        // check for player heads
         if (!checkNBT) return true; // if not checking nbt, you only need to check type
 
         boolean tag = false;
@@ -314,10 +359,22 @@ public class ProtectionStones extends JavaPlugin {
 
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
-        ItemStack is = new ItemStack(Material.getMaterial(b.type));
+        ItemStack is;
+        if (b.type.startsWith(Material.PLAYER_HEAD.toString())) {
+            is = new ItemStack(Material.PLAYER_HEAD);
+        } else {
+            is = new ItemStack(Material.getMaterial(b.type));
+        }
+
         ItemMeta im = is.getItemMeta();
         assert im != null;
 
+        // add skull metadata
+        if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
+            ((SkullMeta) im).setOwningPlayer(Bukkit.getOfflinePlayer(b.type.split(":")[1]));
+        }
+
+        // add display name and lore
         if (!b.displayName.equals("")) {
             im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
         }
@@ -482,6 +539,7 @@ public class ProtectionStones extends JavaPlugin {
         // check for placeholderapi
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
             getServer().getLogger().info("PlaceholderAPI support enabled!");
+            placeholderAPISupportEnabled = true;
         } else {
             getServer().getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
         }

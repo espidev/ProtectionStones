@@ -118,7 +118,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public boolean isHidden() {
-        return !getProtectBlock().getType().toString().equals(originalType.type);
+        return !originalType.type.startsWith(getProtectBlock().getType().toString());
     }
 
     @Override

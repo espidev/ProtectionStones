@@ -79,7 +79,7 @@ public class FlagHandler {
                 String s = (String) flags.get(f);
 
                 // apply placeholders
-                if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                if (ProtectionStones.getInstance().isPlaceholderAPISupportEnabled()) {
                     s = PlaceholderAPI.setPlaceholders(p, s);
                 }
                 flags.put(f, s.replaceAll("%player%", p.getName()));

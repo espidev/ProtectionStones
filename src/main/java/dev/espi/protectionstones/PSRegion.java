@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -210,7 +211,15 @@ public abstract class PSRegion {
      */
     public boolean unhide() {
         if (isHidden()) {
-            getProtectBlock().setType(Material.getMaterial(getType()));
+            if (getType().startsWith("PLAYER_HEAD")) {
+                getProtectBlock().setType(Material.PLAYER_HEAD);
+                Skull s = (Skull) getProtectBlock().getState();
+                if (getType().split(":").length > 1) {
+                    s.setOwningPlayer(Bukkit.getOfflinePlayer(getType().split(":")[1]));
+                }
+            } else {
+                getProtectBlock().setType(Material.getMaterial(getType()));
+            }
             return true;
         } else {
             return false;
