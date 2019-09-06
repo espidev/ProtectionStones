@@ -188,7 +188,9 @@ public abstract class PSRegion {
     /**
      * @return whether or not the protection block is hidden (/ps hide)
      */
-    public abstract boolean isHidden();
+    public boolean isHidden() {
+        return !this.getType().startsWith(this.getProtectBlock().getType().toString());
+    }
 
     /**
      * Hides the protection block, if it is not hidden.
@@ -217,6 +219,7 @@ public abstract class PSRegion {
                 if (getType().split(":").length > 1) {
                     s.setOwningPlayer(Bukkit.getOfflinePlayer(getType().split(":")[1]));
                 }
+                s.update();
             } else {
                 getProtectBlock().setType(Material.getMaterial(getType()));
             }

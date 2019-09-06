@@ -112,16 +112,12 @@ class BlockHandler {
         if (!ProtectionStones.isProtectBlockType(b)) return;
         PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
 
-        Bukkit.getLogger().info("2"); // TODO
-
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
         if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(e.getItemInHand(), true)) return;
 
         // check if player has toggled off placement of protection stones
         if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
-
-        Bukkit.getLogger().info("1"); // TODO
 
         // check if player can place block in that area
         if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {

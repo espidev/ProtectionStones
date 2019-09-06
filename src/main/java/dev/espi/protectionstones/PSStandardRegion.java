@@ -97,11 +97,6 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public boolean isHidden() {
-        return !this.getType().startsWith(this.getProtectBlock().getType().toString());
-    }
-
-    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
         return world.getBlockAt(psl.x, psl.y, psl.z);

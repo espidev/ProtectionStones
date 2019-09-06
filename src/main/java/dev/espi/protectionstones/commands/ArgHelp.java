@@ -22,13 +22,59 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class ArgHelp implements PSCommandArg {
+
+    private static class HelpEntry {
+        String[] permission;
+        TextComponent msg;
+
+        HelpEntry(TextComponent msg, String... permission) {
+            this.permission = permission;
+            this.msg = msg;
+        }
+    }
+
+    public static List<HelpEntry> helpMenu = new ArrayList<>();
+
+    public static void initHelpMenu() {
+        String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
+
+        helpMenu.clear();
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), base + "info"), "protectionstones.info"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), base), "protectionstones.members"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), base), "protectionstones.owners"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), base + "get"), "protectionstones.get"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), base + "give"), "protectionstones.give"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), base + "count"), "protectionstones.count", "protectionstones.count.others"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.LIST_HELP.msg(), PSL.LIST_HELP_DESC.msg(), base + "list"), "protectionstones.list", "protectionstones.list.others"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.NAME_HELP.msg(), PSL.NAME_HELP_DESC.msg(), base + "name"), "protectionstones.name"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.MERGE_HELP.msg(), PSL.MERGE_HELP_DESC.msg(), base + "merge"), "protectionstones.merge"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent"), "protectionstones.setparent", "protectionstones.setparent.others"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag"), "protectionstones.flags"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home"), "protectionstones.home"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), base + "sethome"), "protectionstones.sethome"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), base + "tp"), "protectionstones.tp"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), base + "hide"), "protectionstones.hide"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), base + "unhide"), "protectionstones.unhide"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), base + "toggle"), "protectionstones.toggle"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), base + "view"), "protectionstones.view"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), base + "unclaim"), "protectionstones.unclaim"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), base + "priority"), "protectionstones.priority"));
+        helpMenu.add(new HelpEntry(sendWithPerm( PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region"), "protectionstones.region"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), base + "admin"), "protectionstones.admin"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), base + "reload"), "protectionstones.admin"));
+    }
+
     @Override
     public List<String> getNames() {
         return Collections.singletonList("help");
@@ -49,34 +95,50 @@ public class ArgHelp implements PSCommandArg {
         return null;
     }
 
+    private static final int GUI_SIZE = 16;
+
     @Override
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
-        String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
+        int page = 0;
+        if (args.length > 1 && StringUtils.isNumeric(args[1])) {
+            page = Integer.parseInt(args[1])-1;
+        }
 
         p.sendMessage(PSL.HELP.msg());
-        sendWithPerm(p, PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), base + "info", "protectionstones.info");
-        sendWithPerm(p, PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), base, "protectionstones.members");
-        sendWithPerm(p, PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), base, "protectionstones.owners");
-        sendWithPerm(p, PSL.GET_HELP.msg(), PSL.GET_HELP_DESC.msg(), base + "get", "protectionstones.get");
-        sendWithPerm(p, PSL.GIVE_HELP.msg(), PSL.GIVE_HELP_DESC.msg(), base + "give", "protectionstones.give");
-        sendWithPerm(p, PSL.COUNT_HELP.msg(), PSL.COUNT_HELP_DESC.msg(), base + "count", "protectionstones.count", "protectionstones.count.others");
-        sendWithPerm(p, PSL.LIST_HELP.msg(), PSL.LIST_HELP_DESC.msg(), base + "list", "protectionstones.list", "protectionstones.list.others");
-        sendWithPerm(p, PSL.NAME_HELP.msg(), PSL.NAME_HELP_DESC.msg(), base + "name", "protectionstones.name");
-        sendWithPerm(p, PSL.MERGE_HELP.msg(), PSL.MERGE_HELP_DESC.msg(), base + "merge", "protectionstones.merge");
-        sendWithPerm(p, PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent", "protectionstones.setparent", "protectionstones.setparent.others");
-        sendWithPerm(p, PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag", "protectionstones.flags");
-        sendWithPerm(p, PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home", "protectionstones.home");
-        sendWithPerm(p, PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), base + "sethome", "protectionstones.sethome");
-        sendWithPerm(p, PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), base + "tp", "protectionstones.tp");
-        sendWithPerm(p, PSL.VISIBILITY_HIDE_HELP.msg(), PSL.VISIBILITY_HIDE_HELP_DESC.msg(), base + "hide", "protectionstones.hide");
-        sendWithPerm(p, PSL.VISIBILITY_UNHIDE_HELP.msg(), PSL.VISIBILITY_UNHIDE_HELP_DESC.msg(), base + "unhide", "protectionstones.unhide");
-        sendWithPerm(p, PSL.TOGGLE_HELP.msg(), PSL.TOGGLE_HELP_DESC.msg(), base + "toggle", "protectionstones.toggle");
-        sendWithPerm(p, PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), base + "view", "protectionstones.view");
-        sendWithPerm(p, PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), base + "unclaim", "protectionstones.unclaim");
-        sendWithPerm(p, PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), base + "priority", "protectionstones.priority");
-        sendWithPerm(p, PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region", "protectionstones.region");
-        sendWithPerm(p, PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), base + "admin", "protectionstones.admin");
-        sendWithPerm(p, PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), base + "reload", "protectionstones.admin");
+
+        // display help items
+        int i = 0;
+        for (HelpEntry he : helpMenu) {
+            for (String perm : he.permission) {
+                if (p.hasPermission(perm)) {
+                    if (i >= GUI_SIZE*page && i < GUI_SIZE*(page+1)) {
+                        p.spigot().sendMessage(he.msg);
+                    }
+                    i++;
+                    break;
+                }
+            }
+        }
+
+        // footer page buttons
+        TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
+        backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
+        nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
+        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help " + (page)));
+        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help " + (page + 2)));
+
+        TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
+        // add back page button if the page isn't 0
+        if (page != 0) footer.addExtra(backPage);
+        // add page number
+        footer.addExtra(new TextComponent(ChatColor.WHITE + " " + (page + 1) + " "));
+        // add forward page button if the page isn't last
+        if (page * GUI_SIZE + GUI_SIZE < i) footer.addExtra(nextPage);
+        footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
+
+        p.spigot().sendMessage(footer);
+        if (page * GUI_SIZE + GUI_SIZE < i) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page+2 + "")); // TODO
+
         return true;
     }
 
@@ -85,16 +147,10 @@ public class ArgHelp implements PSCommandArg {
         return null;
     }
 
-    private static void sendWithPerm(CommandSender p, String msg, String desc, String cmd, String... permission) {
-        if (msg.equals("")) return;
-        for (String perm : permission) {
-            if (p.hasPermission(perm)) {
-                TextComponent m = new TextComponent(msg);
-                m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
-                m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
-                p.spigot().sendMessage(m);
-                break;
-            }
-        }
+    private static TextComponent sendWithPerm(String msg, String desc, String cmd) {
+        TextComponent m = new TextComponent(msg);
+        m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
+        m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
+        return m;
     }
 }

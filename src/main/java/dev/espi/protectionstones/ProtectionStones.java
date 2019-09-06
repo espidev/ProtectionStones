@@ -23,6 +23,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
+import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -471,6 +472,9 @@ public class ProtectionStones extends JavaPlugin {
 
         // init messages
         PSL.loadConfig();
+
+        // init help menu
+        ArgHelp.initHelpMenu();
 
         // add command to Bukkit (using reflection)
         if (!isReload) {

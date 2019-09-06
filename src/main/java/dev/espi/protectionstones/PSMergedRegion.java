@@ -117,11 +117,6 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public boolean isHidden() {
-        return !originalType.type.startsWith(getProtectBlock().getType().toString());
-    }
-
-    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(id);
         return world.getBlockAt(psl.x, psl.y, psl.z);

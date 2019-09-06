@@ -40,6 +40,7 @@ public enum PSL {
     GO_NEXT_PAGE("go_next_page", "Go to next page."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
+    HELP_NEXT("help_next", ChatColor.GRAY + "Do /ps help %page% to go to the next page!"),
 
     COMMAND_REQUIRES_PLAYER_NAME("command_requires_player_name", ChatColor.RED + "This command requires a player name."),
 
