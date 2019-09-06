@@ -77,6 +77,8 @@ public class FlagHandler {
         for (Flag<?> f : replaceFlags) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
+
+                // apply placeholders
                 if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
                     s = PlaceholderAPI.setPlaceholders(p, s);
                 }

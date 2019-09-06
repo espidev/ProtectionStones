@@ -24,7 +24,7 @@ allow_duplicate_region_names = false
 
 # Time in seconds between /ps view attempts.
 # Can prevent lag from spamming the command.
-ps_view_cooldown = 20
+ps_view_cooldown = 10
 
 # Base command for protection stones (change if conflicting with other commands)
 base_command = "ps"

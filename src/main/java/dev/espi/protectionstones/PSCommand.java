@@ -92,7 +92,7 @@ public class PSCommand extends Command {
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {
         if (args.length == 0) { // no arguments
-            new ArgHelp().executeArgument(s, args);
+            new ArgHelp().executeArgument(s, args, null);
             return true;
         }
         for (PSCommandArg command : ProtectionStones.getInstance().getCommandArguments()) {

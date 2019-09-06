@@ -55,9 +55,14 @@ public class PSMergedRegion extends PSRegion {
 
     // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
 
-    public static PSMergedRegion getMergedRegion(World w, Location l) {
+    /**
+     * Finds the {@link PSMergedRegion} at a location that is a part of a merged region.
+     * @param l location to look at
+     * @return the {@link PSMergedRegion} the location is in, or null if not applicable
+     */
+    public static PSMergedRegion getMergedRegion(Location l) {
         String psID = WGUtils.createPSID(l);
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
 
         for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
             if (pr.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && pr.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(psID)) {

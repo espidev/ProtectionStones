@@ -73,6 +73,8 @@ public class ProtectionStones extends JavaPlugin {
     private boolean vaultSupportEnabled = false;
     private Economy vaultEconomy;
 
+    private boolean placeholderAPISupportEnabled = false;
+
     public static List<UUID> toggleList = new ArrayList<>();
 
     /* ~~~~~~~~~~ Instance methods ~~~~~~~~~~~~ */
@@ -91,6 +93,13 @@ public class ProtectionStones extends JavaPlugin {
      */
     public List<PSCommandArg> getCommandArguments() {
         return commandArgs;
+    }
+
+    /**
+     * @return whether PlaceholderAPI support is enabled
+     */
+    public boolean isPlaceholderAPISupportEnabled() {
+        return placeholderAPISupportEnabled;
     }
 
     /**
@@ -468,6 +477,13 @@ public class ProtectionStones extends JavaPlugin {
             }
         } else {
             getServer().getLogger().info("Vault not enabled! There will be no economy support!");
+        }
+
+        // check for placeholderapi
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
+            getServer().getLogger().info("PlaceholderAPI support enabled!");
+        } else {
+            getServer().getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
         }
 
         // Load configuration

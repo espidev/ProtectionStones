@@ -54,6 +54,7 @@ prevent_block_place_in_restricted_world = true
 
     # Specify the default flags to be set when a new protected region is created.
     # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
+    # Can use PlaceholderAPI placeholders in string flags (ex. greeting, farewell).
     flags = [
         "pvp deny",
         "tnt deny",

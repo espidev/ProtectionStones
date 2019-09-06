@@ -62,7 +62,7 @@ public abstract class PSRegion {
         ProtectedRegion r = rgm.getRegion(psID);
 
         // check exact location first
-        PSMergedRegion pr = PSMergedRegion.getMergedRegion(l.getWorld(), l);
+        PSMergedRegion pr = PSMergedRegion.getMergedRegion(l);
         if (pr != null) return pr;
 
         // check if location is in a region
