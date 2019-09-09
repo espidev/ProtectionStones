@@ -20,10 +20,12 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -53,7 +55,9 @@ public class ArgHome implements PSCommandArg {
 
     @Override
     public HashMap<String, Boolean> getRegisteredFlags() {
-        return null;
+        HashMap<String, Boolean> h = new HashMap<>();
+        h.put("-p", true);
+        return h;
     }
 
     // tab completion
@@ -85,9 +89,12 @@ public class ArgHome implements PSCommandArg {
         return null;
     }
 
-    private void openHomeGUI(Player p) {
+    private static final int GUI_SIZE = 17;
+
+    private void openHomeGUI(Player p, int page) {
         List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
-        PSL.msg(p, PSL.HOME_HEADER.msg());
+
+        List<TextComponent> entries = new ArrayList<>();
         for (PSRegion r : regions) {
             String msg;
             if (r.getName() == null) {
@@ -98,8 +105,12 @@ public class ArgHome implements PSCommandArg {
             TextComponent tc = new TextComponent(msg);
             tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
             tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
-            p.spigot().sendMessage(tc);
+            entries.add(tc);
         }
+
+        TextGUI.displayGUI(p, PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries);
+
+        if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HOME_NEXT.msg().replace("%page%", page + 2 + ""));
     }
 
     @Override
@@ -118,7 +129,9 @@ public class ArgHome implements PSCommandArg {
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) { // /ps home GUI
-                openHomeGUI(p);
+
+                openHomeGUI(p, (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p"))-1));
+
             } else {// /ps home [id]
                 // get regions from the query
                 List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);

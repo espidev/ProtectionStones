@@ -172,6 +172,7 @@ public enum PSL {
     HOME_HELP_DESC("home.help_desc", "Teleports you to one of your protected regions."),
     HOME_HEADER("home.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Homes (click to teleport) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     HOME_CLICK_TO_TP("home.click_to_tp", "Click to teleport!"),
+    HOME_NEXT("home.next_page", ChatColor.GRAY + "Do /ps home -p %page% to go to the next page!"),
 
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),

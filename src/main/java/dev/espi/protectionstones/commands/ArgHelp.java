@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -70,7 +71,7 @@ public class ArgHelp implements PSCommandArg {
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.VIEW_HELP.msg(), PSL.VIEW_HELP_DESC.msg(), base + "view"), "protectionstones.view"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.UNCLAIM_HELP.msg(), PSL.UNCLAIM_HELP_DESC.msg(), base + "unclaim"), "protectionstones.unclaim"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.PRIORITY_HELP.msg(), PSL.PRIORITY_HELP_DESC.msg(), base + "priority"), "protectionstones.priority"));
-        helpMenu.add(new HelpEntry(sendWithPerm( PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region"), "protectionstones.region"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region"), "protectionstones.region"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), base + "admin"), "protectionstones.admin"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), base + "reload"), "protectionstones.admin"));
     }
@@ -101,43 +102,22 @@ public class ArgHelp implements PSCommandArg {
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
         int page = 0;
         if (args.length > 1 && StringUtils.isNumeric(args[1])) {
-            page = Integer.parseInt(args[1])-1;
+            page = Integer.parseInt(args[1]) - 1;
         }
 
-        p.sendMessage(PSL.HELP.msg());
-
-        // display help items
-        int i = 0;
+        List<TextComponent> entries = new ArrayList<>();
         for (HelpEntry he : helpMenu) {
             for (String perm : he.permission) {
                 if (p.hasPermission(perm)) {
-                    if (i >= GUI_SIZE*page && i < GUI_SIZE*(page+1)) {
-                        p.spigot().sendMessage(he.msg);
-                    }
-                    i++;
+                    entries.add(he.msg);
                     break;
                 }
             }
         }
 
-        // footer page buttons
-        TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
-        backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
-        nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
-        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help " + (page)));
-        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help " + (page + 2)));
+        TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries);
 
-        TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
-        // add back page button if the page isn't 0
-        if (page != 0) footer.addExtra(backPage);
-        // add page number
-        footer.addExtra(new TextComponent(ChatColor.WHITE + " " + (page + 1) + " "));
-        // add forward page button if the page isn't last
-        if (page * GUI_SIZE + GUI_SIZE < i) footer.addExtra(nextPage);
-        footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
-
-        p.spigot().sendMessage(footer);
-        if (page * GUI_SIZE + GUI_SIZE < i) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page+2 + "")); // TODO
+        if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
 
         return true;
     }
