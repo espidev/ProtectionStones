@@ -87,6 +87,8 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminFlag.argumentAdminFlag(s, args);
             case "recreate":
                 return ArgAdminRecreate.argumentAdminRecreate(s, args);
+            case "changeblock":
+                return ArgAdminChangeblock.argumentAdminChangeblock(s, args);
             case "fixregions":
                 s.sendMessage(ChatColor.YELLOW + "Fixing...");
                 LegacyUpgrade.upgradeRegions();
@@ -98,7 +100,7 @@ public class ArgAdmin implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions");
+        List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "changeblock");
         return args.length == 2 ? StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>()) : null;
     }
 
