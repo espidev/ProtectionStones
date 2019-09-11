@@ -21,6 +21,9 @@ import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.session.SessionManager;
+import dev.espi.protectionstones.flags.FarewellFlagHandler;
+import dev.espi.protectionstones.flags.GreetingFlagHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,6 +36,10 @@ import java.util.List;
 import java.util.Set;
 
 public class FlagHandler {
+
+    // Custom WorldGuard Flags
+    public static final Flag<String> GREET_ACTION = new StringFlag("greeting-action");
+    public static final Flag<String> FAREWELL_ACTION = new StringFlag("farewell-action");
 
     // Custom WorldGuard Flags used by ProtectionStones
     // Added to blocks on BlockPlaceEvent Listener
@@ -55,6 +62,18 @@ public class FlagHandler {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();
         }
+
+        // extra custom flag registration
+        try {
+            registry.register(GREET_ACTION);
+            registry.register(FAREWELL_ACTION);
+        } catch (FlagConflictException ignored) {
+            // ignore if flag conflict
+        }
+
+        SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
+        sessionManager.registerHandler(GreetingFlagHandler.FACTORY, null);
+        sessionManager.registerHandler(FarewellFlagHandler.FACTORY, null);
     }
 
     // Add the correct flags for the ps region
