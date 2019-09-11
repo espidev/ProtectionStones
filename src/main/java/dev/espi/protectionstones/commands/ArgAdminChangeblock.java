@@ -47,6 +47,10 @@ public class ArgAdminChangeblock {
             PSL.msg(p, ChatColor.GRAY + "The block to change to is not valid!");
             return true;
         }
+        if (!ProtectionStones.isProtectBlockType(toBlock)) {
+            PSL.msg(p, ChatColor.GRAY + "The block to change to is not a registered protection block!");
+            return true;
+        }
 
         Material set = Material.matchMaterial(toBlock) == null ? Material.PLAYER_HEAD : Material.matchMaterial(toBlock);
 
@@ -55,6 +59,7 @@ public class ArgAdminChangeblock {
                 p.sendMessage(ChatColor.GRAY + "Changing " + region.getID() + "...");
 
                 region.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, toBlock);
+
                 if (!region.isHidden()) {
                     region.getProtectBlock().setType(set);
                     if (toBlock.startsWith("PLAYER_HEAD")) {

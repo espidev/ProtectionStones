@@ -44,13 +44,11 @@ public class PSMergedRegion extends PSRegion {
 
     private PSGroupRegion mergedGroup;
     private String id;
-    private PSProtectBlock originalType;
 
-    PSMergedRegion(String id, PSProtectBlock originalType, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
+    PSMergedRegion(String id, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
         super(rgmanager, world);
         this.id = id;
         this.mergedGroup = mergedGroup;
-        this.originalType = originalType;
     }
 
     // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
@@ -70,7 +68,7 @@ public class PSMergedRegion extends PSRegion {
                     String[] spl = s.split(" ");
                     String id = spl[0], type = spl[1];
                     if (id.equals(psID)) {
-                        return new PSMergedRegion(psID, ProtectionStones.getBlockOptions(type), new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
+                        return new PSMergedRegion(psID, new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
                     }
                 }
             }
@@ -124,12 +122,17 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public PSProtectBlock getTypeOptions() {
-        return originalType;
+        return ProtectionStones.getBlockOptions(getType());
     }
 
     @Override
     public String getType() {
-        return originalType.type;
+        for (String s : mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
+            String[] spl = s.split(" ");
+            String id = spl[0], type = spl[1];
+            if (id.equals(getID())) return type;
+        }
+        return null;
     }
 
     @Override
@@ -154,7 +157,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public List<BlockVector2> getPoints() {
-        return WGUtils.getDefaultProtectedRegion(originalType, WGUtils.parsePSRegionToLocation(id)).getPoints();
+        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id)).getPoints();
     }
 
     @Override
@@ -181,6 +184,6 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public ProtectedRegion getWGRegion() {
-        return WGUtils.getDefaultProtectedRegion(originalType, WGUtils.parsePSRegionToLocation(id));
+        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id));
     }
 }
