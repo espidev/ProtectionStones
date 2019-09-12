@@ -50,6 +50,7 @@ public class GreetingFlagHandler extends Handler {
 
     @Override
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
+        Bukkit.getLogger().info("Cross"); // TODO
         Bukkit.getPlayer(player.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(toSet.queryValue(player, FlagHandler.GREET_ACTION)));
         return false;
     }

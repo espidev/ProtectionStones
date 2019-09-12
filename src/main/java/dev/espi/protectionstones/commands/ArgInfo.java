@@ -29,6 +29,7 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -147,9 +148,9 @@ public class ArgInfo implements PSCommandArg {
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 
                 if (region.getFlag(groupFlag) != null) {
-                    myFlag.append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(myFlagValue).append(", ");
+                    myFlag.append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(myFlagValue).append(", " + ChatColor.GRAY);
                 } else {
-                    myFlag.append(flag.getName()).append(": ").append(myFlagValue).append(", ");
+                    myFlag.append(flag.getName()).append(": ").append(myFlagValue).append(", " + ChatColor.GRAY);
                 }
             }
         }

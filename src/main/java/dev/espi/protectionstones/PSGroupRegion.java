@@ -114,7 +114,7 @@ public class PSGroupRegion extends PSStandardRegion {
         for (String line : getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
             String[] spl = line.split(" ");
             String id = spl[0], type = spl[1];
-            l.add(new PSMergedRegion(id, ProtectionStones.getBlockOptions(type), this, getWGRegionManager(), getWorld()));
+            l.add(new PSMergedRegion(id, this, getWGRegionManager(), getWorld()));
         }
         return l;
     }

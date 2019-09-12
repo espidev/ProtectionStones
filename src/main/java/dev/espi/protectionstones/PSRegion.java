@@ -59,16 +59,14 @@ public abstract class PSRegion {
     public static PSRegion fromLocation(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
-        String psID = WGUtils.createPSID(l);
-        ProtectedRegion r = rgm.getRegion(psID);
 
         // check exact location first
         PSMergedRegion pr = PSMergedRegion.getMergedRegion(l);
         if (pr != null) return pr;
 
         // check if location is in a region
-        psID = WGUtils.matchLocationToPSID(l);
-        r = rgm.getRegion(psID);
+        String psID = WGUtils.matchLocationToPSID(l);
+        ProtectedRegion r = rgm.getRegion(psID);
 
         if (r == null) {
             return null;

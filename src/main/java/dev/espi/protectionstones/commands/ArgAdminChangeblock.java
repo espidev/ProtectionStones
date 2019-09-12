@@ -58,8 +58,6 @@ public class ArgAdminChangeblock {
             if (region.getType().equals(fromBlock)) {
                 p.sendMessage(ChatColor.GRAY + "Changing " + region.getID() + "...");
 
-                region.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, toBlock);
-
                 if (!region.isHidden()) {
                     region.getProtectBlock().setType(set);
                     if (toBlock.startsWith("PLAYER_HEAD")) {
@@ -67,6 +65,8 @@ public class ArgAdminChangeblock {
                         s.setOwningPlayer(Bukkit.getOfflinePlayer(toBlock.split(":")[1]));
                     }
                 }
+
+                region.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, toBlock);
             }
         };
 
