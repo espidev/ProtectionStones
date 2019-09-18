@@ -37,21 +37,20 @@ public class GreetingFlagHandler extends Handler {
     public static class Factory extends Handler.Factory<GreetingFlagHandler> {
         @Override
         public GreetingFlagHandler create(Session session) {
-            // create an instance of a handler for the particular session
-            // if you need to pass certain variables based on, for example, the player
-            // whose session this is, do it here
             return new GreetingFlagHandler(session);
         }
     }
 
-    protected GreetingFlagHandler(Session session) {
+    public GreetingFlagHandler(Session session) {
         super(session);
     }
 
     @Override
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
         Bukkit.getLogger().info("Cross"); // TODO
+
+
         Bukkit.getPlayer(player.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(toSet.queryValue(player, FlagHandler.GREET_ACTION)));
-        return false;
+        return true;
     }
 }

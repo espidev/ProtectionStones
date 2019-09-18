@@ -36,9 +36,6 @@ public class FarewellFlagHandler extends Handler {
     public static class Factory extends Handler.Factory<FarewellFlagHandler> {
         @Override
         public FarewellFlagHandler create(Session session) {
-            // create an instance of a handler for the particular session
-            // if you need to pass certain variables based on, for example, the player
-            // whose session this is, do it here
             return new FarewellFlagHandler(session);
         }
     }

@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.session.handler.ExitFlag;
 import dev.espi.protectionstones.flags.FarewellFlagHandler;
 import dev.espi.protectionstones.flags.GreetingFlagHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -72,8 +73,8 @@ public class FlagHandler {
         }
 
         SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
-        sessionManager.registerHandler(GreetingFlagHandler.FACTORY, null);
-        sessionManager.registerHandler(FarewellFlagHandler.FACTORY, null);
+        sessionManager.registerHandler(GreetingFlagHandler.FACTORY, ExitFlag.FACTORY);
+        sessionManager.registerHandler(FarewellFlagHandler.FACTORY, ExitFlag.FACTORY);
     }
 
     // Add the correct flags for the ps region
