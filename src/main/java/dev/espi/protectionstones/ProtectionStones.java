@@ -22,9 +22,13 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.session.SessionManager;
+import com.sk89q.worldguard.session.handler.ExitFlag;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
+import dev.espi.protectionstones.flags.FarewellFlagHandler;
+import dev.espi.protectionstones.flags.GreetingFlagHandler;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -504,6 +508,8 @@ public class ProtectionStones extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        FlagHandler.registerHandlers(); // register custom WG flag handlers
+
         TomlFormat.instance();
         Config.setInsertionOrderPreserved(true); // make sure that config upgrades aren't a complete mess
 

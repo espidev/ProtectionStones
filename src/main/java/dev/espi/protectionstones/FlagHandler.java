@@ -71,7 +71,9 @@ public class FlagHandler {
         } catch (FlagConflictException ignored) {
             // ignore if flag conflict
         }
+    }
 
+    static void registerHandlers() {
         SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
         sessionManager.registerHandler(GreetingFlagHandler.FACTORY, ExitFlag.FACTORY);
         sessionManager.registerHandler(FarewellFlagHandler.FACTORY, ExitFlag.FACTORY);
@@ -92,8 +94,10 @@ public class FlagHandler {
         List<Flag<?>> replaceFlags = new ArrayList<>();
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting"));
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-title"));
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-action"));
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell"));
         replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-title"));
+        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-action"));
         for (Flag<?> f : replaceFlags) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
