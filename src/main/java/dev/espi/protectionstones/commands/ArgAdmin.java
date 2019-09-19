@@ -28,6 +28,10 @@ import org.bukkit.util.StringUtil;
 
 import java.util.*;
 
+/*
+ * To add new sub commands, add them here, and in ArgAdminHelp manually
+ */
+
 public class ArgAdmin implements PSCommandArg {
 
     @Override
@@ -91,6 +95,8 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminRecreate.argumentAdminRecreate(s, args);
             case "changeblock":
                 return ArgAdminChangeblock.argumentAdminChangeblock(s, args);
+            case "forcemerge":
+                return ArgAdminForceMerge.argumentAdminForceMerge(s, args);
             case "fixregions":
                 s.sendMessage(ChatColor.YELLOW + "Fixing...");
                 LegacyUpgrade.upgradeRegions();
@@ -102,7 +108,7 @@ public class ArgAdmin implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "changeblock");
+        List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock");
         return args.length == 2 ? StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>()) : null;
     }
 

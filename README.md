@@ -290,7 +290,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps list [playername (optional)] - List the regions you or another player owns.
     /ps count [playername (optional)] - Count the number of regions you own or another player.
     /ps merge - Open the merge menu to merge regions with ones you own.
-    /ps admin [version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|recreate|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
+    /ps admin [help|version|settings|hide|unhide|cleanup|flag|lastlogon|lastlogons|stats|forcemerge|recreate|changeblock|fixregions] - This is an admin command showing different stats and allowing to override other player's regions.
     /ps reload - Reload settings from the config.
 
 ## Permissions

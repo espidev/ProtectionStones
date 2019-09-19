@@ -204,6 +204,7 @@ public enum PSL {
     ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),
     ADMIN_FLAG_HELP("admin.flag_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]"),
     ADMIN_CHANGEBLOCK_HELP("admin.changeblock_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtype] [newtype]"),
+    ADMIN_FORCEMERGE_HELP("admin.forcemerge_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]"),
 
     // ps reload
     RELOAD_HELP("reload.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps reload"),
