@@ -187,8 +187,8 @@ public enum PSL {
     VIEW_REMOVING("view.removing", ChatColor.AQUA + "Removing border...\n" + ChatColor.GREEN + "If you still see ghost blocks, relog!"),
 
     // ps admin
-    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin { version | hide | unhide | cleanup | flag |\n" + ChatColor.GRAY + "         lastlogon | lastlogons | stats | recreate | changeblock | fixregions }"),
-    ADMIN_HELP_DESC("admin.help_desc", "This is an admin command showing different stats and allowing to override other player's regions."),
+    ADMIN_HELP("admin.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin"),
+    ADMIN_HELP_DESC("admin.help_desc", "Do /ps admin help for more information."),
     ADMIN_CLEANUP_HELP("admin.cleanup_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]"),
     ADMIN_CLEANUP_HEADER("admin.cleanup_header", ChatColor.YELLOW + "Cleanup %arg% %days% days\n================"),
     ADMIN_CLEANUP_FOOTER("admin.cleanup_footer", ChatColor.YELLOW + "================\nCompleted %arg% cleanup."),
@@ -201,7 +201,7 @@ public enum PSL {
     ADMIN_LASTLOGONS_LINE("admin.lastlogons_line", ChatColor.YELLOW + "%player% %time% days"),
     ADMIN_LASTLOGONS_FOOTER("admin.lastlogons_footer", ChatColor.YELLOW + "================\n%count% Total Players Shown\n%checked% Total Players Checked"),
     ADMIN_FLAG_HELP("admin.flag_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]"),
-    ADMIN_CHANGEBLOCK_HELP("admin.changeblock_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [oldtype] [newtype]"),
+    ADMIN_CHANGEBLOCK_HELP("admin.changeblock_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtype] [newtype]"),
 
     // ps reload
     RELOAD_HELP("reload.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps reload"),

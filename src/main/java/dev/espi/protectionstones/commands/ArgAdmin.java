@@ -59,11 +59,13 @@ public class ArgAdmin implements PSCommandArg {
         }
 
         if (args.length < 2) {
-            s.sendMessage(PSL.ADMIN_HELP.msg());
+            ArgAdminHelp.argumentAdminHelp(s, args);
             return true;
         }
 
         switch (args[1].toLowerCase()) {
+            case "help":
+                return ArgAdminHelp.argumentAdminHelp(s, args);
             case "version":
                 s.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getInstance().getDescription().getVersion());
                 s.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getInstance().getDescription().getAuthors());

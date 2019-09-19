@@ -54,7 +54,8 @@ public class TextGUI {
         if (currentPage * guiSize + guiSize < lines.size()) footer.addExtra(nextPage);
         footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
 
-        s.spigot().sendMessage(footer);
+        // display footer only if there are more than one page of entries
+        if (lines.size() >= guiSize) s.spigot().sendMessage(footer);
     }
 
 }

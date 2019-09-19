@@ -29,16 +29,16 @@ import org.bukkit.command.CommandSender;
 
 import java.util.function.Consumer;
 
-public class ArgAdminChangeblock {
+class ArgAdminChangeblock {
 
-    // /ps admin changeblock [fromblock] [toblock]
+    // /ps admin changeblock [world] [fromblock] [toblock]
     static boolean argumentAdminChangeblock(CommandSender p, String[] args) {
-        if (args.length < 4) {
+        if (args.length < 5) {
             PSL.msg(p, PSL.ADMIN_CHANGEBLOCK_HELP.msg());
             return true;
         }
 
-        String fromBlock = args[2], toBlock = args[3];
+        String world = args[2], fromBlock = args[3], toBlock = args[4];
         if (Material.matchMaterial(toBlock) == null && !toBlock.startsWith("PLAYER_HEAD")) {
             PSL.msg(p, ChatColor.GRAY + "The block to change to is not valid!");
             return true;
@@ -70,17 +70,20 @@ public class ArgAdminChangeblock {
             }
         };
 
-        for (World w : Bukkit.getWorlds()) {
-            for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion pr = PSRegion.fromWGRegion(w, r);
+        World w = Bukkit.getWorld(world);
+        if (w == null) {
+            PSL.msg(p, ChatColor.GRAY + "The world is not valid!");
+            return true;
+        }
+        for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+            if (ProtectionStones.isPSRegion(r)) {
+                PSRegion pr = PSRegion.fromWGRegion(w, r);
 
-                    convertFunction.accept(pr);
+                convertFunction.accept(pr);
 
-                    if (pr instanceof PSGroupRegion) {
-                        for (PSMergedRegion psmr : ((PSGroupRegion) pr).getMergedRegions()) {
-                            convertFunction.accept(psmr);
-                        }
+                if (pr instanceof PSGroupRegion) {
+                    for (PSMergedRegion psmr : ((PSGroupRegion) pr).getMergedRegions()) {
+                        convertFunction.accept(psmr);
                     }
                 }
             }
