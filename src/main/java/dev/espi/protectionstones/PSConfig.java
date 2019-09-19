@@ -68,6 +68,8 @@ public class PSConfig {
     public Boolean regionsMustBeAdjacent;
     @Path("allow_merging_regions")
     public Boolean allowMergingRegions;
+    @Path("allow_merging_holes")
+    public Boolean allowMergingHoles;
 
     static void initConfig() {
 
@@ -277,6 +279,9 @@ public class PSConfig {
                 ProtectionStones.config.set("config_version", 9);
                 ProtectionStones.config.set("allow_merging_regions", true);
                 break;
+            case 9:
+                ProtectionStones.config.set("config_version", 10);
+                ProtectionStones.config.set("allow_merging_holes", true);
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

@@ -30,11 +30,13 @@ import java.util.*;
 
 public class WGMerge {
 
+    public static class RegionHoleException extends Exception {}
+
     // welcome to giant mess of code that does some bad stuff
     // :D
     // more to come in RegionTraverse
 
-    public static void unmergeRegion(World w, RegionManager rm, PSMergedRegion toUnmerge) {
+    public static void unmergeRegion(World w, RegionManager rm, PSMergedRegion toUnmerge) throws RegionHoleException {
 
         // find the psgroupregion containing the region to unmerge
         for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(toUnmerge.getProtectBlock().getX(), toUnmerge.getProtectBlock().getY(), toUnmerge.getProtectBlock().getZ()))) {
@@ -169,13 +171,13 @@ public class WGMerge {
     }
 
     // each region in merge must not be of type PSMergedRegion
-    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) {
+    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
         mergeRegions(root.getID(), w, rm, root, merge);
     }
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied
-    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) {
+    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
         List<PSRegion> decomposedMerge = new ArrayList<>();
 
         // decompose merged regions into their bases
@@ -204,7 +206,7 @@ public class WGMerge {
 
     // returns a merged region; root and merge must be overlapping
     // merge parameter must all be decomposed regions (down to cuboids, no polygon)
-    private static ProtectedRegion mergeRegions(String newID, PSRegion root, List<PSRegion> merge) {
+    private static ProtectedRegion mergeRegions(String newID, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
         HashSet<BlockVector2> points = new HashSet<>();
         List<ProtectedRegion> regions = new ArrayList<>();
 
@@ -228,6 +230,12 @@ public class WGMerge {
                 }
             }
         });
+
+        // allow_merging_holes option
+        // prevent holes from being formed
+        if (vertexGroups.size() > 1 && !ProtectionStones.getInstance().getConfigOptions().allowMergingHoles) {
+            throw new RegionHoleException();
+        }
 
         // assemble vertex group
         // draw in and out lines between holes

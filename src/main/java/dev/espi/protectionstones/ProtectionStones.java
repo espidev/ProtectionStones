@@ -22,13 +22,9 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.session.SessionManager;
-import com.sk89q.worldguard.session.handler.ExitFlag;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
-import dev.espi.protectionstones.flags.FarewellFlagHandler;
-import dev.espi.protectionstones.flags.GreetingFlagHandler;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -61,7 +57,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 9;
+    static final int CONFIG_VERSION = 10;
 
     static File configLocation, blockDataFolder;
     static FileConfig config;
