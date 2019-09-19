@@ -94,6 +94,8 @@ public enum PSL {
     REGION_NOT_ADJACENT("psregion.region_not_adjacent", ChatColor.RED + "You've passed the limit of non-adjacent regions! Try putting your protection block closer to other regions you already own."),
     REGION_NOT_OVERLAPPING("psregion.not_overlapping", ChatColor.RED + "These regions don't overlap each other!"),
     MULTI_REGION_DOES_NOT_EXIST("psregion.multi_region_does_not_exist", "One of these regions don't exist!"),
+    NO_REGION_HOLES("psregion.no_region_holes", ChatColor.RED + "Unprotected area detected inside region! This is not allowed!"),
+    DELETE_REGION_PREVENTED_NO_HOLES("psregion.delete_region_prevented", ChatColor.GRAY + "The region could not be removed, possibly because it creates a hole in the existing region."),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),

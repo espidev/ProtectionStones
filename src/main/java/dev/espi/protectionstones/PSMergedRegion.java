@@ -19,7 +19,6 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -58,6 +57,7 @@ public class PSMergedRegion extends PSRegion {
 
     /**
      * Finds the {@link PSMergedRegion} at a location that is a part of a merged region.
+     *
      * @param l location to look at
      * @return the {@link PSMergedRegion} the location is in, or null if not applicable
      */
@@ -146,17 +146,24 @@ public class PSMergedRegion extends PSRegion {
             if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
                 Skull s = (Skull) getProtectBlock().getState();
                 s.setOwningPlayer(Bukkit.getOfflinePlayer(type.type.split(":")[1]));
+                s.update();
             }
         }
 
         Set<String> flag = mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
+        String original = null;
         for (String s : flag) {
-            String [] spl = s.split(" ");
+            String[] spl = s.split(" ");
             String id = spl[0];
             if (id.equals(getID())) {
-                flag.remove(s);
-                flag.add(getID() + " " + type.type);
+                original = s;
+                break;
             }
+        }
+
+        if (original != null) {
+            flag.remove(original);
+            flag.add(getID() + " " + type.type);
         }
     }
 
@@ -202,7 +209,12 @@ public class PSMergedRegion extends PSRegion {
             this.getProtectBlock().setType(Material.AIR);
         }
 
-        WGMerge.unmergeRegion(getWorld(), getWGRegionManager(), this);
+        try {
+            WGMerge.unmergeRegion(getWorld(), getWGRegionManager(), this);
+        } catch (WGMerge.RegionHoleException e) {
+            this.unhide();
+            return false;
+        }
 
         return true;
     }

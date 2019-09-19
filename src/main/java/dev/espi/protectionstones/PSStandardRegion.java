@@ -121,6 +121,7 @@ public class PSStandardRegion extends PSRegion {
             if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
                 Skull s = (Skull) getProtectBlock().getState();
                 s.setOwningPlayer(Bukkit.getOfflinePlayer(type.type.split(":")[1]));
+                s.update();
             }
         }
         getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, type.type);

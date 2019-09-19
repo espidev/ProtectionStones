@@ -75,7 +75,7 @@ public class ArgUnclaim implements PSCommandArg {
 
             if (r instanceof PSGroupRegion) {
                 for (PSRegion rp : ((PSGroupRegion) r).getMergedRegions()) {
-                    items.add(rp.getTypeOptions().createItem());
+                    if (rp.getTypeOptions() != null) items.add(rp.getTypeOptions().createItem());
                 }
             } else {
                 items.add(cpb.createItem());

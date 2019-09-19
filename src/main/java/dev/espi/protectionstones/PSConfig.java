@@ -282,6 +282,7 @@ public class PSConfig {
             case 9:
                 ProtectionStones.config.set("config_version", 10);
                 ProtectionStones.config.set("allow_merging_holes", true);
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

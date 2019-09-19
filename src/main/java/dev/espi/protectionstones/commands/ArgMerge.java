@@ -120,7 +120,12 @@ public class ArgMerge implements PSCommandArg {
             }
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                WGMerge.mergeRegions(p.getWorld(), rm, aRoot, Arrays.asList(aRegion, aRoot));
+                try {
+                    WGMerge.mergeRegions(p.getWorld(), rm, aRoot, Arrays.asList(aRegion, aRoot));
+                } catch (WGMerge.RegionHoleException e) {
+                    PSL.msg(p, PSL.NO_REGION_HOLES.msg());
+                    return;
+                }
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
 
                 // show menu again if the new region still has overlapping regions

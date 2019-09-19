@@ -23,7 +23,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -120,7 +119,13 @@ public class ListenerClass implements Listener {
         }
 
         // check if removing the region and firing region remove event blocked it
-        if (!r.deleteRegion(true, p)) return;
+        if (!r.deleteRegion(true, p)) {
+            if (!ProtectionStones.getInstance().getConfigOptions().allowMergingHoles) { // side case if the removing creates a hole and those are prevented
+                PSL.msg(p, PSL.DELETE_REGION_PREVENTED_NO_HOLES.msg());
+            }
+            e.setCancelled(true);
+            return;
+        }
 
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
