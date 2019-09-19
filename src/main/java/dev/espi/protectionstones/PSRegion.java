@@ -248,9 +248,15 @@ public abstract class PSRegion {
     public abstract PSProtectBlock getTypeOptions();
 
     /**
-     * @return returns the protect block type that the region is
+     * @return returns the protect block type (may include custom player heads PLAYER_HEAD:playername) that the region is
      */
     public abstract String getType();
+
+    /**
+     * Change the type of the protection region.
+     * @param type the type of protection region to switch to
+     */
+    public abstract void setType(PSProtectBlock type);
 
     /**
      * Get whether or not a player is an owner of this region.

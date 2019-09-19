@@ -19,6 +19,7 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -29,10 +30,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -133,6 +136,28 @@ public class PSMergedRegion extends PSRegion {
             if (id.equals(getID())) return type;
         }
         return null;
+    }
+
+    @Override
+    public void setType(PSProtectBlock type) {
+        if (!isHidden()) {
+            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
+            getProtectBlock().setType(set);
+            if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
+                Skull s = (Skull) getProtectBlock().getState();
+                s.setOwningPlayer(Bukkit.getOfflinePlayer(type.type.split(":")[1]));
+            }
+        }
+
+        Set<String> flag = mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
+        for (String s : flag) {
+            String [] spl = s.split(" ");
+            String id = spl[0];
+            if (id.equals(getID())) {
+                flag.remove(s);
+                flag.add(getID() + " " + type.type);
+            }
+        }
     }
 
     @Override

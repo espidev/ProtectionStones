@@ -52,21 +52,11 @@ class ArgAdminChangeblock {
             return true;
         }
 
-        Material set = Material.matchMaterial(toBlock) == null ? Material.PLAYER_HEAD : Material.matchMaterial(toBlock);
-
         Consumer<PSRegion> convertFunction = (region) -> {
             if (region.getType().equals(fromBlock)) {
                 p.sendMessage(ChatColor.GRAY + "Changing " + region.getID() + "...");
 
-                if (!region.isHidden()) {
-                    region.getProtectBlock().setType(set);
-                    if (toBlock.startsWith("PLAYER_HEAD")) {
-                        Skull s = (Skull) region.getProtectBlock().getState();
-                        s.setOwningPlayer(Bukkit.getOfflinePlayer(toBlock.split(":")[1]));
-                    }
-                }
-
-                region.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, toBlock);
+                region.setType(ProtectionStones.getBlockOptions(toBlock));
             }
         };
 
