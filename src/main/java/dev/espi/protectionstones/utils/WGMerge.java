@@ -134,6 +134,8 @@ public class WGMerge {
                             continue;
                         }
 
+                        // if there is splitting regions
+
                         // check how many groups there are and relabel the original root to be the head ID
                         boolean foundOriginal = false;
 
@@ -172,6 +174,7 @@ public class WGMerge {
                     break;
 
                 } catch (RegionHoleException e) {
+                    // if there is a region hole exception, put back the merged region info
                     psgr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).add(toUnmerge.getID());
                     psgr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).add(toUnmerge.getID() + " " + blockType);
                     throw e;

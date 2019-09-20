@@ -17,24 +17,74 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ArgAdminForceMerge {
+
+    private static Map<Flag<?>, Object> getFlags(Map<Flag<?>, Object> flags) {
+        Map<Flag<?>, Object> f = new HashMap<>(flags);
+        f.remove(FlagHandler.PS_BLOCK_MATERIAL);
+        f.remove(FlagHandler.PS_MERGED_REGIONS_TYPES);
+        f.remove(FlagHandler.PS_MERGED_REGIONS);
+        f.remove(FlagHandler.PS_NAME);
+
+        return f;
+    }
 
     // /ps admin forcemerge [world]
     public static boolean argumentAdminForceMerge(CommandSender p, String[] args) {
         if (args.length < 3) {
             PSL.msg(p, PSL.ADMIN_FORCEMERGE_HELP.msg());
+            return true;
         }
 
         String world = args[2];
-        for (ProtectedRegion pr : WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(world)).getRegions().values()) {
-            // TODO
+        World w = Bukkit.getWorld(world);
+
+        if (w == null) {
+            PSL.msg(p, PSL.INVALID_WORLD.msg());
+            return true;
         }
+
+        RegionManager rm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(world));
+        for (ProtectedRegion pr : rm.getRegions().values()) {
+            if (pr.getParent() != null) break;
+            if (!ProtectionStones.isPSRegion(pr)) continue;
+
+            PSRegion prr = PSRegion.fromWGRegion(w, pr);
+            Map<Flag<?>, Object> baseFlags = getFlags(pr.getFlags());
+
+            for (ProtectedRegion toMerge : rm.getApplicableRegions(pr)) {
+                if (!ProtectionStones.isPSRegion(toMerge)) continue;
+                PSRegion toMergeR = PSRegion.fromWGRegion(w, toMerge);
+
+                Map<Flag<?>, Object> mergeFlags = getFlags(toMerge.getFlags());
+                if (toMerge.getOwners().equals(pr.getOwners()) && toMerge.getMembers().equals(pr.getMembers()) && toMerge.getParent() == null && baseFlags.equals(mergeFlags)) {
+                    try {
+                        p.sendMessage("Merging " + prr.getID() + " and " + toMergeR.getID() + "...");
+                        WGMerge.mergeRegions(w, rm, prr, Arrays.asList(prr, toMergeR));
+                    } catch (WGMerge.RegionHoleException ignored) {
+                        // TODO
+                    }
+                }
+            }
+        }
+
         return true;
     }
 }
