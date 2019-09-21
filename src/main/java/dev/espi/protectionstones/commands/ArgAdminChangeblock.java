@@ -79,6 +79,8 @@ class ArgAdminChangeblock {
             }
         }
 
+        p.sendMessage(ChatColor.GRAY + "Done!");
+
         return true;
     }
 }
