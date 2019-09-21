@@ -45,12 +45,23 @@ import java.util.UUID;
 public class PSMergedRegion extends PSRegion {
 
     private PSGroupRegion mergedGroup;
-    private String id;
+    private String id, type;
 
     PSMergedRegion(String id, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
         super(rgmanager, world);
         this.id = id;
         this.mergedGroup = mergedGroup;
+
+        // get type
+        // stored instead of fetched on the fly because unmerge algorithm removes the flag causing getType to return null
+        for (String s : mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
+            String[] spl = s.split(" ");
+            String did = spl[0], type = spl[1];
+            if (did.equals(getID())) {
+                this.type = type;
+                break;
+            }
+        }
     }
 
     // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
@@ -130,16 +141,12 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public String getType() {
-        for (String s : mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
-            String[] spl = s.split(" ");
-            String id = spl[0], type = spl[1];
-            if (id.equals(getID())) return type;
-        }
-        return null;
+        return type;
     }
 
     @Override
     public void setType(PSProtectBlock type) {
+
         if (!isHidden()) {
             Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
             getProtectBlock().setType(set);
@@ -149,6 +156,9 @@ public class PSMergedRegion extends PSRegion {
                 s.update();
             }
         }
+
+        // has to be after isHidden query
+        this.type = type.type;
 
         Set<String> flag = mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
         String original = null;

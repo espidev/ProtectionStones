@@ -46,7 +46,7 @@ class ArgAdminRecreate {
             for (ProtectedRegion r : rgm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion wr = PSRegion.fromWGRegion(w, r);
-                    if (!(wr instanceof PSStandardRegion)) continue;
+                    if (!(wr instanceof PSStandardRegion)) continue; // skip group regions for now TODO
                     PSProtectBlock blockOptions = wr.getTypeOptions();
 
                     double bx = wr.getProtectBlock().getLocation().getX(), bxo = blockOptions.xOffset;

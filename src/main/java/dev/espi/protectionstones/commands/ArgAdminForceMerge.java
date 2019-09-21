@@ -52,7 +52,7 @@ public class ArgAdminForceMerge {
             if (!o2.contains(uuid)) return false;
         }
         for (UUID uuid : o2.getUniqueIds()) {
-            if (!o1.contains(uuid)) return true;
+            if (!o1.contains(uuid)) return false;
         }
         return true;
     }
@@ -82,8 +82,6 @@ public class ArgAdminForceMerge {
             if (r.getParent() != null) continue;
             boolean merged = idToGroup.get(r.getId()) != null;
 
-            Bukkit.getLogger().info("NEW"); //TODO
-
             Map<Flag<?>, Object> baseFlags = getFlags(r.getFlags()); // comparison flags
 
             PSRegion psr = PSRegion.fromWGRegion(w, r);
@@ -99,13 +97,11 @@ public class ArgAdminForceMerge {
                 String rOverlapGroup = idToGroup.get(rOverlap.getId());
                 if (merged) { // r is part of a group
                     String rGroup = idToGroup.get(r.getId());
-                    Bukkit.getLogger().info("" + (groupToMembers.get(rGroup) == null)); // TODO
                     if (rOverlapGroup == null) { // rOverlap not part of a group
                         idToGroup.put(rOverlap.getId(), rGroup);
                         groupToMembers.get(rGroup).add(PSRegion.fromWGRegion(w, rOverlap));
                     } else if (!rOverlapGroup.equals(rGroup)) { // rOverlap is part of a group (both are part of group)
 
-                        Bukkit.getLogger().info("MHM"); //TODO
                         for (PSRegion pr : groupToMembers.get(rOverlapGroup)) {
                             idToGroup.put(pr.getID(), rGroup);
                         }
@@ -127,6 +123,7 @@ public class ArgAdminForceMerge {
             }
         }
 
+        // actually do region merging
         for (String key : groupToMembers.keySet()) {
             PSRegion root = null;
             p.sendMessage(ChatColor.GRAY + "Merging these regions into " + key + ":");

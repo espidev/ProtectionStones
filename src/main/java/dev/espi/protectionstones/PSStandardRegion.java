@@ -105,7 +105,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public PSProtectBlock getTypeOptions() {
-        return ProtectionStones.getBlockOptions(wgregion.getFlag(FlagHandler.PS_BLOCK_MATERIAL));
+        return ProtectionStones.getBlockOptions(getType());
     }
 
     @Override
