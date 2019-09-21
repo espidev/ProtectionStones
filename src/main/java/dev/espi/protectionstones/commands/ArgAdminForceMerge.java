@@ -74,60 +74,74 @@ public class ArgAdminForceMerge {
 
         RegionManager rm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(world));
 
+        HashMap<String, String> idToGroup = new HashMap<>();
+        HashMap<String, List<PSRegion>> groupToMembers = new HashMap<>();
 
-        
-        Queue<String> toVisitIDs = new LinkedList<>();
-        Set<String> visitedIDs = new HashSet<>();
+        for (ProtectedRegion r : rm.getRegions().values()) {
+            if (!ProtectionStones.isPSRegion(r)) continue;
+            if (r.getParent() != null) continue;
+            boolean merged = idToGroup.get(r.getId()) != null;
 
-        // add regions to check
-        for (ProtectedRegion r : rm.getRegions().values()) toVisitIDs.add(r.getId());
+            Bukkit.getLogger().info("NEW"); //TODO
 
-        // go through all regions
-        while (!toVisitIDs.isEmpty()) {
-            ProtectedRegion pr = rm.getRegion(toVisitIDs.poll()); // get top region and remove from queue
-            if (pr == null) continue;
-            if (pr.getParent() != null) continue;
-            if (!ProtectionStones.isPSRegion(pr)) continue;
-            if (visitedIDs.contains(pr.getId())) continue; // if already visited, skip
+            Map<Flag<?>, Object> baseFlags = getFlags(r.getFlags()); // comparison flags
 
-            PSRegion prr = PSRegion.fromWGRegion(w, pr);
-            Map<Flag<?>, Object> baseFlags = getFlags(pr.getFlags()); // comparison flags
+            PSRegion psr = PSRegion.fromWGRegion(w, r);
 
-            Set<String> traversed = new HashSet<>();
+            for (ProtectedRegion rOverlap : rm.getApplicableRegions(r)) {
+                if (!ProtectionStones.isPSRegion(rOverlap)) continue;
+                if (rOverlap.getId().equals(r.getId())) continue;
 
-            boolean didMerge = true;
-            // keep merging until there are no regions left to merge in
-            while (didMerge) {
-                didMerge = false;
+                Map<Flag<?>, Object> mergeFlags = getFlags(rOverlap.getFlags()); // comparison flags
 
-                for (ProtectedRegion toMerge : rm.getApplicableRegions(pr)) {
-                    if (traversed.contains(toMerge.getId())) continue; // if already traversed
+                if (!(areDomainsEqual(rOverlap.getOwners(), r.getOwners()) && areDomainsEqual(rOverlap.getMembers(), r.getMembers()) && rOverlap.getParent() == null && baseFlags.equals(mergeFlags))) continue;
 
-                    traversed.add(toMerge.getId()); // this region has been visited
-                    if (toMerge.getId().equals(pr.getId())) continue;
-                    if (!ProtectionStones.isPSRegion(toMerge)) continue;
+                String rOverlapGroup = idToGroup.get(rOverlap.getId());
+                if (merged) { // r is part of a group
+                    String rGroup = idToGroup.get(r.getId());
+                    Bukkit.getLogger().info("" + (groupToMembers.get(rGroup) == null)); // TODO
+                    if (rOverlapGroup == null) { // rOverlap not part of a group
+                        idToGroup.put(rOverlap.getId(), rGroup);
+                        groupToMembers.get(rGroup).add(PSRegion.fromWGRegion(w, rOverlap));
+                    } else if (!rOverlapGroup.equals(rGroup)) { // rOverlap is part of a group (both are part of group)
 
-                    PSRegion toMergeR = PSRegion.fromWGRegion(w, toMerge);
-                    Map<Flag<?>, Object> mergeFlags = getFlags(toMerge.getFlags()); // comparison flags
-
-                    if (areDomainsEqual(toMerge.getOwners(), pr.getOwners()) && areDomainsEqual(toMerge.getMembers(), pr.getMembers()) && toMerge.getParent() == null && baseFlags.equals(mergeFlags)) {
-                        didMerge = true;
-                        visitedIDs.add(toMerge.getId());
-
-                        try {
-                            p.sendMessage(ChatColor.GRAY + "Merging " + prr.getID() + " and " + toMergeR.getID() + "...");
-                            WGMerge.mergeRegions(w, rm, prr, Arrays.asList(prr, toMergeR));
-                        } catch (WGMerge.RegionHoleException ignored) {
-                            // TODO
+                        Bukkit.getLogger().info("MHM"); //TODO
+                        for (PSRegion pr : groupToMembers.get(rOverlapGroup)) {
+                            idToGroup.put(pr.getID(), rGroup);
                         }
-
-                        break; // leave when a region is merged
+                        groupToMembers.get(rGroup).addAll(groupToMembers.get(rOverlapGroup));
+                        groupToMembers.remove(rOverlapGroup);
                     }
+                } else { // r not part of group
+                    if (rOverlapGroup == null) { // both are not part of group
+                        idToGroup.put(r.getId(), r.getId());
+                        idToGroup.put(rOverlap.getId(), r.getId());
+                        groupToMembers.put(r.getId(), new ArrayList<>(Arrays.asList(psr, PSRegion.fromWGRegion(w, rOverlap))));
+                    } else { // rOverlap is part of group
+                        idToGroup.put(r.getId(), rOverlapGroup);
+                        groupToMembers.get(rOverlapGroup).add(psr);
+                    }
+                    merged = true;
                 }
+
             }
         }
 
-        p.sendMessage("Done!");
+        for (String key : groupToMembers.keySet()) {
+            PSRegion root = null;
+            p.sendMessage(ChatColor.GRAY + "Merging these regions into " + key + ":");
+            for (PSRegion r : groupToMembers.get(key)) {
+                if (r.getID().equals(key)) root = r;
+                p.sendMessage(ChatColor.GRAY + r.getID());
+            }
+            try {
+                WGMerge.mergeRegions(w, rm, root, groupToMembers.get(key));
+            } catch (WGMerge.RegionHoleException e) {
+                // TODO
+            }
+        }
+
+        p.sendMessage(ChatColor.GRAY + "Done!");
 
         return true;
     }
