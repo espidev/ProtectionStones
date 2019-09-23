@@ -20,6 +20,7 @@ import dev.espi.protectionstones.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
@@ -92,7 +93,11 @@ public class PSCommand extends Command {
     @Override
     public boolean execute(CommandSender s, String label, String[] args) {
         if (args.length == 0) { // no arguments
-            new ArgHelp().executeArgument(s, args, null);
+            if (s instanceof ConsoleCommandSender) {
+                s.sendMessage(ChatColor.RED + "You can only use /ps reload, /ps admin, /ps give from console.");
+            } else {
+                new ArgHelp().executeArgument(s, args, null);
+            }
             return true;
         }
         for (PSCommandArg command : ProtectionStones.getInstance().getCommandArguments()) {
