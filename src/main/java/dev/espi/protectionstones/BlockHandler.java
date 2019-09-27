@@ -30,6 +30,7 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -170,7 +171,33 @@ class BlockHandler {
 
         } // end of non-admin checks
 
-        return createActualRegion(p, l, blockOptions);
+        // check if player has enough money
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
+            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+            return true;
+        }
+
+        // debug message
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+            Bukkit.getLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
+        }
+
+        if (createActualRegion(p, l, blockOptions)) { // region creation successful
+
+            // take money
+            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                if (!er.transactionSuccess()) {
+                    PSL.msg(p, er.errorMessage);
+                    return true;
+                }
+                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+            }
+
+            return true;
+        } else { // region creation failed
+            return false;
+        }
     }
 
     // create the actual WG region for PS region

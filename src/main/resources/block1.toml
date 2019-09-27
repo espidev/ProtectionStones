@@ -143,6 +143,9 @@ prevent_block_place_in_restricted_world = true
     # Recommended to keep false if "Restrict Obtaining" (the new way) is true
     prevent_silk_touch = false
 
+    # Set cost for when a protection block is placed (separate from /ps get cost)
+    cost_to_place = 0.0
+
 [player]
     # Whether or not to allow breaking the protection block with a shift-right click
     # Useful if the protection block is unbreakable (bedrock, command block), etc.

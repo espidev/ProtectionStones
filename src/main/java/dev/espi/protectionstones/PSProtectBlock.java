@@ -116,6 +116,9 @@ public class PSProtectBlock {
     public boolean destroyRegionWhenExplode;
     @Path("behaviour.prevent_silk_touch")
     public boolean preventSilkTouch;
+    @Path("behaviour.cost_to_place")
+    @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
+    public double costToPlace;
 
     // player section
     @Path("player.allow_shift_right_break")

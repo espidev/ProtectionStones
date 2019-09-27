@@ -34,6 +34,7 @@ public enum PSL {
     NO_ROOM_DROPPING_ON_FLOOR("no_room_dropping_on_floor", ChatColor.RED + "You don't have enough room in your inventory. Dropping item on floor."),
     INVALID_BLOCK("invalid_block", ChatColor.RED + "Invalid protection block."),
     NOT_ENOUGH_MONEY("not_enough_money", ChatColor.RED + "You don't have enough money! The price is %price%."),
+    PAID_MONEY("paid_money", ChatColor.AQUA + "You've paid $%price%."),
     INVALID_WORLD("invalid_world", ChatColor.RED + "Invalid world."),
     MUST_BE_PLAYER("must_be_player", ChatColor.RED + "You must be a player to execute this command."),
     GO_BACK_PAGE("go_back_page", "Go back a page."),

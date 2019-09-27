@@ -103,7 +103,7 @@ public class ArgGet implements PSCommandArg {
         }
 
         // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && !ProtectionStones.getInstance().getVaultEconomy().has(p, cp.price)) {
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, cp.price)) {
             PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
             return true;
         }
@@ -114,7 +114,7 @@ public class ArgGet implements PSCommandArg {
         }
 
         // take money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
             EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, cp.price);
             if (!er.transactionSuccess()) {
                 PSL.msg(p, er.errorMessage);
