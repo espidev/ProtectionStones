@@ -109,11 +109,17 @@ public class ListenerClass implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (e.isCancelled()) return;
 
-        // shift-right click block with hand
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getPlayer().isSneaking() && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlockType(e.getClickedBlock())) {
-            if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
-                e.getClickedBlock().setType(Material.AIR);
+        // shift-right click block with hand to break
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlockType(e.getClickedBlock())) {
+            PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
+            if (ppb.allowShiftRightBreak) {
+                if (e.getPlayer().isSneaking()) {
+                    if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
+                        e.getClickedBlock().setType(Material.AIR);
+                    }
+                }
             }
+
         }
     }
 
