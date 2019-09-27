@@ -34,6 +34,11 @@ import java.util.*;
 
 public class ArgAdmin implements PSCommandArg {
 
+    static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]",
+                        FLAG_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]",
+                        CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtype] [newtype]",
+                        FORCEMERGE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]";
+
     @Override
     public List<String> getNames() {
         return Collections.singletonList("admin");

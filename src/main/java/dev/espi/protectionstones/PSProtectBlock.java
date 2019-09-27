@@ -118,6 +118,8 @@ public class PSProtectBlock {
     public boolean preventSilkTouch;
 
     // player section
+    @Path("player.allow_shift_right_break")
+    public boolean allowShiftRightBreak;
     @Path("player.prevent_teleport_in")
     public boolean preventTeleportIn;
     @Path("player.no_moving_when_tp_waiting")

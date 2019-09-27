@@ -14,14 +14,14 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.5.0
+* ProtectionStones 2.6.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
   
 ## Default Configuration (config.toml)
 
-    config_version = 9
+    config_version = 10
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -47,7 +47,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     
     # Time in seconds between /ps view attempts.
     # Can prevent lag from spamming the command.
-    ps_view_cooldown = 20
+    ps_view_cooldown = 10
     
     # Base command for protection stones (change if conflicting with other commands)
     base_command = "ps"
@@ -75,6 +75,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Note: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
     # since polygon regions can only be 2D, not 3D
     allow_merging_regions = true
+    
+    # Whether or not to allow merged regions to have holes in them (merging a bunch of regions in a circle with the inside not protected).
+    # This is only checked during the merge process, it will not unmerge regions with holes already.
+    allow_merging_holes = true
 
 ## Default Configuration (block1.toml)
 

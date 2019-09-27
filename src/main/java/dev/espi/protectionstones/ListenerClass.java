@@ -29,6 +29,7 @@ import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -38,6 +39,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -61,6 +63,60 @@ public class ListenerClass implements Listener {
         BlockHandler.createPSRegion(e);
     }
 
+    // helper method for breaking protection blocks
+    private boolean playerBreakProtection(Player p, PSRegion r) {
+        PSProtectBlock blockOptions = r.getTypeOptions();
+
+        // check for destroy permission
+        if (!p.hasPermission("protectionstones.destroy")) {
+            PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
+            return false;
+        }
+
+        // check if player is owner of region
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
+            return false;
+        }
+
+        // return protection stone if no drop option is off
+        if (!blockOptions.noDrop) {
+            if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
+                // method will return not empty if item couldn't be added
+                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                    p.getWorld().dropItem(r.getProtectBlock().getLocation(), blockOptions.createItem());
+                } else {
+                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                    return false;
+                }
+            }
+        }
+
+        // check if removing the region and firing region remove event blocked it
+        if (!r.deleteRegion(true, p)) {
+            if (!ProtectionStones.getInstance().getConfigOptions().allowMergingHoles) { // side case if the removing creates a hole and those are prevented
+                PSL.msg(p, PSL.DELETE_REGION_PREVENTED_NO_HOLES.msg());
+            }
+            return false;
+        }
+
+        PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
+        return true;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (e.isCancelled()) return;
+
+        // shift-right click block with hand
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getPlayer().isSneaking() && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlockType(e.getClickedBlock())) {
+            if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
+                e.getClickedBlock().setType(Material.AIR);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
@@ -77,8 +133,8 @@ public class ListenerClass implements Listener {
         if (!ProtectionStones.isProtectBlock(pb)) {
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
-                ItemStack left = e.getPlayer().getInventory().getItemInMainHand();
-                ItemStack right = e.getPlayer().getInventory().getItemInOffHand();
+                ItemStack left = p.getInventory().getItemInMainHand();
+                ItemStack right = p.getInventory().getItemInOffHand();
                 if (!left.containsEnchantment(Enchantment.SILK_TOUCH) && !right.containsEnchantment(Enchantment.SILK_TOUCH)) {
                     return;
                 }
@@ -89,48 +145,13 @@ public class ListenerClass implements Listener {
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
-        // check for destroy permission
-        if (!p.hasPermission("protectionstones.destroy")) {
-            PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
+        // break protection
+        if (playerBreakProtection(p, r)) { // successful
+            e.setDropItems(false);
+            e.setExpToDrop(0);
+        } else { // unsuccessful
             e.setCancelled(true);
-            return;
         }
-
-        // check if player is owner of region
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
-            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
-            e.setCancelled(true);
-            return;
-        }
-
-        // return protection stone if no drop option is off
-        if (!blockOptions.noDrop) {
-            if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
-                // method will return not empty if item couldn't be added
-                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
-                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
-                    p.getWorld().dropItem(pb.getLocation(), blockOptions.createItem());
-                } else {
-                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
-                    e.setCancelled(true);
-                    return;
-                }
-            }
-        }
-
-        // check if removing the region and firing region remove event blocked it
-        if (!r.deleteRegion(true, p)) {
-            if (!ProtectionStones.getInstance().getConfigOptions().allowMergingHoles) { // side case if the removing creates a hole and those are prevented
-                PSL.msg(p, PSL.DELETE_REGION_PREVENTED_NO_HOLES.msg());
-            }
-            e.setCancelled(true);
-            return;
-        }
-
-        PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
-
-        e.setDropItems(false);
-        e.setExpToDrop(0);
     }
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
@@ -177,7 +198,6 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
-        String id = WGUtils.createPSID(event.getBlock().getLocation());
         if (ProtectionStones.isProtectBlock(event.getBlock())) {
             event.setCancelled(true);
         }
@@ -185,6 +205,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.isCancelled()) return;
         if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
@@ -241,6 +262,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPSCreate(PSCreateEvent event) {
+        if (event.isCancelled()) return;
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
         // run custom commands (in config)
@@ -251,6 +273,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPSRemove(PSRemoveEvent event) {
+        if (event.isCancelled()) return;
         if (event.getRegion().getTypeOptions() != null && !event.getRegion().getTypeOptions().eventsEnabled) return;
 
         // run custom commands (in config)

@@ -53,6 +53,7 @@ public class WGUtils {
         return new PSLocation(psx, psy, psz);
     }
 
+    // whether region overlaps an unowned region that is more priority
     public static boolean overlapsStrongerRegion(RegionManager rgm, ProtectedRegion r, LocalPlayer lp) {
         if (rgm.overlapsUnownedRegion(r, lp)) { // check if the lp is not owner of a intersecting region
             ApplicableRegionSet rp = rgm.getApplicableRegions(r);

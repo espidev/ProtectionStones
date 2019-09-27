@@ -144,6 +144,10 @@ prevent_block_place_in_restricted_world = true
     prevent_silk_touch = false
 
 [player]
+    # Whether or not to allow breaking the protection block with a shift-right click
+    # Useful if the protection block is unbreakable (bedrock, command block), etc.
+    allow_shift_right_break = false
+
     # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
     # Does not prevent entry, use the flag "entry deny" for preventing entry.
     # Bypass with protectionstones.tp.bypasstp

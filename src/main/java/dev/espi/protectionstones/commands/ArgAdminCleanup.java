@@ -37,7 +37,7 @@ class ArgAdminCleanup {
     static boolean argumentAdminCleanup(CommandSender p, String[] args) {
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
-            PSL.msg(p, PSL.ADMIN_CLEANUP_HELP.msg());
+            PSL.msg(p, ArgAdmin.CLEANUP_HELP);
             return true;
         }
 

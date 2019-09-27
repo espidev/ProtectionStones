@@ -24,7 +24,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Skull;
 import org.bukkit.command.CommandSender;
 
 import java.util.function.Consumer;
@@ -34,7 +33,7 @@ class ArgAdminChangeblock {
     // /ps admin changeblock [world] [fromblock] [toblock]
     static boolean argumentAdminChangeblock(CommandSender p, String[] args) {
         if (args.length < 5) {
-            PSL.msg(p, PSL.ADMIN_CHANGEBLOCK_HELP.msg());
+            PSL.msg(p, ArgAdmin.CHANGEBLOCK_HELP);
             return true;
         }
 

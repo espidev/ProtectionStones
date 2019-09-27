@@ -43,8 +43,8 @@ public class ArgAdminHelp {
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin lastlogons", "List all of the last logons of each player.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin stats [player (optional)]", "Show some statistics of the plugin.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin recreate", "Recreate all PS regions using radius set in config.");
-        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]", "Merge overlapping PS regions together if they have the same owners, members and flags.");
-        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [fromblock] [toblock]", "Change all of the PS blocks in a region to a different block. Both blocks must be configured in config.");
+        send(p, ArgAdmin.FORCEMERGE_HELP, "Merge overlapping PS regions together if they have the same owners, members and flags.");
+        send(p, ArgAdmin.CHANGEBLOCK_HELP, "Change all of the PS blocks in a region to a different block. Both blocks must be configured in config.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin fixregions", "Use this command to correct errors for all of the PS regions in a world. Useful if you have issues with the plugin.");
 
         return true;
