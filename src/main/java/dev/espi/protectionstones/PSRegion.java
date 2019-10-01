@@ -215,10 +215,8 @@ public abstract class PSRegion {
         if (isHidden()) {
             if (getType().startsWith("PLAYER_HEAD")) {
                 getProtectBlock().setType(Material.PLAYER_HEAD);
-                Skull s = (Skull) getProtectBlock().getState();
                 if (getType().split(":").length > 1) {
-                    s.setOwningPlayer(MiscUtil.getPlayerFromSkullType(getType()));
-                    s.update();
+                    MiscUtil.setHeadType(getType(), getProtectBlock());
                 }
             } else {
                 getProtectBlock().setType(Material.getMaterial(getType()));
@@ -263,9 +261,7 @@ public abstract class PSRegion {
             Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
             getProtectBlock().setType(set);
             if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
-                Skull s = (Skull) getProtectBlock().getState();
-                s.setOwningPlayer(MiscUtil.getPlayerFromSkullType(type.type));
-                s.update();
+                MiscUtil.setHeadType(type.type, getProtectBlock());
             }
         }
     }
