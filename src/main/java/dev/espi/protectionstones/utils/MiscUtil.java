@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones.utils;
 
+import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -33,6 +34,8 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.UUID;
 
 public class MiscUtil {
+    private final static int BASE64LENGTH = 180;
+
     public static int getPermissionNumber(Player p, String perm, int def) {
         int n = -999;
         for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
@@ -46,12 +49,22 @@ public class MiscUtil {
     }
 
     public static String getProtectBlockType(ItemStack i) {
-        if (i.getType() == Material.PLAYER_HEAD) {
-            String ret = i.getType().toString() + ":" + ((SkullMeta) (i.getItemMeta())).getOwningPlayer().getUniqueId();
+        if (i.getType() == Material.PLAYER_HEAD || i.getType() == Material.LEGACY_SKULL_ITEM) {
+
+            SkullMeta sm = (SkullMeta) i.getItemMeta();
+
+            // PLAYER_HEAD
+            if (!sm.hasOwner()) {
+                return Material.PLAYER_HEAD.toString();
+            }
+
+            // PLAYER_HEAD:UUID or PLAYER_HEAD:base64
+            String ret = i.getType().toString() + ":" + sm.getOwningPlayer().getUniqueId();
             if (ProtectionStones.isProtectBlockType(ret)) { // try returning uuid type first
                 return ret;
             }
-            return i.getType().toString() + ":" + ((SkullMeta) (i.getItemMeta())).getOwningPlayer().getName(); // return name if it doesn't exist
+            // PLAYER_HEAD:name
+            return i.getType().toString() + ":" + sm.getOwningPlayer().getName(); // return name if it doesn't exist
         }
         return i.getType().toString();
     }
@@ -62,12 +75,17 @@ public class MiscUtil {
             Skull s = (Skull) block.getState();
             if (s.hasOwner()) {
                 Bukkit.getLogger().info(s.getOwningPlayer().getName()); // TODO
+                Bukkit.getLogger().info(s.getOwningPlayer().toString());
+
+                // PLAYER_HEAD:UUID or PLAYER_HEAD:base64
                 String ret = Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getUniqueId();
                 if (ProtectionStones.isProtectBlockType(ret)) { // try returning uuid type first
                     return ret;
                 }
+
+                // PLAYER_HEAD:name
                 return Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName(); // return name if doesn't exist
-            } else {
+            } else { // PLAYER_HEAD
                 return Material.PLAYER_HEAD.toString();
             }
         } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
@@ -100,7 +118,7 @@ public class MiscUtil {
     public static void setHeadType(String psType, Block b) {
         if (psType.split(":").length < 2) return;
         String name = psType.split(":")[1];
-        if (name.length() == 180) {
+        if (name.length() == BASE64LENGTH) {
             blockWithBase64(b, name);
         } else {
             OfflinePlayer op = getPlayerFromSkullType(psType);
@@ -112,10 +130,10 @@ public class MiscUtil {
 
     public static ItemStack setHeadType(String psType, ItemStack item) {
         String name = psType.split(":")[1];
-        if (name.length() == 180) {
+        if (name.length() == BASE64LENGTH) {
             return itemWithBase64(item, name);
         } else {
-            ((SkullMeta)item.getItemMeta()).setOwningPlayer(getPlayerFromSkullType(psType));
+            ((SkullMeta) item.getItemMeta()).setOwningPlayer(getPlayerFromSkullType(psType));
             return item;
         }
     }
@@ -130,5 +148,21 @@ public class MiscUtil {
 
         BlockData blockData = Bukkit.getServer().createBlockData(block.getType(), "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
         block.setBlockData(blockData, true);
+    }
+
+    public static boolean isBase64PSHead(String type) {
+        return type.startsWith("PLAYER_HEAD") && type.split(":").length > 1 && type.split(":")[1].length() == BASE64LENGTH;
+    }
+
+    public static String getUUIDFromBase64PS(PSProtectBlock b) {
+        String base64 = b.type.split(":")[1];
+        ItemStack is = new ItemStack(Material.PLAYER_HEAD);
+        is = itemWithBase64(is, base64);
+        SkullMeta sm = (SkullMeta) is.getItemMeta();
+
+        Bukkit.getLogger().info(sm.getCustomTagContainer().toString());
+
+        assert sm.getOwningPlayer() != null;
+        return sm.getOwningPlayer().getUniqueId().toString();
     }
 }

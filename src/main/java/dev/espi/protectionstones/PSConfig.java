@@ -20,6 +20,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import dev.espi.protectionstones.utils.MiscUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
@@ -188,6 +189,11 @@ public class PSConfig {
                 Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
+
+                // for PLAYER_HEAD:base64, we need to add a second entry to link to its fake UUID
+                if (MiscUtil.isBase64PSHead(b.type)) {
+                    ProtectionStones.protectionStonesOptions.put(MiscUtil.getUUIDFromBase64PS(b), b);
+                }
 
                 // add custom recipes to Bukkit
                 if (b.allowCraftWithCustomRecipe) {
