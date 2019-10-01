@@ -18,7 +18,13 @@
 package dev.espi.protectionstones.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 public class MiscUtil {
@@ -32,5 +38,34 @@ public class MiscUtil {
             }
         }
         return n == -999 ? def : n;
+    }
+
+    public static String getProtectBlockType(ItemStack i) {
+        if (i.getType() == Material.PLAYER_HEAD) return i.getType().toString()  + ":" + ((SkullMeta)(i.getItemMeta())).getOwningPlayer().getName();
+        return i.getType().toString();
+    }
+    public static String getProtectBlockType(Block block) {
+        if (block.getType() == Material.PLAYER_HEAD || block.getType() == Material.PLAYER_WALL_HEAD) {
+
+            Skull s = (Skull) block.getState();
+            if (s.hasOwner()) {
+                return Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName();
+            } else {
+                return Material.PLAYER_HEAD.toString();
+            }
+        } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
+            return Material.CREEPER_HEAD.toString();
+        } else if (block.getType() == Material.DRAGON_WALL_HEAD) {
+            return Material.DRAGON_HEAD.toString();
+        } else if (block.getType() == Material.ZOMBIE_WALL_HEAD) {
+            return Material.ZOMBIE_HEAD.toString();
+        } else {
+            return block.getType().toString();
+        }
+    }
+
+    // for PSProtectBlock types
+    public static OfflinePlayer getPlayerFromSkullType(String type) {
+        
     }
 }

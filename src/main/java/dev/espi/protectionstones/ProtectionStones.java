@@ -25,13 +25,13 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -160,22 +160,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getBlockOptions(Block block) {
-        if (block.getType() == Material.PLAYER_HEAD || block.getType() == Material.PLAYER_WALL_HEAD) {
-            Skull s = (Skull) block.getState();
-            if (s.hasOwner()) {
-                return getBlockOptions(Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName());
-            } else {
-                return getBlockOptions(Material.PLAYER_HEAD.toString());
-            }
-        } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
-            return getBlockOptions(Material.CREEPER_HEAD.toString());
-        } else if (block.getType() == Material.DRAGON_WALL_HEAD) {
-            return getBlockOptions(Material.DRAGON_HEAD.toString());
-        } else if (block.getType() == Material.ZOMBIE_WALL_HEAD) {
-            return getBlockOptions(Material.ZOMBIE_HEAD.toString());
-        } else {
-            return getBlockOptions(block.getType().toString());
-        }
+        return getBlockOptions(MiscUtil.getProtectBlockType(block));
     }
 
     /**
@@ -320,14 +305,7 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
         // check basic item
-        if (!ProtectionStones.isProtectBlockType(item.getType().toString())) {
-            if (item.getType() == Material.PLAYER_HEAD) { // is player head
-                // does not have player name associated
-                if (!ProtectionStones.isProtectBlockType(item.getType().toString() + ":" + ((SkullMeta)(item.getItemMeta())).getOwningPlayer().getName())) return false;
-            } else {
-                return false;
-            }
-        }
+        if (!ProtectionStones.isProtectBlockType(MiscUtil.getProtectBlockType(item))) return false;
         // check for player heads
         if (!checkNBT) return true; // if not checking nbt, you only need to check type
 
