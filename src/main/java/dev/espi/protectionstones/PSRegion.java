@@ -21,6 +21,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -216,9 +217,9 @@ public abstract class PSRegion {
                 getProtectBlock().setType(Material.PLAYER_HEAD);
                 Skull s = (Skull) getProtectBlock().getState();
                 if (getType().split(":").length > 1) {
-                    s.setOwningPlayer(Bukkit.getOfflinePlayer(getType().split(":")[1]));
+                    s.setOwningPlayer(MiscUtil.getPlayerFromSkullType(getType()));
+                    s.update();
                 }
-                s.update();
             } else {
                 getProtectBlock().setType(Material.getMaterial(getType()));
             }
@@ -257,7 +258,17 @@ public abstract class PSRegion {
      * Change the type of the protection region.
      * @param type the type of protection region to switch to
      */
-    public abstract void setType(PSProtectBlock type);
+    public void setType(PSProtectBlock type) {
+        if (!isHidden()) {
+            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
+            getProtectBlock().setType(set);
+            if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
+                Skull s = (Skull) getProtectBlock().getState();
+                s.setOwningPlayer(MiscUtil.getPlayerFromSkullType(type.type));
+                s.update();
+            }
+        }
+    }
 
     /**
      * Get whether or not a player is an owner of this region.

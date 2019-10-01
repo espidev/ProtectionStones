@@ -350,7 +350,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // add skull metadata
         if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
-            ((SkullMeta) im).setOwningPlayer(Bukkit.getOfflinePlayer(b.type.split(":")[1]));
+            ((SkullMeta) im).setOwningPlayer(MiscUtil.getPlayerFromSkullType(b.type));
         }
 
         // add display name and lore

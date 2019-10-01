@@ -22,6 +22,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -147,15 +148,7 @@ public class PSMergedRegion extends PSRegion {
     @Override
     public void setType(PSProtectBlock type) {
 
-        if (!isHidden()) {
-            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
-            getProtectBlock().setType(set);
-            if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
-                Skull s = (Skull) getProtectBlock().getState();
-                s.setOwningPlayer(Bukkit.getOfflinePlayer(type.type.split(":")[1]));
-                s.update();
-            }
-        }
+        super.setType(type);
 
         // has to be after isHidden query
         this.type = type.type;
