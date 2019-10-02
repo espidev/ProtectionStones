@@ -23,10 +23,7 @@ import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.FlagHandler;
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.PSStandardRegion;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -85,10 +82,11 @@ public class ArgInfo implements PSCommandArg {
                 PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getID() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             }
 
-            if (r instanceof PSStandardRegion) {
-                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias);
+            if (r instanceof PSGroupRegion) {
+                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias + " " + PSL.INFO_MAY_BE_MERGED.msg());
+                displayMerged(p, (PSGroupRegion) r);
             } else {
-                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias + PSL.INFO_MAY_BE_MERGED.msg());
+                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias);
             }
 
             displayFlags(p, r);
@@ -146,27 +144,35 @@ public class ArgInfo implements PSCommandArg {
         return null;
     }
 
+    private static void displayMerged(Player p, PSGroupRegion r) {
+        StringBuilder msg = new StringBuilder();
+        for (PSMergedRegion pr : r.getMergedRegions()) {
+            msg.append(pr.getID() + " (" + pr.getTypeOptions().alias + "), ");
+        } // TODO
+        PSL.msg(p, PSL.INFO_MERGED.msg() + msg);
+    }
+
     private static void displayFlags(Player p, PSRegion r) {
         ProtectedRegion region = r.getWGRegion();
 
-        StringBuilder myFlag = new StringBuilder();
-        String myFlagValue;
+        StringBuilder flagDisp = new StringBuilder();
+        String flagValue;
         for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
             if (region.getFlag(flag) != null && !r.getTypeOptions().hiddenFlagsFromInfo.contains(flag.getName())) {
-                myFlagValue = region.getFlag(flag).toString();
+                flagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 
                 if (region.getFlag(groupFlag) != null) {
-                    myFlag.append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(myFlagValue).append(", " + ChatColor.GRAY);
+                    flagDisp.append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(flagValue).append(", " + ChatColor.GRAY);
                 } else {
-                    myFlag.append(flag.getName()).append(": ").append(myFlagValue).append(", " + ChatColor.GRAY);
+                    flagDisp.append(flag.getName()).append(": ").append(flagValue).append(", " + ChatColor.GRAY);
                 }
             }
         }
 
-        if (myFlag.length() > 2) {
-            myFlag = new StringBuilder(myFlag.substring(0, myFlag.length() - 2) + ".");
-            PSL.msg(p, PSL.INFO_FLAGS.msg() + myFlag);
+        if (flagDisp.length() > 2) {
+            flagDisp = new StringBuilder(flagDisp.substring(0, flagDisp.length() - 2) + ".");
+            PSL.msg(p, PSL.INFO_FLAGS.msg() + flagDisp);
         } else {
             PSL.msg(p, PSL.INFO_FLAGS.msg() + "(none)");
         }
