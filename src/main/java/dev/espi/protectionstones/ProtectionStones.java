@@ -139,7 +139,11 @@ public class ProtectionStones extends JavaPlugin {
      * @return the list of PSProtectBlocks configured
      */
     public List<PSProtectBlock> getConfiguredBlocks() {
-        return new ArrayList<>(protectionStonesOptions.values());
+        List<PSProtectBlock> l = new ArrayList<>();
+        for (PSProtectBlock b : protectionStonesOptions.values()) {
+            if (!l.contains(b)) l.add(b);
+        }
+        return l;
     }
 
 
@@ -348,7 +352,7 @@ public class ProtectionStones extends JavaPlugin {
         ItemMeta im = is.getItemMeta();
         assert im != null;
 
-        // add skull metadata
+        // add skull metadata, must be before others since it resets item metadata
         if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
             is = MiscUtil.setHeadType(b.type, is);
             im = is.getItemMeta();
