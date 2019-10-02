@@ -80,6 +80,8 @@ public class PSProtectBlock {
     public List<String> flags;
     @Path("region.allowed_flags")
     public List<String> allowedFlags;
+    @Path("region.hidden_flags_from_info")
+    public List<String> hiddenFlagsFromInfo;
     @Path("region.priority")
     public int priority;
     @Path("region.allow_overlap_unowned_regions")

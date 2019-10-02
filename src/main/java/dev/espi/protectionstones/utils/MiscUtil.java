@@ -51,6 +51,14 @@ public class MiscUtil {
         return n == -999 ? def : n;
     }
 
+    public static ItemStack getProtectBlockItemFromType(String type) {
+        if (type.startsWith(Material.PLAYER_HEAD.toString())) {
+            return new ItemStack(Material.PLAYER_HEAD);
+        } else {
+            return new ItemStack(Material.getMaterial(type));
+        }
+    }
+
     // WARNING: base64 items currently use custom tags in order to identify skull owners without NMS
     public static String getProtectBlockType(ItemStack i) {
         if (i.getType() == Material.PLAYER_HEAD || i.getType() == Material.LEGACY_SKULL_ITEM) {

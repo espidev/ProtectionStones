@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.PSStandardRegion;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -84,7 +85,13 @@ public class ArgInfo implements PSCommandArg {
                 PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getID() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             }
 
-            displayFlags(p, r.getWGRegion());
+            if (r instanceof PSStandardRegion) {
+                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias);
+            } else {
+                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias + PSL.INFO_MAY_BE_MERGED.msg());
+            }
+
+            displayFlags(p, r);
             displayOwners(p, r.getWGRegion());
             displayMembers(p, r.getWGRegion());
 
@@ -122,7 +129,7 @@ public class ArgInfo implements PSCommandArg {
                         PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
                         return true;
                     }
-                    displayFlags(p, r.getWGRegion());
+                    displayFlags(p, r);
                     break;
                 default:
                     PSL.msg(p, PSL.INFO_HELP.msg());
@@ -139,11 +146,13 @@ public class ArgInfo implements PSCommandArg {
         return null;
     }
 
-    private static void displayFlags(Player p, ProtectedRegion region) {
+    private static void displayFlags(Player p, PSRegion r) {
+        ProtectedRegion region = r.getWGRegion();
+
         StringBuilder myFlag = new StringBuilder();
         String myFlagValue;
         for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
-            if (region.getFlag(flag) != null && !flag.equals(FlagHandler.PS_MERGED_REGIONS) && !flag.equals(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
+            if (region.getFlag(flag) != null && !r.getTypeOptions().hiddenFlagsFromInfo.contains(flag.getName())) {
                 myFlagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 

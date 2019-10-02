@@ -342,12 +342,7 @@ public class ProtectionStones extends JavaPlugin {
 
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
-        ItemStack is;
-        if (b.type.startsWith(Material.PLAYER_HEAD.toString())) {
-            is = new ItemStack(Material.PLAYER_HEAD);
-        } else {
-            is = new ItemStack(Material.getMaterial(b.type));
-        }
+        ItemStack is = MiscUtil.getProtectBlockItemFromType(b.type);
 
         ItemMeta im = is.getItemMeta();
         assert im != null;

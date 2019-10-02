@@ -133,6 +133,8 @@ public enum PSL {
     INFO_HELP("info.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps info members|owners|flags"),
     INFO_HELP_DESC("info.help_desc", "Use this command inside a ps region to see more information about it."),
     INFO_HEADER("info.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Info " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    INFO_TYPE("info.type", ChatColor.BLUE + "Type: " + ChatColor.GRAY),
+    INFO_MAY_BE_MERGED("info.may_be_merged", "(may be merged with other types)"),
     INFO_MEMBERS("info.members", ChatColor.BLUE + "Members: " + ChatColor.GRAY),
     INFO_NO_MEMBERS("info.no_members", ChatColor.RED + "(no members)"),
     INFO_OWNERS("info.owners", ChatColor.BLUE + "Owners: " + ChatColor.GRAY),
