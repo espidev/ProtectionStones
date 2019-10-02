@@ -108,6 +108,8 @@ public class PSProtectBlock {
     // behaviour section
     @Path("behaviour.auto_hide")
     public boolean autoHide;
+    @Path("behaviour.auto_merge")
+    public boolean autoMerge;
     @Path("behaviour.no_drop")
     public boolean noDrop;
     @Path("behaviour.prevent_piston_push")

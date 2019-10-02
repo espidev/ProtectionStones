@@ -28,6 +28,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
+import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -274,17 +275,57 @@ class BlockHandler {
 
         // show merge menu
         if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
+
+            boolean showGUI = true;
+
             PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-            if (r != null) {
-                List<TextComponent> tc = ArgMerge.getGUI(p, r);
-                if (!tc.isEmpty()) { // if there are regions you can merge into
-                    p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                    PSL.msg(p, PSL.MERGE_INTO.msg());
-                    PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
-                    for (TextComponent t : tc) p.spigot().sendMessage(t);
-                    p.sendMessage(ChatColor.WHITE + ""); // send empty line
+
+            // auto merge to nearest region if only one exists
+            if (blockOptions.autoMerge) {
+                PSRegion mergeTo = null;
+
+                showGUI = true;
+                for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
+                    PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
+                    if (psr != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
+                        if (mergeTo == null) {
+                            mergeTo = psr;
+                            showGUI = false;
+                        } else {
+                            showGUI = true;
+                            break;
+                        }
+                    }
+                }
+
+                // actually do auto merge
+                if (!showGUI) {
+                    PSRegion finalMergeTo = mergeTo;
+                    Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                        try {
+                            WGMerge.mergeRegions(p.getWorld(), rm, finalMergeTo, Arrays.asList(finalMergeTo, r));
+                        } catch (WGMerge.RegionHoleException e) {
+
+                        }
+                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
+                    });
                 }
             }
+
+            // show merge gui
+            if (showGUI) {
+                if (r != null) {
+                    List<TextComponent> tc = ArgMerge.getGUI(p, r);
+                    if (!tc.isEmpty()) { // if there are regions you can merge into
+                        p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                        PSL.msg(p, PSL.MERGE_INTO.msg());
+                        PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                        for (TextComponent t : tc) p.spigot().sendMessage(t);
+                        p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                    }
+                }
+            }
+
         }
 
         return true;

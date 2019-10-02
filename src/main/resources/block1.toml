@@ -131,6 +131,9 @@ prevent_block_place_in_restricted_world = true
     # Hide protection stone right away when placed?
     auto_hide = false
 
+    # Whether or not to automatically merge into other regions when placed if there is only one overlapping and allow_merging is true
+    auto_merge = false
+
     # Disable returning the block when removed/unclaimed?
     no_drop = false
 
