@@ -158,7 +158,6 @@ public class MiscUtil {
 
         //BlockData blockData = Bukkit.getServer().createBlockData(block.getType(), "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
         //block.setBlockData(blockData, true);
-        Bukkit.getLogger().info(block.getBlockData().getAsString(false)); // TODO
 
         // data command is a terrible idea and not cross-world
         String args = String.format(
