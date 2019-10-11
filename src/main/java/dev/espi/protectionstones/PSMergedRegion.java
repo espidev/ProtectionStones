@@ -123,7 +123,7 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public void setHome(int blockX, int blockY, int blockZ) {
+    public void setHome(double blockX, double blockY, double blockZ) {
         mergedGroup.setHome(blockX, blockY, blockZ);
     }
 

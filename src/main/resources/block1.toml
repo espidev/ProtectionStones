@@ -49,9 +49,9 @@ prevent_block_place_in_restricted_world = true
     z_offset = 0
 
     # How many blocks to offset the default location of /ps home from the protection block
-    home_x_offset = 0
-    home_y_offset = 1
-    home_z_offset = 0
+    home_x_offset = 0.0
+    home_y_offset = 1.0
+    home_z_offset = 0.0
 
     # Specify the default flags to be set when a new protected region is created.
     # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).

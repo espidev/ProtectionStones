@@ -183,7 +183,7 @@ public abstract class PSRegion {
      * @param blockY block y location
      * @param blockZ block z location
      */
-    public abstract void setHome(int blockX, int blockY, int blockZ);
+    public abstract void setHome(double blockX, double blockY, double blockZ);
 
     /**
      * @return whether or not the protection block is hidden (/ps hide)

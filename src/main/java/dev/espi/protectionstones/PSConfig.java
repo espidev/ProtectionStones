@@ -289,6 +289,18 @@ public class PSConfig {
                 ProtectionStones.config.set("config_version", 10);
                 ProtectionStones.config.set("allow_merging_holes", true);
                 break;
+            case 10:
+                ProtectionStones.config.set("config_version", 11);
+                for (File file : ProtectionStones.blockDataFolder.listFiles()) {
+                    CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();
+                    c.load();
+                    c.set("region.home_x_offset", ((Integer) c.get("region.home_x_offset")).doubleValue());
+                    c.set("region.home_y_offset", ((Integer) c.get("region.home_y_offset")).doubleValue());
+                    c.set("region.home_z_offset", ((Integer) c.get("region.home_z_offset")).doubleValue());
+                    c.save();
+                    c.close();
+                }
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

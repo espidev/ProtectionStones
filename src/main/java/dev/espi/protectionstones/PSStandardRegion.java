@@ -21,14 +21,12 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
-import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -90,11 +88,11 @@ public class PSStandardRegion extends PSRegion {
         String oPos = wgregion.getFlag(FlagHandler.PS_HOME);
         if (oPos == null) return null;
         String[] pos = oPos.split(" ");
-        return new Location(world, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+        return new Location(world, Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]));
     }
 
     @Override
-    public void setHome(int blockX, int blockY, int blockZ) {
+    public void setHome(double blockX, double blockY, double blockZ) {
         wgregion.setFlag(FlagHandler.PS_HOME, blockX + " " + blockY + " " + blockZ);
     }
 
