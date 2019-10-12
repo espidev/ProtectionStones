@@ -128,6 +128,26 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public UUID getLandlord() {
+        return getParent().getWGRegion().getFlag(FlagHandler.PS_LANDLORD) == null ? null : UUID.fromString(getParent().getWGRegion().getFlag(FlagHandler.PS_LANDLORD));
+    }
+
+    @Override
+    public void setLandlord(UUID landlord) {
+        getParent().getWGRegion().setFlag(FlagHandler.PS_LANDLORD, landlord.toString());
+    }
+
+    @Override
+    public UUID getTenant() {
+        return getParent().getWGRegion().getFlag(FlagHandler.PS_TENANT) == null ? null : UUID.fromString(getParent().getWGRegion().getFlag(FlagHandler.PS_TENANT));
+    }
+
+    @Override
+    public void setTenant(UUID tenant) {
+        getParent().getWGRegion().setFlag(FlagHandler.PS_TENANT, tenant.toString());
+    }
+
+    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(id);
         return world.getBlockAt(psl.x, psl.y, psl.z);

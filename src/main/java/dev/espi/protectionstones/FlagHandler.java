@@ -49,6 +49,8 @@ public class FlagHandler {
     public static final Flag<String> PS_NAME = new StringFlag("ps-name");
     public static final Flag<Set<String>> PS_MERGED_REGIONS = new SetFlag<>("ps-merged-regions", new StringFlag("ps-merged-region"));
     public static final Flag<Set<String>> PS_MERGED_REGIONS_TYPES = new SetFlag<>("ps-merged-regions-types", new StringFlag("ps-merged-region-type")); // each entry: "[psID] [type]"
+    public static final Flag<String> PS_LANDLORD = new StringFlag("ps-landlord");
+    public static final Flag<String> PS_TENANT = new StringFlag("ps-tenant");
 
     // called on initial start
     static void registerFlags() {
@@ -59,6 +61,8 @@ public class FlagHandler {
             registry.register(PS_NAME);
             registry.register(PS_MERGED_REGIONS);
             registry.register(PS_MERGED_REGIONS_TYPES);
+            registry.register(PS_LANDLORD);
+            registry.register(PS_TENANT);
         } catch (FlagConflictException e) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();

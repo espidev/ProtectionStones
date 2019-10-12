@@ -186,6 +186,33 @@ public abstract class PSRegion {
     public abstract void setHome(double blockX, double blockY, double blockZ);
 
     /**
+     * Get the landlord of the region.
+     *
+     * @return returns the UUID of the landlord, or null if there is none.
+     */
+    public abstract UUID getLandlord();
+
+    /**
+     * Set the landlord of the region.
+     *
+     * @param landlord uuid of landlord
+     */
+    public abstract void setLandlord(UUID landlord);
+
+    /**
+     * Get the tenant of the region.
+     * @return returns the UUID of the tenant, or null if there is none.
+     */
+    public abstract UUID getTenant();
+
+    /**
+     * Set the tenant of the region
+     *
+     * @param tenant uuid of tenant
+     */
+    public abstract void setTenant(UUID tenant);
+
+    /**
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {

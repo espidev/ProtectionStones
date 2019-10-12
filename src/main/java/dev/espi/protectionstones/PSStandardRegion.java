@@ -97,6 +97,26 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public UUID getLandlord() {
+        return wgregion.getFlag(FlagHandler.PS_LANDLORD) == null ? null : UUID.fromString(wgregion.getFlag(FlagHandler.PS_LANDLORD));
+    }
+
+    @Override
+    public void setLandlord(UUID landlord) {
+        wgregion.setFlag(FlagHandler.PS_LANDLORD, landlord.toString());
+    }
+
+    @Override
+    public UUID getTenant() {
+        return wgregion.getFlag(FlagHandler.PS_TENANT) == null ? null : UUID.fromString(wgregion.getFlag(FlagHandler.PS_TENANT));
+    }
+
+    @Override
+    public void setTenant(UUID tenant) {
+        wgregion.setFlag(FlagHandler.PS_TENANT, tenant.toString());
+    }
+
+    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
         return world.getBlockAt(psl.x, psl.y, psl.z);
