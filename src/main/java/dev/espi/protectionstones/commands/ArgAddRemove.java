@@ -122,26 +122,32 @@ public class ArgAddRemove implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        switch (args[0].toLowerCase()) {
-            case "add":
-            case "addowner":
-                List<String> names = new ArrayList<>();
-                for (Player p : Bukkit.getOnlinePlayers()) names.add(p.getName());
-                return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
-            case "remove":
-            case "removeowner":
-                if (sender instanceof Player) {
-                    Player p = (Player) sender;
-                    PSRegion r = PSRegion.fromLocation(p.getLocation());
-                    if (r != null) {
-                        names = new ArrayList<>();
-                        for (UUID uuid : args[0].equalsIgnoreCase("remove") ? r.getMembers() : r.getOwners()) {
-                            names.add(UUIDCache.uuidToName.get(uuid));
-                        }
+        try {
+            if (args.length == 2) {
+                switch (args[0].toLowerCase()) {
+                    case "add":
+                    case "addowner":
+                        List<String> names = new ArrayList<>();
+                        for (Player p : Bukkit.getOnlinePlayers()) names.add(p.getName());
                         return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
-                    }
+                    case "remove":
+                    case "removeowner":
+                        if (sender instanceof Player) {
+                            Player p = (Player) sender;
+                            PSRegion r = PSRegion.fromLocation(p.getLocation());
+                            if (r != null) {
+                                names = new ArrayList<>();
+                                for (UUID uuid : args[0].equalsIgnoreCase("remove") ? r.getMembers() : r.getOwners()) {
+                                    names.add(UUIDCache.uuidToName.get(uuid));
+                                }
+                                return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
+                            }
+                        }
+                        break;
                 }
-                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
