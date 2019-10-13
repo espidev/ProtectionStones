@@ -65,6 +65,8 @@ public class ProtectionStones extends JavaPlugin {
     private static List<PSCommandArg> commandArgs = new ArrayList<>();
     private static ProtectionStones plugin;
 
+    private PSEconomy economy;
+
     // all configuration file options are stored in here
     private PSConfig configOptions;
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
@@ -119,6 +121,10 @@ public class ProtectionStones extends JavaPlugin {
         return vaultEconomy;
     }
 
+    public PSEconomy getPSEconomy() {
+        return economy;
+    }
+
     /**
      * @return returns the config options of this instance of ProtectionStones
      */
@@ -154,6 +160,13 @@ public class ProtectionStones extends JavaPlugin {
      */
     public static ProtectionStones getInstance() {
         return plugin;
+    }
+
+    /**
+     * @return the PSEconomy object adapter
+     */
+    public static PSEconomy getEconomy() {
+        return getInstance().getPSEconomy();
     }
 
     /**
@@ -453,6 +466,9 @@ public class ProtectionStones extends JavaPlugin {
 
         // init help menu
         ArgHelp.initHelpMenu();
+
+        // load economy
+        ProtectionStones.getInstance().economy = new PSEconomy();
 
         // add command to Bukkit (using reflection)
         if (!isReload) {

@@ -195,7 +195,7 @@ public abstract class PSRegion {
     /**
      * Set the landlord of the region.
      *
-     * @param landlord uuid of landlord
+     * @param landlord uuid of landlord, or null to remove
      */
     public abstract void setLandlord(UUID landlord);
 
@@ -208,9 +208,61 @@ public abstract class PSRegion {
     /**
      * Set the tenant of the region
      *
-     * @param tenant uuid of tenant
+     * @param tenant uuid of tenant, or null to remove
      */
     public abstract void setTenant(UUID tenant);
+
+    /**
+     * Get the rent period of the region
+     * @return returns the rent duration, or null if there is none
+     */
+    public abstract String getRentPeriod();
+
+    /**
+     * Set the rent period of the region
+     * @param s the duration between rent payments (d h m s), or null to remove
+     */
+    public abstract void setRentPeriod(String s);
+
+    /**
+     * Get the rent price of the region
+     * @return the price of the region during rent payments, or null if there is no rent
+     */
+    public abstract Double getRentPrice();
+
+    /**
+     * Set the rent price of the region.
+     * @param price the price of the region during rent payments, or null if there is no rent
+     */
+    public abstract void setRentPrice(Double price);
+
+    /**
+     * Set the unix timestamp of when rent was last paid.
+     * @param timestamp the unix timestamp of when rent was last paid, or null
+     */
+    public abstract void setRentLastPaid(Long timestamp);
+
+    /**
+     * Get the unix timestamp of when rent was last paid.
+     * @return the unix timestamp of when rent was last paid, or null if not renting
+     */
+    public abstract Long getRentLastPaid();
+
+    /**
+     * Starts renting process (adds to rent queue) and setup renting.
+     * MUST BE CALLED when setting up rent.
+     * @param landlord the landlord of the region
+     * @param tenant the tenant of the region
+     * @param rentPeriod the rent period (d h m s) of the region
+     * @param rentPrice the price to charge during each rent payment
+     */
+    public abstract void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice);
+
+    /**
+     * Stop renting process and remove tenant.
+     * MUST BE CALLED when removing rent.
+     */
+    public abstract void removeRenting();
 
     /**
      * @return whether or not the protection block is hidden (/ps hide)

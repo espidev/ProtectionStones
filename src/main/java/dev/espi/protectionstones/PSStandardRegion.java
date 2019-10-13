@@ -117,6 +117,65 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public String getRentPeriod() {
+        return wgregion.getFlag(FlagHandler.PS_RENT_PERIOD);
+    }
+
+    @Override
+    public void setRentPeriod(String s) {
+        wgregion.setFlag(FlagHandler.PS_RENT_PERIOD, s);
+    }
+
+    @Override
+    public Double getRentPrice() {
+        return wgregion.getFlag(FlagHandler.PS_RENT);
+    }
+
+    @Override
+    public void setRentPrice(Double price) {
+        wgregion.setFlag(FlagHandler.PS_RENT, price);
+    }
+
+    @Override
+    public void setRentLastPaid(Long timestamp) {
+        wgregion.setFlag(FlagHandler.PS_RENT_LAST_PAID, timestamp == null ? null : timestamp.doubleValue());
+    }
+
+    @Override
+    public Long getRentLastPaid() {
+        return wgregion.getFlag(FlagHandler.PS_RENT_LAST_PAID) == null ? null : wgregion.getFlag(FlagHandler.PS_RENT_LAST_PAID).longValue();
+    }
+
+    @Override
+    public void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
+        setLandlord(landlord);
+        setTenant(tenant);
+        setRentPeriod(rentPeriod);
+        setRentPrice(rentPrice);
+        setRentLastPaid(System.currentTimeMillis()/1000L);
+
+        ProtectionStones.getEconomy().getRentedList().add(this);
+        getWGRegion().getOwners().removeAll();
+        getWGRegion().getMembers().removeAll();
+        getWGRegion().getOwners().addPlayer(tenant);
+    }
+
+    @Override
+    public void removeRenting() {
+        getWGRegion().getOwners().removeAll();
+        getWGRegion().getMembers().removeAll();
+        getWGRegion().getOwners().addPlayer(getLandlord());
+
+        setLandlord(null);
+        setTenant(null);
+        setRentPeriod(null);
+        setRentPrice(null);
+        setRentLastPaid(null);
+
+        ProtectionStones.getEconomy().getRentedList().remove(this);
+    }
+
+    @Override
     public Block getProtectBlock() {
         PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
         return world.getBlockAt(psl.x, psl.y, psl.z);

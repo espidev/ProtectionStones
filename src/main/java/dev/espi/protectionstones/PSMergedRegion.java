@@ -129,22 +129,62 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public UUID getLandlord() {
-        return getParent().getWGRegion().getFlag(FlagHandler.PS_LANDLORD) == null ? null : UUID.fromString(getParent().getWGRegion().getFlag(FlagHandler.PS_LANDLORD));
+        return getParent().getLandlord();
     }
 
     @Override
     public void setLandlord(UUID landlord) {
-        getParent().getWGRegion().setFlag(FlagHandler.PS_LANDLORD, landlord.toString());
+        getParent().setLandlord(landlord);
     }
 
     @Override
     public UUID getTenant() {
-        return getParent().getWGRegion().getFlag(FlagHandler.PS_TENANT) == null ? null : UUID.fromString(getParent().getWGRegion().getFlag(FlagHandler.PS_TENANT));
+        return getParent().getTenant();
     }
 
     @Override
     public void setTenant(UUID tenant) {
-        getParent().getWGRegion().setFlag(FlagHandler.PS_TENANT, tenant.toString());
+        getParent().setTenant(tenant);
+    }
+
+    @Override
+    public String getRentPeriod() {
+        return getParent().getRentPeriod();
+    }
+
+    @Override
+    public void setRentPeriod(String s) {
+        getParent().setRentPeriod(s);
+    }
+
+    @Override
+    public Double getRentPrice() {
+        return getParent().getRentPrice();
+    }
+
+    @Override
+    public void setRentPrice(Double price) {
+        getParent().setRentPrice(price);
+    }
+
+    @Override
+    public void setRentLastPaid(Long timestamp) {
+        getParent().setRentLastPaid(timestamp);
+    }
+
+    @Override
+    public Long getRentLastPaid() {
+        return getParent().getRentLastPaid();
+    }
+
+    @Override
+    public void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
+        getParent().setupRenting(landlord, tenant, rentPeriod, rentPrice);
+    }
+
+    @Override
+    public void removeRenting() {
+        getParent().removeRenting();
     }
 
     @Override
