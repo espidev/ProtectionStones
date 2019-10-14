@@ -117,7 +117,7 @@ public class ArgRent implements PSCommandArg {
                     break;
 
                 case "stoplease":
-                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING)) {
+                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && !p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING)) {
                         PSL.msg(p, PSL.NOT_OWNER.msg());
                         break;
                     }
@@ -170,7 +170,7 @@ public class ArgRent implements PSCommandArg {
 
                     PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName()));
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
-                        PSL.msg(p, PSL.RENT_TENANT_STOPPED_LANDLORD.msg()
+                        PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_TENANT_STOPPED_LANDLORD.msg()
                                 .replace("%player%", p.getName())
                                 .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
                     }
