@@ -84,10 +84,10 @@ prevent_block_place_in_restricted_world = true
         "ps-merged-regions",
         "ps-merged-regions-types",
         "ps-block-material",
+        "ps-price",
         "ps-landlord",
         "ps-tenant",
         "ps-rent-period",
-        "ps-rent",
         "ps-rent-last-paid"
     ]
 

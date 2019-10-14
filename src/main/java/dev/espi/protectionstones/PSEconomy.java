@@ -31,10 +31,10 @@ import java.util.List;
 
 public class PSEconomy {
     private List<PSRegion> rentedList = new ArrayList<>();
-    private static int economyRunner = -1;
+    private static int rentRunner = -1;
 
     public PSEconomy() {
-        if (economyRunner != -1) Bukkit.getScheduler().cancelTask(economyRunner);
+        if (rentRunner != -1) Bukkit.getScheduler().cancelTask(rentRunner);
         if (!ProtectionStones.getInstance().isVaultSupportEnabled()) {
             ProtectionStones.getInstance().getLogger().warning("Vault is not enabled! Economy functions (renting & buying) will not work!");
             return;
@@ -43,7 +43,7 @@ public class PSEconomy {
         loadRentList();
 
         // start rent
-        economyRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateRents, 200, 0).getTaskId();
+        rentRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateRents, 200, 0).getTaskId();
     }
 
     /**
@@ -62,32 +62,20 @@ public class PSEconomy {
 
     public void updateRents() {
 
-        // TODO check for nulls when looping through rented lists
-
-        for (PSRegion r : rentedList) {
-            Duration rentPeriod = Duration.ZERO;
-            for (String s : r.getRentPeriod().split(" ")) {
-                try {
-                    if (s.contains("w")) {
-                        rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", ""))*7);
-                    } else if (s.contains("d")) {
-                        rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("d", "")));
-                    } else if (s.contains("h")) {
-                        rentPeriod = rentPeriod.plusHours(Long.parseLong(s.replace("h", "")));
-                    } else if (s.contains("m")) {
-                        rentPeriod = rentPeriod.plusMinutes(Long.parseLong(s.replace("m", "")));
-                    } else if (s.contains("s")) {
-                        rentPeriod = rentPeriod.plusSeconds(Long.parseLong(s.replace("s", "")));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        for (int i = 0; i < rentedList.size(); i++) {
+            PSRegion r = rentedList.get(i);
+            if (r.getRentStage() != PSRegion.RentStage.RENTING) {
+                // remove entry if it isn't in renting stage.
+                rentedList.remove(i);
+                i--;
+                continue;
             }
-            
+
+            Duration rentPeriod = parseRentPeriod(r.getRentPeriod());
             // if tenant needs to pay
             if (Instant.now().getEpochSecond() > r.getRentLastPaid() + rentPeriod.getSeconds()) {
-                ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(r.getTenant()), r.getRentPrice());
-                ProtectionStones.getInstance().getVaultEconomy().depositPlayer(Bukkit.getOfflinePlayer(r.getLandlord()), r.getRentPrice());
+                ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(r.getTenant()), r.getPrice());
+                ProtectionStones.getInstance().getVaultEconomy().depositPlayer(Bukkit.getOfflinePlayer(r.getLandlord()), r.getPrice());
                 r.setRentLastPaid(Instant.now().getEpochSecond());
             }
             
@@ -102,4 +90,25 @@ public class PSEconomy {
         return rentedList;
     }
 
+    public Duration parseRentPeriod(String period) {
+        Duration rentPeriod = Duration.ZERO;
+        for (String s : period.split(" ")) {
+            try {
+                if (s.contains("w")) {
+                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", ""))*7);
+                } else if (s.contains("d")) {
+                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("d", "")));
+                } else if (s.contains("h")) {
+                    rentPeriod = rentPeriod.plusHours(Long.parseLong(s.replace("h", "")));
+                } else if (s.contains("m")) {
+                    rentPeriod = rentPeriod.plusMinutes(Long.parseLong(s.replace("m", "")));
+                } else if (s.contains("s")) {
+                    rentPeriod = rentPeriod.plusSeconds(Long.parseLong(s.replace("s", "")));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return rentPeriod;
+    }
 }

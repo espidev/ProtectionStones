@@ -98,6 +98,17 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public RentStage getRentStage() {
+        if (getLandlord() == null && getTenant() == null) {
+            return RentStage.NOT_RENTING;
+        } else if (getTenant() == null) {
+            return RentStage.LOOKING_FOR_TENANT;
+        } else {
+            return RentStage.RENTING;
+        }
+    }
+
+    @Override
     public UUID getLandlord() {
         return wgregion.getFlag(FlagHandler.PS_LANDLORD) == null ? null : UUID.fromString(wgregion.getFlag(FlagHandler.PS_LANDLORD));
     }
@@ -128,13 +139,13 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public Double getRentPrice() {
-        return wgregion.getFlag(FlagHandler.PS_RENT);
+    public Double getPrice() {
+        return wgregion.getFlag(FlagHandler.PS_PRICE);
     }
 
     @Override
-    public void setRentPrice(Double price) {
-        wgregion.setFlag(FlagHandler.PS_RENT, price);
+    public void setPrice(Double price) {
+        wgregion.setFlag(FlagHandler.PS_PRICE, price);
     }
 
     @Override
@@ -148,11 +159,19 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
+    public void setRentable(UUID landlord, String rentPeriod, double rentPrice) {
+        setLandlord(landlord);
+        setTenant(null);
+        setRentPeriod(rentPeriod);
+        setPrice(rentPrice);
+    }
+
+    @Override
+    public void rentOut(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
         setLandlord(landlord);
         setTenant(tenant);
         setRentPeriod(rentPeriod);
-        setRentPrice(rentPrice);
+        setPrice(rentPrice);
         setRentLastPaid(Instant.now().getEpochSecond());
 
         ProtectionStones.getEconomy().getRentedList().add(this);
@@ -170,7 +189,7 @@ public class PSStandardRegion extends PSRegion {
         setLandlord(null);
         setTenant(null);
         setRentPeriod(null);
-        setRentPrice(null);
+        setPrice(null);
         setRentLastPaid(null);
 
         ProtectionStones.getEconomy().getRentedList().remove(this);

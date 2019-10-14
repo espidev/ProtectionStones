@@ -28,7 +28,6 @@ import dev.espi.protectionstones.flags.GreetingFlagHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class FlagHandler {
     public static final Flag<String> PS_LANDLORD = new StringFlag("ps-landlord");
     public static final Flag<String> PS_TENANT = new StringFlag("ps-tenant");
     public static final Flag<String> PS_RENT_PERIOD = new StringFlag("ps-rent-period");
-    public static final Flag<Double> PS_RENT = new DoubleFlag("ps-rent");
+    public static final Flag<Double> PS_PRICE = new DoubleFlag("ps-price");
     public static final Flag<Double> PS_RENT_LAST_PAID = new DoubleFlag("ps-rent-last-paid");
 
     // called on initial start
@@ -65,10 +64,11 @@ public class FlagHandler {
             registry.register(PS_NAME);
             registry.register(PS_MERGED_REGIONS);
             registry.register(PS_MERGED_REGIONS_TYPES);
+
             registry.register(PS_LANDLORD);
             registry.register(PS_TENANT);
             registry.register(PS_RENT_PERIOD);
-            registry.register(PS_RENT);
+            registry.register(PS_PRICE);
             registry.register(PS_RENT_LAST_PAID);
         } catch (FlagConflictException e) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");

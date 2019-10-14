@@ -185,6 +185,15 @@ public abstract class PSRegion {
      */
     public abstract void setHome(double blockX, double blockY, double blockZ);
 
+    public enum RentStage {
+        NOT_RENTING, LOOKING_FOR_TENANT, RENTING
+    }
+
+    /**
+     * @return get the stage of the renting process
+     */
+    public abstract RentStage getRentStage();
+
     /**
      * Get the landlord of the region.
      *
@@ -225,16 +234,18 @@ public abstract class PSRegion {
     public abstract void setRentPeriod(String s);
 
     /**
-     * Get the rent price of the region
+     * Get the price of the region
+     * This applies to either the rent or the full purchase of a region.
      * @return the price of the region during rent payments, or null if there is no rent
      */
-    public abstract Double getRentPrice();
+    public abstract Double getPrice();
 
     /**
-     * Set the rent price of the region.
-     * @param price the price of the region during rent payments, or null if there is no rent
+     * Set the price of the region.
+     * This applies to either the rent or the full purchase of a region.
+     * @param price the price of the region, or null if there is no rent
      */
-    public abstract void setRentPrice(Double price);
+    public abstract void setPrice(Double price);
 
     /**
      * Set the unix timestamp of when rent was last paid.
@@ -249,6 +260,14 @@ public abstract class PSRegion {
     public abstract Long getRentLastPaid();
 
     /**
+     * MUST BE CALLED when the region is looking for a tenant.
+     * @param landlord the landlord of the region
+     * @param rentPeriod the rent period (d h m s) of the region
+     * @param rentPrice the price to charge during each rent payment
+     */
+    public abstract void setRentable(UUID landlord, String rentPeriod, double rentPrice);
+
+    /**
      * Starts renting process (adds to rent queue) and setup renting.
      * MUST BE CALLED when setting up rent.
      * @param landlord the landlord of the region
@@ -256,7 +275,7 @@ public abstract class PSRegion {
      * @param rentPeriod the rent period (d h m s) of the region
      * @param rentPrice the price to charge during each rent payment
      */
-    public abstract void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice);
+    public abstract void rentOut(UUID landlord, UUID tenant, String rentPeriod, double rentPrice);
 
     /**
      * Stop renting process and remove tenant.

@@ -128,6 +128,11 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public RentStage getRentStage() {
+        return getParent().getRentStage();
+    }
+
+    @Override
     public UUID getLandlord() {
         return getParent().getLandlord();
     }
@@ -158,13 +163,13 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public Double getRentPrice() {
-        return getParent().getRentPrice();
+    public Double getPrice() {
+        return getParent().getPrice();
     }
 
     @Override
-    public void setRentPrice(Double price) {
-        getParent().setRentPrice(price);
+    public void setPrice(Double price) {
+        getParent().setPrice(price);
     }
 
     @Override
@@ -178,8 +183,13 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public void setupRenting(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
-        getParent().setupRenting(landlord, tenant, rentPeriod, rentPrice);
+    public void setRentable(UUID landlord, String rentPeriod, double rentPrice) {
+        getParent().setRentable(landlord, rentPeriod, rentPrice);
+    }
+
+    @Override
+    public void rentOut(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
+        getParent().rentOut(landlord, tenant, rentPeriod, rentPrice);
     }
 
     @Override
