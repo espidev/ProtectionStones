@@ -29,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.time.Instant;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -152,7 +153,7 @@ public class PSStandardRegion extends PSRegion {
         setTenant(tenant);
         setRentPeriod(rentPeriod);
         setRentPrice(rentPrice);
-        setRentLastPaid(System.currentTimeMillis()/1000L);
+        setRentLastPaid(Instant.now().getEpochSecond());
 
         ProtectionStones.getEconomy().getRentedList().add(this);
         getWGRegion().getOwners().removeAll();
