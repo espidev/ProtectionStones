@@ -55,7 +55,10 @@ public class ListenerClass implements Listener {
         UUIDCache.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
         UUIDCache.nameToUUID.remove(e.getPlayer().getName());
         UUIDCache.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
-        WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
+
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGH)
