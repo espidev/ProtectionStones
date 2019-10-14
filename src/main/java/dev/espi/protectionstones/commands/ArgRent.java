@@ -17,26 +17,26 @@
 
 package dev.espi.protectionstones.commands;
 
+import dev.espi.protectionstones.PSEconomy;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
-import org.apache.commons.lang.StringUtils;
+import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ArgRent implements PSCommandArg {
 
     static final String LEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent lease [price] [period]",
-            UNLEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent unlease",
+            UNLEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoplease",
             RENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent rent",
-            UNRENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent unrent";
+            UNRENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoprenting";
 
     @Override
     public List<String> getNames() {
@@ -87,38 +87,94 @@ public class ArgRent implements PSCommandArg {
 
             if (r == null) {
                 PSL.msg(p, PSL.NOT_IN_REGION.msg());
+                return true;
             }
 
             switch (args[0]) {
                 case "lease":
-                    if (!r.isOwner(p.getUniqueId())) {
-
+                    if (!r.isOwner(p.getUniqueId())) { // check if player is a region owner
+                        PSL.msg(p, PSL.NOT_OWNER.msg());
                         break;
                     }
-                    if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
+                    if (r.getRentStage() == PSRegion.RentStage.RENTING) { // check if already renting
+                        PSL.msg(p, PSL.RENT_ALREADY_RENTING.msg());
                         break;
                     }
                     if (args.length < 4) {
                         PSL.msg(p, LEASE_HELP);
                         break;
                     }
-                    if (!NumberUtils.isNumber(args[2])) {
+                    if (!NumberUtils.isNumber(args[2])) { // check price
                         PSL.msg(p, LEASE_HELP);
+                        break;
                     }
 
                     String period = String.join(" ", Arrays.asList(args).subList(3, args.length));
+                    // TODO period check
 
                     r.setRentable(p.getUniqueId(), period, Double.parseDouble(args[2]));
-
+                    PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
                     break;
-                case "unlease":
-                    if (r.getLandlord() == null || !r.getLandlord().equals(p.getUniqueId())) {
+
+                case "stoplease":
+                    if (!r.isOwner(p.getUniqueId())) {
+                        PSL.msg(p, PSL.NOT_OWNER.msg());
                         break;
                     }
+                    if (r.getRentStage() == PSRegion.RentStage.NOT_RENTING) {
+                        PSL.msg(p, PSL.RENT_NOT_RENTED.msg());
+                        break;
+                    }
+
+                    UUID tenant = r.getTenant();
+                    r.removeRenting();
+
+                    PSL.msg(p, PSL.RENT_STOPPED.msg());
+                    if (tenant != null) {
+                        PSL.msg(p, PSL.RENT_EVICTED.msg().replace("%tenant%", UUIDCache.uuidToName.get(tenant)));
+                    }
                     break;
+
                 case "rent":
+                    if (r.getRentStage() != PSRegion.RentStage.LOOKING_FOR_TENANT) {
+                        PSL.msg(p, PSL.RENT_NOT_RENTING.msg());
+                        break;
+                    }
+                    if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice())) {
+                        PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", "" + r.getPrice()));
+                        break;
+                    }
+
+                    r.rentOut(r.getLandlord(), p.getUniqueId(), r.getRentPeriod(), r.getPrice());
+                    PSEconomy.doRentPayment(r);
+                    PSL.msg(p, PSL.RENT_RENTING_TENANT.msg()
+                            .replace("%region%", r.getName() == null ? r.getID() : r.getName())
+                            .replace("%price%", String.format("%.2f", r.getPrice()))
+                            .replace("%period%", r.getRentPeriod()));
+
+                    if (Bukkit.getPlayer(r.getLandlord()) != null) {
+                        PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_RENTING_LANDLORD.msg()
+                                .replace("%player%", p.getName())
+                                .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                    }
+
                     break;
-                case "unrent":
+
+                case "stoprenting":
+                    if (r.getTenant() == null || !r.getTenant().equals(p.getUniqueId())) {
+                        PSL.msg(p, PSL.RENT_NOT_TENANT.msg());
+                        break;
+                    }
+
+                    r.setTenant(null);
+
+                    PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                    if (Bukkit.getPlayer(r.getLandlord()) != null) {
+                        PSL.msg(p, PSL.RENT_TENANT_STOPPED_LANDLORD.msg()
+                                .replace("%player%", p.getName())
+                                .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                    }
+
                     break;
             }
         }

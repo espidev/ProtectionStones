@@ -20,6 +20,7 @@ package dev.espi.protectionstones;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 
 import java.time.Duration;
@@ -60,6 +61,28 @@ public class PSEconomy {
         }
     }
 
+    public static void doRentPayment(PSRegion r) {
+        OfflinePlayer tenant = Bukkit.getOfflinePlayer(r.getTenant());
+        OfflinePlayer landlord = Bukkit.getOfflinePlayer(r.getLandlord());
+
+        if (tenant.isOnline()) {
+            PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
+                    .replace("%price%", String.format("%.2f", r.getPrice()))
+                    .replace("%landlord%", landlord.getName())
+                    .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
+        }
+        if (landlord.isOnline()) {
+            PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_PAID_LANDLORD.msg()
+                    .replace("%price%", String.format("%.2f", r.getPrice()))
+                    .replace("%tenant%", tenant.getName())
+                    .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
+        }
+
+        ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(tenant, r.getPrice());
+        ProtectionStones.getInstance().getVaultEconomy().depositPlayer(landlord, r.getPrice());
+        r.setRentLastPaid(Instant.now().getEpochSecond());
+    }
+
     public void updateRents() {
 
         for (int i = 0; i < rentedList.size(); i++) {
@@ -74,9 +97,7 @@ public class PSEconomy {
             Duration rentPeriod = parseRentPeriod(r.getRentPeriod());
             // if tenant needs to pay
             if (Instant.now().getEpochSecond() > r.getRentLastPaid() + rentPeriod.getSeconds()) {
-                ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(r.getTenant()), r.getPrice());
-                ProtectionStones.getInstance().getVaultEconomy().depositPlayer(Bukkit.getOfflinePlayer(r.getLandlord()), r.getPrice());
-                r.setRentLastPaid(Instant.now().getEpochSecond());
+                doRentPayment(r);
             }
             
         }

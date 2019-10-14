@@ -98,6 +98,7 @@ public enum PSL {
     MULTI_REGION_DOES_NOT_EXIST("psregion.multi_region_does_not_exist", "One of these regions don't exist!"),
     NO_REGION_HOLES("psregion.no_region_holes", ChatColor.RED + "Unprotected area detected inside region! This is not allowed!"),
     DELETE_REGION_PREVENTED_NO_HOLES("psregion.delete_region_prevented", ChatColor.GRAY + "The region could not be removed, possibly because it creates a hole in the existing region."),
+    NOT_OWNER("psregion.not_owner", ChatColor.RED + "You are not an owner of this region!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
@@ -126,6 +127,19 @@ public enum PSL {
     RENT_HELP("rent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent"),
     RENT_HELP_DESC("rent.help_desc", "Use this command to manage rents (buying and selling)."),
     RENT_HELP_HEADER("rent.help_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Rent Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    RENT_ALREADY_RENTING("rent.already_renting", ChatColor.RED + "The region is already being rented out! You must stop leasing the region first."),
+    RENT_NOT_RENTED("rent.not_rented", ChatColor.RED + "This region is not being rented."),
+    RENT_LEASE_SUCCESS("rent.lease_success", ChatColor.AQUA + "Region leasing terms set:\n" + ChatColor.AQUA + "Price: " + ChatColor.GRAY + "%price%\n" + ChatColor.AQUA + "Payment Term: " + ChatColor.GRAY + "%period%"),
+    RENT_STOPPED("rent.stopped", ChatColor.AQUA + "Leasing stopped."),
+    RENT_EVICTED("rent.evicted", ChatColor.GRAY + "Evicted tenant %tenant%."),
+    RENT_NOT_RENTING("rent.not_renting", ChatColor.RED + "This region is not being rented out to tenants."),
+    RENT_PAID_LANDLORD("rent.paid_landlord", ChatColor.AQUA + "%tenant%" + ChatColor.GRAY + " has paid " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " for renting out " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + "."),
+    RENT_PAID_TENANT("rent.paid_tenant", ChatColor.GRAY + "Paid " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%landlord%" + ChatColor.GRAY + " for region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + "."),
+    RENT_RENTING_LANDLORD("rent.renting_landlord", "%player% is now renting out region %region%."),
+    RENT_RENTING_TENANT("rent.renting_tenant", ChatColor.GRAY + "You are now renting out region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " per " + ChatColor.AQUA + "%period%" + ChatColor.GRAY + "."),
+    RENT_NOT_TENANT("rent.not_tenant", ChatColor.RED + "You are not the tenant of this region!"),
+    RENT_TENANT_STOPPED_LANDLORD("rent.tenant_stopped_landlord", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has stopped renting out region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + ". It is now available for others to rent."),
+    RENT_TENANT_STOPPED_TENANT("rent.tenant_stopped_tenant", ChatColor.AQUA + "You have stopped renting out region %region%."),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),
