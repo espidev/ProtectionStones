@@ -34,9 +34,9 @@ import java.util.*;
 public class ArgRent implements PSCommandArg {
 
     static final String LEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent lease [price] [period]",
-            UNLEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoplease",
+            STOPLEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoplease",
             RENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent rent",
-            UNRENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoprenting";
+            STOPRENTING_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoprenting";
 
     @Override
     public List<String> getNames() {
@@ -61,9 +61,9 @@ public class ArgRent implements PSCommandArg {
     private void runHelp(CommandSender s) {
         PSL.msg(s, PSL.RENT_HELP_HEADER.msg());
         PSL.msg(s, LEASE_HELP);
-        PSL.msg(s, UNLEASE_HELP);
+        PSL.msg(s, STOPLEASE_HELP);
         PSL.msg(s, RENT_HELP);
-        PSL.msg(s, UNRENT_HELP);
+        PSL.msg(s, STOPRENTING_HELP);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class ArgRent implements PSCommandArg {
                 return true;
             }
 
-            switch (args[0]) {
+            switch (args[1]) {
                 case "lease":
                     if (!r.isOwner(p.getUniqueId())) { // check if player is a region owner
                         PSL.msg(p, PSL.NOT_OWNER.msg());
@@ -117,7 +117,7 @@ public class ArgRent implements PSCommandArg {
                     break;
 
                 case "stoplease":
-                    if (!r.isOwner(p.getUniqueId())) {
+                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING)) {
                         PSL.msg(p, PSL.NOT_OWNER.msg());
                         break;
                     }
@@ -183,7 +183,7 @@ public class ArgRent implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> arg = Arrays.asList("lease", "unlease", "rent", "unrent");
+        List<String> arg = Arrays.asList("lease", "stoplease", "rent", "stoprenting");
         return args.length == 2 ? StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>()) : null;
     }
 }

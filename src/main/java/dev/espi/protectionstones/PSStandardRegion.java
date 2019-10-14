@@ -115,7 +115,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setLandlord(UUID landlord) {
-        wgregion.setFlag(FlagHandler.PS_LANDLORD, landlord.toString());
+        wgregion.setFlag(FlagHandler.PS_LANDLORD, landlord == null ? null : landlord.toString());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setTenant(UUID tenant) {
-        wgregion.setFlag(FlagHandler.PS_TENANT, tenant.toString());
+        wgregion.setFlag(FlagHandler.PS_TENANT, tenant == null ? null : tenant.toString());
     }
 
     @Override

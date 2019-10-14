@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -78,9 +79,16 @@ public class PSEconomy {
                     .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
         }
 
-        ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(tenant, r.getPrice());
-        ProtectionStones.getInstance().getVaultEconomy().depositPlayer(landlord, r.getPrice());
+        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+            ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(tenant, r.getPrice());
+            ProtectionStones.getInstance().getVaultEconomy().depositPlayer(landlord, r.getPrice());
+        });
         r.setRentLastPaid(Instant.now().getEpochSecond());
+        try {
+            r.getWGRegionManager().saveChanges();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateRents() {
@@ -96,7 +104,7 @@ public class PSEconomy {
 
             Duration rentPeriod = parseRentPeriod(r.getRentPeriod());
             // if tenant needs to pay
-            if (Instant.now().getEpochSecond() > r.getRentLastPaid() + rentPeriod.getSeconds()) {
+            if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
                 doRentPayment(r);
             }
             
