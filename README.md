@@ -279,6 +279,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps add|remove [playername] - Use this command to add or remove a member of your protected region.
     /ps addowner|removeowner [playername] - Use this command to add or remove an owner of your protected region.
     /ps flag [flagname] [setting|default] - Use this command to set a flag in your protected region.
+    /ps rent - Use this command to manage rents (buying and selling).
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.
     /ps setparent [region|none] - Set the region you are in to inherit properties from another region you own (https://worldguard.enginehub.org/en/latest/regions/priorities/)
     /ps name [name|none] - Nickname your region to help identify it easily.
@@ -326,6 +327,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.owners - Allows players to add or remove region owners. Allows players to use /ps info owners command.
     protectionstones.members - Allows players to add or remove region members. Allows players to use /ps info members command.
     protectionstones.flags - Allows players to set their region flags.
+    protectionstones.rent - Allows players access to /ps rent.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
     protectionstones.adjacent.x - Sets the number of non-adjacent regions players can have if "regions_must_be_adjacent" is true. Unlimited with -1.

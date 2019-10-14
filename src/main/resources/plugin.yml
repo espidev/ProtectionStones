@@ -87,6 +87,9 @@ permissions:
   protectionstones.flags:
     description: Allows players to set their region flags.
     default: op
+  protectionstones.rent:
+    description: Allows players to use the /ps rent command.
+    default: op
   protectionstones.toggle:
     description: Allows players to toggle ProtectionStones placement.
     default: op

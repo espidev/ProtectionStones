@@ -55,6 +55,7 @@ public enum PSL {
     NO_PERMISSION_COUNT_OTHERS("no_permission_count_others", ChatColor.RED + "You do not have permission to use that command."),
     NO_PERMISSION_FLAGS("no_permission_flags", ChatColor.RED + "You do not have permission to use flag commands."),
     NO_PERMISSION_PER_FLAG("no_permission_per_flag", ChatColor.RED + "You do not have permission to use that flag."),
+    NO_PERMISSION_RENT("no_permission_rent", ChatColor.RED + "You do not have permission for renting."),
     NO_PERMISSION_UNHIDE("no_permission_unhide", ChatColor.RED + "You do not have permission to unhide protection blocks."),
     NO_PERMISSION_HIDE("no_permission_hide", ChatColor.RED + " You do not have permission to hide protection blocks."),
     NO_PERMISSION_INFO("no_permission_info", ChatColor.RED + "You do not have permission to use the region info command."),
@@ -120,6 +121,11 @@ public enum PSL {
     FLAG_GUI_HOVER_SET_TEXT("flag.gui_hover_set_text", ChatColor.AQUA + "Click to change." + ChatColor.WHITE + "\nCurrent value:\n%value%"),
     FLAG_GUI_HOVER_CHANGE_GROUP("flag.hover_change_group", "Click to set this flag to apply to only %group%."),
     FLAG_GUI_HOVER_CHANGE_GROUP_NULL("flag.hover_change_group_null", ChatColor.RED + "You must set this flag to a value before changing the group."),
+
+    // ps rent
+    RENT_HELP("rent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent"),
+    RENT_HELP_DESC("rent.help_desc", "Use this command to manage rents (buying and selling)."),
+    RENT_HELP_HEADER("rent.help_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Rent Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),
