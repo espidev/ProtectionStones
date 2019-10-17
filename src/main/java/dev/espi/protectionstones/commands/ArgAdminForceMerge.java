@@ -92,9 +92,11 @@ public class ArgAdminForceMerge {
 
                 Map<Flag<?>, Object> mergeFlags = getFlags(rOverlap.getFlags()); // comparison flags
 
+                // check if regions are roughly equal
                 if (!(areDomainsEqual(rOverlap.getOwners(), r.getOwners()) && areDomainsEqual(rOverlap.getMembers(), r.getMembers()) && rOverlap.getParent() == null && baseFlags.equals(mergeFlags))) continue;
 
                 String rOverlapGroup = idToGroup.get(rOverlap.getId());
+
                 if (merged) { // r is part of a group
                     String rGroup = idToGroup.get(r.getId());
                     if (rOverlapGroup == null) { // rOverlap not part of a group
