@@ -56,6 +56,7 @@ public enum PSL {
     NO_PERMISSION_FLAGS("no_permission_flags", ChatColor.RED + "You do not have permission to use flag commands."),
     NO_PERMISSION_PER_FLAG("no_permission_per_flag", ChatColor.RED + "You do not have permission to use that flag."),
     NO_PERMISSION_RENT("no_permission_rent", ChatColor.RED + "You do not have permission for renting."),
+    NO_PERMISSION_BUYSELL("no_permission_buysell", ChatColor.RED + "You do not have permission to buy and sell regions."),
     NO_PERMISSION_UNHIDE("no_permission_unhide", ChatColor.RED + "You do not have permission to unhide protection blocks."),
     NO_PERMISSION_HIDE("no_permission_hide", ChatColor.RED + " You do not have permission to hide protection blocks."),
     NO_PERMISSION_INFO("no_permission_info", ChatColor.RED + "You do not have permission to use the region info command."),
@@ -140,6 +141,20 @@ public enum PSL {
     RENT_NOT_TENANT("rent.not_tenant", ChatColor.RED + "You are not the tenant of this region!"),
     RENT_TENANT_STOPPED_LANDLORD("rent.tenant_stopped_landlord", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has stopped renting out region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + ". It is now available for others to rent."),
     RENT_TENANT_STOPPED_TENANT("rent.tenant_stopped_tenant", ChatColor.AQUA + "You have stopped renting out region %region%."),
+    RENT_BEING_SOLD("rent.being_sold", ChatColor.RED + "The region is being sold out! Do /ps sell stop first."),
+
+    // ps buy
+    BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),
+    BUY_HELP_DESC("buy.help_desc", "Buy the region you are currently in."),
+    BUY_NOT_FOR_SALE("buy.not_for_sale", ChatColor.RED + "This region is not for sale."),
+    BUY_SOLD_BUYER("buy.sold_buyer", ChatColor.GRAY + "Bought region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " from " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+    BUY_SOLD_SELLER("buy.sold_seller", ChatColor.GRAY + "Sold region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+
+    // ps sell
+    SELL_HELP("sell.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sell [price|stop]"),
+    SELL_HELP_DESC("sell.help_desc", "Sell the region you are currently in."),
+    SELL_RENTED_OUT("sell.rented_out", "The region is being rented out! You must stop renting it out to sell."),
+    SELL_FOR_SALE("sell.for_sale", ChatColor.GRAY + "The region is now for sale for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + "."),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),

@@ -90,6 +90,9 @@ permissions:
   protectionstones.rent:
     description: Allows players to use the /ps rent command.
     default: op
+  protectionstones.buysell:
+    description: Allows players access to /ps buy and /ps sell.
+    default: op
   protectionstones.toggle:
     description: Allows players to toggle ProtectionStones placement.
     default: op

@@ -108,6 +108,10 @@ public class ArgRent implements PSCommandArg {
                         PSL.msg(p, LEASE_HELP);
                         break;
                     }
+                    if (r.forSale()) {
+                        PSL.msg(p, PSL.RENT_BEING_SOLD.msg());
+                        break;
+                    }
 
                     String period = String.join(" ", Arrays.asList(args).subList(3, args.length));
                     // TODO period check
@@ -184,6 +188,11 @@ public class ArgRent implements PSCommandArg {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         List<String> arg = Arrays.asList("lease", "stoplease", "rent", "stoprenting");
+        if (args.length == 3 && args[1].equals("lease")) {
+            return StringUtil.copyPartialMatches(args[2], Arrays.asList("100"), new ArrayList<>());
+        } else if (args.length == 4 && args[1].equals("lease")) {
+            return StringUtil.copyPartialMatches(args[3], Arrays.asList("1w", "1d", "1h"), new ArrayList<>());
+        }
         return args.length == 2 ? StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>()) : null;
     }
 }

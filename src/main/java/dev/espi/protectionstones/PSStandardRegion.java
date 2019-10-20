@@ -98,6 +98,34 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public boolean forSale() {
+        return wgregion.getFlag(FlagHandler.PS_FOR_SALE) != null && wgregion.getFlag(FlagHandler.PS_FOR_SALE);
+    }
+
+    @Override
+    public void setSellable(boolean forSale, UUID landlord, double price) {
+        if (!forSale) {
+            wgregion.setFlag(FlagHandler.PS_LANDLORD, null);
+            wgregion.setFlag(FlagHandler.PS_PRICE, null);
+            wgregion.setFlag(FlagHandler.PS_FOR_SALE, null);
+        } else {
+            wgregion.setFlag(FlagHandler.PS_LANDLORD, landlord.toString());
+            wgregion.setFlag(FlagHandler.PS_PRICE, price);
+            wgregion.setFlag(FlagHandler.PS_FOR_SALE, true);
+        }
+    }
+
+    @Override
+    public void sell(UUID player) {
+        ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(player), getPrice());
+        ProtectionStones.getInstance().getVaultEconomy().depositPlayer(Bukkit.getOfflinePlayer(getLandlord()), getPrice());
+        setSellable(false, null, 0);
+        getWGRegion().getOwners().removeAll();
+        getWGRegion().getMembers().removeAll();
+        getWGRegion().getOwners().addPlayer(player);
+    }
+
+    @Override
     public RentStage getRentStage() {
         if (getLandlord() == null && getTenant() == null) {
             return RentStage.NOT_RENTING;

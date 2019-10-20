@@ -128,6 +128,21 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public boolean forSale() {
+        return getParent().forSale();
+    }
+
+    @Override
+    public void setSellable(boolean forSale, UUID landlord, double price) {
+        getParent().setSellable(forSale, landlord, price);
+    }
+
+    @Override
+    public void sell(UUID player) {
+        getParent().sell(player);
+    }
+
+    @Override
     public RentStage getRentStage() {
         return getParent().getRentStage();
     }

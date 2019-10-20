@@ -63,6 +63,8 @@ public class ArgHelp implements PSCommandArg {
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent"), "protectionstones.setparent", "protectionstones.setparent.others"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag"), "protectionstones.flags"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.RENT_HELP.msg(), PSL.RENT_HELP_DESC.msg(), base + "rent"), "protectionstones.rent"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.BUY_HELP.msg(), PSL.BUY_HELP_DESC.msg(), base + "buy"), "protectionstones.buysell"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.SELL_HELP.msg(), PSL.SELL_HELP_DESC.msg(), base + "sell"), "protectionstones.buysell"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home"), "protectionstones.home"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.SETHOME_HELP.msg(), PSL.SETHOME_HELP_DESC.msg(), base + "sethome"), "protectionstones.sethome"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.TP_HELP.msg(), PSL.TP_HELP_DESC.msg(), base + "tp"), "protectionstones.tp"));

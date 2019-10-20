@@ -37,6 +37,7 @@ public class PSCommand extends Command {
     static void addDefaultArguments() {
         ProtectionStones.getInstance().addCommandArgument(new ArgAddRemove());
         ProtectionStones.getInstance().addCommandArgument(new ArgAdmin());
+        ProtectionStones.getInstance().addCommandArgument(new ArgBuySell());
         ProtectionStones.getInstance().addCommandArgument(new ArgCount());
         ProtectionStones.getInstance().addCommandArgument(new ArgFlag());
         ProtectionStones.getInstance().addCommandArgument(new ArgGet());

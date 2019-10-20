@@ -190,6 +190,25 @@ public abstract class PSRegion {
     }
 
     /**
+     * @return whether or not the region is for sale
+     */
+    public abstract boolean forSale();
+
+    /**
+     * MUST BE CALLED when setting up the region to be sold or cancelling sale
+     * @param forSale whether or not the region is for sale
+     * @param landlord the owner of the region
+     * @param price the price to sell for
+     */
+    public abstract void setSellable(boolean forSale, UUID landlord, double price);
+
+    /**
+     * Sells the region to a player at the price listed.
+     * @param player player to transfer the region to
+     */
+    public abstract void sell(UUID player);
+
+    /**
      * @return get the stage of the renting process
      */
     public abstract RentStage getRentStage();
@@ -268,8 +287,8 @@ public abstract class PSRegion {
     public abstract void setRentable(UUID landlord, String rentPeriod, double rentPrice);
 
     /**
-     * Starts renting process (adds to rent queue) and setup renting.
-     * MUST BE CALLED when setting up rent.
+     * Starts renting process (adds to rent queue) tenant.
+     * MUST BE CALLED when renting the region out to a tenant.
      * @param landlord the landlord of the region
      * @param tenant the tenant of the region
      * @param rentPeriod the rent period (d h m s) of the region

@@ -54,6 +54,7 @@ public class FlagHandler {
     public static final Flag<String> PS_RENT_PERIOD = new StringFlag("ps-rent-period");
     public static final Flag<Double> PS_PRICE = new DoubleFlag("ps-price");
     public static final Flag<Double> PS_RENT_LAST_PAID = new DoubleFlag("ps-rent-last-paid");
+    public static final Flag<Boolean> PS_FOR_SALE = new BooleanFlag("ps-for-sale");
 
     // called on initial start
     static void registerFlags() {
@@ -70,6 +71,7 @@ public class FlagHandler {
             registry.register(PS_RENT_PERIOD);
             registry.register(PS_PRICE);
             registry.register(PS_RENT_LAST_PAID);
+            registry.register(PS_FOR_SALE);
         } catch (FlagConflictException e) {
             Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();

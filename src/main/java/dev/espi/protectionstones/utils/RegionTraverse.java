@@ -20,7 +20,6 @@ package dev.espi.protectionstones.utils;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.ProtectionStones;
 
 import java.util.ArrayList;
 import java.util.Arrays;
