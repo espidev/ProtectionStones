@@ -50,14 +50,14 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
 
     @Override
     protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
-        if (lastValue != null && !lastValue.equals(currentValue))
+        if (lastValue != null && !lastValue.equals(currentValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null)
             Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
         return true;
     }
 
     @Override
     protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
-        if (lastValue != null)
+        if (lastValue != null && Bukkit.getPlayer(localPlayer.getUniqueId()) != null)
             Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
         return true;
     }

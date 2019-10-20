@@ -51,8 +51,9 @@ public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
 
     @Override
     protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
-        if (currentValue != null && !currentValue.equals(lastValue))
+        if (currentValue != null && !currentValue.equals(lastValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
             Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', currentValue)));
+        }
         return true;
     }
 
