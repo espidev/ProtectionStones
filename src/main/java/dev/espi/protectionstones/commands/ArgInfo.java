@@ -148,8 +148,27 @@ public class ArgInfo implements PSCommandArg {
         StringBuilder msg = new StringBuilder();
         for (PSMergedRegion pr : r.getMergedRegions()) {
             msg.append(pr.getID() + " (" + pr.getTypeOptions().alias + "), ");
-        } // TODO
+        }
         PSL.msg(p, PSL.INFO_MERGED.msg() + msg);
+    }
+
+    private static void displayEconomy(Player p, PSRegion r) {
+        // TODO
+        if (r.forSale()) {
+            PSL.msg(p, ChatColor.AQUA + "Region available for sale!");
+            PSL.msg(p, "Seller: " + r.getLandlord());
+            PSL.msg(p, "Price: " + r.getPrice());
+        }
+        if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
+            PSL.msg(p, ChatColor.AQUA + "Region available for rent!");
+        }
+        if (r.getRentStage() == PSRegion.RentStage.RENTING) {
+            PSL.msg(p, "Tenant: " + r.getTenant());
+        }
+        if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
+            PSL.msg(p, "Landlord: " + r.getLandlord());
+            PSL.msg(p, "Rent: " + r.getPrice());
+        }
     }
 
     private static void displayFlags(Player p, PSRegion r) {
