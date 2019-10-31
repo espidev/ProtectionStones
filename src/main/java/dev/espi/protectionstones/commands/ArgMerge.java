@@ -125,6 +125,9 @@ public class ArgMerge implements PSCommandArg {
                 } catch (WGMerge.RegionHoleException e) {
                     PSL.msg(p, PSL.NO_REGION_HOLES.msg());
                     return;
+                } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
+                    PSL.msg(p, PSL.CANNOT_MERGE_RENTED_REGION.msg().replace("%region%", e.getRentedRegion().getName() == null ? e.getRentedRegion().getID() : e.getRentedRegion().getName()));
+                    return;
                 }
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
 

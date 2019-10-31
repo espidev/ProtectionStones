@@ -297,7 +297,7 @@ public class PSMergedRegion extends PSRegion {
 
         try {
             WGMerge.unmergeRegion(getWorld(), getWGRegionManager(), this);
-        } catch (WGMerge.RegionHoleException e) {
+        } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
             this.unhide();
             return false;
         }

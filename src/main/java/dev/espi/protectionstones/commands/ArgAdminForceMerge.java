@@ -135,7 +135,7 @@ public class ArgAdminForceMerge {
             }
             try {
                 WGMerge.mergeRegions(w, rm, root, groupToMembers.get(key));
-            } catch (WGMerge.RegionHoleException e) {
+            } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
                 // TODO
             }
         }

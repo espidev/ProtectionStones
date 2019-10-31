@@ -31,12 +31,22 @@ import java.util.*;
 public class WGMerge {
 
     public static class RegionHoleException extends Exception {}
+    public static class RegionCannotMergeWhileRentedException extends Exception {
+        PSRegion rentedRegion;
+        RegionCannotMergeWhileRentedException(PSRegion r) {
+            rentedRegion = r;
+        }
+
+        public PSRegion getRentedRegion() {
+            return rentedRegion;
+        }
+    }
 
     // welcome to giant mess of code that does some bad stuff
     // :D
     // more to come in RegionTraverse
 
-    public static void unmergeRegion(World w, RegionManager rm, PSMergedRegion toUnmerge) throws RegionHoleException {
+    public static void unmergeRegion(World w, RegionManager rm, PSMergedRegion toUnmerge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
 
         // find the psgroupregion containing the region to unmerge
         for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(toUnmerge.getProtectBlock().getX(), toUnmerge.getProtectBlock().getY(), toUnmerge.getProtectBlock().getZ()))) {
@@ -173,7 +183,7 @@ public class WGMerge {
                     }
                     break;
 
-                } catch (RegionHoleException e) {
+                } catch (RegionHoleException | RegionCannotMergeWhileRentedException e) {
                     // if there is a region hole exception, put back the merged region info
                     psgr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).add(toUnmerge.getID());
                     psgr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).add(toUnmerge.getID() + " " + blockType);
@@ -184,17 +194,21 @@ public class WGMerge {
     }
 
     // each region in merge must not be of type PSMergedRegion
-    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
+    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
         mergeRegions(root.getID(), w, rm, root, merge);
     }
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied
-    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
+    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
         List<PSRegion> decomposedMerge = new ArrayList<>();
 
         // decompose merged regions into their bases
         for (PSRegion r : merge) {
+            if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
+                throw new RegionCannotMergeWhileRentedException(r);
+            }
+
             if (r instanceof PSGroupRegion) {
                 decomposedMerge.addAll(((PSGroupRegion) r).getMergedRegions());
             } else {

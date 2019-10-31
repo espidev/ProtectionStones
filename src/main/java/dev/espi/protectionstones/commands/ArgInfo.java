@@ -89,6 +89,7 @@ public class ArgInfo implements PSCommandArg {
                 PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias);
             }
 
+            displayEconomy(p, r);
             displayFlags(p, r);
             displayOwners(p, r.getWGRegion());
             displayMembers(p, r.getWGRegion());

@@ -100,6 +100,7 @@ public enum PSL {
     NO_REGION_HOLES("psregion.no_region_holes", ChatColor.RED + "Unprotected area detected inside region! This is not allowed!"),
     DELETE_REGION_PREVENTED_NO_HOLES("psregion.delete_region_prevented", ChatColor.GRAY + "The region could not be removed, possibly because it creates a hole in the existing region."),
     NOT_OWNER("psregion.not_owner", ChatColor.RED + "You are not an owner of this region!"),
+    CANNOT_MERGE_RENTED_REGION("psregion.cannot_merge_rented_region", ChatColor.RED + "Cannot merge regions because region %region% is in the process of being rented out!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
