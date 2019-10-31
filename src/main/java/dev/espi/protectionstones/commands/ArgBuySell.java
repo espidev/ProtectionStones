@@ -72,11 +72,14 @@ public class ArgBuySell implements PSCommandArg {
 
             PSL.msg(p, PSL.BUY_SOLD_BUYER.msg()
                     .replace("%region%", r.getName() == null ? r.getID() : r.getName())
-                    .replace("%price%", "" + r.getPrice())
+                    .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%player%", UUIDCache.uuidToName.get(r.getLandlord())));
 
             if (Bukkit.getPlayer(r.getLandlord()) != null) {
-                PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.BUY_SOLD_SELLER.msg());
+                PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.BUY_SOLD_SELLER.msg()
+                        .replace("%region%", r.getName() == null ? r.getID() : r.getName())
+                        .replace("%price%", String.format("%.2f", r.getPrice()))
+                        .replace("%player%", p.getName()));
             }
             r.sell(p.getUniqueId());
 
@@ -103,7 +106,7 @@ public class ArgBuySell implements PSCommandArg {
                     return true;
                 }
 
-                PSL.msg(p, PSL.SELL_FOR_SALE.msg().replace("%price%", ""+Double.parseDouble(args[1])));
+                PSL.msg(p, PSL.SELL_FOR_SALE.msg().replace("%price%", String.format("%.2f", Double.parseDouble(args[1]))));
                 r.setSellable(true, p.getUniqueId(), Double.parseDouble(args[1]));
             }
         }

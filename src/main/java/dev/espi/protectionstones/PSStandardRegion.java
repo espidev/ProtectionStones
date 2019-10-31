@@ -129,11 +129,12 @@ public class PSStandardRegion extends PSRegion {
     public RentStage getRentStage() {
         if (getLandlord() == null && getTenant() == null) {
             return RentStage.NOT_RENTING;
-        } else if (getTenant() == null) {
+        } else if (getTenant() == null && !forSale()) {
             return RentStage.LOOKING_FOR_TENANT;
-        } else {
+        } else if (getPrice() != null && !forSale()) {
             return RentStage.RENTING;
         }
+        return RentStage.NOT_RENTING;
     }
 
     @Override

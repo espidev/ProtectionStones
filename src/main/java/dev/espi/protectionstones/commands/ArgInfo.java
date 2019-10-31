@@ -154,21 +154,21 @@ public class ArgInfo implements PSCommandArg {
     }
 
     private static void displayEconomy(Player p, PSRegion r) {
-        // TODO
+        // TODO add messages to PSL
         if (r.forSale()) {
             PSL.msg(p, ChatColor.AQUA + "Region available for sale!");
-            PSL.msg(p, "Seller: " + r.getLandlord());
-            PSL.msg(p, "Price: " + r.getPrice());
+            PSL.msg(p, ChatColor.BLUE + "Seller: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, ChatColor.BLUE + "Price: " + ChatColor.GRAY + String.format("%.2f", r.getPrice()));
         }
         if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
             PSL.msg(p, ChatColor.AQUA + "Region available for rent!");
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, "Tenant: " + r.getTenant());
+            PSL.msg(p, ChatColor.BLUE + "Tenant: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getTenant()));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
-            PSL.msg(p, "Landlord: " + r.getLandlord());
-            PSL.msg(p, "Rent: " + r.getPrice());
+            PSL.msg(p, ChatColor.BLUE + "Landlord: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, ChatColor.BLUE + "Rent: " + ChatColor.GRAY + String.format("%.2f", r.getPrice()));
         }
     }
 
