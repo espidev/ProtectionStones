@@ -100,6 +100,7 @@ public class ArgBuySell implements PSCommandArg {
 
             if (args[1].equals("stop")) {
                 r.setSellable(false, null, 0);
+                PSL.msg(p, PSL.BUY_STOP_SELL.msg());
             } else {
                 if (!NumberUtils.isNumber(args[1])) {
                     PSL.msg(p, PSL.SELL_HELP.msg());

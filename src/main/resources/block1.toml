@@ -88,7 +88,8 @@ prevent_block_place_in_restricted_world = true
         "ps-landlord",
         "ps-tenant",
         "ps-rent-period",
-        "ps-rent-last-paid"
+        "ps-rent-last-paid",
+        "ps-for-sale",
     ]
 
     # Default priority type for this block type protection stone

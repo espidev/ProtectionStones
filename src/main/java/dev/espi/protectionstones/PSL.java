@@ -148,6 +148,7 @@ public enum PSL {
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),
     BUY_HELP_DESC("buy.help_desc", "Buy the region you are currently in."),
     BUY_NOT_FOR_SALE("buy.not_for_sale", ChatColor.RED + "This region is not for sale."),
+    BUY_STOP_SELL("buy.stop_sell", ChatColor.GRAY + "The region is now not for sale."),
     BUY_SOLD_BUYER("buy.sold_buyer", ChatColor.GRAY + "Bought region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " from " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
     BUY_SOLD_SELLER("buy.sold_seller", ChatColor.GRAY + "Sold region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
 
