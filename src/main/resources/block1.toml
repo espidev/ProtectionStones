@@ -1,6 +1,10 @@
 # Define your protection block below
 # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-# If you want to use player heads, use the format "PLAYER_HEAD:full_uuid" (ex. "PLAYER_HEAD:069a79f4-44e9-4726-a5be-fca90e38aaf5") or "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
+# --------------------------------------------------------------------------------------------------
+# If you want to use player heads, you can use "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
+# To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under "Value:".
+# To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the "value" field not including quotes.
+# When you have the value, you can set the type to "PLAYER_HEAD:value"
 type = "EMERALD_ORE"
 
 # Another way to refer to the protection stone

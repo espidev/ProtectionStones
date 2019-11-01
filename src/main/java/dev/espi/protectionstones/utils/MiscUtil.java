@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones.utils;
 
+import com.google.gson.JsonParser;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +34,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Base64;
 import java.util.UUID;
 
 public class MiscUtil {
@@ -65,6 +71,8 @@ public class MiscUtil {
 
             SkullMeta sm = (SkullMeta) i.getItemMeta();
 
+            Bukkit.getLogger().info("" + sm.hasOwner()); // TODO
+
             // PLAYER_HEAD
             if (!sm.hasOwner()) {
                 // PLAYER_HEAD:base64
@@ -73,6 +81,8 @@ public class MiscUtil {
                 }
                 return Material.PLAYER_HEAD.toString();
             }
+
+            Bukkit.getLogger().info(sm.getOwningPlayer().getUniqueId().toString()); // TODO
 
             // PLAYER_HEAD:UUID
             String ret = i.getType().toString() + ":" + sm.getOwningPlayer().getUniqueId();
@@ -95,6 +105,8 @@ public class MiscUtil {
                 if (ProtectionStones.isProtectBlockType(ret)) { // try returning uuid type first
                     return ret;
                 }
+
+                Bukkit.getLogger().info(s.getOwningPlayer().getName()); // TODO
 
                 // PLAYER_HEAD:name
                 return Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName(); // return name if doesn't exist
@@ -146,7 +158,20 @@ public class MiscUtil {
         if (name.length() == BASE64LENGTH) {
             return itemWithBase64(item, name);
         } else {
-            ((SkullMeta) item.getItemMeta()).setOwningPlayer(getPlayerFromSkullType(psType));
+            if (name.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")) {
+                String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + UUID.fromString(name).toString().replace("-", "");
+                String texture = "";
+                try {
+                    InputStreamReader read = new InputStreamReader(new URL(url).openStream());
+                    texture = new JsonParser().parse(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                item = Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\",Id:\"" + name + "\",Properties:{textures:[{Value:\"" + texture + "\"}]}}}");
+            } else {
+                item = Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\"}}");
+            }
             return item;
         }
     }
