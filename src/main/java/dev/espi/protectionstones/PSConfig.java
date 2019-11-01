@@ -188,12 +188,18 @@ public class PSConfig {
 
                 Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
-                ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
 
+                // add block:
+                // ~~~
                 // for PLAYER_HEAD:base64, we need to change the entry to link to a UUID hash instead of storing the giant base64
                 if (MiscUtil.isBase64PSHead(b.type)) {
-                    ProtectionStones.protectionStonesOptions.put("PLAYER_HEAD:" + MiscUtil.getUUIDFromBase64PS(b), b);
+                    String nuuid = MiscUtil.getUUIDFromBase64PS(b);
+
+                    MiscUtil.uuidToBase64Head.put(nuuid, b.type.split(":")[1]);
+                    b.type = "PLAYER_HEAD:" + nuuid;
                 }
+
+                ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
 
                 // add custom recipes to Bukkit
                 if (b.allowCraftWithCustomRecipe) {

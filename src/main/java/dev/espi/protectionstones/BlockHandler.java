@@ -304,10 +304,10 @@ class BlockHandler {
                     Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                         try {
                             WGMerge.mergeRegions(p.getWorld(), rm, finalMergeTo, Arrays.asList(finalMergeTo, r));
+                            PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
                         } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
                             // don't need to tell player that you can't merge
                         }
-                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
                     });
                 }
             }

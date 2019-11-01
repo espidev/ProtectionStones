@@ -29,8 +29,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO prevent rented regions from being merged
-
 public class PSEconomy {
     private List<PSRegion> rentedList = new ArrayList<>();
     private static int rentRunner = -1;
