@@ -26,9 +26,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -74,18 +72,6 @@ public class MiscUtil {
                 return Material.PLAYER_HEAD.toString() + ":" + sm.getOwningPlayer().getUniqueId().toString();
             }
 
-            /*
-            // PLAYER_HEAD:base64
-            if (i.getItemMeta().getCustomTagContainer().hasCustomTag(BASE64SKULL_TAG, ItemTagType.STRING)) {
-                return Material.PLAYER_HEAD.toString() + ":" + i.getItemMeta().getCustomTagContainer().getCustomTag(BASE64SKULL_TAG, ItemTagType.STRING);
-            }
-
-            // PLAYER_HEAD:UUID
-            String ret = i.getType().toString() + ":" + sm.getOwningPlayer().getUniqueId();
-            if (ProtectionStones.isProtectBlockType(ret)) { // try returning uuid type first
-                return ret;
-            }*/
-
             // PLAYER_HEAD:name
             return Material.PLAYER_HEAD.toString() + ":" + sm.getOwningPlayer().getName(); // return name if it doesn't exist
         }
@@ -117,22 +103,6 @@ public class MiscUtil {
         } else {
             return block.getType().toString();
         }
-    }
-
-    // for PSProtectBlock types
-    public static OfflinePlayer getPlayerFromSkullType(String type) {
-        if (type.split(":").length < 2) return null;
-        String name = type.split(":")[1];
-        try {
-            if (name.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")) {
-                // UUID
-                return Bukkit.getOfflinePlayer(UUID.fromString(name));
-            }
-        } catch (IllegalArgumentException e) {
-            // if there is issue parsing to UUID
-        }
-        // name
-        return Bukkit.getOfflinePlayer(name);
     }
 
     public static void setHeadType(String psType, Block b) {
@@ -175,6 +145,12 @@ public class MiscUtil {
 
         // data command is a terrible idea and not cross-world
 
+        // fake entity
+        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), Pig.class, ent -> {
+            ent.setCustomName("mrpig"); // TODO
+            ent.setInvulnerable(true);
+        });
+
         String args = String.format(
                 "%d %d %d %s",
                 block.getX(),
@@ -182,8 +158,8 @@ public class MiscUtil {
                 block.getZ(),
                 "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
-        Bukkit.getLogger().info(args); // TODO
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + block.getWorld().getName() + " run data merge block " + args);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=pig,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
+        e.remove();
     }
 
     public static boolean isBase64PSHead(String type) {

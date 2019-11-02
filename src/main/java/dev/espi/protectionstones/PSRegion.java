@@ -306,7 +306,8 @@ public abstract class PSRegion {
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {
-        return !this.getType().startsWith(this.getProtectBlock().getType().toString());
+         // TODO HELP PLEASE!!
+        return !this.getType().replace("WALL_", "").startsWith(this.getProtectBlock().getType().toString());
     }
 
     /**
