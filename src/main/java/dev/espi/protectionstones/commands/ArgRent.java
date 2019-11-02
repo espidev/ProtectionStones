@@ -145,7 +145,7 @@ public class ArgRent implements PSCommandArg {
                         break;
                     }
                     if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice())) {
-                        PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", "" + r.getPrice()));
+                        PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", r.getPrice())));
                         break;
                     }
 
@@ -171,6 +171,9 @@ public class ArgRent implements PSCommandArg {
                     }
 
                     r.setTenant(null);
+                    r.getWGRegion().getOwners().removeAll();
+                    r.getWGRegion().getMembers().removeAll();
+                    r.getWGRegion().getOwners().addPlayer(r.getLandlord());
 
                     PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName()));
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
