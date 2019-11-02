@@ -60,10 +60,32 @@ public class PSEconomy {
         }
     }
 
+    /**
+     * Process a rent payment for a region.
+     * It does not do any checks, it is expected to check if the rent time has passed before this function is called.
+     * @param r the region to perform the rent payment
+     */
     public static void doRentPayment(PSRegion r) {
         OfflinePlayer tenant = Bukkit.getOfflinePlayer(r.getTenant());
         OfflinePlayer landlord = Bukkit.getOfflinePlayer(r.getLandlord());
 
+        // not enough money for rent
+        if (!ProtectionStones.getInstance().getVaultEconomy().has(tenant, r.getPrice())) {
+            if (tenant.isOnline()) {
+                PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_EVICT_NO_MONEY_TENANT.msg()
+                        .replace("%region%", r.getName() != null ? r.getName() : r.getID())
+                        .replace("%price%", String.format("%.2f", r.getPrice())));
+            }
+            if (landlord.isOnline()) {
+                PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_EVICT_NO_MONEY_LANDLORD.msg()
+                        .replace("%region%", r.getName() != null ? r.getName() : r.getID())
+                        .replace("%tenant%", tenant.getName()));
+            }
+            r.removeRenting();
+            return;
+        }
+
+        // send payment messages
         if (tenant.isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
@@ -77,12 +99,13 @@ public class PSEconomy {
                     .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
         }
 
+        // update money must be run in main thread
         Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
             ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(tenant, r.getPrice());
             ProtectionStones.getInstance().getVaultEconomy().depositPlayer(landlord, r.getPrice());
         });
         r.setRentLastPaid(Instant.now().getEpochSecond());
-        try {
+        try { // must save region to persist last paid
             r.getWGRegionManager().saveChanges();
         } catch (StorageException e) {
             e.printStackTrace();
@@ -105,12 +128,13 @@ public class PSEconomy {
             if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
                 doRentPayment(r);
             }
-            
+
         }
     }
 
     /**
      * Get list of rented regions.
+     *
      * @return the list of rented regions
      */
     public List<PSRegion> getRentedList() {
@@ -122,7 +146,7 @@ public class PSEconomy {
         for (String s : period.split(" ")) {
             try {
                 if (s.contains("w")) {
-                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", ""))*7);
+                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", "")) * 7);
                 } else if (s.contains("d")) {
                     rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("d", "")));
                 } else if (s.contains("h")) {

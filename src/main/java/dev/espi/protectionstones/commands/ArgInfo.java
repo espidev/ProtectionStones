@@ -154,21 +154,20 @@ public class ArgInfo implements PSCommandArg {
     }
 
     private static void displayEconomy(Player p, PSRegion r) {
-        // TODO add messages to PSL
         if (r.forSale()) {
-            PSL.msg(p, ChatColor.AQUA + "Region available for sale!");
-            PSL.msg(p, ChatColor.BLUE + "Seller: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getLandlord()));
-            PSL.msg(p, ChatColor.BLUE + "Price: " + ChatColor.GRAY + String.format("%.2f", r.getPrice()));
+            PSL.msg(p, PSL.INFO_AVAILABLE_FOR_SALE.msg());
+            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, PSL.INFO_PRICE.msg() + String.format("%.2f", r.getPrice()));
         }
         if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
-            PSL.msg(p, ChatColor.AQUA + "Region available for rent!");
+            PSL.msg(p, PSL.INFO_AVAILABLE_FOR_RENT.msg());
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, ChatColor.BLUE + "Tenant: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getTenant()));
+            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.uuidToName.get(r.getTenant()));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
-            PSL.msg(p, ChatColor.BLUE + "Landlord: " + ChatColor.GRAY + UUIDCache.uuidToName.get(r.getLandlord()));
-            PSL.msg(p, ChatColor.BLUE + "Rent: " + ChatColor.GRAY + String.format("%.2f", r.getPrice()));
+            PSL.msg(p, PSL.INFO_LANDLORD.msg() + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, PSL.INFO_RENT.msg() + String.format("%.2f", r.getPrice()));
         }
     }
 

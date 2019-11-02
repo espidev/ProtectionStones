@@ -58,7 +58,7 @@ public enum PSL {
     NO_PERMISSION_RENT("no_permission_rent", ChatColor.RED + "You do not have permission for renting."),
     NO_PERMISSION_BUYSELL("no_permission_buysell", ChatColor.RED + "You do not have permission to buy and sell regions."),
     NO_PERMISSION_UNHIDE("no_permission_unhide", ChatColor.RED + "You do not have permission to unhide protection blocks."),
-    NO_PERMISSION_HIDE("no_permission_hide", ChatColor.RED + " You do not have permission to hide protection blocks."),
+    NO_PERMISSION_HIDE("no_permission_hide", ChatColor.RED + "You do not have permission to hide protection blocks."),
     NO_PERMISSION_INFO("no_permission_info", ChatColor.RED + "You do not have permission to use the region info command."),
     NO_PERMISSION_PRIORITY("no_permission_priority", ChatColor.RED + "You do not have permission to use the priority command."),
     NO_PERMISSION_REGION("no_permission_region", ChatColor.RED + "You do not have permission to use region commands."),
@@ -142,7 +142,9 @@ public enum PSL {
     RENT_NOT_TENANT("rent.not_tenant", ChatColor.RED + "You are not the tenant of this region!"),
     RENT_TENANT_STOPPED_LANDLORD("rent.tenant_stopped_landlord", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has stopped renting out region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + ". It is now available for others to rent."),
     RENT_TENANT_STOPPED_TENANT("rent.tenant_stopped_tenant", ChatColor.AQUA + "You have stopped renting out region %region%."),
-    RENT_BEING_SOLD("rent.being_sold", ChatColor.RED + "The region is being sold out! Do /ps sell stop first."),
+    RENT_BEING_SOLD("rent.being_sold", ChatColor.RED + "The region is being sold! Do /ps sell stop first."),
+    RENT_EVICT_NO_MONEY_TENANT("rent.evict_no_money_tenant", ChatColor.GRAY + "You have been " + ChatColor.RED + "evicted" + ChatColor.GRAY + " from region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " because you do not have enough money (%price%) to pay for rent."),
+    RENT_EVICT_NO_MONEY_LANDLORD("rent.evict_no_money_landlord", ChatColor.AQUA + "%tenant%" + ChatColor.GRAY + " has been " + ChatColor.RED + "evicted" + ChatColor.GRAY + " from region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " because they are unable to afford rent."),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),
@@ -182,6 +184,13 @@ public enum PSL {
     INFO_PRIORITY("info.priority", ChatColor.BLUE + "Priority: " + ChatColor.AQUA),
     INFO_PARENT("info.parent", ChatColor.BLUE + "Parent: " + ChatColor.AQUA),
     INFO_BOUNDS("info.bounds", ChatColor.BLUE + "Bounds: " + ChatColor.AQUA),
+    INFO_SELLER("info.seller", ChatColor.BLUE + "Seller: " + ChatColor.GRAY),
+    INFO_PRICE("info.price", ChatColor.BLUE + "Price: " + ChatColor.GRAY),
+    INFO_TENANT("info.tenant", ChatColor.BLUE + "Tenant: " + ChatColor.GRAY),
+    INFO_LANDLORD("info.landlord", ChatColor.BLUE + "Landlord: " + ChatColor.GRAY),
+    INFO_RENT("info.rent", ChatColor.BLUE + "Rent: " + ChatColor.GRAY),
+    INFO_AVAILABLE_FOR_SALE("info.available_for_sale", ChatColor.AQUA + "Region available for sale!"),
+    INFO_AVAILABLE_FOR_RENT("info.available_for_rent", ChatColor.AQUA + "Region available for rent!"),
 
     // ps priority
     PRIORITY_HELP("priority.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps priority [number|null]"),

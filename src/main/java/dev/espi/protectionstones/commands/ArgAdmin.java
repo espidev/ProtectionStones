@@ -36,7 +36,7 @@ public class ArgAdmin implements PSCommandArg {
 
     static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]",
                         FLAG_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]",
-                        CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtype] [newtype]",
+                        CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtypealias] [newtypealias]",
                         FORCEMERGE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]";
 
     @Override

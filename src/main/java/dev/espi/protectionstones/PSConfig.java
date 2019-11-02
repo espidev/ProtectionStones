@@ -189,8 +189,6 @@ public class PSConfig {
                 Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
 
-                // add block:
-                // ~~~
                 // for PLAYER_HEAD:base64, we need to change the entry to link to a UUID hash instead of storing the giant base64
                 if (MiscUtil.isBase64PSHead(b.type)) {
                     String nuuid = MiscUtil.getUUIDFromBase64PS(b);
@@ -300,9 +298,19 @@ public class PSConfig {
                 for (File file : ProtectionStones.blockDataFolder.listFiles()) {
                     CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();
                     c.load();
-                    c.set("region.home_x_offset", ((Integer) c.get("region.home_x_offset")).doubleValue());
-                    c.set("region.home_y_offset", ((Integer) c.get("region.home_y_offset")).doubleValue());
-                    c.set("region.home_z_offset", ((Integer) c.get("region.home_z_offset")).doubleValue());
+                    c.setComment("type", "Define your protection block below\n" +
+                            "Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html\n" +
+                            "--------------------------------------------------------------------------------------------------\n" +
+                            "If you want to use player heads, you can use \"PLAYER_HEAD:player_name\" (ex. \"PLAYER_HEAD:Notch\")\n" +
+                            "To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under \"Value:\".\n" +
+                            "To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the \"value\" field not including quotes.\n" +
+                            "When you have the value, you can set the type to \"PLAYER_HEAD:value\"");
+
+                    try {
+                        c.set("region.home_x_offset", ((Integer) c.get("region.home_x_offset")).doubleValue());
+                        c.set("region.home_y_offset", ((Integer) c.get("region.home_y_offset")).doubleValue());
+                        c.set("region.home_z_offset", ((Integer) c.get("region.home_z_offset")).doubleValue());
+                    } catch (Exception e) {}
                     c.save();
                     c.close();
                 }

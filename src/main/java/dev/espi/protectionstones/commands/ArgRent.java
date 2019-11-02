@@ -150,7 +150,6 @@ public class ArgRent implements PSCommandArg {
                     }
 
                     r.rentOut(r.getLandlord(), p.getUniqueId(), r.getRentPeriod(), r.getPrice());
-                    PSEconomy.doRentPayment(r);
                     PSL.msg(p, PSL.RENT_RENTING_TENANT.msg()
                             .replace("%region%", r.getName() == null ? r.getID() : r.getName())
                             .replace("%price%", String.format("%.2f", r.getPrice()))
@@ -161,6 +160,7 @@ public class ArgRent implements PSCommandArg {
                                 .replace("%player%", p.getName())
                                 .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
                     }
+                    PSEconomy.doRentPayment(r);
 
                     break;
 

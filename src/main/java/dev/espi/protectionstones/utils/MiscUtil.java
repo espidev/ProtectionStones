@@ -100,6 +100,10 @@ public class MiscUtil {
             return Material.DRAGON_HEAD.toString();
         } else if (block.getType() == Material.ZOMBIE_WALL_HEAD) {
             return Material.ZOMBIE_HEAD.toString();
+        } else if (block.getType() == Material.SKELETON_WALL_SKULL) {
+            return Material.SKELETON_SKULL.toString();
+        } else if (block.getType() == Material.WITHER_SKELETON_WALL_SKULL) {
+            return Material.WITHER_SKELETON_SKULL.toString();
         } else {
             return block.getType().toString();
         }
@@ -140,16 +144,9 @@ public class MiscUtil {
         }
     }
 
+    // Note: this code is really weird
     private static void blockWithBase64(Block block, String uuid) { // TODO
         String base64 = uuidToBase64Head.get(uuid);
-
-        // data command is a terrible idea and not cross-world
-
-        // fake entity
-        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), Pig.class, ent -> {
-            ent.setCustomName("mrpig"); // TODO
-            ent.setInvulnerable(true);
-        });
 
         String args = String.format(
                 "%d %d %d %s",
@@ -158,6 +155,14 @@ public class MiscUtil {
                 block.getZ(),
                 "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
+
+        // fake entity to run command at its location
+        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), Pig.class, ent -> {
+            ent.setCustomName("mrpig");
+            ent.setInvulnerable(true);
+        });
+
+        // run data command to change block using the pig's world
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=pig,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
         e.remove();
     }
