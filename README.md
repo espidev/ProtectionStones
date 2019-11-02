@@ -21,7 +21,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 10
+    config_version = 11
     uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
     
@@ -32,7 +32,6 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Does your config look messy? It's probably because of gradual config updates. Consider using the default configs.
     # If you need the default configs again, you can get it from here: https://github.com/espidev/ProtectionStones/tree/master/src/main/resources
     # ---------------------------------------------------------------------------------------
-    
     
     # Cooldown between placing protection blocks (in seconds). -1 to disable.
     placing_cooldown = -1
@@ -72,7 +71,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Whether or not to give players the option to merge new regions with ones they already own (overlapping)
     # to create a new large region. Can merge any regions with protectionstones.admin
     # Requires the permission protectionstones.merge to use (with /ps merge)
-    # Note: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
+    # NOTE: Due to the limitations of WorldGuard, merged regions will ignore y_radius and go from bedrock to sky
     # since polygon regions can only be 2D, not 3D
     allow_merging_regions = true
     
@@ -84,6 +83,11 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 
     # Define your protection block below
     # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    # --------------------------------------------------------------------------------------------------
+    # If you want to use player heads, you can use "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
+    # To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under "Value:".
+    # To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the "value" field not including quotes.
+    # When you have the value, you can set the type to "PLAYER_HEAD:value"
     type = "EMERALD_ORE"
     
     # Another way to refer to the protection stone
@@ -132,19 +136,20 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         z_offset = 0
     
         # How many blocks to offset the default location of /ps home from the protection block
-        home_x_offset = 0
-        home_y_offset = 1
-        home_z_offset = 0
+        home_x_offset = 0.0
+        home_y_offset = 1.0
+        home_z_offset = 0.0
     
         # Specify the default flags to be set when a new protected region is created.
         # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
+        # Can use PlaceholderAPI placeholders in string flags (ex. greeting, farewell).
         flags = [
             "pvp deny",
             "tnt deny",
             "greeting &lEntering &b&l%player%'s &f&lprotected area",
             "farewell &lLeaving &b&l%player%'s &f&lprotected area",
-            "greeting-title Entering &b%player%'s &fprotected area",
-            "farewell-title Leaving &b%player%'s &fprotected area",
+            "greeting-action &lEntering &b&l%player%'s &f&lprotected area",
+            "farewell-action &lLeaving &b&l%player%'s &f&lprotected area",
             "creeper-explosion deny",
         ]
     
@@ -153,10 +158,25 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
             "pvp",
             "greeting",
             "greeting-title",
+            "greeting-action",
             "farewell",
             "farewell-title",
+            "farewell-action",
             "mob-spawning",
             "creeper-explosion",
+        ]
+    
+        # Which flags to hide from /ps info
+        hidden_flags_from_info = [
+            "ps-merged-regions",
+            "ps-merged-regions-types",
+            "ps-block-material",
+            "ps-price",
+            "ps-landlord",
+            "ps-tenant",
+            "ps-rent-period",
+            "ps-rent-last-paid",
+            "ps-for-sale",
         ]
     
         # Default priority type for this block type protection stone
@@ -204,6 +224,9 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Hide protection stone right away when placed?
         auto_hide = false
     
+        # Whether or not to automatically merge into other regions when placed if there is only one overlapping and allow_merging is true
+        auto_merge = false
+    
         # Disable returning the block when removed/unclaimed?
         no_drop = false
     
@@ -223,7 +246,14 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         # Recommended to keep false if "Restrict Obtaining" (the new way) is true
         prevent_silk_touch = false
     
+        # Set cost for when a protection block is placed (separate from /ps get cost)
+        cost_to_place = 0.0
+    
     [player]
+        # Whether or not to allow breaking the protection block with a shift-right click
+        # Useful if the protection block is unbreakable (bedrock, command block), etc.
+        allow_shift_right_break = false
+    
         # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
         # Does not prevent entry, use the flag "entry deny" for preventing entry.
         # Bypass with protectionstones.tp.bypasstp
