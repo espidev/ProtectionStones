@@ -30,26 +30,25 @@ import java.util.function.Consumer;
 
 class ArgAdminChangeblock {
 
-    // /ps admin changeblock [world] [fromblock] [toblock]
+    // /ps admin changeblock [world] [fromblockalias] [toblockalias]
     static boolean argumentAdminChangeblock(CommandSender p, String[] args) {
         if (args.length < 5) {
             PSL.msg(p, ArgAdmin.CHANGEBLOCK_HELP);
             return true;
         }
 
-        String world = args[2], fromBlock = args[3], toBlock = args[4];
-        if (Material.matchMaterial(toBlock) == null && !toBlock.startsWith("PLAYER_HEAD")) {
-            PSL.msg(p, ChatColor.GRAY + "The block to change to is not valid!");
+        String world = args[2], fromBlockAlias = args[3], toBlockAlias = args[4];
+        if (ProtectionStones.getProtectBlockFromAlias(fromBlockAlias) == null) {
+            PSL.msg(p, ChatColor.GRAY + "The type to change from is not a registered protection block!");
             return true;
         }
-        if (toBlock.startsWith("PLAYER_HEAD") && toBlock.split(":").length != 2) {
-            PSL.msg(p, ChatColor.GRAY + "The block to change to is not valid!");
+        if (ProtectionStones.getProtectBlockFromAlias(toBlockAlias) == null) {
+            PSL.msg(p, ChatColor.GRAY + "The type to change to is not a registered protection block!");
             return true;
         }
-        if (!ProtectionStones.isProtectBlockType(toBlock)) {
-            PSL.msg(p, ChatColor.GRAY + "The block to change to is not a registered protection block!");
-            return true;
-        }
+
+        String fromBlock = ProtectionStones.getProtectBlockFromAlias(fromBlockAlias).type,
+                toBlock = ProtectionStones.getProtectBlockFromAlias(toBlockAlias).type;
 
         Consumer<PSRegion> convertFunction = (region) -> {
             if (region.getType().equals(fromBlock)) {
