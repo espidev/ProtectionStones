@@ -21,10 +21,13 @@ import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -136,7 +139,7 @@ public class MiscUtil {
         if (psType.split(":").length < 2) return;
         String name = psType.split(":")[1];
         if (name.length() > MAX_USERNAME_LENGTH) {
-            blockWithBase64(b, uuidToBase64Head.get(name));
+            blockWithBase64(b, name);
         } else {
             OfflinePlayer op = Bukkit.getOfflinePlayer(psType.split(":")[1]);
             Skull s = (Skull) b.getState();
@@ -169,26 +172,18 @@ public class MiscUtil {
 
     private static void blockWithBase64(Block block, String uuid) { // TODO
         String base64 = uuidToBase64Head.get(uuid);
-        OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
-        Skull s = (Skull) block.getState();
-        s.setOwningPlayer(op);
-        s.update();
-
-        // UUID hashAsId = new UUID(base64.hashCode(), base64.hashCode());
-
-        //BlockData blockData = Bukkit.getServer().createBlockData(block.getType(), "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}");
-        //block.setBlockData(blockData, true);
 
         // data command is a terrible idea and not cross-world
-        /*
+
         String args = String.format(
                 "%d %d %d %s",
                 block.getX(),
                 block.getY(),
                 block.getZ(),
-                "{Owner:{Id:\"" + hashAsId + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+                "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "data merge block " + args);*/
+        Bukkit.getLogger().info(args); // TODO
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute in " + block.getWorld().getName() + " run data merge block " + args);
     }
 
     public static boolean isBase64PSHead(String type) {
