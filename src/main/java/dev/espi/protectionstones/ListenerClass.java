@@ -173,6 +173,13 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler
+    public void onBlockFromTo(BlockFromToEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getToBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onEntityExplode(EntityExplodeEvent e) {
         // loop through exploded blocks
         for (int i = 0; i < e.blockList().size(); i++) {

@@ -68,6 +68,11 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
+        if (r.getTypeOptions() == null) {
+            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getProtectBlock().getType().toString() + ") is not configured. Please contact an administrator.");
+            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (\" + r.getProtectBlock().getType().toString() + \") is not configured.");
+            return true;
+        }
 
         if (args.length == 1) { // info of current region player is in
             if (!p.hasPermission("protectionstones.info")) {
