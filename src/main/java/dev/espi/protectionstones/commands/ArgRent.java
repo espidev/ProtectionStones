@@ -73,6 +73,12 @@ public class ArgRent implements PSCommandArg {
             return true;
         }
 
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) {
+            Bukkit.getLogger().info(ChatColor.RED + "Vault is required, but is not enabled on this server. Contact an administrator.");
+            s.sendMessage(ChatColor.RED + "Vault is required, but is not enabled on this server. Contact an administrator.");
+            return true;
+        }
+
         Player p = (Player) s;
 
         if (args.length == 1) {
@@ -146,6 +152,11 @@ public class ArgRent implements PSCommandArg {
                     }
                     if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice())) {
                         PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", r.getPrice())));
+                        break;
+                    }
+
+                    if (r.getLandlord().equals(p.getUniqueId())) {
+                        PSL.msg(p, PSL.RENT_CANNOT_RENT_OWN_REGION.msg());
                         break;
                     }
 

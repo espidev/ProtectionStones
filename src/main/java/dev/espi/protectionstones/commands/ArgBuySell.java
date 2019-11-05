@@ -19,9 +19,11 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -55,6 +57,12 @@ public class ArgBuySell implements PSCommandArg {
         Player p = (Player) s;
         if (!p.hasPermission("protectionstones.buysell")) {
             PSL.msg(p, PSL.NO_PERMISSION_BUYSELL.msg());
+            return true;
+        }
+
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) {
+            Bukkit.getLogger().info(ChatColor.RED + "Vault is required, but is not enabled on this server. Contact an administrator.");
+            s.sendMessage(ChatColor.RED + "Vault is required, but is not enabled on this server. Contact an administrator.");
             return true;
         }
 
