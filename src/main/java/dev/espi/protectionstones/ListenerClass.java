@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -185,8 +186,11 @@ public class ListenerClass implements Listener {
     public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
         Block clicked = e.getBlockClicked();
         BlockFace bf = e.getBlockFace();
-        if (ProtectionStones.isProtectBlock(clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ()))) {
+        Block check = clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ());
+        if (ProtectionStones.isProtectBlock(check)) {
             e.setCancelled(true);
+            // fix for dumb head texture changing
+            // Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> MiscUtil.setHeadType(ProtectionStones.getBlockOptions(check).type, check));
         }
     }
 

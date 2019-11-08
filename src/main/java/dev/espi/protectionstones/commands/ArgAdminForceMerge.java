@@ -86,6 +86,7 @@ public class ArgAdminForceMerge {
 
             PSRegion psr = PSRegion.fromWGRegion(w, r);
 
+            // loop over overlapping regions
             for (ProtectedRegion rOverlap : rm.getApplicableRegions(r)) {
                 if (!ProtectionStones.isPSRegion(rOverlap)) continue;
                 if (rOverlap.getId().equals(r.getId())) continue;
@@ -93,7 +94,8 @@ public class ArgAdminForceMerge {
                 Map<Flag<?>, Object> mergeFlags = getFlags(rOverlap.getFlags()); // comparison flags
 
                 // check if regions are roughly equal
-                if (!(areDomainsEqual(rOverlap.getOwners(), r.getOwners()) && areDomainsEqual(rOverlap.getMembers(), r.getMembers()) && rOverlap.getParent() == null && baseFlags.equals(mergeFlags))) continue;
+                if (!(areDomainsEqual(rOverlap.getOwners(), r.getOwners()) && areDomainsEqual(rOverlap.getMembers(), r.getMembers()) && rOverlap.getParent() == null && baseFlags.equals(mergeFlags)))
+                    continue;
 
                 String rOverlapGroup = idToGroup.get(rOverlap.getId());
 
