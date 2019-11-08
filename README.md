@@ -1,7 +1,7 @@
 # ProtectionStones
 [![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
 
-This project was originally forked from https://github.com/vik1395/ProtectionStones-Minecraft.
+This project was originally based off of https://github.com/vik1395/ProtectionStones-Minecraft.
 
 ProtectionStones is a grief prevention and land claiming plugin.
 
@@ -14,7 +14,7 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.6.1
+* ProtectionStones 2.6.2
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)

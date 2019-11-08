@@ -31,6 +31,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -174,8 +175,17 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler
-    public void onPlayerBucketEmptyEvent(PlayerBucketEmptyEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlockClicked()) {
+    public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
+        Block clicked = e.getBlockClicked();
+        BlockFace bf = e.getBlockFace();
+        if (ProtectionStones.isProtectBlock(clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ()))) {
             e.setCancelled(true);
         }
     }
