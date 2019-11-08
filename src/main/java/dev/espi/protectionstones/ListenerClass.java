@@ -39,6 +39,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -169,6 +170,13 @@ public class ListenerClass implements Listener {
             if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerBucketEmptyEvent(PlayerBucketEmptyEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlockClicked()) {
+            e.setCancelled(true);
         }
     }
 
