@@ -26,7 +26,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
-import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -80,7 +79,7 @@ public class ListenerClass implements Listener {
         }
 
         // check if player is owner of region
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner") || r.getRentStage() == PSRegion.RentStage.RENTING) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return false;
         }

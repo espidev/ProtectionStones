@@ -63,7 +63,7 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
-        if (!r.getWGRegion().isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.getWGRegion().isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner") || r.getRentStage() == PSRegion.RentStage.RENTING) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return true;
         }
