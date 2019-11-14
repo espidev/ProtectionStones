@@ -129,87 +129,87 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public boolean forSale() {
-        return getParent().forSale();
+        return mergedGroup.forSale();
     }
 
     @Override
     public void setSellable(boolean forSale, UUID landlord, double price) {
-        getParent().setSellable(forSale, landlord, price);
+        mergedGroup.setSellable(forSale, landlord, price);
     }
 
     @Override
     public void sell(UUID player) {
-        getParent().sell(player);
+        mergedGroup.sell(player);
     }
 
     @Override
     public RentStage getRentStage() {
-        return getParent().getRentStage();
+        return mergedGroup.getRentStage();
     }
 
     @Override
     public UUID getLandlord() {
-        return getParent().getLandlord();
+        return mergedGroup.getLandlord();
     }
 
     @Override
     public void setLandlord(UUID landlord) {
-        getParent().setLandlord(landlord);
+        mergedGroup.setLandlord(landlord);
     }
 
     @Override
     public UUID getTenant() {
-        return getParent().getTenant();
+        return mergedGroup.getTenant();
     }
 
     @Override
     public void setTenant(UUID tenant) {
-        getParent().setTenant(tenant);
+        mergedGroup.setTenant(tenant);
     }
 
     @Override
     public String getRentPeriod() {
-        return getParent().getRentPeriod();
+        return mergedGroup.getRentPeriod();
     }
 
     @Override
     public void setRentPeriod(String s) {
-        getParent().setRentPeriod(s);
+        mergedGroup.setRentPeriod(s);
     }
 
     @Override
     public Double getPrice() {
-        return getParent().getPrice();
+        return mergedGroup.getPrice();
     }
 
     @Override
     public void setPrice(Double price) {
-        getParent().setPrice(price);
+        mergedGroup.setPrice(price);
     }
 
     @Override
     public void setRentLastPaid(Long timestamp) {
-        getParent().setRentLastPaid(timestamp);
+        mergedGroup.setRentLastPaid(timestamp);
     }
 
     @Override
     public Long getRentLastPaid() {
-        return getParent().getRentLastPaid();
+        return mergedGroup.getRentLastPaid();
     }
 
     @Override
     public void setRentable(UUID landlord, String rentPeriod, double rentPrice) {
-        getParent().setRentable(landlord, rentPeriod, rentPrice);
+        mergedGroup.setRentable(landlord, rentPeriod, rentPrice);
     }
 
     @Override
     public void rentOut(UUID landlord, UUID tenant, String rentPeriod, double rentPrice) {
-        getParent().rentOut(landlord, tenant, rentPeriod, rentPrice);
+        mergedGroup.rentOut(landlord, tenant, rentPeriod, rentPrice);
     }
 
     @Override
     public void removeRenting() {
-        getParent().removeRenting();
+        mergedGroup.removeRenting();
     }
 
     @Override
