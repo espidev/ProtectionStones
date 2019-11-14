@@ -113,8 +113,13 @@ public class ArgAdmin implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock");
-        return args.length == 2 ? StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>()) : null;
+        if (args.length == 2) {
+            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock");
+            return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
+        } else if (args.length >= 3 && args[1].equals("forcemerge")) {
+            return ArgAdminForceMerge.tabComplete(sender, alias, args);
+        }
+        return null;
     }
 
 }

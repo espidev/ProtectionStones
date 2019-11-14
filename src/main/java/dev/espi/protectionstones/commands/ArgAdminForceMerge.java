@@ -31,10 +31,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.util.StringUtil;
 
 import java.util.*;
 
 public class ArgAdminForceMerge {
+
+    private static Set<String> flags = new HashSet<>(Arrays.asList("no_member_match", "no_flag_match", "one_owner_match"));
 
     private static Map<Flag<?>, Object> getFlags(Map<Flag<?>, Object> flags) {
         Map<Flag<?>, Object> f = new HashMap<>(flags);
@@ -45,6 +48,17 @@ public class ArgAdminForceMerge {
         f.remove(FlagHandler.PS_HOME);
 
         return f;
+    }
+
+    private static boolean areDomainsEqualByOne(DefaultDomain o1, DefaultDomain o2) {
+        boolean ret = false;
+        for (UUID uuid : o1.getUniqueIds()) {
+            if (o2.contains(uuid)) ret = true;
+        }
+        for (UUID uuid : o2.getUniqueIds()) {
+            if (o1.contains(uuid)) ret = true;
+        }
+        return ret;
     }
 
     private static boolean areDomainsEqual(DefaultDomain o1, DefaultDomain o2) {
@@ -72,6 +86,16 @@ public class ArgAdminForceMerge {
             return true;
         }
 
+        Set<String> options = new HashSet<>();
+        for (int i = 3; i < args.length; i++) {
+            if (!flags.contains(args[i])) {
+                PSL.msg(p, ChatColor.RED + "Invalid option.");
+                return true;
+            } else {
+                options.add(args[i]);
+            }
+        }
+
         RegionManager rm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(world));
 
         HashMap<String, String> idToGroup = new HashMap<>();
@@ -94,8 +118,17 @@ public class ArgAdminForceMerge {
                 Map<Flag<?>, Object> mergeFlags = getFlags(rOverlap.getFlags()); // comparison flags
 
                 // check if regions are roughly equal
-                if (!(areDomainsEqual(rOverlap.getOwners(), r.getOwners()) && areDomainsEqual(rOverlap.getMembers(), r.getMembers()) && rOverlap.getParent() == null && baseFlags.equals(mergeFlags)))
-                    continue;
+                if (!options.contains("no_member_match") && !areDomainsEqual(rOverlap.getMembers(), r.getMembers())) continue;
+
+                if (!options.contains("no_flag_match") && !baseFlags.equals(mergeFlags)) continue;
+
+                if (!options.contains("one_owner_match") && !areDomainsEqual(rOverlap.getOwners(), r.getOwners())) continue;
+
+                if (options.contains("one_owner_match") && !areDomainsEqualByOne(rOverlap.getOwners(), r.getOwners())) continue;
+
+                if (rOverlap.getParent() != null) continue;
+
+                // check groupings
 
                 String rOverlapGroup = idToGroup.get(rOverlap.getId());
 
@@ -145,5 +178,16 @@ public class ArgAdminForceMerge {
         p.sendMessage(ChatColor.GRAY + "Done!");
 
         return true;
+    }
+
+    static List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        if (args.length == 3) {
+            List<String> l = new ArrayList<>();
+            for (World w : Bukkit.getWorlds()) l.add(w.getName());
+
+            return StringUtil.copyPartialMatches(args[2], l, new ArrayList<>());
+        } else {
+            return StringUtil.copyPartialMatches(args[args.length - 1], flags, new ArrayList<>());
+        }
     }
 }
