@@ -160,13 +160,13 @@ public class MiscUtil {
         );
 
         // fake entity to run command at its location
-        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), Pig.class, ent -> {
+        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), ArmorStand.class, ent -> {
             ent.setCustomName("mrpig");
             ent.setInvulnerable(true);
         });
 
         // run data command to change block using the pig's world
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=pig,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=armorstand,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
         e.remove();
     }
 

@@ -45,7 +45,7 @@ public class ArgMerge implements PSCommandArg {
         List<TextComponent> ret = new ArrayList<>();
         for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
             PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
-            if (psr != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
+            if (psr != null && psr.getTypeOptions() != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
                 TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + pr.getId());
 
                 if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")");
