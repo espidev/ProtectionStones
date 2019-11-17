@@ -139,7 +139,10 @@ public class MiscUtil {
 
                 item = Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\",Id:\"" + name + "\",Properties:{textures:[{Value:\"" + texture + "\"}]}}}");
             } else {*/
-            item = Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\"}}");
+            SkullMeta sm = (SkullMeta) item.getItemMeta();
+            sm.setOwningPlayer(Bukkit.getOfflinePlayer(name));
+            item.setItemMeta(sm);
+            // item = Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\"}}");
             return item;
         }
     }
