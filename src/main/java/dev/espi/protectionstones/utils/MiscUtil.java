@@ -163,6 +163,7 @@ public class MiscUtil {
         Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), ArmorStand.class, ent -> {
             ent.setCustomName("mrpig");
             ent.setInvulnerable(true);
+            ent.setVisible(false);
         });
 
         // run data command to change block using the pig's world
