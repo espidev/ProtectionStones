@@ -274,24 +274,24 @@ public class ListenerClass implements Listener {
         String[] sp = action.split(": ");
         if (sp.length == 0) return;
 
-        String act = sp[1];
-        for (int i = 2; i < sp.length; i++) act += ": " + sp[i];
+        StringBuilder act = new StringBuilder(sp[1]);
+        for (int i = 2; i < sp.length; i++) act.append(": ").append(sp[i]);
 
-        act = act.replace("%player%", player).replace("%region%", region);
+        act = new StringBuilder(act.toString().replace("%player%", player).replace("%region%", region));
 
         switch (sp[0]) {
             case "player_command":
-                if (s != null) Bukkit.getServer().dispatchCommand(s, act);
+                if (s != null) Bukkit.getServer().dispatchCommand(s, act.toString());
                 break;
             case "console_command":
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act);
+                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act.toString());
                 break;
             case "message":
-                if (s != null) s.sendMessage(act.replace('&', '§'));
+                if (s != null) s.sendMessage(act.toString().replace('&', '§'));
                 break;
             case "global_message":
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendMessage(act.replace('&', '§'));
+                    p.sendMessage(act.toString().replace('&', '§'));
                 }
                 break;
         }

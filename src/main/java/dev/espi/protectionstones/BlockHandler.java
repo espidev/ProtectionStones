@@ -27,6 +27,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
+import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -55,44 +56,6 @@ class BlockHandler {
         }
         lastProtectStonePlaced.put(p, currentTime);
         return null;
-    }
-
-    private static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
-        HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerRegionLimits(p);
-        int maxPS = ProtectionStones.getPlayerGlobalRegionLimits(p);
-
-        if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
-            // count player's protection stones
-            int total = 0, bFound = 0;
-            for (World w : Bukkit.getWorlds()) {
-                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-                for (ProtectedRegion r : rgm.getRegions().values()) {
-                    if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
-                        PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
-
-                        if (psr instanceof PSGroupRegion) {
-                         for (PSMergedRegion psmr : ((PSGroupRegion) psr).getMergedRegions()) {
-                             total++;
-                             if (psmr.getType().equals(b.type)) bFound++; // if the specific block was found
-                         }
-                        } else {
-                            total++;
-                            if (psr.getType().equals(b.type)) bFound++; // if the specific block was found
-                        }
-                    }
-                }
-            }
-            // check if player has passed region limit
-            if (total >= maxPS && maxPS != -1) {
-                return PSL.REACHED_REGION_LIMIT.msg();
-            }
-
-            // check if player has passed per block limit
-            if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
-                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
-            }
-        }
-        return "";
     }
 
     private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, RegionManager rm, LocalPlayer lp, double bx, double by, double bz) {
@@ -150,14 +113,13 @@ class BlockHandler {
             }
         }
 
+        // check if player reached region limit
+        if (!LimitUtil.check(p, blockOptions)) {
+            return false;
+        }
+
         // non-admin checks
         if (!p.hasPermission("protectionstones.admin")) {
-            // check if player has limit on protection stones
-            String msg = hasPlayerPassedRegionLimit(p, blockOptions);
-            if (!msg.isEmpty()) {
-                PSL.msg(p, msg);
-                return false;
-            }
             // check if in world blacklist or not in world whitelist
             boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
 

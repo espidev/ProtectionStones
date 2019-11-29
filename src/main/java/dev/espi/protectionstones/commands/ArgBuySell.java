@@ -20,6 +20,7 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -72,9 +73,20 @@ public class ArgBuySell implements PSCommandArg {
             return true;
         }
 
-        if (args[0].equals("buy")) {
+        if (args[0].equals("buy")) { // buying
+
             if (!r.forSale()) {
                 PSL.msg(p, PSL.BUY_NOT_FOR_SALE.msg());
+                return true;
+            }
+
+            if ((!r.getTypeOptions().permission.equals("") && !p.hasPermission(r.getTypeOptions().permission))) {
+                PSL.msg(p, PSL.NO_PERMISSION_REGION_TYPE.msg());
+                return true;
+            }
+
+            // check if player reached region limit
+            if (!LimitUtil.check(p, r.getTypeOptions())) {
                 return true;
             }
 
@@ -91,7 +103,7 @@ public class ArgBuySell implements PSCommandArg {
             }
             r.sell(p.getUniqueId());
 
-        } else if (args[0].equals("sell")) {
+        } else if (args[0].equals("sell")) { // selling
 
             if (!r.isOwner(p.getUniqueId())) {
                 PSL.msg(p, PSL.NOT_OWNER.msg());
