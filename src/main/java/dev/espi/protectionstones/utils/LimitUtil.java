@@ -42,7 +42,29 @@ public class LimitUtil {
         return true;
     }
 
-    public static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
+    public static boolean hasPassedOrEqualsRentLimit(Player p) {
+        int lim = MiscUtil.getPermissionNumber(p, "protectionstones.rent.limit.", -1);
+        if (lim != -1) {
+            int total = 0;
+
+            // find total number of
+            for (World w : Bukkit.getWorlds()) {
+                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+                for (ProtectedRegion r : rgm.getRegions().values()) {
+                    if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
+                        PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
+
+                        if (psr != null && psr.getTenant() != null && psr.getTenant().equals(p.getUniqueId())) total++;
+                    }
+                }
+            }
+
+            return total >= lim;
+        }
+        return false;
+    }
+
+    private static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
         HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerRegionLimits(p);
         int maxPS = ProtectionStones.getPlayerGlobalRegionLimits(p);
 

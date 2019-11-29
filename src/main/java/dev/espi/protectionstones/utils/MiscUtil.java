@@ -38,7 +38,7 @@ public class MiscUtil {
     static final int MAX_USERNAME_LENGTH = 16;
     public static HashMap<String, String> uuidToBase64Head = new HashMap<>();
 
-    public static int getPermissionNumber(Player p, String perm, int def) {
+    public static int getPermissionNumber(Player p, String perm, int def /* default */) {
         int n = -999;
         for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
             String permission = pia.getPermission();

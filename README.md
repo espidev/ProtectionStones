@@ -14,7 +14,7 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.6.2
+* ProtectionStones 2.6.3
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
@@ -360,6 +360,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.members - Allows players to add or remove region members. Allows players to use /ps info members command.
     protectionstones.flags - Allows players to set their region flags.
     protectionstones.rent - Allows players access to /ps rent.
+    protectionstones.rent.limit.x - Replace x with a limit for rented regions per player.
     protectionstones.buysell - Allows players access to /ps buy and /ps sell.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.

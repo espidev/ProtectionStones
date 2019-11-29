@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSEconomy;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -157,6 +158,11 @@ public class ArgRent implements PSCommandArg {
 
                     if (r.getLandlord().equals(p.getUniqueId())) {
                         PSL.msg(p, PSL.RENT_CANNOT_RENT_OWN_REGION.msg());
+                        break;
+                    }
+
+                    if (LimitUtil.hasPassedOrEqualsRentLimit(p)) {
+                        PSL.msg(p, PSL.RENT_REACHED_LIMIT.msg());
                         break;
                     }
 
