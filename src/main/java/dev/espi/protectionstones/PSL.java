@@ -87,8 +87,8 @@ public enum PSL {
     PROTECTED("psregion.protected", ChatColor.AQUA + "This area is now protected."),
     NO_LONGER_PROTECTED("psregion.no_longer_protected", ChatColor.YELLOW + "This area is no longer protected."),
     CANT_PROTECT_THAT("psregion.cant_protect_that", ChatColor.RED + "You can't protect that area."),
-    REACHED_REGION_LIMIT("psregion.reached_region_limit", ChatColor.RED + "You can not create any more protected regions."),
-    REACHED_PER_BLOCK_REGION_LIMIT("psregion.reached_per_block_region_limit", ChatColor.RED + "You can not create any more regions of this type."),
+    REACHED_REGION_LIMIT("psregion.reached_region_limit", ChatColor.RED + "You can not have any more protected regions (%limit%)."),
+    REACHED_PER_BLOCK_REGION_LIMIT("psregion.reached_per_block_region_limit", ChatColor.RED + "You can not have any more regions of this type (%limit%)."),
     WORLD_DENIED_CREATE("psregion.world_denied_create", ChatColor.RED + "You can not create protections in this world."),
     REGION_OVERLAP("psregion.region_overlap", ChatColor.RED + "You can not place a protection block here as it overlaps another region."),
     REGION_TOO_CLOSE("psregion.region_too_close", ChatColor.RED + "Your protection block must be a minimum of %num% blocks from the edge of other regions!"),
@@ -358,7 +358,15 @@ public enum PSL {
             if (yml.getString(psl.key) == null) {
                 yml.set(psl.key, psl.msg.replace('§', '&'));
             } else {
-                keyToMsg.put(psl.key, yml.getString(psl.key));
+
+                // psl conversions
+                if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
+                    yml.set(psl.key, psl.msg.replace('§', '&'));
+                } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
+                    yml.set(psl.key, psl.msg.replace('§', '&'));
+                } else { // use custom setting
+                    keyToMsg.put(psl.key, yml.getString(psl.key));
+                }
             }
         }
         try {

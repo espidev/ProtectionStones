@@ -47,7 +47,7 @@ public class LimitUtil {
         if (lim != -1) {
             int total = 0;
 
-            // find total number of
+            // find total number of rented regions
             for (World w : Bukkit.getWorlds()) {
                 RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
@@ -92,12 +92,12 @@ public class LimitUtil {
             }
             // check if player has passed region limit
             if (total >= maxPS && maxPS != -1) {
-                return PSL.REACHED_REGION_LIMIT.msg();
+                return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", ""+maxPS);
             }
 
             // check if player has passed per block limit
             if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
-                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg();
+                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg().replace("%limit%", ""+regionLimits.get(b));
             }
         }
         return "";

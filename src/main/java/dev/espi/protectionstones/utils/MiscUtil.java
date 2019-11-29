@@ -167,7 +167,7 @@ public class MiscUtil {
         });
 
         // run data command to change block using the pig's world
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=armorstand,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=armor_stand,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
         e.remove();
     }
 
