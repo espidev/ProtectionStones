@@ -101,6 +101,7 @@ public class ArgBuySell implements PSCommandArg {
                         .replace("%price%", String.format("%.2f", r.getPrice()))
                         .replace("%player%", p.getName()));
             }
+
             r.sell(p.getUniqueId());
 
         } else if (args[0].equals("sell")) { // selling

@@ -101,6 +101,7 @@ public class ArgAdminForceMerge {
         HashMap<String, String> idToGroup = new HashMap<>();
         HashMap<String, List<PSRegion>> groupToMembers = new HashMap<>();
 
+        // loop over regions in world
         for (ProtectedRegion r : rm.getRegions().values()) {
             if (!ProtectionStones.isPSRegion(r)) continue;
             if (r.getParent() != null) continue;

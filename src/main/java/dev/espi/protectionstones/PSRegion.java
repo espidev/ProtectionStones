@@ -17,19 +17,14 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.event.PSRemoveEvent;
-import dev.espi.protectionstones.utils.MiscUtil;
-import dev.espi.protectionstones.utils.WGMerge;
+import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -306,7 +301,7 @@ public abstract class PSRegion {
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {
-        return !this.getType().equals(MiscUtil.getProtectBlockType(this.getProtectBlock()));
+        return !this.getType().equals(BlockUtil.getProtectBlockType(this.getProtectBlock()));
     }
 
     /**
@@ -333,7 +328,7 @@ public abstract class PSRegion {
             if (getType().startsWith("PLAYER_HEAD")) {
                 getProtectBlock().setType(Material.PLAYER_HEAD);
                 if (getType().split(":").length > 1) {
-                    MiscUtil.setHeadType(getType(), getProtectBlock());
+                    BlockUtil.setHeadType(getType(), getProtectBlock());
                 }
             } else {
                 getProtectBlock().setType(Material.getMaterial(getType()));
@@ -378,7 +373,7 @@ public abstract class PSRegion {
             Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
             getProtectBlock().setType(set);
             if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
-                MiscUtil.setHeadType(type.type, getProtectBlock());
+                BlockUtil.setHeadType(type.type, getProtectBlock());
             }
         }
     }

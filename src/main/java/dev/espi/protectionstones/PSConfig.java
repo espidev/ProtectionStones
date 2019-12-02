@@ -20,7 +20,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import dev.espi.protectionstones.utils.MiscUtil;
+import dev.espi.protectionstones.utils.BlockUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
@@ -28,7 +28,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -190,10 +189,10 @@ public class PSConfig {
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
 
                 // for PLAYER_HEAD:base64, we need to change the entry to link to a UUID hash instead of storing the giant base64
-                if (MiscUtil.isBase64PSHead(b.type)) {
-                    String nuuid = MiscUtil.getUUIDFromBase64PS(b);
+                if (BlockUtil.isBase64PSHead(b.type)) {
+                    String nuuid = BlockUtil.getUUIDFromBase64PS(b);
 
-                    MiscUtil.uuidToBase64Head.put(nuuid, b.type.split(":")[1]);
+                    BlockUtil.uuidToBase64Head.put(nuuid, b.type.split(":")[1]);
                     b.type = "PLAYER_HEAD:" + nuuid;
                 }
 

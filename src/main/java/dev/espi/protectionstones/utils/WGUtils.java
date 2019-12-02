@@ -132,6 +132,7 @@ public class WGUtils {
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
+    // get the overlapping sets of groups of regions a player owns
     public static HashMap<String, ArrayList<String>> getPlayerAdjacentRegionGroups(Player p, RegionManager rm) {
         List<PSRegion> pRegions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
         HashMap<String, String> idToGroup = new HashMap<>();

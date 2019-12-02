@@ -25,7 +25,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
-import dev.espi.protectionstones.utils.MiscUtil;
+import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -177,7 +177,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getBlockOptions(Block block) {
-        return getBlockOptions(MiscUtil.getProtectBlockType(block));
+        return getBlockOptions(BlockUtil.getProtectBlockType(block));
     }
 
     /**
@@ -322,7 +322,7 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
         // check basic item
-        if (!ProtectionStones.isProtectBlockType(MiscUtil.getProtectBlockType(item))) return false;
+        if (!ProtectionStones.isProtectBlockType(BlockUtil.getProtectBlockType(item))) return false;
         // check for player heads
         if (!checkNBT) return true; // if not checking nbt, you only need to check type
 
@@ -355,14 +355,14 @@ public class ProtectionStones extends JavaPlugin {
 
     // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
-        ItemStack is = MiscUtil.getProtectBlockItemFromType(b.type);
+        ItemStack is = BlockUtil.getProtectBlockItemFromType(b.type);
 
         ItemMeta im = is.getItemMeta();
         assert im != null;
 
         // add skull metadata, must be before others since it resets item metadata
         if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
-            is = MiscUtil.setHeadType(b.type, is);
+            is = BlockUtil.setHeadType(b.type, is);
             im = is.getItemMeta();
         }
 
