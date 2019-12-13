@@ -146,7 +146,9 @@ public class FlagHandler {
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
                 b.regionFlags.put(flag, flag.parseInput(fc));
-                if (!group.equals("")) {
+                if (group.equals("-e")) { // empty flag
+                    b.regionFlags.put(flag.getRegionGroupFlag(), "");
+                } else if (!group.equals("")) { // normal flag value detection
                     b.regionFlags.put(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(group));
                 }
             } catch (Exception e) {

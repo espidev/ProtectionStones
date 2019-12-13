@@ -176,6 +176,7 @@ public class PSConfig {
                     continue;
                 }
 
+                // check for duplicates
                 if (ProtectionStones.isProtectBlockType(b.type)) {
                     Bukkit.getLogger().info("Duplicate block type found! Ignoring the extra block " + b.type);
                     continue;
