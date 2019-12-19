@@ -83,8 +83,8 @@ class ArgAdminCleanup {
 
                 // Loop over regions and check if offline player is in
                 for (String idname : regions.keySet()) {
-                    if (!idname.substring(0, 2).equals("ps")) continue;
                     ProtectedRegion region = regions.get(idname);
+                    if (!ProtectionStones.isPSRegion(region)) continue;
                     // remove inactive players from being owner
                     for (LocalPlayer lp : inactivePlayers) {
                         try {
