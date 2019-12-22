@@ -71,6 +71,15 @@ public class PSConfig {
     @Path("allow_merging_holes")
     public Boolean allowMergingHoles;
 
+    @Path("economy.max-rent-price")
+    public double maxRentPrice;
+    @Path("economy.min-rent-price")
+    public double minRentPrice;
+    @Path("economy.max-rent-period")
+    public int maxRentPeriod;
+    @Path("economy.min-rent-period")
+    public int minRentPeriod;
+
     static void initConfig() {
 
         // check if using config v1 or v2 (config.yml -> config.toml)
@@ -314,6 +323,13 @@ public class PSConfig {
                     c.save();
                     c.close();
                 }
+                break;
+            case 11:
+                ProtectionStones.config.set("config_version", 12);
+                ProtectionStones.config.set("economy.max-rent-price", -1.0);
+                ProtectionStones.config.set("economy.min-rent-price", -1.0);
+                ProtectionStones.config.set("economy.max-rent-period", -1);
+                ProtectionStones.config.set("economy.min-rent-period", 1);
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

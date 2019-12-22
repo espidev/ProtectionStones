@@ -22,6 +22,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.LimitUtil;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -30,6 +31,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
+import java.time.Duration;
 import java.util.*;
 
 public class ArgRent implements PSCommandArg {
@@ -115,15 +117,38 @@ public class ArgRent implements PSCommandArg {
                         PSL.msg(p, LEASE_HELP);
                         break;
                     }
-                    if (r.forSale()) {
+                    if (r.forSale()) { // if region is already being sold
                         PSL.msg(p, PSL.RENT_BEING_SOLD.msg());
+                        break;
+                    }
+                    double price = Double.parseDouble(args[2]);
+                    if (ProtectionStones.getInstance().getConfigOptions().minRentPrice != -1 && price < ProtectionStones.getInstance().getConfigOptions().minRentPrice) { // if rent price is too low
+                        PSL.msg(p, PSL.RENT_PRICE_TOO_LOW.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPrice));
+                        break;
+                    }
+                    if (ProtectionStones.getInstance().getConfigOptions().maxRentPrice != -1 && price > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) { // if rent price is too high
+                        PSL.msg(p, PSL.RENT_PRICE_TOO_HIGH.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPrice));
                         break;
                     }
 
                     String period = String.join(" ", Arrays.asList(args).subList(3, args.length));
-                    // TODO period check
 
-                    r.setRentable(p.getUniqueId(), period, Double.parseDouble(args[2]));
+                    try {
+                        Duration d = MiscUtil.parseRentPeriod(period);
+                        if (ProtectionStones.getInstance().getConfigOptions().minRentPeriod != -1 && d.getSeconds() < ProtectionStones.getInstance().getConfigOptions().minRentPrice) {
+                            PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+d.getSeconds()));
+                            break;
+                        }
+                        if (ProtectionStones.getInstance().getConfigOptions().maxRentPeriod != -1 && d.getSeconds() > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) {
+                            PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+d.getSeconds()));
+                            break;
+                        }
+                    } catch (NumberFormatException e) {
+                        PSL.msg(p, PSL.RENT_PERIOD_INVALID.msg());
+                        break;
+                    }
+
+                    r.setRentable(p.getUniqueId(), period, price);
                     PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
                     break;
 

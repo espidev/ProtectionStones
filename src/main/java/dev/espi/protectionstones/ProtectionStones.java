@@ -57,7 +57,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 11;
+    static final int CONFIG_VERSION = 12;
 
     static File configLocation, blockDataFolder;
     static FileConfig config;

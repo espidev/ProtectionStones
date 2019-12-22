@@ -17,24 +17,31 @@
 
 package dev.espi.protectionstones.utils;
 
-import dev.espi.protectionstones.PSProtectBlock;
-import dev.espi.protectionstones.ProtectionStones;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.time.Duration;
 
 public class MiscUtil {
+
+    public static Duration parseRentPeriod(String period) throws NumberFormatException {
+        Duration rentPeriod = Duration.ZERO;
+        for (String s : period.split(" ")) {
+            if (s.contains("w")) {
+                rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", "")) * 7);
+            } else if (s.contains("d")) {
+                rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("d", "")));
+            } else if (s.contains("h")) {
+                rentPeriod = rentPeriod.plusHours(Long.parseLong(s.replace("h", "")));
+            } else if (s.contains("m")) {
+                rentPeriod = rentPeriod.plusMinutes(Long.parseLong(s.replace("m", "")));
+            } else if (s.contains("s")) {
+                rentPeriod = rentPeriod.plusSeconds(Long.parseLong(s.replace("s", "")));
+            }
+        }
+        return rentPeriod;
+    }
 
     public static int getPermissionNumber(Player p, String perm, int def /* default */) {
         int n = -999;

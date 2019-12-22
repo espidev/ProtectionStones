@@ -148,6 +148,11 @@ public enum PSL {
     RENT_EVICT_NO_MONEY_LANDLORD("rent.evict_no_money_landlord", ChatColor.AQUA + "%tenant%" + ChatColor.GRAY + " has been " + ChatColor.RED + "evicted" + ChatColor.GRAY + " from region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " because they are unable to afford rent."),
     RENT_CANNOT_RENT_OWN_REGION("rent.cannot_rent_own_region", ChatColor.RED + "You cannot rent your own region!"),
     RENT_REACHED_LIMIT("rent.reached_limit", ChatColor.RED + "You've reached the limit of regions you are allowed to rent!"),
+    RENT_PRICE_TOO_LOW("rent.price_too_low", ChatColor.RED + "The rent price is too low (must be larger than %price%)."),
+    RENT_PRICE_TOO_HIGH("rent.price_too_high", ChatColor.RED + "The rent price is too high (must be lower than %price%)."),
+    RENT_PERIOD_TOO_SHORT("rent.period_too_short", ChatColor.RED + "The rent period is too short (must be longer than %period% seconds)."),
+    RENT_PERIOD_TOO_LONG("rent.period_too_long", ChatColor.RED + "The rent period is too long (must be shorter than %period% seconds)."),
+    RENT_PERIOD_INVALID("rent.period_invalid", ChatColor.RED + "Invalid period format! Example: 24h for once a day."),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),

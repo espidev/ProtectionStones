@@ -55,3 +55,12 @@ allow_merging_regions = true
 # Whether or not to allow merged regions to have holes in them (merging a bunch of regions in a circle with the inside not protected).
 # This is only checked during the merge process, it will not unmerge regions with holes already.
 allow_merging_holes = true
+
+[economy]
+    # Set limits on the price for renting. Set to -1 to disable.
+    max-rent-price = -1.0
+    min-rent-price = -1.0
+
+    # Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.
+    max-rent-period = -1
+    min-rent-period = 1

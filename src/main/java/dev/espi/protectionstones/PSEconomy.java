@@ -19,6 +19,7 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -63,6 +64,7 @@ public class PSEconomy {
     /**
      * Process a rent payment for a region.
      * It does not do any checks, it is expected to check if the rent time has passed before this function is called.
+     *
      * @param r the region to perform the rent payment
      */
     public static void doRentPayment(PSRegion r) {
@@ -123,7 +125,7 @@ public class PSEconomy {
                 continue;
             }
 
-            Duration rentPeriod = parseRentPeriod(r.getRentPeriod());
+            Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
             // if tenant needs to pay
             if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
                 doRentPayment(r);
@@ -139,28 +141,6 @@ public class PSEconomy {
      */
     public List<PSRegion> getRentedList() {
         return rentedList;
-    }
-
-    public Duration parseRentPeriod(String period) {
-        Duration rentPeriod = Duration.ZERO;
-        for (String s : period.split(" ")) {
-            try {
-                if (s.contains("w")) {
-                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("w", "")) * 7);
-                } else if (s.contains("d")) {
-                    rentPeriod = rentPeriod.plusDays(Long.parseLong(s.replace("d", "")));
-                } else if (s.contains("h")) {
-                    rentPeriod = rentPeriod.plusHours(Long.parseLong(s.replace("h", "")));
-                } else if (s.contains("m")) {
-                    rentPeriod = rentPeriod.plusMinutes(Long.parseLong(s.replace("m", "")));
-                } else if (s.contains("s")) {
-                    rentPeriod = rentPeriod.plusSeconds(Long.parseLong(s.replace("s", "")));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return rentPeriod;
     }
 
 
