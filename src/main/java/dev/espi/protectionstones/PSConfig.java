@@ -71,14 +71,16 @@ public class PSConfig {
     @Path("allow_merging_holes")
     public Boolean allowMergingHoles;
 
-    @Path("economy.max-rent-price")
+    @Path("economy.max_rent_price")
     public double maxRentPrice;
-    @Path("economy.min-rent-price")
+    @Path("economy.min_rent_price")
     public double minRentPrice;
-    @Path("economy.max-rent-period")
+    @Path("economy.max_rent_period")
     public int maxRentPeriod;
-    @Path("economy.min-rent-period")
+    @Path("economy.min_rent_period")
     public int minRentPeriod;
+    @Path("economy.tax_enabled")
+    public Boolean taxEnabled;
 
     static void initConfig() {
 
@@ -328,8 +330,14 @@ public class PSConfig {
                 ProtectionStones.config.set("config_version", 12);
                 ProtectionStones.config.set("economy.max-rent-price", -1.0);
                 ProtectionStones.config.set("economy.min-rent-price", -1.0);
+                ProtectionStones.config.set("economy.max-rent-price", "Set limits on the price for renting. Set to -1 to disable.");
                 ProtectionStones.config.set("economy.max-rent-period", -1);
                 ProtectionStones.config.set("economy.min-rent-period", 1);
+                ProtectionStones.config.setComment("economy.max-rent-period", "Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.");
+                ProtectionStones.config.set("economy.tax-enabled", false);
+                ProtectionStones.config.setComment("economy.tax-enabled", "# Set taxes on regions.\n" +
+                        "    # Taxes are configured in each individual block config.\n" +
+                        "    # Whether or not to enable the tax command.");
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

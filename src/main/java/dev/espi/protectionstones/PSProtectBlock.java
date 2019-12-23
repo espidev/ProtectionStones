@@ -105,6 +105,23 @@ public class PSProtectBlock {
     @SpecIntInRange(min = 0, max = 64)
     public int recipeAmount;
 
+    // economy section
+    @Path("economy.tax_amount")
+    @SpecIntInRange(min = Integer.MIN_VALUE, max = Integer.MAX_VALUE)
+    public double taxAmount;
+    @Path("economy.tax_period")
+    @SpecIntInRange(min = -1, max = Integer.MAX_VALUE)
+    public int taxPeriod;
+    @Path("economy.tax_payment_time")
+    @SpecIntInRange(min = 1, max = Integer.MAX_VALUE)
+    public int taxPaymentTime;
+    @Path("economy.tax_punishment")
+    public String taxPunishment;
+    @Path("economy.start_with_tax_autopay")
+    public boolean startWithTaxAutopay;
+    @Path("economy.tax_message_on_join")
+    public boolean taxMessageOnJoin;
+
     // behaviour section
     @Path("behaviour.auto_hide")
     public boolean autoHide;

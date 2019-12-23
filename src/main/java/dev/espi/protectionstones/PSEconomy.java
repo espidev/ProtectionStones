@@ -48,6 +48,13 @@ public class PSEconomy {
     }
 
     /**
+     * Stops the economy cycle. Used for reloads when creating a new PSEconomy.
+     */
+    public void stop() {
+        Bukkit.getScheduler().cancelTask(rentRunner);
+    }
+
+    /**
      * Load list of regions that are rented into memory.
      */
     public void loadRentList() {

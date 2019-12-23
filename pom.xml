@@ -250,8 +250,6 @@
             <scope>provided</scope>
         </dependency>
 
-
-
         <!--<dependency> LOCAL DEPENDENCIES-->
         <!--<groupId>com.sk89q.worldedit</groupId>-->
         <!--<artifactId>worldedit-bukkit</artifactId>-->

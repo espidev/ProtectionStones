@@ -17,6 +17,7 @@
 package dev.espi.protectionstones;
 
 import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.sk89q.worldguard.WorldGuard;
@@ -60,7 +61,7 @@ public class ProtectionStones extends JavaPlugin {
     static final int CONFIG_VERSION = 12;
 
     static File configLocation, blockDataFolder;
-    static FileConfig config;
+    static CommentedFileConfig config;
 
     private static List<PSCommandArg> commandArgs = new ArrayList<>();
     private static ProtectionStones plugin;
@@ -468,6 +469,7 @@ public class ProtectionStones extends JavaPlugin {
         ArgHelp.initHelpMenu();
 
         // load economy
+        if (ProtectionStones.getInstance().economy != null) ProtectionStones.getInstance().economy.stop();
         ProtectionStones.getInstance().economy = new PSEconomy();
 
         // add command to Bukkit (using reflection)

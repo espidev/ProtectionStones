@@ -1,6 +1,6 @@
+# Please do not change the config version unless you know what you are doing!
 config_version = 11
 uuidupdated = true
-# Please do not change the config version unless you know what you are doing!
 
 # ---------------------------------------------------------------------------------------
 # Protection Stones Config
@@ -58,9 +58,16 @@ allow_merging_holes = true
 
 [economy]
     # Set limits on the price for renting. Set to -1 to disable.
-    max-rent-price = -1.0
-    min-rent-price = -1.0
+    max_rent_price = -1.0
+    min_rent_price = -1.0
 
     # Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.
-    max-rent-period = -1
-    min-rent-period = 1
+    max_rent_period = -1
+    min_rent_period = 1
+
+    # Set taxes on regions.
+    # Taxes are configured in each individual block config.
+    # Whether or not to enable the tax command.
+    tax_enabled = false
+
+
