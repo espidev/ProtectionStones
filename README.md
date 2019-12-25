@@ -362,6 +362,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     protectionstones.rent - Allows players access to /ps rent.
     protectionstones.rent.limit.x - Replace x with a limit for rented regions per player.
     protectionstones.buysell - Allows players access to /ps buy and /ps sell.
+    protectionstones.tax - Allows players to access /ps tax commands.
     protectionstones.toggle - Allows players to toggle ProtectionStones placement.
     protectionstones.region - Allows players to use the /ps region commands.
     protectionstones.adjacent.x - Sets the number of non-adjacent regions players can have if "regions_must_be_adjacent" is true. Unlimited with -1.

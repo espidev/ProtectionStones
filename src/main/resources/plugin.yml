@@ -93,6 +93,9 @@ permissions:
   protectionstones.buysell:
     description: Allows players access to /ps buy and /ps sell.
     default: op
+  protectionstones.tax:
+    description: Allows players to access /ps tax commands.
+    default: op
   protectionstones.toggle:
     description: Allows players to toggle ProtectionStones placement.
     default: op

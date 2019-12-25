@@ -72,8 +72,7 @@ public class ArgRent implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.rent")) {
-            PSL.msg(s, PSL.NO_PERMISSION_RENT.msg());
-            return true;
+            return PSL.msg(s, PSL.NO_PERMISSION_RENT.msg());
         }
 
         if (!ProtectionStones.getInstance().isVaultSupportEnabled()) {
@@ -87,7 +86,7 @@ public class ArgRent implements PSCommandArg {
         if (args.length == 1) {
             runHelp(s);
         } else {
-            if (args[0].equals("help")) {
+            if (args[1].equals("help")) {
                 runHelp(s);
                 return true;
             }
@@ -95,72 +94,56 @@ public class ArgRent implements PSCommandArg {
             PSRegion r = PSRegion.fromLocation(p.getLocation());
 
             if (r == null) {
-                PSL.msg(p, PSL.NOT_IN_REGION.msg());
-                return true;
+                return PSL.msg(p, PSL.NOT_IN_REGION.msg());
             }
 
             switch (args[1]) {
                 case "lease":
-                    if (!r.isOwner(p.getUniqueId())) { // check if player is a region owner
-                        PSL.msg(p, PSL.NOT_OWNER.msg());
-                        break;
-                    }
-                    if (r.getRentStage() == PSRegion.RentStage.RENTING) { // check if already renting
-                        PSL.msg(p, PSL.RENT_ALREADY_RENTING.msg());
-                        break;
-                    }
-                    if (args.length < 4) {
-                        PSL.msg(p, LEASE_HELP);
-                        break;
-                    }
-                    if (!NumberUtils.isNumber(args[2])) { // check price
-                        PSL.msg(p, LEASE_HELP);
-                        break;
-                    }
-                    if (r.forSale()) { // if region is already being sold
-                        PSL.msg(p, PSL.RENT_BEING_SOLD.msg());
-                        break;
-                    }
+                    if (!r.isOwner(p.getUniqueId())) // check if player is a region owner
+                        return PSL.msg(p, PSL.NOT_OWNER.msg());
+
+                    if (r.getRentStage() == PSRegion.RentStage.RENTING) // check if already renting
+                        return PSL.msg(p, PSL.RENT_ALREADY_RENTING.msg());
+
+                    if (args.length < 4)
+                        return PSL.msg(p, LEASE_HELP);
+
+                    if (!NumberUtils.isNumber(args[2])) // check price
+                        return PSL.msg(p, LEASE_HELP);
+
+                    if (r.forSale()) // if region is already being sold
+                        return PSL.msg(p, PSL.RENT_BEING_SOLD.msg());
+
                     double price = Double.parseDouble(args[2]);
-                    if (ProtectionStones.getInstance().getConfigOptions().minRentPrice != -1 && price < ProtectionStones.getInstance().getConfigOptions().minRentPrice) { // if rent price is too low
-                        PSL.msg(p, PSL.RENT_PRICE_TOO_LOW.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPrice));
-                        break;
-                    }
-                    if (ProtectionStones.getInstance().getConfigOptions().maxRentPrice != -1 && price > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) { // if rent price is too high
-                        PSL.msg(p, PSL.RENT_PRICE_TOO_HIGH.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPrice));
-                        break;
-                    }
+                    if (ProtectionStones.getInstance().getConfigOptions().minRentPrice != -1 && price < ProtectionStones.getInstance().getConfigOptions().minRentPrice) // if rent price is too low
+                        return PSL.msg(p, PSL.RENT_PRICE_TOO_LOW.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPrice));
+
+                    if (ProtectionStones.getInstance().getConfigOptions().maxRentPrice != -1 && price > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) // if rent price is too high
+                        return PSL.msg(p, PSL.RENT_PRICE_TOO_HIGH.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPrice));
 
                     String period = String.join(" ", Arrays.asList(args).subList(3, args.length));
 
                     try {
                         Duration d = MiscUtil.parseRentPeriod(period);
                         if (ProtectionStones.getInstance().getConfigOptions().minRentPeriod != -1 && d.getSeconds() < ProtectionStones.getInstance().getConfigOptions().minRentPrice) {
-                            PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+d.getSeconds()));
-                            break;
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+d.getSeconds()));
                         }
                         if (ProtectionStones.getInstance().getConfigOptions().maxRentPeriod != -1 && d.getSeconds() > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) {
-                            PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+d.getSeconds()));
-                            break;
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+d.getSeconds()));
                         }
                     } catch (NumberFormatException e) {
-                        PSL.msg(p, PSL.RENT_PERIOD_INVALID.msg());
-                        break;
+                        return PSL.msg(p, PSL.RENT_PERIOD_INVALID.msg());
                     }
 
                     r.setRentable(p.getUniqueId(), period, price);
-                    PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
-                    break;
+                    return PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
 
                 case "stoplease":
-                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && !p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING)) {
-                        PSL.msg(p, PSL.NOT_OWNER.msg());
-                        break;
-                    }
-                    if (r.getRentStage() == PSRegion.RentStage.NOT_RENTING) {
-                        PSL.msg(p, PSL.RENT_NOT_RENTED.msg());
-                        break;
-                    }
+                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && !p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING))
+                        return PSL.msg(p, PSL.NOT_OWNER.msg());
+
+                    if (r.getRentStage() == PSRegion.RentStage.NOT_RENTING)
+                        return PSL.msg(p, PSL.RENT_NOT_RENTED.msg());
 
                     UUID tenant = r.getTenant();
                     r.removeRenting();
@@ -172,24 +155,17 @@ public class ArgRent implements PSCommandArg {
                     break;
 
                 case "rent":
-                    if (r.getRentStage() != PSRegion.RentStage.LOOKING_FOR_TENANT) {
-                        PSL.msg(p, PSL.RENT_NOT_RENTING.msg());
-                        break;
-                    }
-                    if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice())) {
-                        PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", r.getPrice())));
-                        break;
-                    }
+                    if (r.getRentStage() != PSRegion.RentStage.LOOKING_FOR_TENANT)
+                        return PSL.msg(p, PSL.RENT_NOT_RENTING.msg());
 
-                    if (r.getLandlord().equals(p.getUniqueId())) {
-                        PSL.msg(p, PSL.RENT_CANNOT_RENT_OWN_REGION.msg());
-                        break;
-                    }
+                    if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice()))
+                        return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", r.getPrice())));
 
-                    if (LimitUtil.hasPassedOrEqualsRentLimit(p)) {
-                        PSL.msg(p, PSL.RENT_REACHED_LIMIT.msg());
-                        break;
-                    }
+                    if (r.getLandlord().equals(p.getUniqueId()))
+                        return PSL.msg(p, PSL.RENT_CANNOT_RENT_OWN_REGION.msg());
+
+                    if (LimitUtil.hasPassedOrEqualsRentLimit(p))
+                        return PSL.msg(p, PSL.RENT_REACHED_LIMIT.msg());
 
                     r.rentOut(r.getLandlord(), p.getUniqueId(), r.getRentPeriod(), r.getPrice());
                     PSL.msg(p, PSL.RENT_RENTING_TENANT.msg()
@@ -207,10 +183,8 @@ public class ArgRent implements PSCommandArg {
                     break;
 
                 case "stoprenting":
-                    if (r.getTenant() == null || !r.getTenant().equals(p.getUniqueId())) {
-                        PSL.msg(p, PSL.RENT_NOT_TENANT.msg());
-                        break;
-                    }
+                    if (r.getTenant() == null || !r.getTenant().equals(p.getUniqueId()))
+                        return PSL.msg(p, PSL.RENT_NOT_TENANT.msg());
 
                     r.setTenant(null);
                     r.getWGRegion().getOwners().removeAll();
@@ -224,6 +198,9 @@ public class ArgRent implements PSCommandArg {
                                 .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
                     }
 
+                    break;
+                default:
+                    runHelp(s);
                     break;
             }
         }

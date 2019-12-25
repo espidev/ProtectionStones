@@ -63,8 +63,7 @@ public class ArgAdmin implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.admin")) {
-            PSL.msg(s, PSL.NO_PERMISSION_ADMIN.msg());
-            return true;
+            return PSL.msg(s, PSL.NO_PERMISSION_ADMIN.msg());
         }
 
         if (args.length < 2) {

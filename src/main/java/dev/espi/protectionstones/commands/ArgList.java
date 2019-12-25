@@ -50,18 +50,14 @@ public class ArgList implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.list")) {
-            PSL.msg(s, PSL.NO_PERMISSION_LIST.msg());
-            return true;
-        }
-        if (args.length == 2 && !s.hasPermission("protectionstones.list.others")) {
-            PSL.msg(s, PSL.NO_PERMISSION_LIST_OTHERS.msg());
-            return true;
-        }
-        if (args.length == 2 && !UUIDCache.nameToUUID.containsKey(args[1])) {
-            PSL.msg(s, PSL.PLAYER_NOT_FOUND.msg());
-            return true;
-        }
+        if (!s.hasPermission("protectionstones.list"))
+            return PSL.msg(s, PSL.NO_PERMISSION_LIST.msg());
+
+        if (args.length == 2 && !s.hasPermission("protectionstones.list.others"))
+            return PSL.msg(s, PSL.NO_PERMISSION_LIST_OTHERS.msg());
+
+        if (args.length == 2 && !UUIDCache.nameToUUID.containsKey(args[1]))
+            return PSL.msg(s, PSL.PLAYER_NOT_FOUND.msg());
 
         // run query async to reduce load
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

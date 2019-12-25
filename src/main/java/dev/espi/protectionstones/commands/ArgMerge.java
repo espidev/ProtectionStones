@@ -61,28 +61,21 @@ public class ArgMerge implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.merge")) {
-            PSL.msg(s, PSL.NO_PERMISSION_MERGE.msg());
-            return true;
-        }
+        if (!s.hasPermission("protectionstones.merge"))
+            return PSL.msg(s, PSL.NO_PERMISSION_MERGE.msg());
 
-        if (!ProtectionStones.getInstance().getConfigOptions().allowMergingRegions) {
-            PSL.msg(s, PSL.MERGE_DISABLED.msg());
-            return true;
-        }
+        if (!ProtectionStones.getInstance().getConfigOptions().allowMergingRegions)
+            return PSL.msg(s, PSL.MERGE_DISABLED.msg());
 
         Player p = (Player) s;
         if (args.length == 1) { // GUI
 
             PSRegion r = PSRegion.fromLocation(p.getLocation());
-            if (r == null) {
-                PSL.msg(s, PSL.NOT_IN_REGION.msg());
-                return true;
-            }
-            if (!r.getTypeOptions().allowMerging) {
-                PSL.msg(s, PSL.MERGE_NOT_ALLOWED.msg());
-                return true;
-            }
+            if (r == null)
+                return PSL.msg(s, PSL.NOT_IN_REGION.msg());
+
+            if (!r.getTypeOptions().allowMerging)
+                return PSL.msg(s, PSL.MERGE_NOT_ALLOWED.msg());
 
             List<TextComponent> components = getGUI(p, r);
             if (components.isEmpty()) {
@@ -100,24 +93,18 @@ public class ArgMerge implements PSCommandArg {
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
             LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
 
-            if (!ProtectionStones.isPSRegion(region) || !ProtectionStones.isPSRegion(root)) {
-                PSL.msg(p, PSL.MULTI_REGION_DOES_NOT_EXIST.msg());
-                return true;
-            }
-            if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp))) {
-                PSL.msg(p, PSL.NO_ACCESS.msg());
-                return true;
-            }
-            if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region)) {
-                PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
-                return true;
-            }
+            if (!ProtectionStones.isPSRegion(region) || !ProtectionStones.isPSRegion(root))
+                return PSL.msg(p, PSL.MULTI_REGION_DOES_NOT_EXIST.msg());
+
+            if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp)))
+                return PSL.msg(p, PSL.NO_ACCESS.msg());
+
+            if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region))
+                return PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
 
             PSRegion aRegion = PSRegion.fromWGRegion(p.getWorld(), region), aRoot = PSRegion.fromWGRegion(p.getWorld(), root);
-            if (!aRegion.getTypeOptions().allowMerging || !aRoot.getTypeOptions().allowMerging) {
-                PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
-                return true;
-            }
+            if (!aRegion.getTypeOptions().allowMerging || !aRoot.getTypeOptions().allowMerging)
+                return PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                 try {

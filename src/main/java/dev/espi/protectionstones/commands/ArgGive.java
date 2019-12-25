@@ -34,28 +34,20 @@ public class ArgGive implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
-        if (!p.hasPermission("protectionstones.give")) {
-            PSL.msg(p, PSL.NO_PERMISSION_GIVE.msg());
-            return true;
-        }
+        if (!p.hasPermission("protectionstones.give"))
+            return PSL.msg(p, PSL.NO_PERMISSION_GIVE.msg());
 
-        if (args.length != 3) {
-            PSL.msg(p, PSL.GIVE_HELP.msg());
-            return true;
-        }
+        if (args.length != 3)
+            return PSL.msg(p, PSL.GIVE_HELP.msg());
 
         // check if player online
-        if (Bukkit.getPlayer(args[2]) == null) {
-            PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg() + " (" + args[2] + ")");
-            return true;
-        }
+        if (Bukkit.getPlayer(args[2]) == null)
+            return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg() + " (" + args[2] + ")");
 
         // check if argument is valid block
         PSProtectBlock cp = ProtectionStones.getProtectBlockFromAlias(args[1]);
-        if (cp == null) {
-            PSL.msg(p, PSL.INVALID_BLOCK.msg());
-            return true;
-        }
+        if (cp == null)
+            return PSL.msg(p, PSL.INVALID_BLOCK.msg());
 
         // check if item was able to be added (inventory not full)
         Player ps = Bukkit.getPlayer(args[2]);
@@ -64,14 +56,11 @@ public class ArgGive implements PSCommandArg {
                 PSL.msg(ps, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
                 ps.getWorld().dropItem(ps.getLocation(), cp.createItem());
             } else {
-                PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
-                return true;
+                return PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
             }
         }
 
-        PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));
-
-        return true;
+        return PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));
     }
 
     // tab completion

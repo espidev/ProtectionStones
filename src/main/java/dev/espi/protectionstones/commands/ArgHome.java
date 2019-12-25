@@ -118,14 +118,11 @@ public class ArgHome implements PSCommandArg {
         Player p = (Player) s;
 
         // prelim checks
-        if (!p.hasPermission("protectionstones.home")) {
-            PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
-            return true;
-        }
-        if (args.length != 2 && args.length != 1) {
-            PSL.msg(p, PSL.HOME_HELP.msg());
-            return true;
-        }
+        if (!p.hasPermission("protectionstones.home"))
+            return PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
+
+        if (args.length != 2 && args.length != 1)
+            return PSL.msg(p, PSL.HOME_HELP.msg());
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) { // /ps home GUI

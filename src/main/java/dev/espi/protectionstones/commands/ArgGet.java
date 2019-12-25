@@ -70,43 +70,31 @@ public class ArgGet implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        if (!p.hasPermission("protectionstones.get")) {
-            PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
-            return true;
-        }
+        if (!p.hasPermission("protectionstones.get"))
+            return PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
 
         // /ps get (for GUI)
         if (args.length == 1) return openGetGUI(p);
 
-        if (args.length != 2) {
-            PSL.msg(p, PSL.GET_HELP.msg());
-            return true;
-        }
+        if (args.length != 2)
+            return PSL.msg(p, PSL.GET_HELP.msg());
 
         // check if argument is valid block
         PSProtectBlock cp = ProtectionStones.getProtectBlockFromAlias(args[1]);
-        if (cp == null) {
-            PSL.msg(p, PSL.INVALID_BLOCK.msg());
-            return true;
-        }
+        if (cp == null)
+            return PSL.msg(p, PSL.INVALID_BLOCK.msg());
 
         // check for block permission (custom)
-        if (!cp.permission.equals("") && !p.hasPermission(cp.permission)) {
-            PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
-            return true;
-        }
+        if (!cp.permission.equals("") && !p.hasPermission(cp.permission))
+            return PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
 
         // check if /ps get is disabled on this
-        if (cp.preventPsGet && !p.hasPermission("protectionstones.admin")) {
-            PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
-            return true;
-        }
+        if (cp.preventPsGet && !p.hasPermission("protectionstones.admin"))
+            return PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
 
         // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, cp.price)) {
-            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
-            return true;
-        }
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, cp.price))
+            return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
 
         // debug message
         if (!ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
@@ -117,8 +105,7 @@ public class ArgGet implements PSCommandArg {
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
             EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, cp.price);
             if (!er.transactionSuccess()) {
-                PSL.msg(p, er.errorMessage);
-                return true;
+                return PSL.msg(p, er.errorMessage);
             }
         }
 
@@ -132,17 +119,14 @@ public class ArgGet implements PSCommandArg {
                 if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
                     EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().depositPlayer(p, cp.price);
                     if (!er.transactionSuccess()) {
-                        PSL.msg(p, er.errorMessage);
-                        return true;
+                        return PSL.msg(p, er.errorMessage);
                     }
                 }
             }
             return true;
         }
 
-        PSL.msg(p, PSL.GET_GOTTEN.msg());
-
-        return true;
+        return PSL.msg(p, PSL.GET_GOTTEN.msg());
     }
 
     // tab completion

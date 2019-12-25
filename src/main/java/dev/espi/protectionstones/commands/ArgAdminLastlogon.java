@@ -17,7 +17,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PlayerComparator;
+import dev.espi.protectionstones.utils.PlayerComparator;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;

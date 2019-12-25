@@ -56,6 +56,7 @@ public enum PSL {
     NO_PERMISSION_FLAGS("no_permission_flags", ChatColor.RED + "You do not have permission to use flag commands."),
     NO_PERMISSION_PER_FLAG("no_permission_per_flag", ChatColor.RED + "You do not have permission to use that flag."),
     NO_PERMISSION_RENT("no_permission_rent", ChatColor.RED + "You do not have permission for renting."),
+    NO_PERMISSION_TAX("no_permission_tax", ChatColor.RED + "You do not have permission to use the tax command."),
     NO_PERMISSION_BUYSELL("no_permission_buysell", ChatColor.RED + "You do not have permission to buy and sell regions."),
     NO_PERMISSION_UNHIDE("no_permission_unhide", ChatColor.RED + "You do not have permission to unhide protection blocks."),
     NO_PERMISSION_HIDE("no_permission_hide", ChatColor.RED + "You do not have permission to hide protection blocks."),
@@ -153,6 +154,11 @@ public enum PSL {
     RENT_PERIOD_TOO_SHORT("rent.period_too_short", ChatColor.RED + "The rent period is too short (must be longer than %period% seconds)."),
     RENT_PERIOD_TOO_LONG("rent.period_too_long", ChatColor.RED + "The rent period is too long (must be shorter than %period% seconds)."),
     RENT_PERIOD_INVALID("rent.period_invalid", ChatColor.RED + "Invalid period format! Example: 24h for once a day."),
+
+    // ps tax
+    TAX_HELP("tax.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax"),
+    TAX_HELP_DESC("tax.help_desc", "Use this command to manage and pay taxes."),
+    TAX_HELP_HEADER("tax.help_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Taxes Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),
@@ -292,24 +298,28 @@ public enum PSL {
     SETHOME_HELP_DESC("sethome.help_desc", "Use this command to set the home of a region to where you are right now."),
     SETHOME_SET("sethome.set", ChatColor.GRAY + "The home for " + ChatColor.AQUA + "%psid%" + ChatColor.GRAY + " has been set to your location."),
 
+    // ps list
     LIST_HELP("list.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps list [player (optional)]"),
     LIST_HELP_DESC("list.help_desc", "Use this command to list the regions you, or another player owns."),
     LIST_HEADER("list.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " %player%'s Regions " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     LIST_OWNER("list.owner", ChatColor.GRAY + "Owner of:"),
     LIST_MEMBER("list.member", ChatColor.GRAY + "Member of:"),
 
+    // ps name
     NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name|none]"),
     NAME_HELP_DESC("name.help_desc", "Use this command to give a nickname to your region, to make identifying your region easier."),
     NAME_REMOVED("name.removed", ChatColor.GRAY + "Removed the name for %id%."),
     NAME_SET_NAME("name.set_name", ChatColor.GRAY + "Set the name of %id% to " + ChatColor.AQUA + "%name%" + ChatColor.GRAY + "."),
     NAME_TAKEN("name.taken", ChatColor.GRAY + "The region name " + ChatColor.AQUA + "%name%" + ChatColor.GRAY + " has already been taken! Try another one."),
 
+    // ps setparent
     SETPARENT_HELP("setparent.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps setparent [region|none]"),
     SETPARENT_HELP_DESC("setparent.help_desc", "Use this command to allow this region to inherit properties from another region (owners, members, flags, etc.)."),
     SETPARENT_SUCCESS("setparent.success", ChatColor.GRAY + "Successfully set the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%parent%" + ChatColor.GRAY + "."),
     SETPARENT_SUCCESS_REMOVE("setparent.success_remove", ChatColor.GRAY + "Successfully removed the parent of " + ChatColor.AQUA + "%id%" + ChatColor.GRAY + "."),
     SETPARENT_CIRCULAR_INHERITANCE("setparent.circular_inheritance", ChatColor.RED + "Detected circular inheritance (the parent already inherits from this region?). Parent not set."),
 
+    // ps merge
     MERGE_HELP("merge.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps merge"),
     MERGE_HELP_DESC("merge.help_desc", "Use this command to merge the region you are in with other overlapping regions."),
     MERGE_DISABLED("merge.disabled", "Merging regions is disabled in the config!"),
@@ -342,10 +352,11 @@ public enum PSL {
 
     // Sends a message to a commandsender if the string is not empty
 
-    public static void msg(CommandSender p, String str) {
+    public static boolean msg(CommandSender p, String str) {
         if (str != null && !str.isEmpty()) {
             p.sendMessage(str);
         }
+        return true;
     }
 
     public static void loadConfig() {

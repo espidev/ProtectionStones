@@ -54,33 +54,26 @@ public class ArgHideUnhide implements PSCommandArg {
         PSRegion r = PSRegion.fromLocation(p.getLocation());
 
         // preliminary checks
-        if (arg[0].equals("unhide") && !p.hasPermission("protectionstones.unhide")) {
-            PSL.msg(p, PSL.NO_PERMISSION_UNHIDE.msg());
-            return true;
-        }
-        if (arg[0].equals("hide") && !p.hasPermission("protectionstones.hide")) {
-            PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
-            return true;
-        }
-        if (r == null) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            return true;
-        }
-        if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
-            PSL.msg(p, PSL.NO_ACCESS.msg());
-            return true;
-        }
+        if (arg[0].equals("unhide") && !p.hasPermission("protectionstones.unhide"))
+            return PSL.msg(p, PSL.NO_PERMISSION_UNHIDE.msg());
+
+        if (arg[0].equals("hide") && !p.hasPermission("protectionstones.hide"))
+            return PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
+
+        if (r == null)
+            return PSL.msg(p, PSL.NOT_IN_REGION.msg());
+
+        if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false))
+            return PSL.msg(p, PSL.NO_ACCESS.msg());
 
         if (r.isHidden()) {
             if (arg[0].equals("hide")) {
-                PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
-                return true;
+                return PSL.msg(p, PSL.ALREADY_HIDDEN.msg());
             }
             r.unhide();
         } else {
             if (arg[0].equals("unhide")) {
-                PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
-                return true;
+                return PSL.msg(p, PSL.ALREADY_NOT_HIDDEN.msg());
             }
             r.hide();
         }

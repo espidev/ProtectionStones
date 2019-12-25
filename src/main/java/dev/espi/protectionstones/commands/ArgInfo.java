@@ -60,25 +60,21 @@ public class ArgInfo implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocation(p.getLocation());
 
-        if (r == null) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            return true;
-        }
-        if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true)) {
-            PSL.msg(p, PSL.NO_ACCESS.msg());
-            return true;
-        }
+        if (r == null)
+            return PSL.msg(p, PSL.NOT_IN_REGION.msg());
+
+        if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
+            return PSL.msg(p, PSL.NO_ACCESS.msg());
+
         if (r.getTypeOptions() == null) {
             PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getProtectBlock().getType().toString() + ") is not configured. Please contact an administrator.");
-            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (\" + r.getProtectBlock().getType().toString() + \") is not configured.");
+            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getProtectBlock().getType().toString() + ") is not configured.");
             return true;
         }
 
         if (args.length == 1) { // info of current region player is in
-            if (!p.hasPermission("protectionstones.info")) {
-                PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
-                return true;
-            }
+            if (!p.hasPermission("protectionstones.info"))
+                return PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
             if (r.getName() == null) {
@@ -115,25 +111,21 @@ public class ArgInfo implements PSCommandArg {
 
             switch (args[1].toLowerCase()) {
                 case "members":
-                    if (!p.hasPermission("protectionstones.members")) {
-                        PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
-                        return true;
-                    }
+                    if (!p.hasPermission("protectionstones.members"))
+                        return PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
+
                     displayMembers(p, r.getWGRegion());
                     break;
                 case "owners":
-                    if (!p.hasPermission("protectionstones.owners")) {
-                        PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
-                        return true;
-                    }
+                    if (!p.hasPermission("protectionstones.owners"))
+                        return PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
+
                     displayOwners(p, r.getWGRegion());
                     break;
                 case "flags":
-                    if (!p.hasPermission("protectionstones.flags")) {
-                        PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
-                        return true;
-                    }
-                    displayFlags(p, r);
+                    if (!p.hasPermission("protectionstones.flags"))
+                        return PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
+                        displayFlags(p, r);
                     break;
                 default:
                     PSL.msg(p, PSL.INFO_HELP.msg());

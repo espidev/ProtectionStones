@@ -30,6 +30,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+// farewell-action flag
 public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
     public static final FarewellFlagHandler.Factory FACTORY = new FarewellFlagHandler.Factory();
     public static class Factory extends Handler.Factory<FarewellFlagHandler> {

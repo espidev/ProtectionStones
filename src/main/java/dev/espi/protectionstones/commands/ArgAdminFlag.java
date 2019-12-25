@@ -37,10 +37,9 @@ class ArgAdminFlag {
 
         String flag, value = "", gee = "";
         World w = Bukkit.getWorld(args[2]);
-        if (w == null) {
-            PSL.msg(p, PSL.INVALID_WORLD.msg());
-            return true;
-        }
+        if (w == null)
+            return PSL.msg(p, PSL.INVALID_WORLD.msg());
+
         if (args[3].equalsIgnoreCase("-g")) {
             flag = args[5];
             for (int i = 6; i < args.length; i++) value += args[i] + " ";
@@ -50,10 +49,8 @@ class ArgAdminFlag {
             for (int i = 4; i < args.length; i++) value += args[i] + " ";
         }
 
-        if (WorldGuard.getInstance().getFlagRegistry().get(flag) == null) {
-            PSL.msg(p, PSL.FLAG_NOT_SET.msg());
-            return true;
-        }
+        if (WorldGuard.getInstance().getFlagRegistry().get(flag) == null)
+            return PSL.msg(p, PSL.FLAG_NOT_SET.msg());
 
         final String fValue = value, fGee = gee;
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
