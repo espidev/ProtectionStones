@@ -214,7 +214,8 @@ class BlockHandler {
             if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
                 HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
 
-                if (adjGroups.size() > MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1)) {
+                int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
+                if (adjGroups.size() > permNum && permNum != -1) {
                     PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
                     rm.removeRegion(id);
                     return false;
