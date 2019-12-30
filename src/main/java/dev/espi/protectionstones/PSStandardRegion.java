@@ -233,11 +233,19 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public Duration getTaxPeriod() {
+        return Duration.ofSeconds(getTypeOptions().taxPeriod);
+    }
+
+    @Override
+    public Duration getTaxPaymentPeriod() {
         return Duration.ofSeconds(getTypeOptions().taxPaymentTime);
     }
 
     @Override
     public List<TaxPayment> getTaxPaymentsDue() {
+        // taxes disabled
+        if (getTypeOptions().taxPeriod == -1) return new ArrayList<>();
+
         Set<String> s = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
         if (s == null) return new ArrayList<>();
 
@@ -271,7 +279,7 @@ public class PSStandardRegion extends PSRegion {
             TaxPayment tp = paymentList.get(i);
             if (tp.amount > amount) {
                 tp.amount -= amount;
-                paymentAmount = amount;
+                paymentAmount += amount;
                 break;
             } else {
                 amount -= tp.amount;
@@ -289,18 +297,22 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public boolean isTaxPaymentLate() {
+        if (getTypeOptions().taxPeriod == -1) return false;
+
         for (TaxPayment tp : getTaxPaymentsDue()) {
-            if (tp.whenPaymentWasGiven + getTaxPeriod().toMillis() < System.currentTimeMillis()) {
+            if (tp.whenPaymentWasGiven + getTaxPaymentPeriod().toMillis() < System.currentTimeMillis())
                 return true;
-            }
         }
         return false;
     }
 
     @Override
     public void updateTaxPayments() {
+        // taxes disabled
+        if (getTypeOptions().taxPeriod == -1) return;
+
         long currentTime = System.currentTimeMillis();
-        if (wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) + getTaxPeriod().toMillis() < currentTime) {
+        if (wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null || wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) + getTaxPeriod().toMillis() < currentTime) {
             Set<String> payments = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
             payments.add(currentTime + " " + getTaxRate());
         }

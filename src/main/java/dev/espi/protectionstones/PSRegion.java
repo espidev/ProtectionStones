@@ -334,11 +334,18 @@ public abstract class PSRegion {
     public abstract double getTaxRate();
 
     /**
-     * Get the tax period for this region type.
+     * Get the period between tax payments for this region type.
      *
      * @return the duration between tax payments
      */
     public abstract Duration getTaxPeriod();
+
+    /**
+     * Get the period allowed for the payment of tax.
+     *
+     * @return the duration of time allowed to pay a tax
+     */
+    public abstract Duration getTaxPaymentPeriod();
 
     /**
      * Get the list of tax payments that are due.

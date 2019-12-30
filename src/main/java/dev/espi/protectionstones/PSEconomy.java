@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
@@ -31,10 +32,9 @@ import java.util.List;
 
 public class PSEconomy {
     private List<PSRegion> rentedList = new ArrayList<>();
-    private static int rentRunner = -1;
+    private static int rentRunner = -1, taxRunner = -1;
 
     public PSEconomy() {
-        if (rentRunner != -1) Bukkit.getScheduler().cancelTask(rentRunner);
         if (!ProtectionStones.getInstance().isVaultSupportEnabled()) {
             ProtectionStones.getInstance().getLogger().warning("Vault is not enabled! Economy functions (renting & buying) will not work!");
             return;
@@ -44,13 +44,57 @@ public class PSEconomy {
 
         // start rent
         rentRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateRents, 200, 0).getTaskId();
+
+        // start taxes
+        if (ProtectionStones.getInstance().getConfigOptions().taxEnabled)
+            taxRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateTaxes, 600, 0).getTaskId();
+    }
+
+    private void updateRents() {
+
+        for (int i = 0; i < rentedList.size(); i++) {
+            try {
+                PSRegion r = rentedList.get(i);
+                if (r.getRentStage() != PSRegion.RentStage.RENTING) {
+                    // remove entry if it isn't in renting stage.
+                    rentedList.remove(i);
+                    i--;
+                    continue;
+                }
+
+                Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
+                // if tenant needs to pay
+                if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
+                    doRentPayment(r);
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void updateTaxes() {
+        for (World w : Bukkit.getWorlds()) {
+            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+            for (ProtectedRegion r : rgm.getRegions().values()) {
+                if (ProtectionStones.isPSRegion(r)) {
+                    PSRegion psr = PSRegion.fromWGRegion(w, r);
+                    processTaxes(psr);
+                }
+            }
+        }
     }
 
     /**
      * Stops the economy cycle. Used for reloads when creating a new PSEconomy.
      */
     public void stop() {
-        Bukkit.getScheduler().cancelTask(rentRunner);
+        if (rentRunner != -1) {
+            Bukkit.getScheduler().cancelTask(rentRunner);
+            rentRunner = -1;
+        }
+        if (taxRunner != -1) {
+            Bukkit.getScheduler().cancelTask(taxRunner);
+            taxRunner = -1;
+        }
     }
 
     /**
@@ -64,6 +108,21 @@ public class PSEconomy {
                 if (ProtectionStones.isPSRegion(pr)) {
                     rentedList.add(PSRegion.fromWGRegion(w, pr));
                 }
+            }
+        }
+    }
+
+    public static void processTaxes(PSRegion r) {
+        if (r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
+            r.updateTaxPayments(); // process payments
+
+            if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
+                PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
+                r.payTax(psp, psp.getBalance());
+            }
+
+            if (r.isTaxPaymentLate()) { // late tax payment punishment
+                r.deleteRegion(true); // TODO
             }
         }
     }
@@ -116,27 +175,6 @@ public class PSEconomy {
             r.getWGRegionManager().saveChanges();
         } catch (StorageException e) {
             e.printStackTrace();
-        }
-    }
-
-    public void updateRents() {
-
-        for (int i = 0; i < rentedList.size(); i++) {
-            try {
-                PSRegion r = rentedList.get(i);
-                if (r.getRentStage() != PSRegion.RentStage.RENTING) {
-                    // remove entry if it isn't in renting stage.
-                    rentedList.remove(i);
-                    i--;
-                    continue;
-                }
-
-                Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
-                // if tenant needs to pay
-                if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
-                    doRentPayment(r);
-                }
-            } catch (Exception ignored) {}
         }
     }
 
