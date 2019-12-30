@@ -100,7 +100,7 @@ public class ConfigUpgrades {
                     c.load();
                     try {
                         List<String> l = c.get("region.hidden_flags_from_info");
-                        l.addAll(Arrays.asList("ps-rent-settings", "ps-tax-payments-due", "ps-tax-last-payment-added"));
+                        l.addAll(Arrays.asList("ps-rent-settings", "ps-tax-payments-due", "ps-tax-last-payment-added", "ps-tax-autopayer"));
                         c.set("region.hidden_flags_from_info", l);
                     } catch (Exception e) {}
                     c.save();

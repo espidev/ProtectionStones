@@ -64,7 +64,7 @@ class ArgAdminRecreate {
             }
         }
 
-        s.sendMessage(ChatColor.YELLOW + "Done...");
+        s.sendMessage(ChatColor.YELLOW + "Done.");
         return true;
     }
 }

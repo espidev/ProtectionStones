@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Represents a region that exists but is a group of merged {@link PSStandardRegion}s.
- * Contains multiple {@link PSMergedRegion} representing the individual merged regions (which don't technically exist).
+ * Contains multiple {@link PSMergedRegion} representing the individual merged regions (which don't technically exist in WorldGuard).
  */
 
 public class PSGroupRegion extends PSStandardRegion {

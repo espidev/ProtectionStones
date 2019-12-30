@@ -18,10 +18,12 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldguard.protection.flags.SetFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -221,6 +224,86 @@ public class PSStandardRegion extends PSRegion {
         setRentLastPaid(null);
 
         ProtectionStones.getEconomy().getRentedList().remove(this);
+    }
+
+    @Override
+    public double getTaxRate() {
+        return getTypeOptions().taxAmount;
+    }
+
+    @Override
+    public Duration getTaxPeriod() {
+        return Duration.ofSeconds(getTypeOptions().taxPaymentTime);
+    }
+
+    @Override
+    public List<TaxPayment> getTaxPaymentsDue() {
+        Set<String> s = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+        if (s == null) return new ArrayList<>();
+
+        List<TaxPayment> taxPayments = new ArrayList<>();
+
+        for (String payment : s) {
+            try {
+                // format: "timestamp amount"
+                taxPayments.add(new TaxPayment(Long.parseLong(payment.split(" ")[0]), Double.parseDouble(payment.split(" ")[1])));
+            } catch (Exception e) {
+                e.printStackTrace();
+                s.remove(payment);
+            }
+        }
+        wgregion.setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, s);
+        return taxPayments;
+    }
+
+    @Override
+    public UUID getTaxAutopayer() {
+        return wgregion.getFlag(FlagHandler.PS_TAX_AUTOPAYER) == null ? null : UUID.fromString(wgregion.getFlag(FlagHandler.PS_TAX_AUTOPAYER));
+    }
+
+    @Override
+    public EconomyResponse payTax(PSPlayer p, double amount) {
+        List<TaxPayment> paymentList = getTaxPaymentsDue();
+        Collections.sort(paymentList);
+
+        double paymentAmount = 0;
+        for (int i = 0; i < paymentList.size(); i++) {
+            TaxPayment tp = paymentList.get(i);
+            if (tp.amount > amount) {
+                tp.amount -= amount;
+                paymentAmount = amount;
+                break;
+            } else {
+                amount -= tp.amount;
+                paymentAmount += tp.amount;
+                paymentList.remove(i);
+                i--;
+            }
+        }
+
+        Set<String> s = new HashSet<>();
+        paymentList.forEach(taxPayment -> s.add(taxPayment.whenPaymentWasGiven + " " + taxPayment.amount));
+        wgregion.setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, s);
+        return p.withdrawBalance(paymentAmount);
+    }
+
+    @Override
+    public boolean isTaxPaymentLate() {
+        for (TaxPayment tp : getTaxPaymentsDue()) {
+            if (tp.whenPaymentWasGiven + getTaxPeriod().toMillis() < System.currentTimeMillis()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void updateTaxPayments() {
+        long currentTime = System.currentTimeMillis();
+        if (wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) + getTaxPeriod().toMillis() < currentTime) {
+            Set<String> payments = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+            payments.add(currentTime + " " + getTaxRate());
+        }
     }
 
     @Override

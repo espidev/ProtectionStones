@@ -21,12 +21,17 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.WGUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -307,6 +312,70 @@ public abstract class PSRegion {
      * MUST BE CALLED when removing rent.
      */
     public abstract void removeRenting();
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class TaxPayment implements Comparable<TaxPayment> {
+        long whenPaymentWasGiven;
+        double amount;
+
+        @Override
+        public int compareTo(TaxPayment t) {
+            return Double.compare(amount, t.amount);
+        }
+    }
+
+    /**
+     * Get the tax rate for this region type.
+     *
+     * @return the tax rate
+     */
+    public abstract double getTaxRate();
+
+    /**
+     * Get the tax period for this region type.
+     *
+     * @return the duration between tax payments
+     */
+    public abstract Duration getTaxPeriod();
+
+    /**
+     * Get the list of tax payments that are due.
+     *
+     * @return the list of tax payments outstanding
+     */
+    public abstract List<TaxPayment> getTaxPaymentsDue();
+
+    /**
+     * Get the player that is set to autopay the tax amount.
+     *
+     * @return the player that is set as the autopayer, or null if no player is set
+     */
+    public abstract UUID getTaxAutopayer();
+
+    /**
+     * Pay outstanding taxes.
+     * It will only withdraw the amount required to pay the taxes, and will take up to the amount
+     * specified if the outstanding payments are larger.
+     *
+     * @param p the player to take money from
+     * @param amount the amount to take
+     * @return the {@link EconomyResponse} returned by Vault
+     */
+    public abstract EconomyResponse payTax(PSPlayer p, double amount);
+
+    /**
+     * Check if any tax payments are now late (exceeded tax payment time shown in config).
+     *
+     * @return whether or not any tax payments are now late
+     */
+    public abstract boolean isTaxPaymentLate();
+
+    /**
+     * Update with the current time and calculate any tax payments that are now due.
+     */
+    public abstract void updateTaxPayments();
 
     /**
      * @return whether or not the protection block is hidden (/ps hide)

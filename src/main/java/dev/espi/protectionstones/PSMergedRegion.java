@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -210,6 +212,41 @@ public class PSMergedRegion extends PSRegion {
     @Override
     public void removeRenting() {
         mergedGroup.removeRenting();
+    }
+
+    @Override
+    public double getTaxRate() {
+        return mergedGroup.getTaxRate();
+    }
+
+    @Override
+    public Duration getTaxPeriod() {
+        return mergedGroup.getTaxPeriod();
+    }
+
+    @Override
+    public List<TaxPayment> getTaxPaymentsDue() {
+        return mergedGroup.getTaxPaymentsDue();
+    }
+
+    @Override
+    public UUID getTaxAutopayer() {
+        return mergedGroup.getTaxAutopayer();
+    }
+
+    @Override
+    public EconomyResponse payTax(PSPlayer p, double amount) {
+        return mergedGroup.payTax(p, amount);
+    }
+
+    @Override
+    public boolean isTaxPaymentLate() {
+        return mergedGroup.isTaxPaymentLate();
+    }
+
+    @Override
+    public void updateTaxPayments() {
+        mergedGroup.updateTaxPayments();
     }
 
     @Override
