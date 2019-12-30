@@ -55,7 +55,7 @@ public class FlagHandler {
     public static final Flag<Double> PS_PRICE = new DoubleFlag("ps-price");
     public static final Flag<Double> PS_RENT_LAST_PAID = new DoubleFlag("ps-rent-last-paid");
     public static final Flag<Boolean> PS_FOR_SALE = new BooleanFlag("ps-for-sale");
-    public static final Flag<Set<String>> PS_RENT_SETTINGS = new SetFlag<>("ps-rent-settings", new StringFlag("ps-rent-setting"));
+    public static final Flag<Set<String>> PS_RENT_SETTINGS = new SetFlag<>("ps-rent-settings", new StringFlag("ps-rent-setting")); // TODO
 
     // called on initial start
     static void registerFlags() {

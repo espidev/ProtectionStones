@@ -23,7 +23,9 @@ import dev.espi.protectionstones.utils.WGUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -47,6 +49,7 @@ public class PSPlayer {
 
     /**
      * Adapt a UUID into a PSPlayer wrapper.
+     *
      * @param uuid the uuid to wrap
      * @return the PSPlayer object
      */
@@ -57,12 +60,17 @@ public class PSPlayer {
 
     /**
      * Adapt a Bukkit player into a PSPlayer wrapper.
+     *
      * @param p the player to wrap
      * @return the PSPlayer object
      */
 
     public static PSPlayer fromPlayer(@NonNull Player p) {
         return new PSPlayer(p);
+    }
+
+    public static PSPlayer fromPlayer(@NonNull OfflinePlayer p) {
+        return new PSPlayer((Player) p);
     }
 
     public PSPlayer(Player player) {
@@ -74,11 +82,85 @@ public class PSPlayer {
         this.uuid = uuid;
     }
 
+    /**
+     * Get the wrapped Bukkit player.
+     * It may return an empty player if the object wraps a UUID that does not exist.
+     *
+     * @return the player
+     */
+
     public Player getPlayer() {
         if (p == null) return (Player) Bukkit.getOfflinePlayer(uuid);
         return p;
     }
 
+    public String getName() {
+        return getPlayer().getName();
+    }
+
+    /**
+     * Get if the player has a certain amount of money.
+     * Vault must be enabled!
+     *
+     * @param amount the amount to check
+     * @return whether the player has this amount of money
+     */
+
+    public boolean hasAmount(double amount) {
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return false;
+        return ProtectionStones.getInstance().getVaultEconomy().has(getPlayer(), amount);
+    }
+
+    /**
+     * Get the player's balance.
+     * Vault must be enabled!
+     *
+     * @return the amount of money the player has
+     */
+
+    public double getBalance() {
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return 0;
+        return ProtectionStones.getInstance().getVaultEconomy().getBalance(getPlayer());
+    }
+
+    /**
+     * Add a certain amount to the player's bank account.
+     * Vault must be enabled! Must be run on main thread!
+     *
+     * @param amount the amount to add
+     * @return the {@link EconomyResponse} that is given by Vault
+     */
+
+    public EconomyResponse depositBalance(double amount) {
+        if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
+        return ProtectionStones.getInstance().getVaultEconomy().depositPlayer(getPlayer(), amount);
+    }
+
+    /**
+     * Withdraw a certain amount from the player's bank account.
+     * Vault must be enabled! Must be run on main thread!
+     *
+     * @param amount the amount to withdraw
+     * @return the {@link EconomyResponse} that is given by Vault
+     */
+
+    public EconomyResponse withdrawBalance(double amount) {
+        if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
+        return ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(getPlayer(), amount);
+    }
+
+    /**
+     * Pay another player a certain amount of money
+     * Vault must be enabled! Must be run on main thread!
+     *
+     * @param payee  the player to pay
+     * @param amount the amount to pay
+     */
+
+    public void pay(PSPlayer payee, double amount) {
+        withdrawBalance(amount);
+        payee.depositBalance(amount);
+    }
 
     /**
      * Get a player's permission limits for each protection block (protectionstones.limit.alias.x)

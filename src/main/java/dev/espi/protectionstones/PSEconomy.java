@@ -57,6 +57,7 @@ public class PSEconomy {
     /**
      * Load list of regions that are rented into memory.
      */
+
     public void loadRentList() {
         rentedList = new ArrayList<>();
         for (World w : Bukkit.getWorlds()) {
@@ -74,18 +75,19 @@ public class PSEconomy {
      *
      * @param r the region to perform the rent payment
      */
+
     public static void doRentPayment(PSRegion r) {
-        OfflinePlayer tenant = Bukkit.getOfflinePlayer(r.getTenant());
-        OfflinePlayer landlord = Bukkit.getOfflinePlayer(r.getLandlord());
+        PSPlayer tenant = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getTenant()));
+        PSPlayer landlord = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getLandlord()));
 
         // not enough money for rent
-        if (!ProtectionStones.getInstance().getVaultEconomy().has(tenant, r.getPrice())) {
-            if (tenant.isOnline()) {
+        if (!tenant.hasAmount(r.getPrice())) {
+            if (tenant.getPlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_EVICT_NO_MONEY_TENANT.msg()
                         .replace("%region%", r.getName() != null ? r.getName() : r.getID())
                         .replace("%price%", String.format("%.2f", r.getPrice())));
             }
-            if (landlord.isOnline()) {
+            if (landlord.getPlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_EVICT_NO_MONEY_LANDLORD.msg()
                         .replace("%region%", r.getName() != null ? r.getName() : r.getID())
                         .replace("%tenant%", tenant.getName()));
@@ -95,13 +97,13 @@ public class PSEconomy {
         }
 
         // send payment messages
-        if (tenant.isOnline()) {
+        if (tenant.getPlayer().isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%landlord%", landlord.getName())
                     .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
         }
-        if (landlord.isOnline()) {
+        if (landlord.getPlayer().isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_PAID_LANDLORD.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%tenant%", tenant.getName())
@@ -109,10 +111,7 @@ public class PSEconomy {
         }
 
         // update money must be run in main thread
-        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
-            ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(tenant, r.getPrice());
-            ProtectionStones.getInstance().getVaultEconomy().depositPlayer(landlord, r.getPrice());
-        });
+        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> tenant.pay(landlord, r.getPrice()));
         r.setRentLastPaid(Instant.now().getEpochSecond());
         try { // must save region to persist last paid
             r.getWGRegionManager().saveChanges();

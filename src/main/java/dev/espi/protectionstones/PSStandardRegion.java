@@ -117,8 +117,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void sell(UUID player) {
-        ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(Bukkit.getOfflinePlayer(player), getPrice());
-        ProtectionStones.getInstance().getVaultEconomy().depositPlayer(Bukkit.getOfflinePlayer(getLandlord()), getPrice());
+        PSPlayer.fromUUID(player).pay(PSPlayer.fromUUID(getLandlord()), getPrice());
         setSellable(false, null, 0);
         getWGRegion().getOwners().removeAll();
         getWGRegion().getMembers().removeAll();

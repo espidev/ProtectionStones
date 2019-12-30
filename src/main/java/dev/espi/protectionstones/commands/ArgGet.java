@@ -1,5 +1,6 @@
 package dev.espi.protectionstones.commands;
 
+import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
@@ -70,6 +71,7 @@ public class ArgGet implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
+        PSPlayer psp = PSPlayer.fromPlayer(p);
         if (!p.hasPermission("protectionstones.get"))
             return PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
 
@@ -93,7 +95,7 @@ public class ArgGet implements PSCommandArg {
             return PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
 
         // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, cp.price))
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !psp.hasAmount(cp.price))
             return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
 
         // debug message
@@ -103,7 +105,7 @@ public class ArgGet implements PSCommandArg {
 
         // take money
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
-            EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, cp.price);
+            EconomyResponse er = psp.withdrawBalance(cp.price);
             if (!er.transactionSuccess()) {
                 return PSL.msg(p, er.errorMessage);
             }
@@ -117,7 +119,7 @@ public class ArgGet implements PSCommandArg {
             } else { // cancel event
                 PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
                 if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
-                    EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().depositPlayer(p, cp.price);
+                    EconomyResponse er = psp.depositBalance(cp.price);
                     if (!er.transactionSuccess()) {
                         return PSL.msg(p, er.errorMessage);
                     }
