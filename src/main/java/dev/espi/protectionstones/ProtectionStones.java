@@ -29,7 +29,6 @@ import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -57,10 +56,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    static final int CONFIG_VERSION = 12;
+    public static final int CONFIG_VERSION = 12;
 
-    static File configLocation, blockDataFolder;
-    static CommentedFileConfig config;
+    public static File configLocation, blockDataFolder;
+    public static CommentedFileConfig config;
 
     private static List<PSCommandArg> commandArgs = new ArrayList<>();
     private static ProtectionStones plugin;

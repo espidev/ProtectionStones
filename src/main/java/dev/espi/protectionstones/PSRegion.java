@@ -191,14 +191,16 @@ public abstract class PSRegion {
 
     /**
      * MUST BE CALLED when setting up the region to be sold or cancelling sale
-     * @param forSale whether or not the region is for sale
+     *
+     * @param forSale  whether or not the region is for sale
      * @param landlord the owner of the region
-     * @param price the price to sell for
+     * @param price    the price to sell for
      */
     public abstract void setSellable(boolean forSale, UUID landlord, double price);
 
     /**
      * Sells the region to a player at the price listed.
+     *
      * @param player player to transfer the region to
      */
     public abstract void sell(UUID player);
@@ -224,6 +226,7 @@ public abstract class PSRegion {
 
     /**
      * Get the tenant of the region.
+     *
      * @return returns the UUID of the tenant, or null if there is none.
      */
     public abstract UUID getTenant();
@@ -237,12 +240,14 @@ public abstract class PSRegion {
 
     /**
      * Get the rent period of the region
+     *
      * @return returns the rent duration, or null if there is none
      */
     public abstract String getRentPeriod();
 
     /**
      * Set the rent period of the region
+     *
      * @param s the duration between rent payments (d h m s), or null to remove
      */
     public abstract void setRentPeriod(String s);
@@ -250,6 +255,7 @@ public abstract class PSRegion {
     /**
      * Get the price of the region
      * This applies to either the rent or the full purchase of a region.
+     *
      * @return the price of the region during rent payments, or null if there is no rent
      */
     public abstract Double getPrice();
@@ -257,37 +263,42 @@ public abstract class PSRegion {
     /**
      * Set the price of the region.
      * This applies to either the rent or the full purchase of a region.
+     *
      * @param price the price of the region, or null if there is no rent
      */
     public abstract void setPrice(Double price);
 
     /**
      * Set the unix timestamp of when rent was last paid.
+     *
      * @param timestamp the unix timestamp of when rent was last paid, or null
      */
     public abstract void setRentLastPaid(Long timestamp);
 
     /**
      * Get the unix timestamp of when rent was last paid.
+     *
      * @return the unix timestamp of when rent was last paid, or null if not renting
      */
     public abstract Long getRentLastPaid();
 
     /**
      * MUST BE CALLED when the region is looking for a tenant.
-     * @param landlord the landlord of the region
+     *
+     * @param landlord   the landlord of the region
      * @param rentPeriod the rent period (d h m s) of the region
-     * @param rentPrice the price to charge during each rent payment
+     * @param rentPrice  the price to charge during each rent payment
      */
     public abstract void setRentable(UUID landlord, String rentPeriod, double rentPrice);
 
     /**
      * Starts renting process (adds to rent queue) tenant.
      * MUST BE CALLED when renting the region out to a tenant.
-     * @param landlord the landlord of the region
-     * @param tenant the tenant of the region
+     *
+     * @param landlord   the landlord of the region
+     * @param tenant     the tenant of the region
      * @param rentPeriod the rent period (d h m s) of the region
-     * @param rentPrice the price to charge during each rent payment
+     * @param rentPrice  the price to charge during each rent payment
      */
     public abstract void rentOut(UUID landlord, UUID tenant, String rentPeriod, double rentPrice);
 
@@ -366,6 +377,7 @@ public abstract class PSRegion {
 
     /**
      * Change the type of the protection region.
+     *
      * @param type the type of protection region to switch to
      */
     public void setType(PSProtectBlock type) {

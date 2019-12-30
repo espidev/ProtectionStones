@@ -22,7 +22,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 
 import java.time.Duration;
@@ -123,20 +122,21 @@ public class PSEconomy {
     public void updateRents() {
 
         for (int i = 0; i < rentedList.size(); i++) {
-            PSRegion r = rentedList.get(i);
-            if (r.getRentStage() != PSRegion.RentStage.RENTING) {
-                // remove entry if it isn't in renting stage.
-                rentedList.remove(i);
-                i--;
-                continue;
-            }
+            try {
+                PSRegion r = rentedList.get(i);
+                if (r.getRentStage() != PSRegion.RentStage.RENTING) {
+                    // remove entry if it isn't in renting stage.
+                    rentedList.remove(i);
+                    i--;
+                    continue;
+                }
 
-            Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
-            // if tenant needs to pay
-            if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
-                doRentPayment(r);
-            }
-
+                Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
+                // if tenant needs to pay
+                if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
+                    doRentPayment(r);
+                }
+            } catch (Exception ignored) {}
         }
     }
 

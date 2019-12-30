@@ -94,6 +94,9 @@ prevent_block_place_in_restricted_world = true
         "ps-rent-period",
         "ps-rent-last-paid",
         "ps-for-sale",
+        "ps-rent-settings",
+        "ps-tax-payments-due",
+        "ps-tax-last-payment-added",
     ]
 
     # Default priority type for this block type protection stone
