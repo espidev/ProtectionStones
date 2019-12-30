@@ -61,13 +61,11 @@ public class ArgTp implements PSCommandArg {
         Player p = (Player) s;
 
         // preliminary checks
-        if (!p.hasPermission("protectionstones.tp")) {
-            PSL.msg(p, PSL.NO_PERMISSION_TP.msg());
-            return true;
-        } else if (args.length < 2 || args.length > 3) {
-            PSL.msg(p, PSL.TP_HELP.msg());
-            return true;
-        }
+        if (!p.hasPermission("protectionstones.tp"))
+            return PSL.msg(p, PSL.NO_PERMISSION_TP.msg());
+
+        if (args.length < 2 || args.length > 3)
+            return PSL.msg(p, PSL.TP_HELP.msg());
 
         if (args.length == 2) { // /ps tp [name/id]
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
@@ -90,41 +88,31 @@ public class ArgTp implements PSCommandArg {
             try {
                 regionNumber = Integer.parseInt(args[2]);
                 if (regionNumber <= 0) {
-                    PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
-                    return true;
+                    return PSL.msg(p, PSL.NUMBER_ABOVE_ZERO.msg());
                 }
             } catch (NumberFormatException e) {
-                PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
-                return true;
+                return PSL.msg(p, PSL.TP_VALID_NUMBER.msg());
             }
 
-            LocalPlayer rlp;
+            String tpName = args[1];
             // region checks, and set lp to offline player
-            if (!UUIDCache.nameToUUID.containsKey(args[1])) {
-                PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
-                return true;
+            if (!UUIDCache.nameToUUID.containsKey(tpName)) {
+                return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             }
-            try {
-                rlp = WorldGuardPlugin.inst().wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[1])));
-            } catch (Exception e) {
-                PSL.msg(p, PSL.REGION_ERROR_SEARCH.msg()
-                        .replace("%player%", args[1]));
-                return true;
-            }
+            UUID tpUuid = UUIDCache.nameToUUID.get(tpName);
 
-            LocalPlayer lp = rlp;
             // run region search asynchronously to avoid blocking server thread
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), lp.getUniqueId(), false);
+                List<PSRegion> regions = PSPlayer.fromUUID(tpUuid).getPSRegions(p.getWorld(), false);
 
                 // check if region was found
                 if (regions.isEmpty()) {
                     PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
-                            .replace("%player%", lp.getName()));
+                            .replace("%player%", tpName));
                     return;
                 } else if (regionNumber > regions.size()) {
                     PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
-                            .replace("%player%", lp.getName())
+                            .replace("%player%", tpName)
                             .replace("%num%", "" + regionNumber));
                     return;
                 }

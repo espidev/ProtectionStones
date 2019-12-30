@@ -44,7 +44,7 @@ public class MiscUtil {
     }
 
     public static int getPermissionNumber(Player p, String perm, int def /* default */) {
-        int n = -999;
+        int n = -99999;
         for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
             String permission = pia.getPermission();
             String[] sp = permission.split("\\.");
@@ -52,7 +52,7 @@ public class MiscUtil {
                 n = Math.max(n, Integer.parseInt(sp[sp.length - 1]));
             }
         }
-        return n == -999 ? def : n;
+        return n == -99999 ? def : n;
     }
 
 }

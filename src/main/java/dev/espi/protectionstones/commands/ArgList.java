@@ -17,6 +17,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
@@ -59,14 +60,16 @@ public class ArgList implements PSCommandArg {
         if (args.length == 2 && !UUIDCache.nameToUUID.containsKey(args[1]))
             return PSL.msg(s, PSL.PLAYER_NOT_FOUND.msg());
 
+        PSPlayer psp = PSPlayer.fromPlayer((Player) s);
+
         // run query async to reduce load
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            Player p = (Player) s;
             if (args.length == 1) {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), true);
-                display(s, regions, p.getName(), p.getUniqueId());
+                List<PSRegion> regions = psp.getPSRegions(psp.getPlayer().getWorld(), true);
+                display(s, regions, psp.getPlayer().getName(), psp.getUuid());
             } else if (args.length == 2) {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), UUIDCache.nameToUUID.get(args[1]), true);
+                UUID uuid = UUIDCache.nameToUUID.get(args[1]);
+                List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegions(psp.getPlayer().getWorld(), true);
                 display(s, regions, args[1], UUIDCache.nameToUUID.get(args[1]));
             } else {
                 PSL.msg(s, PSL.LIST_HELP.msg());

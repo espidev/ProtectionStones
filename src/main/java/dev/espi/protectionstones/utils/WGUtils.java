@@ -134,7 +134,9 @@ public class WGUtils {
 
     // get the overlapping sets of groups of regions a player owns
     public static HashMap<String, ArrayList<String>> getPlayerAdjacentRegionGroups(Player p, RegionManager rm) {
-        List<PSRegion> pRegions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+        PSPlayer psp = PSPlayer.fromPlayer(p);
+
+        List<PSRegion> pRegions = psp.getPSRegions(p.getWorld(), false);
         HashMap<String, String> idToGroup = new HashMap<>();
         HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
 

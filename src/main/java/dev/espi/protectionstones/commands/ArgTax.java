@@ -95,6 +95,8 @@ public class ArgTax implements PSCommandArg {
                 break;
             case "autopay":
                 break;
+            case "info":
+                break;
             default:
                 runHelp(s);
                 break;

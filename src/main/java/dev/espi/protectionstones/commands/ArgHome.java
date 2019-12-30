@@ -17,6 +17,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.ChatUtils;
@@ -65,12 +66,13 @@ public class ArgHome implements PSCommandArg {
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (!(sender instanceof Player)) return null;
         Player p = (Player) sender;
+        PSPlayer psp = PSPlayer.fromPlayer(p);
 
         if (args.length == 2) {
 
             // add to cache if not already
             if (tabCache.get(p.getUniqueId()) == null) {
-                List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+                List<PSRegion> regions = psp.getPSRegions(p.getWorld(), false);
                 List<String> regionNames = new ArrayList<>();
                 for (PSRegion r : regions) {
                     if (r.getName() != null) regionNames.add(r.getName());
@@ -92,7 +94,8 @@ public class ArgHome implements PSCommandArg {
     private static final int GUI_SIZE = 17;
 
     private void openHomeGUI(Player p, int page) {
-        List<PSRegion> regions = ProtectionStones.getPlayerPSRegions(p.getWorld(), p.getUniqueId(), false);
+        PSPlayer psp = PSPlayer.fromPlayer(p);
+        List<PSRegion> regions = psp.getPSRegions(p.getWorld(), false);
 
         List<TextComponent> entries = new ArrayList<>();
         for (PSRegion r : regions) {

@@ -65,8 +65,9 @@ public class LimitUtil {
     }
 
     private static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
-        HashMap<PSProtectBlock, Integer> regionLimits = ProtectionStones.getPlayerRegionLimits(p);
-        int maxPS = ProtectionStones.getPlayerGlobalRegionLimits(p);
+        PSPlayer psp = PSPlayer.fromPlayer(p);
+        HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
+        int maxPS = psp.getGlobalRegionLimits();
 
         if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
 
