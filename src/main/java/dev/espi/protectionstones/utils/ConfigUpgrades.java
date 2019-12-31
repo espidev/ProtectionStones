@@ -84,16 +84,17 @@ public class ConfigUpgrades {
                 break;
             case 11:
                 ProtectionStones.config.set("config_version", 12);
-                ProtectionStones.config.set("economy.max-rent-price", -1.0);
-                ProtectionStones.config.set("economy.min-rent-price", -1.0);
-                ProtectionStones.config.set("economy.max-rent-price", "Set limits on the price for renting. Set to -1 to disable.");
-                ProtectionStones.config.set("economy.max-rent-period", -1);
-                ProtectionStones.config.set("economy.min-rent-period", 1);
-                ProtectionStones.config.setComment("economy.max-rent-period", "Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.");
-                ProtectionStones.config.set("economy.tax-enabled", false);
-                ProtectionStones.config.setComment("economy.tax-enabled", "# Set taxes on regions.\n" +
-                        "    # Taxes are configured in each individual block config.\n" +
-                        "    # Whether or not to enable the tax command.");
+                ProtectionStones.config.set("economy.max_rent_price", -1.0);
+                ProtectionStones.config.set("economy.min_rent_price", 1.0);
+                ProtectionStones.config.setComment("economy.max_rent_price", " Set limits on the price for renting. Set to -1.0 to disable.");
+                ProtectionStones.config.set("economy.max_rent_period", -1);
+                ProtectionStones.config.set("economy.min_rent_period", 1);
+                ProtectionStones.config.setComment("economy.max_rent_period", " Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.");
+                ProtectionStones.config.set("economy.tax_enabled", false);
+                ProtectionStones.config.set("economy.tax_message_on_join", true);
+                ProtectionStones.config.setComment("economy.tax_enabled", " Set taxes on regions.\n" +
+                        " Taxes are configured in each individual block config.\n" +
+                        " Whether or not to enable the tax command.");
 
                 for (File file : ProtectionStones.blockDataFolder.listFiles()) {
                     CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();

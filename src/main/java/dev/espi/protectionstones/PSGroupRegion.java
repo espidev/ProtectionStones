@@ -20,6 +20,7 @@ package dev.espi.protectionstones;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lombok.val;
+import lombok.var;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -51,7 +52,7 @@ public class PSGroupRegion extends PSStandardRegion {
             // taxes disabled
             if (getTypeOptions().taxPeriod == -1) return;
 
-            val found = false;
+            var found = false;
             // loop over last paid entries
             for (val str : lastAdded) {
                 try {

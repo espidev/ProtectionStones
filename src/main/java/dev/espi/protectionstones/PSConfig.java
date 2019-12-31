@@ -73,17 +73,17 @@ public class PSConfig {
     public Boolean allowMergingHoles;
 
     @Path("economy.max_rent_price")
-    public double maxRentPrice;
+    public Double maxRentPrice;
     @Path("economy.min_rent_price")
-    public double minRentPrice;
+    public Double minRentPrice;
     @Path("economy.max_rent_period")
-    public int maxRentPeriod;
+    public Integer maxRentPeriod;
     @Path("economy.min_rent_period")
-    public int minRentPeriod;
+    public Integer minRentPeriod;
     @Path("economy.tax_enabled")
     public Boolean taxEnabled;
     @Path("economy.tax_message_on_join")
-    public boolean taxMessageOnJoin;
+    public Boolean taxMessageOnJoin;
 
     static void initConfig() {
 

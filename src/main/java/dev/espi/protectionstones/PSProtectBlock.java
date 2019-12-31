@@ -107,7 +107,6 @@ public class PSProtectBlock {
 
     // economy section
     @Path("economy.tax_amount")
-    @SpecIntInRange(min = Integer.MIN_VALUE, max = Integer.MAX_VALUE)
     public double taxAmount;
     @Path("economy.tax_period")
     @SpecIntInRange(min = -1, max = Integer.MAX_VALUE)

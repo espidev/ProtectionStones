@@ -67,8 +67,8 @@ public class ArgInfo implements PSCommandArg {
             return PSL.msg(p, PSL.NO_ACCESS.msg());
 
         if (r.getTypeOptions() == null) {
-            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getProtectBlock().getType().toString() + ") is not configured. Please contact an administrator.");
-            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getProtectBlock().getType().toString() + ") is not configured.");
+            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
             return true;
         }
 

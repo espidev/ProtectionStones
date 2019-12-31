@@ -62,7 +62,7 @@ public class ListenerClass implements Listener {
             WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
         });
 
-        if (ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {
+        if (ProtectionStones.getInstance().getConfigOptions().taxEnabled && ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {
             // TODO
         }
     }

@@ -56,6 +56,7 @@ public class PSEconomy {
         for (int i = 0; i < rentedList.size(); i++) {
             try {
                 PSRegion r = rentedList.get(i);
+                if (r.getTypeOptions() == null) continue;
                 if (r.getRentStage() != PSRegion.RentStage.RENTING) {
                     // remove entry if it isn't in renting stage.
                     rentedList.remove(i);
@@ -119,7 +120,7 @@ public class PSEconomy {
      * @param r the region to process taxes for
      */
     public static void processTaxes(PSRegion r) {
-        if (r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
+        if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
             r.updateTaxPayments(); // process payments
 
             if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment

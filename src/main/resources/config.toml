@@ -59,7 +59,7 @@ allow_merging_holes = true
 [economy]
     # Set limits on the price for renting. Set to -1 to disable.
     max_rent_price = -1.0
-    min_rent_price = -1.0
+    min_rent_price = 1.0
 
     # Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.
     max_rent_period = -1
