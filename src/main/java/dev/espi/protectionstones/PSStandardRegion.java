@@ -297,7 +297,7 @@ public class PSStandardRegion extends PSRegion {
         if (getTypeOptions().taxPeriod == -1) return false;
         long currentTime = System.currentTimeMillis();
         for (TaxPayment tp : getTaxPaymentsDue()) {
-            if (tp.whenPaymentIsDue < System.currentTimeMillis()) return true;
+            if (tp.whenPaymentIsDue < currentTime) return true;
         }
         return false;
     }

@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -112,13 +113,21 @@ public class PSEconomy {
         }
     }
 
+    /**
+     * Process taxes for a region.
+     *
+     * @param r the region to process taxes for
+     */
     public static void processTaxes(PSRegion r) {
         if (r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
             r.updateTaxPayments(); // process payments
 
             if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
                 PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
-                r.payTax(psp, psp.getBalance());
+                val res = r.payTax(psp, psp.getBalance());
+                PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
+                        .replace("%amount%", ""+res.amount)
+                        .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
             }
 
             if (r.isTaxPaymentLate()) { // late tax payment punishment

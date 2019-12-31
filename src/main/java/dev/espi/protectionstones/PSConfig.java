@@ -82,6 +82,8 @@ public class PSConfig {
     public int minRentPeriod;
     @Path("economy.tax_enabled")
     public Boolean taxEnabled;
+    @Path("economy.tax_message_on_join")
+    public boolean taxMessageOnJoin;
 
     static void initConfig() {
 

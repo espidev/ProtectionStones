@@ -243,7 +243,6 @@ class BlockHandler {
 
         // show merge menu
         if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
-
             boolean showGUI = true;
 
             PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);

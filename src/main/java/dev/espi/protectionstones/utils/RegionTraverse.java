@@ -118,7 +118,7 @@ public class RegionTraverse {
                         break;
                     case 3: // random 1x1 jutting out
                         //if (isInRegion(v, regions)) ProtectionStones.getInstance().getLogger().info("Reached impossible situation in region edge traversal at " + v.getX() + " " + v.getZ() + ", please notify the developers that you saw this message!");
-                        // TODO it's fine right now but it'd be nice if it worked
+                        // it's fine right now but it'd be nice if it worked
                         break;
                     case 0: // concave vertex, or point in middle of region
                         List<Vector2> cornersNotIn = new ArrayList<>();

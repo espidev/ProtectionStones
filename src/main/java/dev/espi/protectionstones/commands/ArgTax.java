@@ -17,10 +17,9 @@
 
 package dev.espi.protectionstones.commands;
 
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSProtectBlock;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.*;
+import lombok.val;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -89,20 +88,49 @@ public class ArgTax implements PSCommandArg {
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());
 
-
-
         PSProtectBlock cp = r.getTypeOptions();
+
+        if (cp.taxPeriod == -1) { // taxes disabled for this region
+            return PSL.msg(s, ""); // TODO
+        }
 
         switch (args[1]) {
             case "pay":
+
+                if (!r.isOwner(p.getUniqueId()))
+                    return PSL.msg(p, PSL.NOT_OWNER.msg());
+
+                if (!NumberUtils.isNumber(args[2]))
+                    return PSL.msg(p, PAY_HELP);
+
+                val payment = Double.parseDouble(args[2]);
+
+                if (payment <= 0)
+                    return PSL.msg(p, PAY_HELP);
+
+                PSPlayer psp = PSPlayer.fromPlayer(p);
+                if (!psp.hasAmount(payment))
+                    return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg());
+
+                val res = r.payTax(psp, payment);
+
+                PSL.msg(p, PSL.TAX_PAID.msg()
+                        .replace("%amount%", ""+res.amount)
+                        .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+
                 break;
             case "autopay":
 
                 if (!r.isOwner(p.getUniqueId()))
                     return PSL.msg(p, PSL.NOT_OWNER.msg());
 
-                r.setTaxAutopayer(p.getUniqueId());
-
+                if (r.getTaxAutopayer() != null && r.getTaxAutopayer().equals(p.getUniqueId())) {
+                    r.setTaxAutopayer(null);
+                    PSL.msg(s, PSL.TAX_SET_NO_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                } else {
+                    r.setTaxAutopayer(p.getUniqueId());
+                    PSL.msg(s, PSL.TAX_SET_AS_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                }
                 break;
             default:
                 runHelp(s);

@@ -117,8 +117,6 @@ public class PSProtectBlock {
     public int taxPaymentTime;
     @Path("economy.start_with_tax_autopay")
     public boolean startWithTaxAutopay;
-    @Path("economy.tax_message_on_join")
-    public boolean taxMessageOnJoin;
 
     // behaviour section
     @Path("behaviour.auto_hide")

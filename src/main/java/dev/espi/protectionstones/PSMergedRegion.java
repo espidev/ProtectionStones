@@ -215,11 +215,6 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public Duration getTaxPaymentPeriod() {
-        return mergedGroup.getTaxPaymentPeriod();
-    }
-
-    @Override
     public List<TaxPayment> getTaxPaymentsDue() {
         return mergedGroup.getTaxPaymentsDue();
     }

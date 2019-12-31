@@ -61,6 +61,10 @@ public class ListenerClass implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
         });
+
+        if (ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {
+            // TODO
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)

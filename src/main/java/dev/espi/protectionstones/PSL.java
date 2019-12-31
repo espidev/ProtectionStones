@@ -159,6 +159,10 @@ public enum PSL {
     TAX_HELP("tax.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax"),
     TAX_HELP_DESC("tax.help_desc", "Use this command to manage and pay taxes."),
     TAX_HELP_HEADER("tax.help_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Taxes Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    TAX_DISABLED_REGION("tax.disabled_region", ChatColor.RED + "Taxes are disabled for this region."),
+    TAX_SET_AS_AUTOPAYER("tax.set_as_autopayer", ChatColor.AQUA + "Taxes for region %region% will now be automatically paid by you."),
+    TAX_SET_NO_AUTOPAYER("tax.set_no_autopayer", ChatColor.AQUA + "Taxes for region %region% now have to be manually paid for."),
+    TAX_PAID("tax.paid", ChatColor.AQUA + "Paid $%amount% in taxes for region %region%."),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),
@@ -357,6 +361,10 @@ public enum PSL {
             p.sendMessage(str);
         }
         return true;
+    }
+
+    public static boolean msg(PSPlayer p, String str) {
+        return msg(p.getPlayer(), str);
     }
 
     public static void loadConfig() {

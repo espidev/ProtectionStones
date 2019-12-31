@@ -70,4 +70,5 @@ allow_merging_holes = true
     # Whether or not to enable the tax command.
     tax_enabled = false
 
-
+    # Notify players of outstanding tax payments for the regions they own.
+    tax_message_on_join = true

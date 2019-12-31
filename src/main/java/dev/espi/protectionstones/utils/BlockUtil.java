@@ -105,7 +105,7 @@ public class BlockUtil {
     }
 
     // Note: this code is really weird
-    private static void blockWithBase64(Block block, String uuid) { // TODO
+    private static void blockWithBase64(Block block, String uuid) {
         String base64 = uuidToBase64Head.get(uuid);
 
         String args = String.format(
