@@ -262,7 +262,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setTaxAutopayer(UUID player) {
-        wgregion.setFlag(FlagHandler.PS_TAX_AUTOPAYER, player.toString());
+        wgregion.setFlag(FlagHandler.PS_TAX_AUTOPAYER, player == null ? null : player.toString());
     }
 
     @Override
@@ -330,7 +330,7 @@ public class PSStandardRegion extends PSRegion {
 
                     long lastPaid = Long.parseLong(last.split(" ")[1]);
                     if (lastPaid + getTaxPeriod().toMillis() < currentTime) { // if there is a tax cycle
-                        payments.add((currentTime + getTaxPaymentPeriod().toMillis()) + " " + getTaxRate()); // add payment
+                        payments.add((currentTime + getTaxPaymentPeriod().toMillis()) + " " + getTaxRate() + " " + getID()); // add payment
                         remove.add(last); // remove this entry
                         lastAdded.add(getID() + " " + currentTime); // add new entry for next tax cycle
                     }

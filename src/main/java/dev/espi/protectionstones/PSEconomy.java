@@ -44,11 +44,11 @@ public class PSEconomy {
         loadRentList();
 
         // start rent
-        rentRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateRents, 200, 0).getTaskId();
+        rentRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateRents, 0, 200).getTaskId();
 
         // start taxes
         if (ProtectionStones.getInstance().getConfigOptions().taxEnabled)
-            taxRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateTaxes, 600, 0).getTaskId();
+            taxRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateTaxes, 0, 200).getTaskId();
     }
 
     private void updateRents() {
@@ -121,19 +121,20 @@ public class PSEconomy {
      */
     public static void processTaxes(PSRegion r) {
         if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
-            r.updateTaxPayments(); // process payments
+            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+                r.updateTaxPayments(); // process payments
+                if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
+                    PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
+                    val res = r.payTax(psp, psp.getBalance());
+                    PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
+                            .replace("%amount%", ""+res.amount)
+                            .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                }
 
-            if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
-                PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
-                val res = r.payTax(psp, psp.getBalance());
-                PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
-                        .replace("%amount%", ""+res.amount)
-                        .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
-            }
-
-            if (r.isTaxPaymentLate()) { // late tax payment punishment
-                r.deleteRegion(true); // TODO
-            }
+                if (r.isTaxPaymentLate()) { // late tax payment punishment
+                    r.deleteRegion(true); // TODO
+                }
+            });
         }
     }
 
@@ -149,12 +150,12 @@ public class PSEconomy {
 
         // not enough money for rent
         if (!tenant.hasAmount(r.getPrice())) {
-            if (tenant.getPlayer().isOnline()) {
+            if (tenant.getOfflinePlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_EVICT_NO_MONEY_TENANT.msg()
                         .replace("%region%", r.getName() != null ? r.getName() : r.getID())
                         .replace("%price%", String.format("%.2f", r.getPrice())));
             }
-            if (landlord.getPlayer().isOnline()) {
+            if (landlord.getOfflinePlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_EVICT_NO_MONEY_LANDLORD.msg()
                         .replace("%region%", r.getName() != null ? r.getName() : r.getID())
                         .replace("%tenant%", tenant.getName()));
@@ -164,13 +165,13 @@ public class PSEconomy {
         }
 
         // send payment messages
-        if (tenant.getPlayer().isOnline()) {
+        if (tenant.getOfflinePlayer().isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%landlord%", landlord.getName())
                     .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
         }
-        if (landlord.getPlayer().isOnline()) {
+        if (landlord.getOfflinePlayer().isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_PAID_LANDLORD.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%tenant%", tenant.getName())

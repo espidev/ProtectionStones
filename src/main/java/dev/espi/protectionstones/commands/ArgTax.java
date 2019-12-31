@@ -91,7 +91,7 @@ public class ArgTax implements PSCommandArg {
         PSProtectBlock cp = r.getTypeOptions();
 
         if (cp.taxPeriod == -1) { // taxes disabled for this region
-            return PSL.msg(s, ""); // TODO
+            return PSL.msg(s, PSL.TAX_DISABLED_REGION.msg()); // TODO
         }
 
         switch (args[1]) {

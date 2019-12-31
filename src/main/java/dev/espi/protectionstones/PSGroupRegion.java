@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lombok.val;
 import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -42,8 +43,8 @@ public class PSGroupRegion extends PSStandardRegion {
     public void updateTaxPayments() {
         val currentTime = System.currentTimeMillis();
 
-        final Set<String> lastAdded = getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null ? new HashSet<>() : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED),
-                payments = getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE) == null ? new HashSet<>() : getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+        Set<String> lastAdded = getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null ? new HashSet<>() : new HashSet<>(getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)),
+                payments = getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE) == null ? new HashSet<>() : new HashSet<>(getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE));
 
         val remove = new ArrayList<String>();
 
@@ -54,31 +55,34 @@ public class PSGroupRegion extends PSStandardRegion {
 
             var found = false;
             // loop over last paid entries
-            for (val str : lastAdded) {
-                try {
-                    val id = str.split(" ")[0];
-                    if (!id.equals(r.getID())) { // found this region
-                        found = true;
-                        val lastPaid = Long.parseLong(str.split(" ")[1]);
+            if (getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) != null) {
+                for (String str : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)) {
+                    try {
+                        val id = str.split(" ")[0];
+                        if (!id.equals(r.getID())) { // found this region
+                            found = true;
+                            val lastPaid = Long.parseLong(str.split(" ")[1]);
 
-                        if (lastPaid + r.getTaxPeriod().toMillis() < currentTime) { // if it's time to pay
-                            payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate());
-                            remove.add(str);
-                            lastAdded.add(r.getID() + " " + currentTime);
+                            if (lastPaid + r.getTaxPeriod().toMillis() < currentTime) { // if it's time to pay
+                                payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate() + " " + r.getID()); // add the id on the end because no duplicates
+                                remove.add(str);
+                                lastAdded.add(r.getID() + " " + currentTime);
+                            }
                         }
+                    } catch (Exception e) {
+                        remove.add(str);
                     }
-                } catch (Exception e) {
-                    remove.add(str);
                 }
             }
 
             if (!found) {
-                payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate());
+                payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate() + " " + r.getID());
                 lastAdded.add(r.getID() + " " + currentTime);
             }
         }
 
         remove.forEach(lastAdded::remove);
+        Bukkit.getLogger().info(payments.toString()); // TODO
         getWGRegion().setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastAdded);
         getWGRegion().setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, payments);
     }

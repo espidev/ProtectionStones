@@ -84,13 +84,26 @@ public class PSPlayer {
 
     /**
      * Get the wrapped Bukkit player.
-     * It may return an empty player if the object wraps a UUID that does not exist.
+     * It may return null if the object wraps a UUID that does not exist.
      *
-     * @return the player
+     * @return the player, or null
      */
 
     public Player getPlayer() {
-        if (p == null) return (Player) Bukkit.getOfflinePlayer(uuid);
+        if (p == null) return Bukkit.getPlayer(uuid);
+        return p;
+    }
+
+    /**
+     * Get the wrapped Bukkit offline player.
+     * Safer to use than getPlayer (this does not return a null)
+     * It may return an empty player if the object wraps a UUID that does not exist.
+     *
+     * @return the offline player
+     */
+
+    public OfflinePlayer getOfflinePlayer() {
+        if (p == null) return Bukkit.getOfflinePlayer(uuid);
         return p;
     }
 
@@ -108,7 +121,7 @@ public class PSPlayer {
 
     public boolean hasAmount(double amount) {
         if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return false;
-        return ProtectionStones.getInstance().getVaultEconomy().has(getPlayer(), amount);
+        return ProtectionStones.getInstance().getVaultEconomy().has(getOfflinePlayer(), amount);
     }
 
     /**
@@ -120,7 +133,7 @@ public class PSPlayer {
 
     public double getBalance() {
         if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return 0;
-        return ProtectionStones.getInstance().getVaultEconomy().getBalance(getPlayer());
+        return ProtectionStones.getInstance().getVaultEconomy().getBalance(getOfflinePlayer());
     }
 
     /**
@@ -133,7 +146,7 @@ public class PSPlayer {
 
     public EconomyResponse depositBalance(double amount) {
         if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
-        return ProtectionStones.getInstance().getVaultEconomy().depositPlayer(getPlayer(), amount);
+        return ProtectionStones.getInstance().getVaultEconomy().depositPlayer(getOfflinePlayer(), amount);
     }
 
     /**
@@ -146,7 +159,7 @@ public class PSPlayer {
 
     public EconomyResponse withdrawBalance(double amount) {
         if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
-        return ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(getPlayer(), amount);
+        return ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(getOfflinePlayer(), amount);
     }
 
     /**
