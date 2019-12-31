@@ -115,8 +115,6 @@ public class PSProtectBlock {
     @Path("economy.tax_payment_time")
     @SpecIntInRange(min = 1, max = Integer.MAX_VALUE)
     public int taxPaymentTime;
-    @Path("economy.tax_punishment")
-    public String taxPunishment;
     @Path("economy.start_with_tax_autopay")
     public boolean startWithTaxAutopay;
     @Path("economy.tax_message_on_join")

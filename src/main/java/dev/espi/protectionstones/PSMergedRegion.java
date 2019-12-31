@@ -215,16 +215,6 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public double getTaxRate() {
-        return mergedGroup.getTaxRate();
-    }
-
-    @Override
-    public Duration getTaxPeriod() {
-        return mergedGroup.getTaxPeriod();
-    }
-
-    @Override
     public Duration getTaxPaymentPeriod() {
         return mergedGroup.getTaxPaymentPeriod();
     }
@@ -237,6 +227,11 @@ public class PSMergedRegion extends PSRegion {
     @Override
     public UUID getTaxAutopayer() {
         return mergedGroup.getTaxAutopayer();
+    }
+
+    @Override
+    public void setTaxAutopayer(UUID uuid) {
+        mergedGroup.setTaxAutopayer(uuid);
     }
 
     @Override

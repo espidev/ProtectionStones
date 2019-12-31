@@ -317,7 +317,7 @@ public abstract class PSRegion {
     @Setter
     @AllArgsConstructor
     public static class TaxPayment implements Comparable<TaxPayment> {
-        long whenPaymentWasGiven;
+        long whenPaymentIsDue;
         double amount;
 
         @Override
@@ -331,21 +331,27 @@ public abstract class PSRegion {
      *
      * @return the tax rate
      */
-    public abstract double getTaxRate();
+    public double getTaxRate() {
+        return getTypeOptions().taxAmount;
+    }
 
     /**
      * Get the period between tax payments for this region type.
      *
      * @return the duration between tax payments
      */
-    public abstract Duration getTaxPeriod();
+    public Duration getTaxPeriod() {
+        return Duration.ofSeconds(getTypeOptions().taxPeriod);
+    }
 
     /**
      * Get the period allowed for the payment of tax.
      *
      * @return the duration of time allowed to pay a tax
      */
-    public abstract Duration getTaxPaymentPeriod();
+    public Duration getTaxPaymentPeriod() {
+        return Duration.ofSeconds(getTypeOptions().taxPaymentTime);
+    }
 
     /**
      * Get the list of tax payments that are due.
@@ -360,6 +366,13 @@ public abstract class PSRegion {
      * @return the player that is set as the autopayer, or null if no player is set
      */
     public abstract UUID getTaxAutopayer();
+
+    /**
+     * Set a player to auto-pay taxes for this region.
+     *
+     * @param player the player to use to auto-pay taxes
+     */
+    public abstract void setTaxAutopayer(UUID player);
 
     /**
      * Pay outstanding taxes.

@@ -18,11 +18,11 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldguard.protection.flags.SetFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.WGUtils;
+import lombok.val;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -226,15 +227,6 @@ public class PSStandardRegion extends PSRegion {
         ProtectionStones.getEconomy().getRentedList().remove(this);
     }
 
-    @Override
-    public double getTaxRate() {
-        return getTypeOptions().taxAmount;
-    }
-
-    @Override
-    public Duration getTaxPeriod() {
-        return Duration.ofSeconds(getTypeOptions().taxPeriod);
-    }
 
     @Override
     public Duration getTaxPaymentPeriod() {
@@ -270,6 +262,11 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public void setTaxAutopayer(UUID player) {
+        wgregion.setFlag(FlagHandler.PS_TAX_AUTOPAYER, player.toString());
+    }
+
+    @Override
     public EconomyResponse payTax(PSPlayer p, double amount) {
         List<TaxPayment> paymentList = getTaxPaymentsDue();
         Collections.sort(paymentList);
@@ -290,7 +287,7 @@ public class PSStandardRegion extends PSRegion {
         }
 
         Set<String> s = new HashSet<>();
-        paymentList.forEach(taxPayment -> s.add(taxPayment.whenPaymentWasGiven + " " + taxPayment.amount));
+        paymentList.forEach(taxPayment -> s.add(taxPayment.whenPaymentIsDue + " " + taxPayment.amount));
         wgregion.setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, s);
         return p.withdrawBalance(paymentAmount);
     }
@@ -298,10 +295,9 @@ public class PSStandardRegion extends PSRegion {
     @Override
     public boolean isTaxPaymentLate() {
         if (getTypeOptions().taxPeriod == -1) return false;
-
+        long currentTime = System.currentTimeMillis();
         for (TaxPayment tp : getTaxPaymentsDue()) {
-            if (tp.whenPaymentWasGiven + getTaxPaymentPeriod().toMillis() < System.currentTimeMillis())
-                return true;
+            if (tp.whenPaymentIsDue < System.currentTimeMillis()) return true;
         }
         return false;
     }
@@ -312,10 +308,48 @@ public class PSStandardRegion extends PSRegion {
         if (getTypeOptions().taxPeriod == -1) return;
 
         long currentTime = System.currentTimeMillis();
-        if (wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null || wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) + getTaxPeriod().toMillis() < currentTime) {
-            Set<String> payments = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
-            payments.add(currentTime + " " + getTaxRate());
+
+        final Set<String> lastAdded = wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null ? new HashSet<>() : wgregion.getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED),
+                payments = wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE) == null ? new HashSet<>() : wgregion.getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+
+        if (lastAdded.isEmpty()) { // if the flags have not been initialized yet
+            lastAdded.add(getID() + " " + currentTime);
+            payments.add((currentTime + getTaxPaymentPeriod().toMillis()) + " " + getTaxRate());
+        } else {
+            List<String> remove = new ArrayList<>();
+
+            boolean found = false;
+            // loop through entries
+            for (val last : lastAdded) {
+                try {
+                    String id = last.split(" ")[0];
+                    if (!id.equals(getID())) { // remove entries that aren't this region (auto-fixes)
+                        remove.add(last);
+                        continue;
+                    }
+                    found = true;
+
+                    long lastPaid = Long.parseLong(last.split(" ")[1]);
+                    if (lastPaid + getTaxPeriod().toMillis() < currentTime) { // if there is a tax cycle
+                        payments.add((currentTime + getTaxPaymentPeriod().toMillis()) + " " + getTaxRate()); // add payment
+                        remove.add(last); // remove this entry
+                        lastAdded.add(getID() + " " + currentTime); // add new entry for next tax cycle
+                    }
+                } catch (Exception e) {
+                    remove.add(last);
+                }
+            }
+
+            if (!found) { // if no entry was found, add a tax payment
+                payments.add((currentTime + getTaxPaymentPeriod().toMillis()) + " " + getTaxRate());
+                lastAdded.add(getID() + " " + currentTime);
+            }
+
+            remove.forEach(lastAdded::remove); // remove entries
         }
+
+        wgregion.setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastAdded);
+        wgregion.setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, payments);
     }
 
     @Override

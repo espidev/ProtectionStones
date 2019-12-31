@@ -67,7 +67,8 @@ public class PSEconomy {
                 if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
                     doRentPayment(r);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -100,7 +101,6 @@ public class PSEconomy {
     /**
      * Load list of regions that are rented into memory.
      */
-
     public void loadRentList() {
         rentedList = new ArrayList<>();
         for (World w : Bukkit.getWorlds()) {
@@ -133,7 +133,6 @@ public class PSEconomy {
      *
      * @param r the region to perform the rent payment
      */
-
     public static void doRentPayment(PSRegion r) {
         PSPlayer tenant = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getTenant()));
         PSPlayer landlord = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getLandlord()));

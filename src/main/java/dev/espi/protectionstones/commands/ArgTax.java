@@ -80,6 +80,7 @@ public class ArgTax implements PSCommandArg {
         }
 
         if (args[1].equals("info")) {
+            // TODO
             return true;
         }
 
@@ -88,14 +89,20 @@ public class ArgTax implements PSCommandArg {
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());
 
+
+
         PSProtectBlock cp = r.getTypeOptions();
 
         switch (args[1]) {
             case "pay":
                 break;
             case "autopay":
-                break;
-            case "info":
+
+                if (!r.isOwner(p.getUniqueId()))
+                    return PSL.msg(p, PSL.NOT_OWNER.msg());
+
+                r.setTaxAutopayer(p.getUniqueId());
+
                 break;
             default:
                 runHelp(s);

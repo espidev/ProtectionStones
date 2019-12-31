@@ -58,7 +58,7 @@ public class FlagHandler {
     public static final Flag<Boolean> PS_FOR_SALE = new BooleanFlag("ps-for-sale");
     public static final Flag<Set<String>> PS_RENT_SETTINGS = new SetFlag<>("ps-rent-settings", new StringFlag("ps-rent-setting")); // TODO
     public static final Flag<Set<String>> PS_TAX_PAYMENTS_DUE = new SetFlag<>("ps-tax-payments-due", new StringFlag("ps-tax-payment"));
-    public static final Flag<Double> PS_TAX_LAST_PAYMENT_ADDED = new DoubleFlag("ps-tax-last-payment-added");
+    public static final Flag<Set<String>> PS_TAX_LAST_PAYMENT_ADDED = new SetFlag<>("ps-tax-last-payment-added", new StringFlag("ps-tax-last-payment-entry"));
     public static final Flag<String> PS_TAX_AUTOPAYER = new StringFlag("ps-tax-autopayer");
 
     // called on initial start

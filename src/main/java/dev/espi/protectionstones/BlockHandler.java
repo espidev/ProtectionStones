@@ -236,6 +236,11 @@ class BlockHandler {
         // hide block if auto hide is enabled
         if (blockOptions.autoHide) l.getBlock().setType(Material.AIR);
 
+        if (blockOptions.startWithTaxAutopay) {
+            // set tax auto-pay (even if taxing is not enabled)
+            region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
+        }
+
         // show merge menu
         if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
 

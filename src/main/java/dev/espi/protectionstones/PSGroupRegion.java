@@ -19,13 +19,12 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import lombok.val;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents a region that exists but is a group of merged {@link PSStandardRegion}s.
@@ -36,6 +35,51 @@ public class PSGroupRegion extends PSStandardRegion {
     PSGroupRegion(ProtectedRegion wgregion, RegionManager rgmanager, World world) {
         super(wgregion, rgmanager, world);
         assert getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS) != null;
+    }
+
+    @Override
+    public void updateTaxPayments() {
+        val currentTime = System.currentTimeMillis();
+
+        final Set<String> lastAdded = getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) == null ? new HashSet<>() : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED),
+                payments = getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE) == null ? new HashSet<>() : getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+
+        val remove = new ArrayList<String>();
+
+        // loop over merged regions
+        for (val r : getMergedRegions()) {
+            // taxes disabled
+            if (getTypeOptions().taxPeriod == -1) return;
+
+            val found = false;
+            // loop over last paid entries
+            for (val str : lastAdded) {
+                try {
+                    val id = str.split(" ")[0];
+                    if (!id.equals(r.getID())) { // found this region
+                        found = true;
+                        val lastPaid = Long.parseLong(str.split(" ")[1]);
+
+                        if (lastPaid + r.getTaxPeriod().toMillis() < currentTime) { // if it's time to pay
+                            payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate());
+                            remove.add(str);
+                            lastAdded.add(r.getID() + " " + currentTime);
+                        }
+                    }
+                } catch (Exception e) {
+                    remove.add(str);
+                }
+            }
+
+            if (!found) {
+                payments.add((currentTime + r.getTaxPaymentPeriod().toMillis()) + " " + r.getTaxRate());
+                lastAdded.add(r.getID() + " " + currentTime);
+            }
+        }
+
+        remove.forEach(lastAdded::remove);
+        getWGRegion().setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastAdded);
+        getWGRegion().setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, payments);
     }
 
     @Override
@@ -101,6 +145,15 @@ public class PSGroupRegion extends PSStandardRegion {
                 i.remove();
                 break;
             }
+        }
+
+        // remove from taxes
+        if (getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) != null) {
+            String entry = "";
+            for (val e : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)) {
+                if (e.startsWith(id)) entry = e;
+            }
+            getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED).remove(entry);
         }
     }
 
