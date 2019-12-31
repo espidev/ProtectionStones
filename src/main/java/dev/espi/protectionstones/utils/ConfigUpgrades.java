@@ -18,6 +18,7 @@
 package dev.espi.protectionstones.utils;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import dev.espi.protectionstones.LegacyUpgrade;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
 

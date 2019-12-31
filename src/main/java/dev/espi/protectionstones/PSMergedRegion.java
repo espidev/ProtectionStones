@@ -94,6 +94,15 @@ public class PSMergedRegion extends PSRegion {
 
     // ~~~~~~~~~~~ instance ~~~~~~~~~~~~~~~~
 
+    /**
+     * Get the group region that contains this region.
+     *
+     * @return the group region
+     */
+    public PSRegion getGroupRegion() {
+        return mergedGroup;
+    }
+
     @Override
     public String getID() {
         return id;

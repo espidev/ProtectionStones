@@ -134,6 +134,11 @@ public class BlockUtil {
 
     public static String getUUIDFromBase64PS(PSProtectBlock b) {
         String base64 = b.type.split(":")[1];
+        // return UUID.nameUUIDFromBytes(base64.getBytes()).toString(); <- I should be using this
+
+        // the below is bad, because hashcode should really not be used... unfortunately, this is used in production so it will have to stay like this
+        // until I can find a way to convert items to the new uuid
+        // see github issue #126
         return new UUID(base64.hashCode(), base64.hashCode()).toString();
     }
 }
