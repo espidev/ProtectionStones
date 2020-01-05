@@ -31,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.*;
 
@@ -455,8 +456,9 @@ public abstract class PSRegion {
     public abstract Block getProtectBlock();
 
     /**
-     * @return returns the type
+     * @return returns the type, or null if the type is not configured
      */
+    @Nullable
     public abstract PSProtectBlock getTypeOptions();
 
     /**

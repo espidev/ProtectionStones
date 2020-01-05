@@ -74,6 +74,12 @@ public class ArgMerge implements PSCommandArg {
             if (r == null)
                 return PSL.msg(s, PSL.NOT_IN_REGION.msg());
 
+            if (r.getTypeOptions() == null) {
+                PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+                Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
+                return true;
+            }
+
             if (!r.getTypeOptions().allowMerging)
                 return PSL.msg(s, PSL.MERGE_NOT_ALLOWED.msg());
 

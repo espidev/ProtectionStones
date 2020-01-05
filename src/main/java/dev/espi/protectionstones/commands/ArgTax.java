@@ -20,6 +20,7 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.*;
 import lombok.val;
 import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,8 +30,7 @@ import java.util.*;
 
 public class ArgTax implements PSCommandArg {
 
-    static final String INFO_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax info",
-            REGIONINFO_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax regioninfo", // maybe put in /ps info
+    static final String INFO_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax info [region (optional)]", // maybe put in /ps info
             PAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax pay [amount]",
             AUTOPAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax autopay";
 
@@ -57,7 +57,6 @@ public class ArgTax implements PSCommandArg {
     private void runHelp(CommandSender s) {
         PSL.msg(s, PSL.TAX_HELP_HEADER.msg());
         PSL.msg(s, INFO_HELP);
-        PSL.msg(s, REGIONINFO_HELP);
         PSL.msg(s, PAY_HELP);
         PSL.msg(s, AUTOPAY_HELP);
     }
@@ -72,6 +71,7 @@ public class ArgTax implements PSCommandArg {
         }
 
         Player p = (Player) s;
+        PSPlayer psp = PSPlayer.fromPlayer(p);
 
         if (args.length == 1 || args[1].equals("help")) {
             runHelp(s);
@@ -79,7 +79,14 @@ public class ArgTax implements PSCommandArg {
         }
 
         if (args[1].equals("info")) {
-            // TODO
+            PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> { // TODO
+                for (PSRegion r : psp.getPSRegions(p.getWorld(), false)) {
+                    if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) {
+                        PSL.msg(p, "-" + (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
+                    }
+                }
+            });
             return true;
         }
 
@@ -91,7 +98,7 @@ public class ArgTax implements PSCommandArg {
         PSProtectBlock cp = r.getTypeOptions();
 
         if (cp.taxPeriod == -1) { // taxes disabled for this region
-            return PSL.msg(s, PSL.TAX_DISABLED_REGION.msg()); // TODO
+            return PSL.msg(s, PSL.TAX_DISABLED_REGION.msg());
         }
 
         switch (args[1]) {
@@ -108,7 +115,6 @@ public class ArgTax implements PSCommandArg {
                 if (payment <= 0)
                     return PSL.msg(p, PAY_HELP);
 
-                PSPlayer psp = PSPlayer.fromPlayer(p);
                 if (!psp.hasAmount(payment))
                     return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg());
 

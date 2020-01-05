@@ -82,7 +82,6 @@ public class PSGroupRegion extends PSStandardRegion {
         }
 
         remove.forEach(lastAdded::remove);
-        Bukkit.getLogger().info(payments.toString()); // TODO
         getWGRegion().setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastAdded);
         getWGRegion().setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, payments);
     }

@@ -20,6 +20,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import dev.espi.protectionstones.commands.ArgTax;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.ConfigUpgrades;
 import org.bukkit.Bukkit;
@@ -222,6 +223,11 @@ public class PSConfig {
             // cleanup temp file
             template.close();
             tempFile.delete();
+        }
+
+        // remove tax command if taxes are not enabled
+        if (!ProtectionStones.getInstance().getConfigOptions().taxEnabled) {
+            ProtectionStones.getInstance().getCommandArguments().remove(new ArgTax());
         }
 
     }
