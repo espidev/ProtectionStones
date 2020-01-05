@@ -64,6 +64,10 @@ public class PSStandardRegion extends PSRegion {
     @Override
     public void setName(String name) {
         HashMap<String, ArrayList<String>> m = ProtectionStones.regionNameToID.get(getWorld());
+        if (m == null) { // if the world has not been added
+            ProtectionStones.regionNameToID.put(getWorld(), new HashMap<>());
+            m = ProtectionStones.regionNameToID.get(getWorld());
+        }
         if (m.get(getName()) != null) {
             m.get(getName()).remove(getID());
         }

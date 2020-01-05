@@ -226,7 +226,9 @@ public class WGMerge {
                 rm.removeRegion(r.getID());
             }
         }
-        nRegion.setName(nRegion.getName()); // reapply name cache
+        try {
+            nRegion.setName(nRegion.getName()); // reapply name cache
+        } catch (NullPointerException ignored) {} // catch nulls
 
         rm.addRegion(nRegion.getWGRegion());
     }
