@@ -176,7 +176,7 @@ public enum PSL {
     // ps sell
     SELL_HELP("sell.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sell [price|stop]"),
     SELL_HELP_DESC("sell.help_desc", "Sell the region you are currently in."),
-    SELL_RENTED_OUT("sell.rented_out", "The region is being rented out! You must stop renting it out to sell."),
+    SELL_RENTED_OUT("sell.rented_out", ChatColor.RED + "The region is being rented out! You must stop renting it out to sell."),
     SELL_FOR_SALE("sell.for_sale", ChatColor.GRAY + "The region is now for sale for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + "."),
 
     // ps hide/unhide

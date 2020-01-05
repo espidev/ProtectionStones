@@ -14,7 +14,7 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.6.3
+* ProtectionStones 2.6.4
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
@@ -310,6 +310,7 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     /ps addowner|removeowner [playername] - Use this command to add or remove an owner of your protected region.
     /ps flag [flagname] [setting|default] - Use this command to set a flag in your protected region.
     /ps rent - Use this command to manage rents (buying and selling).
+    /ps tax - Use this command to manage taxes.
     /ps buy - Buy the region you are currently in.
     /ps sell [price|stop] - Sell the region you are currently in.
     /ps hide|unhide - Use this command to hide or unhide your protectionstones block.

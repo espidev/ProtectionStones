@@ -20,6 +20,7 @@ import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtils;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -128,6 +129,12 @@ public class ArgTp implements PSCommandArg {
     }
 
     static void teleportPlayer(Player p, PSRegion r) {
+        if (r.getTypeOptions() == null) {
+            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+            Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
+            return;
+        }
+
         // teleport player
         if (r.getTypeOptions().tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) {
             // no teleport delay
