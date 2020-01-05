@@ -67,7 +67,7 @@ public class ArgTax implements PSCommandArg {
             return PSL.msg(s, PSL.NO_PERMISSION_TAX.msg());
         }
         if (!ProtectionStones.getInstance().getConfigOptions().taxEnabled) {
-            return PSL.msg(s, ChatColor.RED + "Renting is disabled! Enable it in the config.");
+            return PSL.msg(s, ChatColor.RED + "Taxes is disabled! Enable it in the config.");
         }
 
         Player p = (Player) s;

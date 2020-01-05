@@ -1,235 +1,235 @@
-# Define your protection block below
-# Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-# --------------------------------------------------------------------------------------------------
-# If you want to use player heads, you can use "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
-# To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under "Value:".
-# To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the "value" field not including quotes.
-# When you have the value, you can set the type to "PLAYER_HEAD:value"
-type = "EMERALD_ORE"
+    # Define your protection block below
+    # Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    # --------------------------------------------------------------------------------------------------
+    # If you want to use player heads, you can use "PLAYER_HEAD:player_name" (ex. "PLAYER_HEAD:Notch")
+    # To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under "Value:".
+    # To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the "value" field not including quotes.
+    # When you have the value, you can set the type to "PLAYER_HEAD:value"
+    type = "EMERALD_ORE"
 
-# Another way to refer to the protection stone
-# Can be used for /ps give and /ps get
-# Must be one word (no spaces)
-alias = "64"
+    # Another way to refer to the protection stone
+    # Can be used for /ps give and /ps get
+    # Must be one word (no spaces)
+    alias = "64"
 
-# Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give and custom crafting recipes.
-# Other ways to obtain this block (ex. mining) will not work as a protection stone.
-# Useful to allow the protection block to only be obtained from a shop or command.
-# Set to "false" if you want to allow players to obtain a protection stone naturally
-restrict_obtaining = true
+    # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give and custom crafting recipes.
+    # Other ways to obtain this block (ex. mining) will not work as a protection stone.
+    # Useful to allow the protection block to only be obtained from a shop or command.
+    # Set to "false" if you want to allow players to obtain a protection stone naturally
+    restrict_obtaining = true
 
-# Enable or disable the use of this protection stone in specific worlds
-# "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
-# "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
-# Can be overriden with protectionstones.admin permission (including OP)!
-world_list_type = "blacklist"
-worlds = [
-    "exampleworld1",
-    "exampleworld2"
-]
-
-# Whether or not to actually restrict the protection stone from being placed when the world is restricted (in blacklist/whitelist)
-# The block will place normally, without PS behaviour.
-prevent_block_place_in_restricted_world = true
-
-[region]
-    # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
-    # You will probably have to change this between blocks, since the region sizes will be different
-    # Set to -1 for no minimum, but will still check for overlapping regions
-    distance_between_claims = -1
-
-    # Protection radius of block
-    # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
-    # Turn "allow_merging_regions" in config.toml to false if editing the y_radius to not be -1
-    x_radius = 64
-    y_radius = -1
-    z_radius = 64
-
-    # Offset the protection block
-    # If you would like to make the protection block not be at the center of new regions, you can offset it here
-    # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
-    x_offset = 0
-    y_offset = 0
-    z_offset = 0
-
-    # How many blocks to offset the default location of /ps home from the protection block
-    home_x_offset = 0.0
-    home_y_offset = 1.0
-    home_z_offset = 0.0
-
-    # Specify the default flags to be set when a new protected region is created.
-    # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
-    # Can use PlaceholderAPI placeholders in string flags (ex. greeting, farewell).
-    flags = [
-        "pvp deny",
-        "tnt deny",
-        "greeting &lEntering &b&l%player%'s &f&lprotected area",
-        "farewell &lLeaving &b&l%player%'s &f&lprotected area",
-        "greeting-action &lEntering &b&l%player%'s &f&lprotected area",
-        "farewell-action &lLeaving &b&l%player%'s &f&lprotected area",
-        "creeper-explosion deny",
+    # Enable or disable the use of this protection stone in specific worlds
+    # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
+    # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
+    # Can be overriden with protectionstones.admin permission (including OP)!
+    world_list_type = "blacklist"
+    worlds = [
+        "exampleworld1",
+        "exampleworld2"
     ]
 
-    # List all the flags that can be set by region owners.
-    allowed_flags = [
-        "pvp",
-        "greeting",
-        "greeting-title",
-        "greeting-action",
-        "farewell",
-        "farewell-title",
-        "farewell-action",
-        "mob-spawning",
-        "creeper-explosion",
-    ]
+    # Whether or not to actually restrict the protection stone from being placed when the world is restricted (in blacklist/whitelist)
+    # The block will place normally, without PS behaviour.
+    prevent_block_place_in_restricted_world = true
 
-    # Which flags to hide from /ps info
-    hidden_flags_from_info = [
-        "ps-merged-regions",
-        "ps-merged-regions-types",
-        "ps-block-material",
-        "ps-price",
-        "ps-landlord",
-        "ps-tenant",
-        "ps-rent-period",
-        "ps-rent-last-paid",
-        "ps-for-sale",
-        "ps-rent-settings",
-        "ps-tax-payments-due",
-        "ps-tax-last-payment-added",
-        "ps-tax-autopayer"
-    ]
+    [region]
+        # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
+        # You will probably have to change this between blocks, since the region sizes will be different
+        # Set to -1 for no minimum, but will still check for overlapping regions
+        distance_between_claims = -1
 
-    # Default priority type for this block type protection stone
-    priority = 0
+        # Protection radius of block
+        # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
+        # Turn "allow_merging_regions" in config.toml to false if editing the y_radius to not be -1
+        x_radius = 64
+        y_radius = -1
+        z_radius = 64
 
-    # Whether or not to allow creation of regions that overlap other regions you don't own
-    allow_overlap_unowned_regions = false
+        # Offset the protection block
+        # If you would like to make the protection block not be at the center of new regions, you can offset it here
+        # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
+        x_offset = 0
+        y_offset = 0
+        z_offset = 0
 
-    # Whether or not to allow this regions created with this block to merge with other regions
-    # allow_merging_regions must be set to true in config.toml
-    allow_merging = true
+        # How many blocks to offset the default location of /ps home from the protection block
+        home_x_offset = 0.0
+        home_y_offset = 1.0
+        home_z_offset = 0.0
 
-[block_data]
-    # Name given to protection block when obtained with /ps give or /ps get
-    # Also affects custom crafted items (see custom_recipe)
-    # Leave as '' for no name
-    display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
+        # Specify the default flags to be set when a new protected region is created.
+        # Can use -g [group] before the flag to set group flags (ex. -g members pvp deny).
+        # Can use PlaceholderAPI placeholders in string flags (ex. greeting, farewell).
+        flags = [
+            "pvp deny",
+            "tnt deny",
+            "greeting &lEntering &b&l%player%'s &f&lprotected area",
+            "farewell &lLeaving &b&l%player%'s &f&lprotected area",
+            "greeting-action &lEntering &b&l%player%'s &f&lprotected area",
+            "farewell-action &lLeaving &b&l%player%'s &f&lprotected area",
+            "creeper-explosion deny",
+        ]
 
-    # Lore given to protection block when obtained with /ps give or /ps get
-    # Also affects custom crafted items (see custom_recipe)
-    # Leave as [] for no lore
-    lore = [
-        "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
-    ]
+        # List all the flags that can be set by region owners.
+        allowed_flags = [
+            "pvp",
+            "greeting",
+            "greeting-title",
+            "greeting-action",
+            "farewell",
+            "farewell-title",
+            "farewell-action",
+            "mob-spawning",
+            "creeper-explosion",
+        ]
 
-    # Add price when using /ps get
-    # Must have compatible economy plugin (requires Vault, ie. Essentials)
-    price = 0.0
+        # Which flags to hide from /ps info
+        hidden_flags_from_info = [
+            "ps-merged-regions",
+            "ps-merged-regions-types",
+            "ps-block-material",
+            "ps-price",
+            "ps-landlord",
+            "ps-tenant",
+            "ps-rent-period",
+            "ps-rent-last-paid",
+            "ps-for-sale",
+            "ps-rent-settings",
+            "ps-tax-payments-due",
+            "ps-tax-last-payment-added",
+            "ps-tax-autopayer"
+        ]
 
-    # Whether or not to allow crafting this item using a custom recipe
-    # Useful to allow crafting the item when restrict_obtaining is set to true
-    allow_craft_with_custom_recipe = false
-    # Specify the custom crafting recipe below
-    # You must fill the item spots with names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-    # If you want air, you can just leave the spot as ""
-    custom_recipe = [
-        ["", "STONE", ""],
-        ["STONE", "EMERALD", "STONE"],
-        ["", "STONE", ""]
-    ]
-    # Amount of the protection item to give when crafted
-    recipe_amount = 1
+        # Default priority type for this block type protection stone
+        priority = 0
 
-[economy]
-    # Taxes must be enabled in config.toml first (tax-enabled)
-    # The amount to tax the region per tax cycle.
-    tax_amount = 0.0
+        # Whether or not to allow creation of regions that overlap other regions you don't own
+        allow_overlap_unowned_regions = false
 
-    # The amount of seconds between tax cycles. Set to -1 to disable taxes.
-    tax_period = -1
+        # Whether or not to allow this regions created with this block to merge with other regions
+        # allow_merging_regions must be set to true in config.toml
+        allow_merging = true
 
-    # Amount of time to pay taxes in seconds after tax cycle before there is punishment.
-    tax_payment_time = 86400
+    [block_data]
+        # Name given to protection block when obtained with /ps give or /ps get
+        # Also affects custom crafted items (see custom_recipe)
+        # Leave as '' for no name
+        display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
 
-    # Automatically set the player that created the region as the taxpayer.
-    start_with_tax_autopay = true
+        # Lore given to protection block when obtained with /ps give or /ps get
+        # Also affects custom crafted items (see custom_recipe)
+        # Leave as [] for no lore
+        lore = [
+            "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
+        ]
 
-[behaviour]
-    # Hide protection stone right away when placed?
-    auto_hide = false
+        # Add price when using /ps get
+        # Must have compatible economy plugin (requires Vault, ie. Essentials)
+        price = 0.0
 
-    # Whether or not to automatically merge into other regions when placed if there is only one overlapping and allow_merging is true
-    auto_merge = false
+        # Whether or not to allow crafting this item using a custom recipe
+        # Useful to allow crafting the item when restrict_obtaining is set to true
+        allow_craft_with_custom_recipe = false
+        # Specify the custom crafting recipe below
+        # You must fill the item spots with names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+        # If you want air, you can just leave the spot as ""
+        custom_recipe = [
+            ["", "STONE", ""],
+            ["STONE", "EMERALD", "STONE"],
+            ["", "STONE", ""]
+        ]
+        # Amount of the protection item to give when crafted
+        recipe_amount = 1
 
-    # Disable returning the block when removed/unclaimed?
-    no_drop = false
+    [economy]
+        # Taxes must be enabled in config.toml first (tax-enabled)
+        # The amount to tax the region per tax cycle.
+        tax_amount = 0.0
 
-    # Prevents piston pushing of the block. Recommended to keep as true.
-    prevent_piston_push = true
+        # The amount of seconds between tax cycles. Set to -1 to disable taxes.
+        tax_period = -1
 
-    # Prevents the block from being destroyed when exploded.
-    # Recommended to keep true to prevent players from exploiting more protection stones with /ps unhide (when the block is destroyed)
-    prevent_explode = true
+        # Amount of time to pay taxes in seconds after tax cycle before there is punishment.
+        tax_payment_time = 86400
 
-    # Destroys the protection stone region when block is exploded. Can be useful for PVP/Factions servers.
-    # prevent_explode must be false for this to work.
-    destroy_region_when_explode = false
+        # Automatically set the player that created the region as the taxpayer.
+        start_with_tax_autopay = true
 
-    # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
-    # This was the old behaviour to prevent natural obtaining of the protection stone.
-    # Recommended to keep false if "Restrict Obtaining" (the new way) is true
-    prevent_silk_touch = false
+    [behaviour]
+        # Hide protection stone right away when placed?
+        auto_hide = false
 
-    # Set cost for when a protection block is placed (separate from /ps get cost)
-    cost_to_place = 0.0
+        # Whether or not to automatically merge into other regions when placed if there is only one overlapping and allow_merging is true
+        auto_merge = false
 
-[player]
-    # Whether or not to allow breaking the protection block with a shift-right click
-    # Useful if the protection block is unbreakable (bedrock, command block), etc.
-    allow_shift_right_break = false
+        # Disable returning the block when removed/unclaimed?
+        no_drop = false
 
-    # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
-    # Does not prevent entry, use the flag "entry deny" for preventing entry.
-    # Bypass with protectionstones.tp.bypasstp
-    prevent_teleport_in = false
+        # Prevents piston pushing of the block. Recommended to keep as true.
+        prevent_piston_push = true
 
-    # Can't move for x seconds before teleporting with /ps home or /ps tp. Can be disabled with 0.
-    # Option to teleport only if player stands still.
-    # Can override with permission protectionstones.tp.bypasswait
-    no_moving_when_tp_waiting = true
-    tp_waiting_seconds = 0
+        # Prevents the block from being destroyed when exploded.
+        # Recommended to keep true to prevent players from exploiting more protection stones with /ps unhide (when the block is destroyed)
+        prevent_explode = true
 
-    # Whether or not to prevent obtaining this block through /ps get.
-    # Ignored with protectionstones.admin
-    prevent_ps_get = false
+        # Destroys the protection stone region when block is exploded. Can be useful for PVP/Factions servers.
+        # prevent_explode must be false for this to work.
+        destroy_region_when_explode = false
 
-    # Extra permission required to place this specific protection block (you still need protectionstones.create)
-    # Also applies to /ps get (you still need protectionstones.get)
-    # '' for no extra permission
-    permission = ''
+        # Silk Touch: if true, ore-blocks that are also configured by ProtectionStones will disallow Silk Touch drops
+        # This was the old behaviour to prevent natural obtaining of the protection stone.
+        # Recommended to keep false if "Restrict Obtaining" (the new way) is true
+        prevent_silk_touch = false
 
-[event]
+        # Set cost for when a protection block is placed (separate from /ps get cost)
+        cost_to_place = 0.0
 
-    # Events section
-    # ~~~~~~~~~~~~~~
-    # For each line on events, it is the format 'type: action'
-    # The following are accepted types:
-    # player_command - Execute command by player that caused event (won't execute if not applicable)
-    # console_command - Execute command by console
-    # message - Send message to player or console if applicable (colour support with &)
-    # global_message - Send message to all players and console (colour support with &)
+    [player]
+        # Whether or not to allow breaking the protection block with a shift-right click
+        # Useful if the protection block is unbreakable (bedrock, command block), etc.
+        allow_shift_right_break = false
 
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Whether or not to enable event tracking (API events will still be enabled)
-    enable = false
+        # Whether or not to prevent teleporting into a protected region if the player doesn't own it (except with ender pearl and chorus fruit)
+        # Does not prevent entry, use the flag "entry deny" for preventing entry.
+        # Bypass with protectionstones.tp.bypasstp
+        prevent_teleport_in = false
 
-    # Execute commands when a region is created (ex. player place protection block)
-    on_region_create = [
-        'global_message: &l%player% created the region %region%!',
-    ]
+        # Can't move for x seconds before teleporting with /ps home or /ps tp. Can be disabled with 0.
+        # Option to teleport only if player stands still.
+        # Can override with permission protectionstones.tp.bypasswait
+        no_moving_when_tp_waiting = true
+        tp_waiting_seconds = 0
 
-    # Execute commands when a region is destroyed (ex. when player destroy protection block)
-    on_region_destroy = [
-        'console_command: say %player% has destroyed region %region%!',
-    ]
+        # Whether or not to prevent obtaining this block through /ps get.
+        # Ignored with protectionstones.admin
+        prevent_ps_get = false
+
+        # Extra permission required to place this specific protection block (you still need protectionstones.create)
+        # Also applies to /ps get (you still need protectionstones.get)
+        # '' for no extra permission
+        permission = ''
+
+    [event]
+
+        # Events section
+        # ~~~~~~~~~~~~~~
+        # For each line on events, it is the format 'type: action'
+        # The following are accepted types:
+        # player_command - Execute command by player that caused event (won't execute if not applicable)
+        # console_command - Execute command by console
+        # message - Send message to player or console if applicable (colour support with &)
+        # global_message - Send message to all players and console (colour support with &)
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Whether or not to enable event tracking (API events will still be enabled)
+        enable = false
+
+        # Execute commands when a region is created (ex. player place protection block)
+        on_region_create = [
+            'global_message: &l%player% created the region %region%!',
+        ]
+
+        # Execute commands when a region is destroyed (ex. when player destroy protection block)
+        on_region_destroy = [
+            'console_command: say %player% has destroyed region %region%!',
+        ]
