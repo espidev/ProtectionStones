@@ -21,9 +21,9 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
   
 ## Default Configuration (config.toml)
 
-    config_version = 11
-    uuidupdated = true
     # Please do not change the config version unless you know what you are doing!
+    config_version = 12
+    uuidupdated = true
     
     # ---------------------------------------------------------------------------------------
     # Protection Stones Config
@@ -78,6 +78,23 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
     # Whether or not to allow merged regions to have holes in them (merging a bunch of regions in a circle with the inside not protected).
     # This is only checked during the merge process, it will not unmerge regions with holes already.
     allow_merging_holes = true
+    
+    [economy]
+        # Set limits on the price for renting. Set to -1 to disable.
+        max_rent_price = -1.0
+        min_rent_price = 1.0
+    
+        # Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.
+        max_rent_period = -1
+        min_rent_period = 1
+    
+        # Set taxes on regions. (THIS FEATURE IS STILL BEING DEVELOPED, ONLY USE FOR TESTING!)
+        # Taxes are configured in each individual block config.
+        # Whether or not to enable the tax command.
+        tax_enabled = false
+    
+        # Notify players of outstanding tax payments for the regions they own.
+        tax_message_on_join = true
 
 ## Default Configuration (block1.toml)
 
@@ -177,6 +194,10 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
             "ps-rent-period",
             "ps-rent-last-paid",
             "ps-for-sale",
+            "ps-rent-settings",
+            "ps-tax-payments-due",
+            "ps-tax-last-payment-added",
+            "ps-tax-autopayer"
         ]
     
         # Default priority type for this block type protection stone
@@ -219,6 +240,20 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
         ]
         # Amount of the protection item to give when crafted
         recipe_amount = 1
+    
+    [economy]
+        # Taxes must be enabled in config.toml first (tax-enabled)
+        # The amount to tax the region per tax cycle.
+        tax_amount = 0.0
+    
+        # The amount of seconds between tax cycles. Set to -1 to disable taxes.
+        tax_period = -1
+    
+        # Amount of time to pay taxes in seconds after tax cycle before there is punishment.
+        tax_payment_time = 86400
+    
+        # Automatically set the player that created the region as the taxpayer.
+        start_with_tax_autopay = true
     
     [behaviour]
         # Hide protection stone right away when placed?
