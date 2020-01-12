@@ -111,7 +111,7 @@ public class ArgHome implements PSCommandArg {
             entries.add(tc);
         }
 
-        TextGUI.displayGUI(p, PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries);
+        TextGUI.displayGUI(p, PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries, true);
 
         if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HOME_NEXT.msg().replace("%page%", page + 2 + ""));
     }

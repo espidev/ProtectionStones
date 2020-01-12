@@ -63,6 +63,7 @@ public class ArgHelp implements PSCommandArg {
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.SETPARENT_HELP.msg(), PSL.SETPARENT_HELP_DESC.msg(), base + "setparent"), "protectionstones.setparent", "protectionstones.setparent.others"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.FLAG_HELP.msg(), PSL.FLAG_HELP_DESC.msg(), base + "flag"), "protectionstones.flags"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.RENT_HELP.msg(), PSL.RENT_HELP_DESC.msg(), base + "rent"), "protectionstones.rent"));
+        helpMenu.add(new HelpEntry(sendWithPerm(PSL.TAX_HELP.msg(), PSL.TAX_HELP_DESC.msg(), base + "tax"), "protectionstones.tax"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.BUY_HELP.msg(), PSL.BUY_HELP_DESC.msg(), base + "buy"), "protectionstones.buysell"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.SELL_HELP.msg(), PSL.SELL_HELP_DESC.msg(), base + "sell"), "protectionstones.buysell"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.HOME_HELP.msg(), PSL.HOME_HELP_DESC.msg(), base + "home"), "protectionstones.home"));
@@ -118,7 +119,7 @@ public class ArgHelp implements PSCommandArg {
             }
         }
 
-        TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries);
+        TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries, false);
 
         if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
 

@@ -31,11 +31,12 @@ public class TextGUI {
 
     // page starts at zero, but displays start at one
     // pageCommand will be replacing %page%
-    public static void displayGUI(CommandSender s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines) {
+    public static void displayGUI(CommandSender s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines, boolean sendBlankLines) {
         PSL.msg(s, header);
 
         for (int i = currentPage*guiSize; i < Math.min((currentPage+1) * guiSize, lines.size()); i++) {
-            s.spigot().sendMessage(lines.get(i));
+            if (sendBlankLines || !lines.get(i).equals(new TextComponent("")))
+                s.spigot().sendMessage(lines.get(i));
         }
 
         // footer page buttons
