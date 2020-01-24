@@ -47,7 +47,6 @@ public class MiscUtil {
         int n = -99999;
         for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
             String permission = pia.getPermission();
-            String[] sp = permission.split("\\.");
 
             if (permission.startsWith(perm)) {
                 String value = permission.substring(perm.length());
