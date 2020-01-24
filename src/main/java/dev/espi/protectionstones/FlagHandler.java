@@ -30,10 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class FlagHandler {
 
@@ -137,30 +134,49 @@ public class FlagHandler {
     // Initializes user defined default flags for block
     static void initDefaultFlagsForBlock(PSProtectBlock b) {
         b.regionFlags = new HashMap<>();
+
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
-            String settings = "", group = "";
+            String settings = "", // flag settings (after flag name)
+                    group = "", // -g group
+                    flagName = split[0];
+            boolean isEmpty = false; // whether or not it's the -e flag at beginning
 
+            int startInd = 1;
             if (split[0].equals("-g")) { // if it's a group flag
                 group = split[1];
-                for (int i = 3; i < split.length; i++) settings += split[i] + " ";
-            } else { // not group flag
-                for (int i = 1; i < split.length; i++) settings += split[i] + " ";
+                flagName = split[2];
+                startInd = 3; // ex. -g nonmembers tnt deny
+            } else if (split[0].equals("-e")) { // if it's an empty flag
+                isEmpty = true;
+                flagName = split[1];
+                startInd = 2; // ex. -e deny-message
             }
 
+            // get settings (after flag name)
+            for (int i = startInd; i < split.length; i++) settings += split[i] + " ";
             settings = settings.trim();
 
-            String f = split[0];
-            if (split[0].equals("-g")) f = split[2];
-            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), f);
+            if (settings.equals("-e")) { // if the setting is set to -e, change to empty flag
+                isEmpty = true;
+            }
+
+            // apply flag
+            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
             try {
                 FlagContext fc = FlagContext.create().setInput(settings).build();
-                b.regionFlags.put(flag, flag.parseInput(fc));
-                if (group.equals("-e")) { // empty flag
-                    b.regionFlags.put(flag.getRegionGroupFlag(), "");
-                } else if (!group.equals("")) { // normal flag value detection
-                    b.regionFlags.put(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(group));
+
+                if (isEmpty) { // empty flag
+                    b.regionFlags.put(flag, "");
+                } else if (!group.equals("")) { // group flag
+
+                    b.regionFlags.put(flag, flag.parseInput(fc)); // add flag
+                    b.regionFlags.put(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(group)); // apply group
+
+                } else { // normal flag
+                    b.regionFlags.put(flag, flag.parseInput(fc));
                 }
+
             } catch (Exception e) {
                 Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
                 e.printStackTrace();

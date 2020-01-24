@@ -179,7 +179,7 @@ public class ArgInfo implements PSCommandArg {
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 
                 if (region.getFlag(groupFlag) != null) {
-                    flagDisp.append(flag.getName()).append(" -g ").append(region.getFlag(groupFlag)).append(" ").append(flagValue).append(", " + ChatColor.GRAY);
+                    flagDisp.append(flag.getName()).append(": -g ").append(region.getFlag(groupFlag)).append(" ").append(flagValue).append(", " + ChatColor.GRAY);
                 } else {
                     flagDisp.append(flag.getName()).append(": ").append(flagValue).append(", " + ChatColor.GRAY);
                 }
