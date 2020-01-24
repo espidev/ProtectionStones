@@ -234,7 +234,11 @@ class BlockHandler {
         PSL.msg(p, PSL.PROTECTED.msg());
 
         // hide block if auto hide is enabled
-        if (blockOptions.autoHide) l.getBlock().setType(Material.AIR);
+        if (blockOptions.autoHide) {
+            PSL.msg(p, PSL.REGION_HIDDEN.msg());
+            // run on next tick so placing tile entities don't complain
+            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
+        }
 
         if (blockOptions.startWithTaxAutopay) {
             // set tax auto-pay (even if taxing is not enabled)
