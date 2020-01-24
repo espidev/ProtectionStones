@@ -229,7 +229,7 @@ public class ArgFlag implements PSCommandArg {
                 flagName = flagSplit[1];
             }
 
-            if (r.getTypeOptions().allowedFlags.contains(flagName)) {
+            if (r.getTypeOptions().allowedFlags.contains(flagName) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
                 String value = "";
                 for (int i = 2; i < args.length; i++) value += args[i] + " ";
                 setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));

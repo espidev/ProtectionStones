@@ -450,7 +450,6 @@ public class ProtectionStones extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
-
         // check if Vault is enabled (for economy support)
         if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
             RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
@@ -475,6 +474,9 @@ public class ProtectionStones extends JavaPlugin {
 
         // Load configuration
         loadConfig(false);
+
+        // register protectionstones.flags.edit.[flag] permission
+        FlagHandler.initializePermissions();
 
         // build up region cache
         getServer().getConsoleSender().sendMessage("Building region cache...");

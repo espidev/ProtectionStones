@@ -25,10 +25,13 @@ import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.session.handler.ExitFlag;
 import dev.espi.protectionstones.flags.FarewellFlagHandler;
 import dev.espi.protectionstones.flags.GreetingFlagHandler;
+import lombok.var;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import java.util.*;
 
@@ -98,6 +101,16 @@ public class FlagHandler {
         sessionManager.registerHandler(FarewellFlagHandler.FACTORY, ExitFlag.FACTORY);
     }
 
+    // adds flag permissions for ALL registered WorldGuard flags
+    // by default, all players have access to it
+    static void initializePermissions() {
+        for (var flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
+            Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags.edit." + flag.getName(),
+                    "Given to all players by default. Remove if you do not want the player to have the ability to edit this flag with /ps flag.",
+                    PermissionDefault.TRUE));
+        }
+    }
+
     // Add the correct flags for the ps region
     static void initCustomFlagsForPS(ProtectedRegion region, Location l, PSProtectBlock cpb) {
         String home = l.getBlockX() + cpb.homeXOffset + " ";
@@ -142,28 +155,29 @@ public class FlagHandler {
                     flagName = split[0];
             boolean isEmpty = false; // whether or not it's the -e flag at beginning
 
-            int startInd = 1;
-            if (split[0].equals("-g")) { // if it's a group flag
-                group = split[1];
-                flagName = split[2];
-                startInd = 3; // ex. -g nonmembers tnt deny
-            } else if (split[0].equals("-e")) { // if it's an empty flag
-                isEmpty = true;
-                flagName = split[1];
-                startInd = 2; // ex. -e deny-message
-            }
-
-            // get settings (after flag name)
-            for (int i = startInd; i < split.length; i++) settings += split[i] + " ";
-            settings = settings.trim();
-
-            if (settings.equals("-e")) { // if the setting is set to -e, change to empty flag
-                isEmpty = true;
-            }
-
-            // apply flag
-            Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
             try {
+                int startInd = 1;
+                if (split[0].equals("-g")) { // if it's a group flag
+                    group = split[1];
+                    flagName = split[2];
+                    startInd = 3; // ex. -g nonmembers tnt deny
+                } else if (split[0].equals("-e")) { // if it's an empty flag
+                    isEmpty = true;
+                    flagName = split[1];
+                    startInd = 2; // ex. -e deny-message
+                }
+
+                // get settings (after flag name)
+                for (int i = startInd; i < split.length; i++) settings += split[i] + " ";
+                settings = settings.trim();
+
+                // if the setting is set to -e, change to empty flag
+                if (settings.equals("-e")) {
+                    isEmpty = true;
+                }
+
+                // apply flag
+                Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
                 FlagContext fc = FlagContext.create().setInput(settings).build();
 
                 if (isEmpty) { // empty flag
