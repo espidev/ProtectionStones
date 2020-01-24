@@ -48,8 +48,12 @@ public class MiscUtil {
         for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
             String permission = pia.getPermission();
             String[] sp = permission.split("\\.");
-            if (permission.startsWith(perm) && sp.length > 0 && StringUtils.isNumeric(sp[sp.length - 1])) {
-                n = Math.max(n, Integer.parseInt(sp[sp.length - 1]));
+
+            if (permission.startsWith(perm)) {
+                String value = permission.substring(perm.length());
+                if (StringUtils.isNumeric(value)) {
+                    n = Math.max(n, Integer.parseInt(value));
+                }
             }
         }
         return n == -99999 ? def : n;
