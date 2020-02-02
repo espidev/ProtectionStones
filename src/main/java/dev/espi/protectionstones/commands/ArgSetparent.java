@@ -59,7 +59,7 @@ public class ArgSetparent implements PSCommandArg {
             return true;
         }
         Player p = (Player) s;
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
         if (r == null) {
             PSL.msg(s, PSL.NOT_IN_REGION.msg());
             return true;

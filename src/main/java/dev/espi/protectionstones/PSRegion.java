@@ -81,6 +81,30 @@ public abstract class PSRegion {
     }
 
     /**
+     * Get the protection stone parent region that the location is in.
+     * Returns either {@link PSGroupRegion} or {@link PSStandardRegion}.
+     *
+     * @param l the location
+     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     */
+    public static PSRegion fromLocationGroup(Location l) {
+        checkNotNull(checkNotNull(l).getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+
+        // check if location is in a region
+        String psID = WGUtils.matchLocationToPSID(l);
+        ProtectedRegion r = rgm.getRegion(psID);
+
+        if (r == null) {
+            return null;
+        } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
+            return new PSGroupRegion(r, rgm, l.getWorld());
+        } else {
+            return new PSStandardRegion(r, rgm, l.getWorld());
+        }
+    }
+
+    /**
      * Get the protection stone region with the world and region.
      *
      * @param w the world

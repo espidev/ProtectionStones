@@ -68,7 +68,7 @@ class BlockHandler {
     }
 
     // create PS region from a block place event
-    static void createPSRegion(BlockPlaceEvent e) {
+    public static void createPSRegion(BlockPlaceEvent e) {
         if (e.isCancelled()) return;
         Player p = e.getPlayer();
         Block b = e.getBlock();
@@ -97,7 +97,7 @@ class BlockHandler {
     }
 
     // create a PS region (no checks for items)
-    static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // check permission
         if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
             PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
@@ -164,7 +164,7 @@ class BlockHandler {
     }
 
     // create the actual WG region for PS region
-    static boolean createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static boolean createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // create region
         double bx = l.getX(), bxo = blockOptions.xOffset;
         double by = l.getY(), bxy = blockOptions.yOffset;

@@ -90,7 +90,7 @@ public class ArgTax implements PSCommandArg {
             return true;
         }
 
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());

@@ -57,7 +57,7 @@ public class ArgView implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
 
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         if (!p.hasPermission("protectionstones.view")) {
             PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());

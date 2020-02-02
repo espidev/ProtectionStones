@@ -70,7 +70,7 @@ public class ArgMerge implements PSCommandArg {
         Player p = (Player) s;
         if (args.length == 1) { // GUI
 
-            PSRegion r = PSRegion.fromLocation(p.getLocation());
+            PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
             if (r == null)
                 return PSL.msg(s, PSL.NOT_IN_REGION.msg());
 

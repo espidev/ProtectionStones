@@ -192,7 +192,7 @@ public class ArgFlag implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         if (!p.hasPermission("protectionstones.flags")) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
@@ -251,7 +251,7 @@ public class ArgFlag implements PSCommandArg {
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            PSRegion r = PSRegion.fromLocation(p.getLocation());
+            PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
             if (r == null) return null;
 
             List<String> keywords = new ArrayList<>();

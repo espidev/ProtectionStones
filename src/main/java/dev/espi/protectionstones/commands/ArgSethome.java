@@ -55,7 +55,7 @@ public class ArgSethome implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (!p.hasPermission("protectionstones.sethome")) {

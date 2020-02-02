@@ -63,7 +63,7 @@ public class ArgAddRemove implements PSCommandArg {
     //   removeowner: remove owner
 
     public static boolean template(Player p, String[] args, String type) {
-        PSRegion r = PSRegion.fromLocation(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
@@ -139,7 +139,7 @@ public class ArgAddRemove implements PSCommandArg {
                         return StringUtil.copyPartialMatches(args[1], names, new ArrayList<>());
                     case "remove":
                     case "removeowner":
-                        PSRegion r = PSRegion.fromLocation(p.getLocation());
+                        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
                         if (r != null) {
                             names = new ArrayList<>();
                             for (UUID uuid : args[0].equalsIgnoreCase("remove") ? r.getMembers() : r.getOwners()) {

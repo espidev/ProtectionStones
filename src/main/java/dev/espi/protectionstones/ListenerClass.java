@@ -128,7 +128,6 @@ public class ListenerClass implements Listener {
                     }
                 }
             }
-
         }
     }
 
@@ -159,6 +158,8 @@ public class ListenerClass implements Listener {
         }
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
+
+        //Bukkit.getLogger().info("REGION: " + r.getID() + ", TYPE: " + r.getType()); // TODO
 
         // break protection
         if (playerBreakProtection(p, r)) { // successful

@@ -205,6 +205,8 @@ public class WGMerge {
 
         // decompose merged regions into their bases
         for (PSRegion r : merge) {
+            Bukkit.getLogger().info("MERGE REGION: " + r.getID() + ", TYPE: " + r.getType()); // TODO
+
             if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
                 throw new RegionCannotMergeWhileRentedException(r);
             }
@@ -275,12 +277,11 @@ public class WGMerge {
                 first = false;
                 vertex.addAll(l);
                 backPoint = l.get(0);
-                vertex.add(backPoint);
             } else {
                 vertex.addAll(l);
                 vertex.add(l.get(0));
-                vertex.add(backPoint);
             }
+            vertex.add(backPoint);
         }
 
         //for (BlockVector2 bv : vertex) Bukkit.getLogger().info(bv.toString());
@@ -300,8 +301,10 @@ public class WGMerge {
         // create new merged region
         ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, 0, WGUtils.MAX_BUILD_HEIGHT);
         r.copyFrom(root.getWGRegion());
-        r.setFlag(FlagHandler.PS_MERGED_REGIONS, regionNames);
-        r.setFlag(FlagHandler.PS_MERGED_REGIONS_TYPES, regionLines);
+        if (regionNames.size() > 1 && regionLines.size() > 1) { // only make it a merged region if there is more than one contained region
+            r.setFlag(FlagHandler.PS_MERGED_REGIONS, regionNames);
+            r.setFlag(FlagHandler.PS_MERGED_REGIONS_TYPES, regionLines);
+        }
         return r;
     }
 

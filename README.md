@@ -14,7 +14,7 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.6.5
+* ProtectionStones 2.6.6
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
