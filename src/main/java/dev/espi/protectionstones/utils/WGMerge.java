@@ -71,8 +71,13 @@ public class WGMerge {
 
                         ProtectedRegion nRegion = WGUtils.getDefaultProtectedRegion(ProtectionStones.getBlockOptions(type), WGUtils.parsePSRegionToLocation(id));
                         nRegion.copyFrom(r);
+                        nRegion.setFlag(FlagHandler.PS_BLOCK_MATERIAL, type);
                         nRegion.setFlag(FlagHandler.PS_MERGED_REGIONS, null);
                         nRegion.setFlag(FlagHandler.PS_MERGED_REGIONS_TYPES, null);
+
+                        // reapply name cache
+                        PSRegion rr = PSRegion.fromWGRegion(w, nRegion);
+                        rr.setName(rr.getName());
 
                         rm.removeRegion(r.getId());
                         rm.addRegion(nRegion);
@@ -136,7 +141,7 @@ public class WGMerge {
                         // if there is no splitting
                         if (groupToIDs.size() == 1) {
                             // actually unmerge the regions
-                            if (r.getId().equals(toUnmerge.getID())) { // it is the root
+                            if (r.getId().equals(toUnmerge.getID())) { // it the region to unmerge is the root, we need to change the root region
                                 mergeRegions(psgr.getMergedRegions().iterator().next().getID(), w, rm, psr, Arrays.asList(psr));
                             } else {
                                 mergeRegions(w, rm, psr, Arrays.asList(psr));
@@ -175,10 +180,13 @@ public class WGMerge {
                         if (foundOriginal) {
                             mergeRegions(w, rm, psr, Arrays.asList(psr));
                         } else {
+                            psr.setName(null); // remove name from cache
                             rm.removeRegion(psr.getID());
                         }
 
-                        for (ProtectedRegion pr : regionsToAdd) rm.addRegion(pr);
+                        for (ProtectedRegion pr : regionsToAdd) {
+                            rm.addRegion(pr);
+                        }
 
                     }
                     break;
@@ -205,8 +213,6 @@ public class WGMerge {
 
         // decompose merged regions into their bases
         for (PSRegion r : merge) {
-            Bukkit.getLogger().info("MERGE REGION: " + r.getID() + ", TYPE: " + r.getType()); // TODO
-
             if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
                 throw new RegionCannotMergeWhileRentedException(r);
             }
