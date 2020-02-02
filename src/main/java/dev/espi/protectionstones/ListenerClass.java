@@ -159,8 +159,6 @@ public class ListenerClass implements Listener {
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
-        //Bukkit.getLogger().info("REGION: " + r.getID() + ", TYPE: " + r.getType()); // TODO
-
         // break protection
         if (playerBreakProtection(p, r)) { // successful
             e.setDropItems(false);
@@ -213,15 +211,23 @@ public class ListenerClass implements Listener {
 
             if (ProtectionStones.isProtectBlock(b)) {
                 String id = WGUtils.createPSID(b.getLocation());
-                if (ProtectionStones.getBlockOptions(b).preventExplode) {
-                    // remove block from exploded list if prevent_explode is enabled
-                    e.blockList().remove(i);
-                    i--;
-                } else if (ProtectionStones.getBlockOptions(b).destroyRegionWhenExplode) {
+
+                PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
+
+                // remove block from exploded list if prevent_explode is enabled
+                e.blockList().remove(i);
+                i--;
+
+                // if allow explode
+                if (!blockOptions.preventExplode) {
+                    b.setType(Material.AIR); // manually set to air
+                    // manually add drop
+                    if (!blockOptions.noDrop) {
+                        b.getWorld().dropItem(b.getLocation(), blockOptions.createItem());
+                    }
                     // remove region from worldguard if destroy_region_when_explode is enabled
-                    // check if removing the region and firing region remove event blocked it
-                    if (!ProtectionStones.removePSRegion(e.getLocation().getWorld(), id)) {
-                        return;
+                    if (blockOptions.destroyRegionWhenExplode) {
+                        ProtectionStones.removePSRegion(e.getLocation().getWorld(), id);
                     }
                 }
             }
