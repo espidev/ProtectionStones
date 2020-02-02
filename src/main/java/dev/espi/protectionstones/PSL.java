@@ -115,7 +115,9 @@ public enum PSL {
     COUNT_HELP("count.count_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps count [player (optional)]"),
     COUNT_HELP_DESC("count.count_help_desc", "Count the number of regions you own or another player."),
     PERSONAL_REGION_COUNT("count.personal_region_count", ChatColor.GRAY + "Your region count in this world: " + ChatColor.AQUA + "%num%"),
+    PERSONAL_REGION_COUNT_MERGED("count.personal_region_count_merged", ChatColor.GRAY + "- Including each merged region: " + ChatColor.AQUA + "%num%"),
     OTHER_REGION_COUNT("count.other_region_count", ChatColor.GRAY + "%player%'s region count in this world: " + ChatColor.AQUA + "%num%"),
+    OTHER_REGION_COUNT_MERGED("count.other_region_count_merged", ChatColor.GRAY + "- Including each merged region: " + ChatColor.AQUA + "%num%"),
 
     // ps flag
     FLAG_HELP("flag.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps flag [flagname] [value|null|default]"),
