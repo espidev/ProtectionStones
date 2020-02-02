@@ -71,16 +71,13 @@ public class WGUtils {
                 // check ProtectionStones allow_other_regions_to_overlap settings
                 if (ProtectionStones.isPSRegion(rg)) {
                     PSRegion pr = PSRegion.fromWGRegion(w, rg);
-                    Bukkit.getLogger().info("REGION: " + rg.getId()); // TODO
                     // don't need to check for owner, since all of these are unowned regions.
                     if (pr.isMember(lp.getUniqueId()) && pr.getTypeOptions().allowOtherRegionsToOverlap.equals("member")) {
                         // if members are allowed to overlap this region
-                        Bukkit.getLogger().info("AH2"); // TODO
                         continue;
                     }
                     if (pr.getTypeOptions().allowOtherRegionsToOverlap.equals("all")) {
                         // if everyone is allowed to overlap this region
-                        Bukkit.getLogger().info("AH3"); // TODO
                         continue;
                     }
                     // otherwise, this region is not allowed to be overlapped
