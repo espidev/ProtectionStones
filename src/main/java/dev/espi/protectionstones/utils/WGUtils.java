@@ -27,6 +27,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -54,12 +55,35 @@ public class WGUtils {
     }
 
     // whether region overlaps an unowned region that is more priority
-    public static boolean overlapsStrongerRegion(RegionManager rgm, ProtectedRegion r, LocalPlayer lp) {
+    public static boolean overlapsStrongerRegion(World w, ProtectedRegion r, LocalPlayer lp) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+
         if (rgm.overlapsUnownedRegion(r, lp)) { // check if the lp is not owner of a intersecting region
             ApplicableRegionSet rp = rgm.getApplicableRegions(r);
             boolean powerfulOverLap = false;
             for (ProtectedRegion rg : rp) {
-                if (rg.getPriority() >= r.getPriority()) { // if protection priority < overlap priority
+
+                if (rg.getPriority() > r.getPriority()) { // if protection priority < overlap priority
+                    powerfulOverLap = true;
+                    break;
+                }
+
+                // check ProtectionStones allow_other_regions_to_overlap settings
+                if (ProtectionStones.isPSRegion(rg)) {
+                    PSRegion pr = PSRegion.fromWGRegion(w, rg);
+                    Bukkit.getLogger().info("REGION: " + rg.getId()); // TODO
+                    // don't need to check for owner, since all of these are unowned regions.
+                    if (pr.isMember(lp.getUniqueId()) && pr.getTypeOptions().allowOtherRegionsToOverlap.equals("member")) {
+                        // if members are allowed to overlap this region
+                        Bukkit.getLogger().info("AH2"); // TODO
+                        continue;
+                    }
+                    if (pr.getTypeOptions().allowOtherRegionsToOverlap.equals("all")) {
+                        // if everyone is allowed to overlap this region
+                        Bukkit.getLogger().info("AH3"); // TODO
+                        continue;
+                    }
+                    // otherwise, this region is not allowed to be overlapped
                     powerfulOverLap = true;
                     break;
                 }

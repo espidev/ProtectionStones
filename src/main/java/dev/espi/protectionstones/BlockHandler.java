@@ -58,13 +58,13 @@ class BlockHandler {
         return null;
     }
 
-    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, RegionManager rm, LocalPlayer lp, double bx, double by, double bz) {
+    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World w, LocalPlayer lp, double bx, double by, double bz) {
         BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
         BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
         ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), true, min, max);
         td.setPriority(blockOptions.priority);
-        return !WGUtils.overlapsStrongerRegion(rm, td, lp);
+        return !WGUtils.overlapsStrongerRegion(w, td, lp);
     }
 
     // create PS region from a block place event
@@ -176,8 +176,8 @@ class BlockHandler {
         String id = WGUtils.createPSID(bx, by, bz);
 
         // check for minimum distance between claims by using fake region
-        if (blockOptions.distanceBetweenClaims != -1) {
-            if (!isFarEnoughFromOtherClaims(blockOptions, rm, lp, bx + bxo, by + bxy, bz + bxz)) {
+        if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
+            if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx + bxo, by + bxy, bz + bxz)) {
                 PSL.msg(p, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
                 return false;
             }
@@ -193,7 +193,7 @@ class BlockHandler {
         rm.addRegion(region);
 
         // check if new region overlaps more powerful region
-        if (!blockOptions.allowOverlapUnownedRegions && WGUtils.overlapsStrongerRegion(rm, region, lp)) {
+        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
             rm.removeRegion(id);
             PSL.msg(p, PSL.REGION_OVERLAP.msg());
             return false;

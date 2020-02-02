@@ -104,7 +104,15 @@ prevent_block_place_in_restricted_world = true
     priority = 0
 
     # Whether or not to allow creation of regions that overlap other regions you don't own
+    # This is dangerous, so think about this carefully if you set it to true.
     allow_overlap_unowned_regions = false
+
+    # Whether or not to allow players to create other regions that overlap this region.
+    # "owner" - only allow owners to overlap this (default)
+    # "member" - allow members and owners to overlap this region type. (useful for city plots)
+    # "all" - allow all players to overlap this region type.
+    # allow_overlap_unowned_regions does not need to be true for this to work.
+    allow_other_regions_to_overlap = "owner"
 
     # Whether or not to allow this regions created with this block to merge with other regions
     # allow_merging_regions must be set to true in config.toml
