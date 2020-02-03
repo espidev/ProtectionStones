@@ -226,7 +226,8 @@ public enum PSL {
     REGION_HELP_DESC("region.help_desc", "Use this command to find information or edit other players' (or your own) protected regions."),
     REGION_NOT_FOUND_FOR_PLAYER("region.not_found_for_player", ChatColor.GRAY + "No regions found for %player% in this world."),
     REGION_LIST("region.list", ChatColor.GRAY + "%player%'s regions in this world: " + ChatColor.AQUA + "%regions%"),
-    REGION_REMOVE("region.remove", ChatColor.YELLOW + "%player%'s regions have been removed in this world."),
+    REGION_REMOVE("region.remove", ChatColor.YELLOW + "%player%'s regions have been removed in this world, and removed from regions %player% partially owned."),
+    REGION_DISOWN("region.remove", ChatColor.YELLOW + "%player% has been removed as owner from all regions on this world."),
     REGION_ERROR_SEARCH("region.error_search", ChatColor.RED + "Error while searching for %player%'s regions. Please make sure you have entered the correct name."),
 
     // ps tp

@@ -185,6 +185,8 @@ public class WGMerge {
                         }
 
                         for (ProtectedRegion pr : regionsToAdd) {
+                            PSRegion rr = PSRegion.fromWGRegion(w, pr);
+                            rr.setName(rr.getName()); // reapply name cache
                             rm.addRegion(pr);
                         }
 
