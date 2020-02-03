@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSLocation;
+import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -62,7 +63,6 @@ public class ArgRegion implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
         if (!p.hasPermission("protectionstones.region")) {
@@ -80,15 +80,15 @@ public class ArgRegion implements PSCommandArg {
             return true;
         }
 
-        LocalPlayer lp = wg.wrapOfflinePlayer(Bukkit.getOfflinePlayer(UUIDCache.nameToUUID.get(args[2])));
+        UUID playerUuid = UUIDCache.nameToUUID.get(args[2]);
 
         if (args[1].equalsIgnoreCase("list")) { // list player's regions
             StringBuilder regionMessage = new StringBuilder();
             boolean found = false;
-            for (String str : rgm.getRegions().keySet()) {
-                if (str.startsWith("ps") && rgm.getRegions().get(str).getOwners().contains(lp)) {
-                    regionMessage.append(str).append(", ");
+            for (ProtectedRegion r : rgm.getRegions().values()) {
+                if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(playerUuid)) {
                     found = true;
+                    regionMessage.append(r.getId()).append(", ");
                 }
             }
 
@@ -104,46 +104,37 @@ public class ArgRegion implements PSCommandArg {
 
         } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("disown"))) {
 
-            // Find regions
-            Map<String, ProtectedRegion> regions = rgm.getRegions();
-            List<String> regionIDList = new ArrayList<>();
             boolean found = false;
-            for (String idname : regions.keySet()) {
-                if (idname.startsWith("ps") && (regions.get(idname).getOwners().contains(lp))) {
-                    regionIDList.add(idname);
-                    found = true;
+            for (ProtectedRegion r : rgm.getRegions().values()) {
+                if (ProtectionStones.isPSRegion(r)) {
+
+                    PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
+                    if (psr.isOwner(playerUuid)) {
+                        found = true;
+
+                        // remove as owner
+                        DefaultDomain owners = r.getOwners();
+                        owners.removePlayer(playerUuid);
+                        r.setOwners(owners);
+
+                        // remove region if empty and is "remove" mode
+                        if (owners.size() == 0 && args[1].equalsIgnoreCase("remove")) {
+                            psr.deleteRegion(true);
+                        }
+                    }
                 }
             }
+
             if (!found) {
                 PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg().replace("%player%", args[2]));
                 return true;
             }
 
-            // Remove regions
-            for (String str : regionIDList) {
-                ProtectedRegion region = rgm.getRegion(str);
-                switch (args[1].toLowerCase()) {
-                    case "disown":
-                        DefaultDomain owners = region.getOwners();
-                        owners.removePlayer(lp);
-                        region.setOwners(owners);
-                        break;
-                    case "remove":
-                        if (str.substring(0, 2).equals("ps")) {
-                            PSLocation psl = WGUtils.parsePSRegionToLocation(str);
-                            Block blockToRemove = p.getWorld().getBlockAt(psl.x, psl.y, psl.z);
-                            blockToRemove.setType(Material.AIR);
-                        }
-                        // remove region
-                        // check if removing the region and firing region remove event blocked it
-                        if (!ProtectionStones.removePSRegion(p.getWorld(), str, p)) {
-                            return true;
-                        }
-                        break;
-                }
+            if (args[1].equalsIgnoreCase("remove")) {
+                PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
+            } else if (args[1].equalsIgnoreCase("disown")) {
+                PSL.msg(p, PSL.REGION_DISOWN.msg().replace("%player%", args[2]));
             }
-
-            PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
         } else {
             PSL.msg(p, PSL.REGION_HELP.msg());
         }
