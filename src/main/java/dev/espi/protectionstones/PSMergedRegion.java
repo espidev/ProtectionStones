@@ -99,7 +99,7 @@ public class PSMergedRegion extends PSRegion {
      *
      * @return the group region
      */
-    public PSRegion getGroupRegion() {
+    public PSGroupRegion getGroupRegion() {
         return mergedGroup;
     }
 
