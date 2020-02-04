@@ -322,7 +322,8 @@ public class ListenerClass implements Listener {
     @EventHandler
     public void onPSRemove(PSRemoveEvent event) {
         if (event.isCancelled()) return;
-        if (event.getRegion().getTypeOptions() != null && !event.getRegion().getTypeOptions().eventsEnabled) return;
+        if (event.getRegion().getTypeOptions() == null) return;
+        if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
