@@ -25,7 +25,7 @@ public interface PSCommandArg {
     List<String> getNames();
     boolean allowNonPlayersToExecute();
     List<String> getPermissionsToExecute();
-    HashMap<String, Boolean> getRegisteredFlags();
+    HashMap<String, Boolean> getRegisteredFlags(); // <flag, has value after>
     boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags);
     List<String> tabComplete(CommandSender sender, String alias, String[] args);
 }

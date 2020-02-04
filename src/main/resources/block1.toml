@@ -71,8 +71,10 @@ prevent_block_place_in_restricted_world = true
     ]
 
     # List all the flags that can be set by region owners.
+    # If you want to whitelist the groups that can be set as well, use -g (ex. "-g all,members pvp" restricts it to no group flag, and members group)
+    # "-g all pvp" - Prevents players setting the group to nonmembers, and being invulnerable to attacks.
     allowed_flags = [
-        "pvp",
+        "-g all pvp",
         "greeting",
         "greeting-title",
         "greeting-action",

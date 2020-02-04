@@ -75,11 +75,11 @@ public class ArgAdmin implements PSCommandArg {
             case "help":
                 return ArgAdminHelp.argumentAdminHelp(s, args);
             case "version":
-                s.sendMessage(ChatColor.YELLOW + "ProtectionStones: " + ProtectionStones.getInstance().getDescription().getVersion());
-                s.sendMessage(ChatColor.YELLOW + "Developers: " + ProtectionStones.getInstance().getDescription().getAuthors());
-                s.sendMessage(ChatColor.YELLOW + "Bukkit:  " + Bukkit.getVersion());
-                s.sendMessage(ChatColor.YELLOW + "WG: " + WorldGuardPlugin.inst().getDescription().getVersion());
-                s.sendMessage(ChatColor.YELLOW + "WE: " + WorldEdit.getVersion());
+                s.sendMessage(ChatColor.AQUA + "ProtectionStones: " + ChatColor.GRAY + ProtectionStones.getInstance().getDescription().getVersion());
+                s.sendMessage(ChatColor.AQUA + "Developers: " + ChatColor.GRAY + ProtectionStones.getInstance().getDescription().getAuthors());
+                s.sendMessage(ChatColor.AQUA + "Bukkit:  " + ChatColor.GRAY + Bukkit.getVersion());
+                s.sendMessage(ChatColor.AQUA + "WG: " + ChatColor.GRAY + WorldGuardPlugin.inst().getDescription().getVersion());
+                s.sendMessage(ChatColor.AQUA + "WE: " +ChatColor.GRAY +  WorldEdit.getVersion());
                 break;
             case "hide":
                 return ArgAdminHide.argumentAdminHide(s, args);

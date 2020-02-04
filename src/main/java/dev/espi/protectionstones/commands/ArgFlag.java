@@ -20,10 +20,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.FlagHandler;
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
@@ -60,7 +57,7 @@ public class ArgFlag implements PSCommandArg {
     }
 
     private static final int GUI_SIZE = 18;
-    private static final List<String> REGION_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
+    private static final List<String> FLAG_GROUPS = FlagHandler.FLAG_GROUPS;
     private static final int[] REGION_GROUP_KERNING_LENGTHS = {2, 17, 14, 26, 23};
 
     private String getDots(int num) {
@@ -78,12 +75,15 @@ public class ArgFlag implements PSCommandArg {
 
         PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
 
+        List<String> allowedFlags = new ArrayList<>(r.getTypeOptions().allowedFlags.keySet());
+
         // send actual flags
-        for (int i = GUI_SIZE * page; i < Math.min(r.getTypeOptions().allowedFlags.size(), GUI_SIZE * page + GUI_SIZE); i++) {
+        for (int i = GUI_SIZE * page; i < Math.min(allowedFlags.size(), GUI_SIZE * page + GUI_SIZE); i++) {
             if (i >= r.getTypeOptions().allowedFlags.size()) {
                 PSL.msg(p, ChatColor.WHITE + "");
             } else {
-                String flag = r.getTypeOptions().allowedFlags.get(i);
+                String flag = allowedFlags.get(i);
+                List<String> currentFlagGroups = r.getTypeOptions().allowedFlags.get(flag);
                 TextComponent flagLine = new TextComponent();
 
                 // calculate flag command
@@ -150,7 +150,13 @@ public class ArgFlag implements PSCommandArg {
                         toLowerCase().
                         replace("_", "");
                 TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
-                String nextGroup = REGION_GROUPS.get((REGION_GROUPS.indexOf(groupfValue) + 1) % REGION_GROUPS.size());
+
+                String nextGroup;
+                if (currentFlagGroups.contains(groupfValue)) { // if the current flag group is an allowed flag group
+                    nextGroup = currentFlagGroups.get((currentFlagGroups.indexOf(groupfValue) + 1) % currentFlagGroups.size());
+                } else { // otherwise, just take the first allowed flag group
+                    nextGroup = currentFlagGroups.get(0);
+                }
 
                 BaseComponent[] hover;
                 if (fValue == null) {
@@ -163,7 +169,7 @@ public class ArgFlag implements PSCommandArg {
 
                 flagLine.addExtra(groupChange);
                 // send message
-                flagLine.addExtra(getDots(40 - REGION_GROUP_KERNING_LENGTHS[REGION_GROUPS.indexOf(groupfValue)]) + ChatColor.AQUA + " " + flag);
+                flagLine.addExtra(getDots(40 - REGION_GROUP_KERNING_LENGTHS[FLAG_GROUPS.indexOf(groupfValue)]) + ChatColor.AQUA + " " + flag);
 
                 p.spigot().sendMessage(flagLine);
             }
@@ -229,7 +235,10 @@ public class ArgFlag implements PSCommandArg {
                 flagName = flagSplit[1];
             }
 
-            if (r.getTypeOptions().allowedFlags.contains(flagName) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
+            LinkedHashMap<String, List<String>> allowedFlags = r.getTypeOptions().allowedFlags;
+
+            // check if flag is allowed and its group is also allowed
+            if (allowedFlags.keySet().contains(flagName) && allowedFlags.get(flagName).contains(flags.getOrDefault("-g", "all")) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
                 String value = "";
                 for (int i = 2; i < args.length; i++) value += args[i] + " ";
                 setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));
@@ -257,10 +266,14 @@ public class ArgFlag implements PSCommandArg {
             List<String> keywords = new ArrayList<>();
             if (args.length == 2) { // -g, or allowed flag names
                 keywords.add("-g");
-                keywords.addAll(r.getTypeOptions().allowedFlags);
+                for (String f : r.getTypeOptions().allowedFlags.keySet()) { // must allow the "all" group
+                    if (r.getTypeOptions().allowedFlags.get(f).contains("all")) {
+                        keywords.add(f);
+                    }
+                }
                 return StringUtil.copyPartialMatches(args[1], keywords, new ArrayList<>());
             } else if (args.length == 3 && args[1].equals("-g")) { // -g options
-                keywords.addAll(Arrays.asList("all", "members", "owners", "nonmembers", "nonowners"));
+                keywords.addAll(FlagHandler.FLAG_GROUPS);
 
                 return StringUtil.copyPartialMatches(args[2], keywords, new ArrayList<>());
             } else if (args.length == 3) { // flag options
@@ -274,9 +287,12 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 return StringUtil.copyPartialMatches(args[2], keywords, new ArrayList<>());
-            } else if (args.length == 4 && args[1].equals("-g")) { // -g option flag name
-
-                keywords.addAll(r.getTypeOptions().allowedFlags);
+            } else if (args.length == 4 && args[1].equals("-g")) { // -g option flag
+                for (String f : r.getTypeOptions().allowedFlags.keySet()) {
+                    if (r.getTypeOptions().allowedFlags.get(f).contains(args[2])) { // if the flag is allowed for this group
+                        keywords.add(f);
+                    }
+                }
                 return StringUtil.copyPartialMatches(args[3], keywords, new ArrayList<>());
 
             } else if (args.length == 5 && args[1].equals("-g")) { // -g option flag arg

@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -79,7 +80,7 @@ public class PSProtectBlock {
     @Path("region.flags")
     public List<String> flags;
     @Path("region.allowed_flags")
-    public List<String> allowedFlags;
+    public List<String> allowedFlagsRaw;
     @Path("region.hidden_flags_from_info")
     public List<String> hiddenFlagsFromInfo;
     @Path("region.priority")
@@ -164,6 +165,7 @@ public class PSProtectBlock {
 
     // non-config items
     public HashMap<Flag<?>, Object> regionFlags = new HashMap<>();
+    public LinkedHashMap<String, List<String>> allowedFlags = new LinkedHashMap<>();
 
     /**
      * Get the protection block item for this specific protection block.

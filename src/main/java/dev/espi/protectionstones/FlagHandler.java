@@ -36,6 +36,7 @@ import org.bukkit.permissions.PermissionDefault;
 import java.util.*;
 
 public class FlagHandler {
+    public static final List<String> FLAG_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
 
     // Custom WorldGuard Flags
     public static final Flag<String> GREET_ACTION = new StringFlag("greeting-action");
@@ -145,7 +146,31 @@ public class FlagHandler {
     }
 
     // Initializes user defined default flags for block
+    // also initializes allowed flags list
     static void initDefaultFlagsForBlock(PSProtectBlock b) {
+        // initialize allowed flags list
+        b.allowedFlags = new LinkedHashMap<>();
+        for (String f : b.allowedFlagsRaw) {
+            try {
+                String[] spl = f.split(" ");
+                if (spl[0].equals("-g")) {
+                    String[] splGroups = spl[1].split(",");
+                    List<String> groups = new ArrayList<>();
+                    for (String g : splGroups) {
+                        if (FLAG_GROUPS.contains(g)) groups.add(g);
+                    }
+
+                    b.allowedFlags.put(spl[2], groups);
+                } else {
+                    b.allowedFlags.put(f, FLAG_GROUPS);
+                }
+            } catch (Exception e) {
+                ProtectionStones.getInstance().getLogger().warning("Skipping flag " + f + ". Did you configure the allowed_flags section correctly?");
+                e.printStackTrace();
+            }
+        }
+
+        // initialize default flags
         b.regionFlags = new HashMap<>();
 
         for (String flagraw : b.flags) {
