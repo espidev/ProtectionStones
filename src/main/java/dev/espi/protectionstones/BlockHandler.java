@@ -40,7 +40,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.*;
 
-class BlockHandler {
+public class BlockHandler {
     private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
 
     private static String checkCooldown(Player p) {

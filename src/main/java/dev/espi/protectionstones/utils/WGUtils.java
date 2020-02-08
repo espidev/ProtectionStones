@@ -83,6 +83,9 @@ public class WGUtils {
                     // otherwise, this region is not allowed to be overlapped
                     powerfulOverLap = true;
                     break;
+                } else if (rg.getPriority() >= r.getPriority()) { // if the priorities are the same for plain WorldGuard regions, prevent overlap
+                    powerfulOverLap = true;
+                    break;
                 }
             }
             // if we overlap a more powerful region
