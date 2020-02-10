@@ -95,4 +95,4 @@ Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, 
     If you don't want a limit, do not give this permission. x can only be replaced with an integer number.
     protectionstones.superowner - Allows players to override region permissions, and use ps commands without being the owner of a region.
 
-This plugin is licensed under the **Apache 2.0 License**.
+This plugin is licensed under the **GPLv3**, as is required by Bukkit plugins.
