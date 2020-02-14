@@ -29,14 +29,16 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class ArgAdminRecreate {
     static boolean argumentAdminRecreate(CommandSender s, String[] args) {
         s.sendMessage(ChatColor.YELLOW + "Recreating...");
 
-        for (World w : Bukkit.getWorlds()) {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+        for (World w : m.keySet()) {
+            RegionManager rgm = m.get(w);
 
             List<ProtectedRegion> toAdd = new ArrayList<>();
 

@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -63,7 +64,11 @@ class ArgAdminChangeblock {
             PSL.msg(p, ChatColor.GRAY + "The world is not valid!");
             return true;
         }
-        for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        if (rgm == null) {
+            return PSL.msg(p, ChatColor.GRAY + "The world does not have WorldGuard configured!");
+        }
+        for (ProtectedRegion r : rgm.getRegions().values()) {
             if (ProtectionStones.isPSRegion(r)) {
                 PSRegion pr = PSRegion.fromWGRegion(w, r);
 

@@ -17,6 +17,7 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -222,8 +223,11 @@ public class PSPlayer {
      */
 
     public List<PSRegion> getPSRegions(World w, boolean canBeMember) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        if (rgm == null) return new ArrayList<>();
+
         List<PSRegion> regions = new ArrayList<>();
-        for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+        for (ProtectedRegion r : rgm.getRegions().values()) {
             if (ProtectionStones.isPSRegion(r) && (r.getOwners().contains(uuid) || (canBeMember && r.getMembers().contains(uuid)))) {
                 regions.add(PSRegion.fromWGRegion(w, r));
             }

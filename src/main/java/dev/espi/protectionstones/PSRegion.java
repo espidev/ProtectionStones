@@ -62,6 +62,7 @@ public abstract class PSRegion {
     public static PSRegion fromLocation(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        if (rgm == null) return null;
 
         // check exact location first
         PSMergedRegion pr = PSMergedRegion.getMergedRegion(l);
@@ -90,6 +91,7 @@ public abstract class PSRegion {
     public static PSRegion fromLocationGroup(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        if (rgm == null) return null;
 
         // check if location is in a region
         String psID = WGUtils.matchLocationToPSID(l);
@@ -129,17 +131,20 @@ public abstract class PSRegion {
      */
 
     public static List<PSRegion> fromName(World w, String name) {
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        if (rgm == null) return new ArrayList<>();
+
         List<PSRegion> l = new ArrayList<>();
 
         if (ProtectionStones.regionNameToID.get(w).get(name) == null) return l;
 
         for (int i = 0; i < ProtectionStones.regionNameToID.get(w).get(name).size(); i++) {
             String id = ProtectionStones.regionNameToID.get(w).get(name).get(i);
-            if (WGUtils.getRegionManagerWithWorld(w).getRegion(id) == null) { // cleanup cache
+            if (rgm.getRegion(id) == null) { // cleanup cache
                 ProtectionStones.regionNameToID.get(w).get(name).remove(i);
                 i--;
             } else {
-                l.add(fromWGRegion(w, WGUtils.getRegionManagerWithWorld(w).getRegion(id)));
+                l.add(fromWGRegion(w, rgm.getRegion(id)));
             }
         }
         return l;

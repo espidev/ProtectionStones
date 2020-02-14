@@ -213,7 +213,9 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isProtectBlock(Block b) {
         if (!isProtectBlockType(b)) return false;
-        return WGUtils.getRegionManagerWithWorld(b.getWorld()).getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion;
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(b.getWorld());
+        if (rgm == null) return false;
+        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion;
     }
 
     /**
@@ -235,10 +237,12 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isPSNameAlreadyUsed(String name) {
         for (World w : regionNameToID.keySet()) {
+            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+
             List<String> l = regionNameToID.get(w).get(name);
             if (l == null) continue;
             for (int i = 0; i < l.size(); i++) { // remove outdated cache
-                if (WGUtils.getRegionManagerWithWorld(w).getRegion(l.get(i)) == null) {
+                if (rgm.getRegion(l.get(i)) == null) {
                     l.remove(i);
                     i--;
                 }
@@ -258,6 +262,8 @@ public class ProtectionStones extends JavaPlugin {
 
     public static List<PSRegion> getPSRegions(World w, String identifier) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        if (rgm == null) return new ArrayList<>();
+
         PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
         if (r != null) { // return id based query
             return Collections.singletonList(r);
@@ -480,9 +486,12 @@ public class ProtectionStones extends JavaPlugin {
 
         // build up region cache
         getServer().getConsoleSender().sendMessage("Building region cache...");
-        for (World w : Bukkit.getWorlds()) {
+
+        HashMap<World, RegionManager> regionManagers = WGUtils.getAllRegionManagers();
+        for (World w : regionManagers.keySet()) {
+            RegionManager rgm = regionManagers.get(w);
             HashMap<String, ArrayList<String>> m = new HashMap<>();
-            for (ProtectedRegion r : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+            for (ProtectedRegion r : rgm.getRegions().values()) {
                 String name = r.getFlag(FlagHandler.PS_NAME);
                 if (isPSRegion(r) && name != null) {
                     if (m.containsKey(name)) {

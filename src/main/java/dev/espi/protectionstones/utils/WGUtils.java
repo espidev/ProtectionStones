@@ -42,8 +42,31 @@ public class WGUtils {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
     }
 
+    /**
+     * Get a RegionManager from a world.
+     *
+     * @param w the world
+     * @return the region manager, or null if it is not found
+     */
+
     public static RegionManager getRegionManagerWithWorld(World w) {
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+    }
+
+    /**
+     * Get all of the region managers for all of the worlds.
+     * Use this instead of looping worlds manually because some worlds may not have a region manager.
+     *
+     * @return returns all of the region managers from all of the worlds
+     */
+
+    public static HashMap<World, RegionManager> getAllRegionManagers() {
+        HashMap<World, RegionManager> m = new HashMap<>();
+        for (World w : Bukkit.getWorlds()) {
+            RegionManager rgm = getRegionManagerWithWorld(w);
+            if (rgm != null) m.put(w, rgm);
+        }
+        return m;
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z)

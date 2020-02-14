@@ -48,8 +48,9 @@ public class LimitUtil {
             int total = 0;
 
             // find total number of rented regions
-            for (World w : Bukkit.getWorlds()) {
-                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+            for (World w : m.keySet()) {
+                RegionManager rgm = m.get(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
                     if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
                         PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
@@ -73,8 +74,9 @@ public class LimitUtil {
 
             // count player's protection stones
             int total = 0, bFound = 0;
-            for (World w : Bukkit.getWorlds()) {
-                RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+            for (World w : m.keySet()) {
+                RegionManager rgm = m.get(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
                     if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
                         PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);

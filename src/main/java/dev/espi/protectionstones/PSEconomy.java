@@ -23,12 +23,14 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import lombok.val;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PSEconomy {
@@ -75,8 +77,9 @@ public class PSEconomy {
     }
 
     private void updateTaxes() {
-        for (World w : Bukkit.getWorlds()) {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        HashMap<World, RegionManager> regions = WGUtils.getAllRegionManagers();
+        for (World w : regions.keySet()) {
+            RegionManager rgm = regions.get(w);
             for (ProtectedRegion r : rgm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion psr = PSRegion.fromWGRegion(w, r);
@@ -105,8 +108,12 @@ public class PSEconomy {
      */
     public void loadRentList() {
         rentedList = new ArrayList<>();
-        for (World w : Bukkit.getWorlds()) {
-            for (ProtectedRegion pr : WGUtils.getRegionManagerWithWorld(w).getRegions().values()) {
+
+        var managers = WGUtils.getAllRegionManagers();
+
+        for (World w : managers.keySet()) {
+            RegionManager rgm = managers.get(w);
+            for (ProtectedRegion pr : rgm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(pr)) {
                     rentedList.add(PSRegion.fromWGRegion(w, pr));
                 }
