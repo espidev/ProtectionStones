@@ -87,6 +87,7 @@ public class WGUtils {
             for (ProtectedRegion rg : rp) {
                 // ignore itself it has already has been added to the rgm
                 if (rg.getId().equals(r.getId())) continue;
+                if (rg.isOwner(lp)) continue;
 
                 if (rg.getPriority() > r.getPriority()) { // if protection priority < overlap priority
                     powerfulOverLap = true;
