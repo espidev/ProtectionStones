@@ -93,8 +93,13 @@ public class ArgFlag implements PSCommandArg {
                 if (f == null) continue;
                 Object fValue = r.getWGRegion().getFlag(f);
 
+                // replace § with & to prevent "illegal characters in chat" disconnection
+                if (fValue instanceof String) {
+                    fValue = ((String) fValue).replace("§", "&");
+                }
+
                 // add line based on flag type
-                if (f instanceof StateFlag) {
+                if (f instanceof StateFlag) { // allow/deny
                     TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
                             deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
 
@@ -115,7 +120,7 @@ public class ArgFlag implements PSCommandArg {
                     flagLine.addExtra(" ");
                     flagLine.addExtra(deny);
                     flagLine.addExtra(getDots(5));
-                } else if (f instanceof BooleanFlag) {
+                } else if (f instanceof BooleanFlag) { // true/false
                     TextComponent allow = new TextComponent((fValue == Boolean.TRUE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "True"),
                             deny = new TextComponent((fValue == Boolean.FALSE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "False");
 
@@ -136,7 +141,7 @@ public class ArgFlag implements PSCommandArg {
                     flagLine.addExtra(" ");
                     flagLine.addExtra(deny);
                     flagLine.addExtra(getDots(5));
-                } else {
+                } else { // text
                     TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
                     edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
                             .replace("%value%", fValue == null ? "none" : fValue.toString())).create()));
@@ -158,6 +163,7 @@ public class ArgFlag implements PSCommandArg {
                     nextGroup = currentFlagGroups.get(0);
                 }
 
+                // set hover and click task for flag group
                 BaseComponent[] hover;
                 if (fValue == null) {
                     hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create();
