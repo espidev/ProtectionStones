@@ -123,7 +123,7 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the protection stone regions that have the given name as their set nickname (/ps name)
+     * Get the protection stones regions that have the given name as their set nickname (/ps name)
      *
      * @param w    the world to look for regions in
      * @param name the nickname of the region
@@ -148,6 +148,21 @@ public abstract class PSRegion {
             }
         }
         return l;
+    }
+
+    /**
+     * Get the protection stones regions that have the given name as their set nickname (/ps name), from all worlds.
+     *
+     * @param name the nickname of the regions
+     * @return the map of worlds, to the regions that have the name
+     */
+
+    public static HashMap<World, List<PSRegion>> fromName(String name) {
+        HashMap<World, List<PSRegion>> regions = new HashMap<>();
+        for (World w : ProtectionStones.regionNameToID.keySet()) {
+            regions.put(w, fromName(w, name));
+        }
+        return regions;
     }
 
     // ~~~~~~~~~~~ instance ~~~~~~~~~~~~~~~~

@@ -25,10 +25,10 @@ import java.util.List;
 
 public class ChatUtils {
     public static void displayDuplicateRegionAliases(Player p, List<PSRegion> r) {
-        StringBuilder rep = new StringBuilder(r.get(0).getID());
+        StringBuilder rep = new StringBuilder(r.get(0).getID() + " (" + r.get(0).getWorld().getName() + ")");
 
         for (int i = 1; i < r.size(); i++) {
-            rep.append(", ").append(r.get(i).getID());
+            rep.append(String.format(", %s (%s)", r.get(i).getID(), r.get(i).getWorld().getName()));
         }
 
         PSL.msg(p, PSL.SPECIFY_ID_INSTEAD_OF_ALIAS.msg().replace("%regions%", rep.toString()));

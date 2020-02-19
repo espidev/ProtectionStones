@@ -255,7 +255,7 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Get protection stone regions using an ID or alias.
      *
-     * @param w          the world to search in (if it is an id, aliases are global)
+     * @param w          the world to search in (only if it is an id; aliases/names are global)
      * @param identifier id or alias of the region
      * @return a list of psregions that match the id or alias; will be empty if no regions were found
      */
@@ -268,7 +268,9 @@ public class ProtectionStones extends JavaPlugin {
         if (r != null) { // return id based query
             return Collections.singletonList(r);
         } else { // return alias based query
-            return PSRegion.fromName(w, identifier);
+            List<PSRegion> regions = new ArrayList<>();
+            PSRegion.fromName(identifier).values().forEach(regions::addAll);
+            return regions;
         }
     }
 

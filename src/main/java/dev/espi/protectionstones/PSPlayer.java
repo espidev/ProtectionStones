@@ -31,10 +31,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Wrapper for a Bukkit player so that it exposes ProtectionStones related methods.
@@ -217,6 +214,8 @@ public class PSPlayer {
      * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
      * since the query can be slow.
      *
+     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
+     *
      * @param w           world to search for regions in
      * @param canBeMember whether or not to add regions where the player is a member, not owner
      * @return list of regions that the player owns (or is a part of if canBeMember is true)
@@ -226,12 +225,31 @@ public class PSPlayer {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) return new ArrayList<>();
 
+        Set<String> regionIdAdded = new HashSet<>();
         List<PSRegion> regions = new ArrayList<>();
-        for (ProtectedRegion r : rgm.getRegions().values()) {
+
+        // obtain worlds by id
+        rgm.getRegions().values().forEach(r -> {
             if (ProtectionStones.isPSRegion(r) && (r.getOwners().contains(uuid) || (canBeMember && r.getMembers().contains(uuid)))) {
                 regions.add(PSRegion.fromWGRegion(w, r));
+                regionIdAdded.add(r.getId());
             }
-        }
+        });
+
+        // obtain cross-world named worlds
+        ProtectionStones.regionNameToID.forEach((rw, rs) -> {
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(rw);
+            rs.values().forEach(rIds -> rIds.forEach(rId -> {
+                ProtectedRegion r = rm.getRegion(rId);
+                if (r != null && r.getOwners().contains(uuid) && ProtectionStones.isPSRegion(r)) {
+                    // check if it has already been added
+                    if (!rw.getName().equals(w.getName()) || !regionIdAdded.contains(r.getId())) {
+                        regions.add(PSRegion.fromWGRegion(rw, r));
+                    }
+                }
+            }));
+        });
+
         return regions;
     }
 
