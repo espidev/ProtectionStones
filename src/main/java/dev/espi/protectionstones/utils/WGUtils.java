@@ -85,6 +85,8 @@ public class WGUtils {
             ApplicableRegionSet rp = rgm.getApplicableRegions(r);
             boolean powerfulOverLap = false;
             for (ProtectedRegion rg : rp) {
+                // ignore itself it has already has been added to the rgm
+                if (rg.getId().equals(r.getId())) continue;
 
                 if (rg.getPriority() > r.getPriority()) { // if protection priority < overlap priority
                     powerfulOverLap = true;
@@ -199,7 +201,7 @@ public class WGUtils {
             ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", true, minT, maxT);
             ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
 
-            // algorithm to find adjacent regions (oooh boy)
+            // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(r.getID());
             for (ProtectedRegion pr : overlapping) {
                 if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getID())) {

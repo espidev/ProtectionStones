@@ -190,7 +190,7 @@ public class BlockHandler {
         ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
         region.getOwners().addPlayer(p.getUniqueId());
         region.setPriority(blockOptions.priority);
-        rm.addRegion(region);
+        rm.addRegion(region); // added to the region manager, be careful in implementing checks
 
         // check if new region overlaps more powerful region
         if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
