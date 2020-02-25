@@ -75,7 +75,9 @@ class ArgAdminCleanup {
                 for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
                     long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                     if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
-                    inactivePlayers.add(wg.wrapOfflinePlayer(op));
+                    try {
+                        inactivePlayers.add(wg.wrapOfflinePlayer(op));
+                    } catch (NullPointerException ignored) {} // wg.wrapOfflinePlayer can return null if the player isn't in WG cache
                 }
 
                 List<String> toRemove = new ArrayList<>();
