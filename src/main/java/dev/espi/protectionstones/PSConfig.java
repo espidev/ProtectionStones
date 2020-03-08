@@ -235,10 +235,12 @@ public class PSConfig {
         // remove previous protectionstones recipes (/ps reload)
         Iterator<Recipe> iter = Bukkit.getServer().recipeIterator();
         while (iter.hasNext()) {
-            Recipe r = iter.next();
-            if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
-                iter.remove();
-            }
+            try {
+                Recipe r = iter.next();
+                if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
+                    iter.remove();
+                }
+            } catch (Exception ignored) {}
         }
     }
 
