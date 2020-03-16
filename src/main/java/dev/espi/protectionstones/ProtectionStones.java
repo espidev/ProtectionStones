@@ -44,6 +44,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -158,6 +159,13 @@ public class ProtectionStones extends JavaPlugin {
      */
     public static ProtectionStones getInstance() {
         return plugin;
+    }
+
+    /**
+     * @return the plugin's logger
+     */
+    public static Logger getPluginLogger() {
+        return plugin.getLogger();
     }
 
     /**
@@ -453,7 +461,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // check that WorldGuard and WorldEdit are enabled (WorldGuard will only be enabled if there's WorldEdit)
         if (getServer().getPluginManager().getPlugin("WorldGuard") == null || !getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
-            getServer().getConsoleSender().sendMessage("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
+            getLogger().severe("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
         }
 
@@ -461,22 +469,22 @@ public class ProtectionStones extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
             RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
             if (econ == null) {
-                getServer().getLogger().info("No economy plugin found by Vault! There will be no economy support!");
+                getLogger().warning("No economy plugin found by Vault! There will be no economy support!");
                 vaultSupportEnabled = false;
             } else {
                 vaultEconomy = econ.getProvider();
                 vaultSupportEnabled = true;
             }
         } else {
-            getServer().getLogger().info("Vault not enabled! There will be no economy support!");
+            getLogger().warning("Vault not enabled! There will be no economy support!");
         }
 
         // check for placeholderapi
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
-            getServer().getLogger().info("PlaceholderAPI support enabled!");
+            getLogger().info("PlaceholderAPI support enabled!");
             placeholderAPISupportEnabled = true;
         } else {
-            getServer().getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
+            getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
         }
 
         // Load configuration
@@ -486,7 +494,7 @@ public class ProtectionStones extends JavaPlugin {
         FlagHandler.initializePermissions();
 
         // build up region cache
-        getServer().getConsoleSender().sendMessage("Building region cache...");
+        getLogger().info("Building region cache...");
 
         HashMap<World, RegionManager> regionManagers = WGUtils.getAllRegionManagers();
         for (World w : regionManagers.keySet()) {
@@ -506,7 +514,7 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // uuid cache
-        getServer().getConsoleSender().sendMessage("Building UUID cache... (if slow change async-load-uuid-cache in the config to true)");
+        getLogger().info("Building UUID cache... (if slow change async-load-uuid-cache in the config to true)");
         if (configOptions.asyncLoadUUIDCache) { // async load
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
@@ -532,12 +540,12 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // check if uuids have been upgraded already
-        getServer().getConsoleSender().sendMessage("Checking if PS regions have been updated to UUIDs...");
+        getLogger().info("Checking if PS regions have been updated to UUIDs...");
 
         // Update to UUIDs
         if (configOptions.uuidupdated == null || !configOptions.uuidupdated) LegacyUpgrade.convertToUUID();
 
-        getServer().getConsoleSender().sendMessage(ChatColor.WHITE + "ProtectionStones has successfully started!");
+        getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
     }
 
 }

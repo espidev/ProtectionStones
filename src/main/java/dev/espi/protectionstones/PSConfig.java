@@ -135,7 +135,7 @@ public class PSConfig {
 
         // load protection stones to options map
         if (ProtectionStones.blockDataFolder.listFiles().length == 0) {
-            Bukkit.getLogger().info("The blocks folder is empty! You do not have any protection blocks configured!");
+            ProtectionStones.getPluginLogger().warning("The blocks folder is empty! You do not have any protection blocks configured!");
         } else {
 
             // temp file to load in default ps block config
@@ -153,7 +153,7 @@ public class PSConfig {
             template.load();
 
             // iterate over block files and load into map
-            Bukkit.getLogger().info("Protection Stone Blocks:");
+            ProtectionStones.getPluginLogger().info("Protection Stone Blocks:");
             for (File file : ProtectionStones.blockDataFolder.listFiles()) {
 
                 CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();
@@ -186,22 +186,22 @@ public class PSConfig {
 
                 // check if material is valid, and is not a player head (since player heads also have the player name after)
                 if (Material.getMaterial(b.type) == null && !(b.type.startsWith(Material.PLAYER_HEAD.toString()))) {
-                    Bukkit.getLogger().info("Unrecognized material: " + b.type);
-                    Bukkit.getLogger().info("Block will not be added. Please fix this in your config.");
+                    ProtectionStones.getPluginLogger().warning("Unrecognized material: " + b.type);
+                    ProtectionStones.getPluginLogger().warning("Block will not be added. Please fix this in your config.");
                     continue;
                 }
 
                 // check for duplicates
                 if (ProtectionStones.isProtectBlockType(b.type)) {
-                    Bukkit.getLogger().info("Duplicate block type found! Ignoring the extra block " + b.type);
+                    ProtectionStones.getPluginLogger().warning("Duplicate block type found! Ignoring the extra block " + b.type);
                     continue;
                 }
                 if (ProtectionStones.getProtectBlockFromAlias(b.alias) != null) {
-                    Bukkit.getLogger().info("Duplicate block alias found! Ignoring the extra block " + b.alias);
+                    ProtectionStones.getPluginLogger().warning("Duplicate block alias found! Ignoring the extra block " + b.alias);
                     continue;
                 }
 
-                Bukkit.getLogger().info("- " + b.type + " (" + b.alias + ")");
+                ProtectionStones.getPluginLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
 
                 // for PLAYER_HEAD:base64, we need to change the entry to link to a UUID hash instead of storing the giant base64
@@ -239,7 +239,8 @@ public class PSConfig {
                 if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
                     iter.remove();
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -286,17 +287,22 @@ public class PSConfig {
             } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
 
                 // format PROTECTION_STONES:alias
-                String alias = mat.substring(mat.indexOf(":"));
-                if (ProtectionStones.getProtectBlockFromAlias(alias) != null) {
-                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(ProtectionStones.getProtectBlockFromAlias(alias).createItem()));
+                String alias = mat.substring(mat.indexOf(":")+1);
+                PSProtectBlock use = ProtectionStones.getProtectBlockFromAlias(alias);
+                if (use != null && use.createItem() != null) {
+                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(use.createItem()));
+                } else {
+                    ProtectionStones.getPluginLogger().warning("Unable to resolve material " + mat + " for the crafting recipe for " + b.alias + ".");
                 }
 
+            } else {
+                ProtectionStones.getPluginLogger().warning("Unable to find material " + mat + " for the crafting recipe for " + b.alias + ".");
             }
         }
         try {
             Bukkit.addRecipe(recipe);
         } catch (IllegalStateException e) {
-            Bukkit.getLogger().warning("Reloading custom recipes does not work right now, you have to restart the server for updated recipes.");
+            ProtectionStones.getPluginLogger().warning("Reloading custom recipes does not work right now, you have to restart the server for updated recipes.");
         }
     }
 
