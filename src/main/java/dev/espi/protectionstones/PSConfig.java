@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.io.*;
@@ -212,16 +213,14 @@ public class PSConfig {
                 }
 
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
-
-                // add custom recipes to Bukkit
-                if (b.allowCraftWithCustomRecipe) {
-                    setupRecipe(b);
-                }
             }
 
             // cleanup temp file
             template.close();
             tempFile.delete();
+
+            // setup crafting recipes for all blocks
+            setupRecipes();
         }
 
         // remove tax command if taxes are not enabled
@@ -241,6 +240,15 @@ public class PSConfig {
                     iter.remove();
                 }
             } catch (Exception ignored) {}
+        }
+    }
+
+    private static void setupRecipes() {
+        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            // add custom recipes to Bukkit
+            if (b.allowCraftWithCustomRecipe) {
+                setupRecipe(b);
+            }
         }
     }
 
@@ -271,7 +279,19 @@ public class PSConfig {
         // recipe
         recipe.shape(recipeLine.toArray(new String[0]));
         for (String mat : items.keySet()) {
-            recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
+            if (Material.matchMaterial(mat) != null) { // general material type
+
+                recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
+
+            } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
+
+                // format PROTECTION_STONES:alias
+                String alias = mat.substring(mat.indexOf(":"));
+                if (ProtectionStones.getProtectBlockFromAlias(alias) != null) {
+                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(ProtectionStones.getProtectBlockFromAlias(alias).createItem()));
+                }
+
+            }
         }
         try {
             Bukkit.addRecipe(recipe);
