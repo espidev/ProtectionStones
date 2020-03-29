@@ -66,7 +66,11 @@ public class PSPlayer {
     }
 
     public static PSPlayer fromPlayer(@NonNull OfflinePlayer p) {
-        return new PSPlayer((Player) p);
+        if (p instanceof Player) {
+            return new PSPlayer((Player) p);
+        } else {
+            return new PSPlayer(p.getUniqueId());
+        }
     }
 
     public PSPlayer(Player player) {
@@ -104,7 +108,7 @@ public class PSPlayer {
     }
 
     public String getName() {
-        return getPlayer().getName();
+        return getOfflinePlayer().getName();
     }
 
     /**

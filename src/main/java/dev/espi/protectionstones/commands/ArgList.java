@@ -65,7 +65,7 @@ public class ArgList implements PSCommandArg {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) {
                 List<PSRegion> regions = psp.getPSRegions(psp.getPlayer().getWorld(), true);
-                display(s, regions, psp.getPlayer().getName(), psp.getUuid());
+                display(s, regions, psp.getName(), psp.getUuid());
             } else if (args.length == 2) {
                 UUID uuid = UUIDCache.nameToUUID.get(args[1]);
                 List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegions(psp.getPlayer().getWorld(), true);

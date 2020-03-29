@@ -142,6 +142,7 @@ prevent_block_place_in_restricted_world = true
     allow_craft_with_custom_recipe = false
     # Specify the custom crafting recipe below
     # You must fill the item spots with names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    # You can also use other protection stone items as ingredients in the recipe, in the format PROTECTION_STONES:alias
     # If you want air, you can just leave the spot as ""
     custom_recipe = [
         ["", "STONE", ""],

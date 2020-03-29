@@ -131,9 +131,12 @@ public class PSEconomy {
                 if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
                     PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
                     val res = r.payTax(psp, psp.getBalance());
-                    PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
-                            .replace("%amount%", ""+res.amount)
-                            .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+
+                    if (psp.getPlayer() != null) {
+                        PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
+                                .replace("%amount%", "" + res.amount)
+                                .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                    }
                 }
 
                 if (r.isTaxPaymentLate()) { // late tax payment punishment

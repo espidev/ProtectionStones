@@ -76,6 +76,7 @@ public class ArgTax implements PSCommandArg {
             return true;
         }
 
+        // /ps tax info
         if (args[1].equals("info")) {
             PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> { // TODO
@@ -87,6 +88,8 @@ public class ArgTax implements PSCommandArg {
             });
             return true;
         }
+
+        // other tax subcommands requiring a region
 
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
