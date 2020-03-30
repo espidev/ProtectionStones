@@ -132,7 +132,7 @@ public class PSEconomy {
 
                     if (psp.getPlayer() != null) {
                         PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
-                                .replace("%amount%", "" + res.amount)
+                                .replace("%amount%", String.format("%.2f", res.amount))
                                 .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
                     }
                 }

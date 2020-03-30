@@ -68,6 +68,8 @@ allow_merging_holes = true
     # Set taxes on regions.
     # Taxes are configured in each individual block config.
     # Whether or not to enable the tax command.
+    # If you already have regions, you may want to set each one to have an autopayer (player that automatically pays taxes).
+    # This can be done with /ps admin settaxautopayers, which updates every region on the server with an autopayer from their owners list.
     tax_enabled = false
 
     # Notify players of outstanding tax payments for the regions they own.

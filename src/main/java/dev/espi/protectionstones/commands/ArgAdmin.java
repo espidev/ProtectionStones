@@ -100,6 +100,8 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminChangeblock.argumentAdminChangeblock(s, args);
             case "forcemerge":
                 return ArgAdminForceMerge.argumentAdminForceMerge(s, args);
+            case "settaxautopayers":
+                return ArgAdminSetTaxAutopayers.argumentAdminSetTaxAutopayers(s, args);
             case "fixregions":
                 s.sendMessage(ChatColor.YELLOW + "Fixing...");
                 LegacyUpgrade.upgradeRegions();
@@ -112,7 +114,7 @@ public class ArgAdmin implements PSCommandArg {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (args.length == 2) {
-            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock");
+            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock", "settaxautopayers");
             return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
         } else if (args.length >= 3 && args[1].equals("forcemerge")) {
             return ArgAdminForceMerge.tabComplete(sender, alias, args);
