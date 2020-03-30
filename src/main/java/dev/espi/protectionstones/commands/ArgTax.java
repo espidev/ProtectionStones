@@ -17,6 +17,8 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
 import lombok.val;
+import lombok.var;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -79,11 +81,25 @@ public class ArgTax implements PSCommandArg {
         // /ps tax info
         if (args[1].equals("info")) {
             PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
-            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> { // TODO
-                for (PSRegion r : psp.getPSRegions(p.getWorld(), false)) {
-                    if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) {
-                        PSL.msg(p, "-" + (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                for (PSRegion r : psp.getTaxEligibleRegions()) {
+                    double amountDue = 0;
+                    for (var tp : r.getTaxPaymentsDue()) {
+                        amountDue += tp.getAmount();
                     }
+
+                    TextComponent component;
+                    if (r.getTaxAutopayer() != null & r.getTaxAutopayer() == p.getUniqueId()) {
+                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO_AUTOPAYER.msg()
+                                .replace("%region%", (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"))
+                                .replace("%money%", String.format("%.2f", amountDue)));
+                    } else {
+                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO.msg()
+                                .replace("%region%", (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"))
+                                .replace("%money%", String.format("%.2f", amountDue)));
+                    }
+                    // todo hover information, pages
+                    p.spigot().sendMessage(component);
                 }
             });
             return true;
@@ -118,7 +134,7 @@ public class ArgTax implements PSCommandArg {
         if (!r.isOwner(p.getUuid()))
             return PSL.msg(p, PSL.NOT_OWNER.msg());
         // the amount to pay must be a number
-        if (!NumberUtils.isNumber(args[2]))
+        if (args.length != 3 && !NumberUtils.isNumber(args[2]))
             return PSL.msg(p, PAY_HELP);
 
         val payment = Double.parseDouble(args[2]);
