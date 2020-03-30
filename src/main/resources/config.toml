@@ -65,7 +65,7 @@ allow_merging_holes = true
     max_rent_period = -1
     min_rent_period = 1
 
-    # Set taxes on regions. (THIS FEATURE IS STILL BEING DEVELOPED, ONLY USE FOR TESTING!)
+    # Set taxes on regions.
     # Taxes are configured in each individual block config.
     # Whether or not to enable the tax command.
     tax_enabled = false

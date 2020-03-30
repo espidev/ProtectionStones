@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PSEconomy {
     private List<PSRegion> rentedList = new ArrayList<>();
@@ -51,27 +52,21 @@ public class PSEconomy {
             taxRunner = Bukkit.getScheduler().runTaskTimerAsynchronously(ProtectionStones.getInstance(), this::updateTaxes, 0, 200).getTaskId();
     }
 
-    private void updateRents() {
-
-        for (int i = 0; i < rentedList.size(); i++) {
-            try {
-                PSRegion r = rentedList.get(i);
-                if (r.getTypeOptions() == null) continue;
-                if (r.getRentStage() != PSRegion.RentStage.RENTING) {
-                    // remove entry if it isn't in renting stage.
-                    rentedList.remove(i);
-                    i--;
-                    continue;
-                }
-
-                Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
-                // if tenant needs to pay
-                if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
-                    doRentPayment(r);
-                }
-            } catch (Exception ignored) {
-            }
-        }
+    private synchronized void updateRents() {
+        rentedList = rentedList.stream()
+                .filter(r -> r.getTypeOptions() != null) // remove null regions
+                .filter(r -> r.getRentStage() == PSRegion.RentStage.RENTING) // remove regions not being rented out
+                .peek(r -> {
+                    try {
+                        Duration rentPeriod = MiscUtil.parseRentPeriod(r.getRentPeriod());
+                        // if tenant needs to pay
+                        if (Instant.now().getEpochSecond() > (r.getRentLastPaid() + rentPeriod.getSeconds())) {
+                            doRentPayment(r);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private void updateTaxes() {
@@ -104,6 +99,7 @@ public class PSEconomy {
     /**
      * Load list of regions that are rented into memory.
      */
+
     public void loadRentList() {
         rentedList = new ArrayList<>();
 
@@ -125,10 +121,14 @@ public class PSEconomy {
      * @param r the region to process taxes for
      */
     public static void processTaxes(PSRegion r) {
-        if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) { // taxes are enabled
+        // if taxes are enabled for this regions
+        if (r.getTypeOptions() != null && r.getTypeOptions().taxPeriod != -1) {
             Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
-                r.updateTaxPayments(); // process payments
-                if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) { // check auto-payment
+                // update tax payments due
+                r.updateTaxPayments();
+
+                // check if a player is set to auto-pay
+                if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) {
                     PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
                     val res = r.payTax(psp, psp.getBalance());
 
@@ -139,7 +139,8 @@ public class PSEconomy {
                     }
                 }
 
-                if (r.isTaxPaymentLate()) { // late tax payment punishment
+                // late tax payment punishment
+                if (r.isTaxPaymentLate()) {
                     r.deleteRegion(true); // TODO
                 }
             });
@@ -204,6 +205,4 @@ public class PSEconomy {
     public List<PSRegion> getRentedList() {
         return rentedList;
     }
-
-
 }

@@ -14,7 +14,7 @@ The current Spigot page: https://www.spigotmc.org/resources/protectionstones-upd
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.6.10
+* ProtectionStones 2.7.0
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
@@ -23,7 +23,7 @@ The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-pl
 Find it in the src/main/resources folder.
 
 ## Commands
-Aliases in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
+Default aliases (configurable in config) in case of command conflicts: /ps, /protectionstone, /protectionstones, /pstone
 
     /ps get [block] - Get a protection stone. Can be charged with currency set in the config (requires Vault)
     /ps give [block] [player] - Give a protection stone to another player as admin (free).
