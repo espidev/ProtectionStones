@@ -153,7 +153,7 @@ prevent_block_place_in_restricted_world = true
     recipe_amount = 1
 
 [economy]
-    # Taxes must be enabled in config.toml first (tax-enabled)
+    # Taxes must be enabled in config.toml first (tax_enabled)
     # The amount to tax the region per tax cycle.
     tax_amount = 0.0
 

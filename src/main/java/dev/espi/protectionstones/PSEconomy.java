@@ -70,16 +70,15 @@ public class PSEconomy {
     }
 
     private void updateTaxes() {
-        HashMap<World, RegionManager> regions = WGUtils.getAllRegionManagers();
-        for (World w : regions.keySet()) {
-            RegionManager rgm = regions.get(w);
-            for (ProtectedRegion r : rgm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion psr = PSRegion.fromWGRegion(w, r);
-                    processTaxes(psr);
-                }
-            }
-        }
+        WGUtils.getAllRegionManagers()
+                .forEach((w, rgm) -> {
+                    for (ProtectedRegion r : rgm.getRegions().values()) {
+                        if (ProtectionStones.isPSRegion(r)) {
+                            PSRegion psr = PSRegion.fromWGRegion(w, r);
+                            processTaxes(psr);
+                        }
+                    }
+                });
     }
 
     /**

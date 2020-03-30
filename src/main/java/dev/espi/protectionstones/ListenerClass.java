@@ -27,6 +27,7 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -57,12 +58,27 @@ public class ListenerClass implements Listener {
         UUIDCache.nameToUUID.remove(e.getPlayer().getName());
         UUIDCache.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
 
+        // allow worldguard to resolve all UUIDs to names
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
         });
 
+        PSPlayer psp = PSPlayer.fromPlayer(e.getPlayer());
+
+        // tax join message
         if (ProtectionStones.getInstance().getConfigOptions().taxEnabled && ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {
-            // TODO
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                int amount = 0;
+                for (PSRegion psr : psp.getTaxEligibleRegions()) {
+                    for (var tp : psr.getTaxPaymentsDue()) {
+                        amount += tp.getAmount();
+                    }
+                }
+
+                if (amount != 0) {
+                    PSL.msg(psp, PSL.TAX_JOIN_MSG_PENDING_PAYMENTS.msg().replace("%money%", ""+amount));
+                }
+            });
         }
     }
 

@@ -22,6 +22,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.var;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -219,6 +220,29 @@ public class PSPlayer {
 
     public int getGlobalRegionLimits() {
         return MiscUtil.getPermissionNumber(getPlayer(), "protectionstones.limit.", -1);
+    }
+
+    /**
+     * Get the list of regions that a player can pay money for taxes to.
+     * Note: this should be run asynchronously, as it can be very slow with large amounts of regions.
+     *
+     * @return the regions that the player owes tax money to
+     */
+    public List<PSRegion> getTaxEligibleRegions() {
+        var m = WGUtils.getAllRegionManagers();
+        List<PSRegion> ret = new ArrayList<>();
+
+        for (World w : m.keySet()) {
+            RegionManager rgm = m.get(w);
+            for (ProtectedRegion r : rgm.getRegions().values()) {
+                PSRegion psr = PSRegion.fromWGRegion(w, r);
+
+                if (psr != null && psr.isOwner(getUuid()) && psr.getTypeOptions() != null && psr.getTypeOptions().taxPeriod != -1) {
+                    ret.add(psr);
+                }
+            }
+        }
+        return ret;
     }
 
     /**

@@ -168,6 +168,7 @@ public enum PSL {
     TAX_SET_NO_AUTOPAYER("tax.set_no_autopayer", ChatColor.GRAY + "Taxes for region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " now have to be manually paid for."),
     TAX_PAID("tax.paid", ChatColor.GRAY + "Paid " + ChatColor.AQUA + "$%amount%" + ChatColor.GRAY + " in taxes for region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + "."),
     TAX_INFO_HEADER("tax.info_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Tax Info " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
+    TAX_JOIN_MSG_PENDING_PAYMENTS("tax.join_msg_pending_payments", ChatColor.GRAY + "You have " + ChatColor.AQUA + "$%money%" + ChatColor.GRAY + " in tax payments due on your regions!\nView them with /ps tax info."),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),

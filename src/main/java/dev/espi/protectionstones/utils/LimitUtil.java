@@ -92,8 +92,6 @@ public class LimitUtil {
                 }
             }
 
-            //Bukkit.getLogger().info("TOTAL: " + total + ", FOUND: " + bFound); // TODO
-
             // check if player has passed region limit
             if (total >= maxPS && maxPS != -1) {
                 return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", ""+maxPS);
