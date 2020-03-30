@@ -53,10 +53,9 @@ public class ListenerClass implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        UUIDCache.uuidToName.remove(e.getPlayer().getUniqueId());
-        UUIDCache.uuidToName.put(e.getPlayer().getUniqueId(), e.getPlayer().getName());
-        UUIDCache.nameToUUID.remove(e.getPlayer().getName());
-        UUIDCache.nameToUUID.put(e.getPlayer().getName(), e.getPlayer().getUniqueId());
+        UUIDCache.removeUUID(e.getPlayer().getUniqueId());
+        UUIDCache.removeName(e.getPlayer().getName());
+        UUIDCache.storeUUIDNamePair(e.getPlayer().getUniqueId(), e.getPlayer().getName());
 
         // allow worldguard to resolve all UUIDs to names
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

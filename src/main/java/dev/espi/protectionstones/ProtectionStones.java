@@ -518,8 +518,7 @@ public class ProtectionStones extends JavaPlugin {
         if (configOptions.asyncLoadUUIDCache) { // async load
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-                    UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
-                    UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
+                    UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
                     if (op.getName() != null)
                         WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
                 }
@@ -527,8 +526,7 @@ public class ProtectionStones extends JavaPlugin {
         } else { // sync load
             List<Profile> profiles = new ArrayList<>();
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
-                UUIDCache.uuidToName.put(op.getUniqueId(), op.getName());
-                UUIDCache.nameToUUID.put(op.getName(), op.getUniqueId());
+                UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
                 if (op.getName() != null) profiles.add(new Profile(op.getUniqueId(), op.getName()));
             }
 

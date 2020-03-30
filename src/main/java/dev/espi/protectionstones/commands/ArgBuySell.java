@@ -89,7 +89,7 @@ public class ArgBuySell implements PSCommandArg {
             PSL.msg(p, PSL.BUY_SOLD_BUYER.msg()
                     .replace("%region%", r.getName() == null ? r.getID() : r.getName())
                     .replace("%price%", String.format("%.2f", r.getPrice()))
-                    .replace("%player%", UUIDCache.uuidToName.get(r.getLandlord())));
+                    .replace("%player%", UUIDCache.getNameFromUUID(r.getLandlord())));
 
             if (Bukkit.getPlayer(r.getLandlord()) != null) {
                 PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.BUY_SOLD_SELLER.msg()

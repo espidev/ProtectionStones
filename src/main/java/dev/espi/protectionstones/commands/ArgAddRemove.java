@@ -70,10 +70,10 @@ public class ArgAddRemove implements PSCommandArg {
         if (args.length < 2) {
             return PSL.msg(p, PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
         }
-        if (!UUIDCache.nameToUUID.containsKey(args[1])) {
+        if (!UUIDCache.containsName(args[1])) {
             return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
         }
-        UUID addUuid = UUIDCache.nameToUUID.get(args[1]);
+        UUID addUuid = UUIDCache.getUUIDFromName(args[1]);
 
         List<PSRegion> regions;
 
@@ -96,18 +96,18 @@ public class ArgAddRemove implements PSCommandArg {
             if (operationType.equals("add") || operationType.equals("addowner")) {
                 if (flags.containsKey("-a")) {
                     PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
-                            .replace("%player%", args[1])
+                            .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
                             .replace("%region%", r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
                 } else {
-                    PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", args[1]));
+                    PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
                 }
             } else if ((operationType.equals("remove") && r.getWGRegion().getMembers().contains(addUuid)) || (operationType.equals("removeowner") && r.getWGRegion().getOwners().contains(addUuid))) {
                 if (flags.containsKey("-a")) {
                     PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
-                            .replace("%player%", args[1])
+                            .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
                             .replace("%region%", r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
                 } else {
-                    PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", args[1]));
+                    PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
                 }
             }
 
@@ -160,7 +160,7 @@ public class ArgAddRemove implements PSCommandArg {
                         if (r != null) {
                             names = new ArrayList<>();
                             for (UUID uuid : args[0].equalsIgnoreCase("remove") ? r.getMembers() : r.getOwners()) {
-                                names.add(UUIDCache.uuidToName.get(uuid));
+                                names.add(UUIDCache.getNameFromUUID(uuid));
                             }
                             ret.addAll(names);
                         }

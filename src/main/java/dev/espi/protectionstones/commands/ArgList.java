@@ -56,7 +56,7 @@ public class ArgList implements PSCommandArg {
         if (args.length == 2 && !s.hasPermission("protectionstones.list.others"))
             return PSL.msg(s, PSL.NO_PERMISSION_LIST_OTHERS.msg());
 
-        if (args.length == 2 && !UUIDCache.nameToUUID.containsKey(args[1]))
+        if (args.length == 2 && !UUIDCache.containsName(args[1]))
             return PSL.msg(s, PSL.PLAYER_NOT_FOUND.msg());
 
         PSPlayer psp = PSPlayer.fromPlayer((Player) s);
@@ -65,11 +65,11 @@ public class ArgList implements PSCommandArg {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) {
                 List<PSRegion> regions = psp.getPSRegions(psp.getPlayer().getWorld(), true);
-                display(s, regions, psp.getName(), psp.getUuid());
+                display(s, regions, psp.getUuid());
             } else if (args.length == 2) {
-                UUID uuid = UUIDCache.nameToUUID.get(args[1]);
+                UUID uuid = UUIDCache.getUUIDFromName(args[1]);
                 List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegions(psp.getPlayer().getWorld(), true);
-                display(s, regions, args[1], UUIDCache.nameToUUID.get(args[1]));
+                display(s, regions, UUIDCache.getUUIDFromName(args[1]));
             } else {
                 PSL.msg(s, PSL.LIST_HELP.msg());
             }
@@ -82,7 +82,7 @@ public class ArgList implements PSCommandArg {
         return null;
     }
 
-    private void display(CommandSender s, List<PSRegion> regions, String pName, UUID pUUID) {
+    private void display(CommandSender s, List<PSRegion> regions, UUID pUUID) {
         List<String> ownerOf = new ArrayList<>(), memberOf = new ArrayList<>();
         for (PSRegion r : regions) {
             if (r.isOwner(pUUID)) {
@@ -101,7 +101,7 @@ public class ArgList implements PSCommandArg {
             }
         }
 
-        PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", pName));
+        PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
 
         if (!ownerOf.isEmpty()) {
             PSL.msg(s, PSL.LIST_OWNER.msg());

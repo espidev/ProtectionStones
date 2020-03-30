@@ -99,19 +99,20 @@ public class ArgCount implements PSCommandArg {
                     PSL.msg(p, PSL.NO_PERMISSION_COUNT_OTHERS.msg());
                     return;
                 }
-                if (!UUIDCache.nameToUUID.containsKey(args[1])) {
+                if (!UUIDCache.containsName(args[1])) {
                     PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
                     return;
                 }
 
-                count = countRegionsOfPlayer(UUIDCache.nameToUUID.get(args[1]), p.getWorld());
+                UUID countUuid = UUIDCache.getUUIDFromName(args[1]);
+                count = countRegionsOfPlayer(countUuid, p.getWorld());
 
                 PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
-                        .replace("%player%", args[1])
+                        .replace("%player%", UUIDCache.getNameFromUUID(countUuid))
                         .replace("%num%", "" + count[0]));
                 if (count[1] != 0) {
                     PSL.msg(p, PSL.OTHER_REGION_COUNT_MERGED.msg()
-                            .replace("%player%", args[1])
+                            .replace("%player%", UUIDCache.getNameFromUUID(countUuid))
                             .replace("%num%", "" + count[1]));
                 }
             } else {

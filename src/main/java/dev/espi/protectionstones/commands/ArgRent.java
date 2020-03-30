@@ -148,7 +148,7 @@ public class ArgRent implements PSCommandArg {
 
                     PSL.msg(p, PSL.RENT_STOPPED.msg());
                     if (tenant != null) {
-                        PSL.msg(p, PSL.RENT_EVICTED.msg().replace("%tenant%", UUIDCache.uuidToName.get(tenant)));
+                        PSL.msg(p, PSL.RENT_EVICTED.msg().replace("%tenant%", UUIDCache.getNameFromUUID(tenant)));
                     }
                     break;
 

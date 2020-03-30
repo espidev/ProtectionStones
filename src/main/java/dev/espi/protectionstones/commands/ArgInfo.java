@@ -152,17 +152,17 @@ public class ArgInfo implements PSCommandArg {
     private static void displayEconomy(Player p, PSRegion r) {
         if (r.forSale()) {
             PSL.msg(p, PSL.INFO_AVAILABLE_FOR_SALE.msg());
-            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.getNameFromUUID(r.getLandlord()));
             PSL.msg(p, PSL.INFO_PRICE.msg() + String.format("%.2f", r.getPrice()));
         }
         if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
             PSL.msg(p, PSL.INFO_AVAILABLE_FOR_RENT.msg());
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.uuidToName.get(r.getTenant()));
+            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.getNameFromUUID(r.getTenant()));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
-            PSL.msg(p, PSL.INFO_LANDLORD.msg() + UUIDCache.uuidToName.get(r.getLandlord()));
+            PSL.msg(p, PSL.INFO_LANDLORD.msg() + UUIDCache.getNameFromUUID(r.getLandlord()));
             PSL.msg(p, PSL.INFO_RENT.msg() + String.format("%.2f", r.getPrice()));
         }
     }
@@ -201,7 +201,7 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, send.toString());
         } else {
             for (UUID uuid : owners.getUniqueIds()) {
-                String name = UUIDCache.uuidToName.get(uuid);
+                String name = UUIDCache.getNameFromUUID(uuid);
                 if (name == null) name = Bukkit.getOfflinePlayer(uuid).getName();
                 send.append(name).append(", ");
             }
@@ -220,7 +220,7 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, send.toString());
         } else {
             for (UUID uuid : members.getUniqueIds()) {
-                String name = UUIDCache.uuidToName.get(uuid);
+                String name = UUIDCache.getNameFromUUID(uuid);
                 if (name == null) name = uuid.toString();
                 send.append(name).append(", ");
             }

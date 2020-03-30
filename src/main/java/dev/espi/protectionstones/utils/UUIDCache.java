@@ -20,6 +20,37 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UUIDCache {
-    public static Map<UUID, String> uuidToName = new HashMap<>();
-    public static Map<String, UUID> nameToUUID = new HashMap<>();
+    private static Map<UUID, String> uuidToName = new HashMap<>();
+    private static Map<String, UUID> nameToUUID = new HashMap<>();
+
+    // toLowerCase for case insensitive search
+
+    public static UUID getUUIDFromName(String name) {
+        return nameToUUID.get(name.toLowerCase());
+    }
+
+    public static String getNameFromUUID(UUID uuid) {
+        return uuidToName.get(uuid);
+    }
+
+    public static boolean containsName(String name) {
+        return nameToUUID.containsKey(name.toLowerCase());
+    }
+
+    public static boolean containsUUID(UUID uuid) {
+        return uuidToName.containsKey(uuid);
+    }
+
+    public static void storeUUIDNamePair(UUID uuid, String name) {
+        uuidToName.put(uuid, name);
+        nameToUUID.put(name.toLowerCase(), uuid);
+    }
+
+    public static void removeUUID(UUID uuid) {
+        uuidToName.remove(uuid);
+    }
+
+    public static void removeName(String name) {
+        nameToUUID.remove(name.toLowerCase());
+    }
 }

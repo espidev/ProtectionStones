@@ -94,10 +94,10 @@ public class ArgTp implements PSCommandArg {
 
             String tpName = args[1];
             // region checks, and set lp to offline player
-            if (!UUIDCache.nameToUUID.containsKey(tpName)) {
+            if (!UUIDCache.containsName(tpName)) {
                 return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             }
-            UUID tpUuid = UUIDCache.nameToUUID.get(tpName);
+            UUID tpUuid = UUIDCache.getUUIDFromName(tpName);
 
             // run region search asynchronously to avoid blocking server thread
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

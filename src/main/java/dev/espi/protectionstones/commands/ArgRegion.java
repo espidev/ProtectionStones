@@ -15,20 +15,14 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSLocation;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -74,12 +68,12 @@ public class ArgRegion implements PSCommandArg {
             return true;
         }
 
-        if (!UUIDCache.nameToUUID.containsKey(args[2])) {
+        if (!UUIDCache.containsName(args[2])) {
             PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
             return true;
         }
 
-        UUID playerUuid = UUIDCache.nameToUUID.get(args[2]);
+        UUID playerUuid = UUIDCache.getUUIDFromName(args[2]);
 
         if (args[1].equalsIgnoreCase("list")) { // list player's regions
             StringBuilder regionMessage = new StringBuilder();
