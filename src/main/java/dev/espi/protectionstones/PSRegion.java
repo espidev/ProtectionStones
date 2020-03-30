@@ -558,6 +558,14 @@ public abstract class PSRegion {
     public abstract List<BlockVector2> getPoints();
 
     /**
+     * Get a list of regions that the current region can merge into, taking into account a player's permissions.
+     *
+     * @param p the player to compare permissions with
+     * @return the list of regions that the current region can merge into
+     */
+    public abstract List<PSRegion> getMergeableRegions(Player p);
+
+    /**
      * Deletes the region forever. Can be cancelled by event cancellation.
      *
      * @param deleteBlock whether or not to also set the protection block to air (if not hidden)

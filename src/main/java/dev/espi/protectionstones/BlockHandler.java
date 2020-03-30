@@ -18,10 +18,8 @@ package dev.espi.protectionstones;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgMerge;
@@ -37,7 +35,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class BlockHandler {
     private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
@@ -246,58 +247,54 @@ public class BlockHandler {
 
         // show merge menu
         if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
-            boolean showGUI = true;
-
             PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-
-            // auto merge to nearest region if only one exists
-            if (blockOptions.autoMerge) {
-                PSRegion mergeTo = null;
-
-                showGUI = true;
-                for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
-                    PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
-                    if (psr != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
-                        if (mergeTo == null) {
-                            mergeTo = psr;
-                            showGUI = false;
-                        } else {
-                            showGUI = true;
-                            break;
-                        }
-                    }
-                }
-
-                // actually do auto merge
-                if (!showGUI) {
-                    PSRegion finalMergeTo = mergeTo;
-                    Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                        try {
-                            WGMerge.mergeRegions(p.getWorld(), rm, finalMergeTo, Arrays.asList(finalMergeTo, r));
-                            PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
-                        } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
-                            // don't need to tell player that you can't merge
-                        }
-                    });
-                }
-            }
-
-            // show merge gui
-            if (showGUI) {
-                if (r != null) {
-                    List<TextComponent> tc = ArgMerge.getGUI(p, r);
-                    if (!tc.isEmpty()) { // if there are regions you can merge into
-                        p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                        PSL.msg(p, PSL.MERGE_INTO.msg());
-                        PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
-                        for (TextComponent t : tc) p.spigot().sendMessage(t);
-                        p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                    }
-                }
-            }
-
+            if (r != null) playerMergeTask(p, r);
         }
 
         return true;
+    }
+
+    // merge behaviour after a region is created
+    private static void playerMergeTask(Player p, PSRegion r) {
+        boolean showGUI = true;
+
+        // auto merge to nearest region if only one exists
+        if (r.getTypeOptions().autoMerge) {
+            PSRegion mergeTo = null;
+            for (PSRegion psr : r.getMergeableRegions(p)) {
+                if (mergeTo == null) {
+                    mergeTo = psr;
+                    showGUI = false;
+                } else {
+                    showGUI = true;
+                    break;
+                }
+            }
+
+            // actually do auto merge
+            if (!showGUI) {
+                PSRegion finalMergeTo = mergeTo;
+                Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                    try {
+                        WGMerge.mergeRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
+                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
+                    } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
+                        // don't need to tell player that you can't merge
+                    }
+                });
+            }
+        }
+
+        // show merge gui
+        if (showGUI) {
+            List<TextComponent> tc = ArgMerge.getGUI(p, r);
+            if (!tc.isEmpty()) { // if there are regions you can merge into
+                p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                PSL.msg(p, PSL.MERGE_INTO.msg());
+                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                for (TextComponent t : tc) p.spigot().sendMessage(t);
+                p.sendMessage(ChatColor.WHITE + ""); // send empty line
+            }
+        }
     }
 }

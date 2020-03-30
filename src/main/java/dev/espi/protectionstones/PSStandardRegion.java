@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -398,6 +399,17 @@ public class PSStandardRegion extends PSRegion {
     @Override
     public List<BlockVector2> getPoints() {
         return wgregion.getPoints();
+    }
+
+    @Override
+    public List<PSRegion> getMergeableRegions(Player p) {
+        return getWGRegionManager()
+                .getApplicableRegions(getWGRegion())
+                .getRegions()
+                .stream()
+                .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
+                .filter(r -> r != null && r.getTypeOptions() != null && r.getTypeOptions().allowMerging && !r.getID().equals(getID()) && (r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin")))
+                .collect(Collectors.toList());
     }
 
     @Override

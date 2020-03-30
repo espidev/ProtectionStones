@@ -319,6 +319,11 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public List<PSRegion> getMergeableRegions(Player p) {
+        return mergedGroup.getMergeableRegions(p);
+    }
+
+    @Override
     public boolean deleteRegion(boolean deleteBlock) {
         return deleteRegion(deleteBlock, null);
     }

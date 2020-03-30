@@ -34,6 +34,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ArgMerge implements PSCommandArg {
     @Override
@@ -57,21 +58,17 @@ public class ArgMerge implements PSCommandArg {
     }
 
     public static List<TextComponent> getGUI(Player p, PSRegion r) {
-        List<TextComponent> ret = new ArrayList<>();
-        for (ProtectedRegion pr : r.getWGRegionManager().getApplicableRegions(r.getWGRegion()).getRegions()) {
-            PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), pr);
-            if (psr != null && psr.getTypeOptions() != null && psr.getTypeOptions().allowMerging && !pr.getId().equals(r.getID()) && (psr.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))) {
-                TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + pr.getId());
+        return r.getMergeableRegions(p).stream()
+                .map(psr -> {
+                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + psr.getID());
+                    if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")"); // name
+                    tc.addExtra(" (" + psr.getTypeOptions().alias + ")"); // region type
 
-                if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")");
-                tc.addExtra(" (" + psr.getTypeOptions().alias + ")");
-
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + pr.getId()));
-                tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", pr.getId())).create()));
-                ret.add(tc);
-            }
-        }
-        return ret;
+                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + psr.getID()));
+                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", psr.getID())).create()));
+                    return tc;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

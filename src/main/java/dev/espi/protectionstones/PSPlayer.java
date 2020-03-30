@@ -37,6 +37,15 @@ import java.util.*;
 
 public class PSPlayer {
 
+    // TODO implement
+    public enum PlayerRegionRelationship {
+        OWNER,
+        MEMBER,
+        LANDLORD,
+        TENANT,
+        NONMEMBER,
+    }
+
     @Getter
     @Setter
     UUID uuid;
