@@ -228,6 +228,21 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public void setTaxPaymentsDue(List<TaxPayment> taxPayments) {
+        mergedGroup.setTaxPaymentsDue(taxPayments);
+    }
+
+    @Override
+    public List<LastRegionTaxPaymentEntry> getRegionLastTaxPaymentAddedEntries() {
+        return mergedGroup.getRegionLastTaxPaymentAddedEntries();
+    }
+
+    @Override
+    public void setRegionLastTaxPaymentAddedEntries(List<LastRegionTaxPaymentEntry> entries) {
+        mergedGroup.setRegionLastTaxPaymentAddedEntries(entries);
+    }
+
+    @Override
     public UUID getTaxAutopayer() {
         return mergedGroup.getTaxAutopayer();
     }

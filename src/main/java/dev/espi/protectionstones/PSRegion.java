@@ -229,6 +229,8 @@ public abstract class PSRegion {
      */
     public abstract void setHome(double blockX, double blockY, double blockZ);
 
+    // -=-=-=-=- Selling, Buying, Renting -=-=-=-=-
+
     public enum RentStage {
         NOT_RENTING, LOOKING_FOR_TENANT, RENTING
     }
@@ -357,22 +359,78 @@ public abstract class PSRegion {
      */
     public abstract void removeRenting();
 
+    // -=-=-=-=- Taxes -=-=-=-=-
+
     @Getter
     @Setter
     @AllArgsConstructor
     public static class TaxPayment implements Comparable<TaxPayment> {
         long whenPaymentIsDue;
         double amount;
+        String regionId; // the region that caused the payment (especially applicable for group regions); also used since hashsets don't have duplicates
+
+        /**
+         * Convert a flag entry to a tax payment object. The flag entry is in the form "timestamp amount regionId".
+         * @param s the flag value
+         * @return the tax payment object, or null if the string was invalid
+         */
+        public static TaxPayment fromString(String s) {
+            String[] arr = s.split(" ");
+            if (arr.length < 3) return null;
+            try {
+                return new TaxPayment(Long.parseLong(arr[0]), Double.parseDouble(arr[1]), arr[2]);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        /**
+         * Converts the tax payment object into its flag representation.
+         * @return the flag representation of this object
+         */
+        public String toFlagEntry() {
+            return whenPaymentIsDue + " " + amount + " " + regionId;
+        }
 
         @Override
         public int compareTo(TaxPayment t) {
-            return Double.compare(amount, t.amount);
+            return Long.compare(whenPaymentIsDue, t.whenPaymentIsDue);
+        }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class LastRegionTaxPaymentEntry {
+        String regionId;
+        long lastPaymentAdded;
+
+        /**
+         * Convert a flag entry to a last region tax payment entry object. The flag entry is in the form "regionId timestamp".
+         * @param s the flag value
+         * @return the last region tax payment entry object, or null if the string was invalid
+         */
+        public static LastRegionTaxPaymentEntry fromString(String s) {
+            String[] arr = s.split(" ");
+            if (arr.length < 2) return null;
+            try {
+                return new LastRegionTaxPaymentEntry(arr[0], Long.parseLong(arr[1]));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        /**
+         * Converts the last region tax payment entry object into its flag representation.
+         * @return the flag representation of this object
+         */
+        public String toFlagEntry() {
+            return regionId + " " + lastPaymentAdded;
         }
     }
 
     /**
      * Get the tax rate for this region type.
-     *
      * @return the tax rate
      */
     public double getTaxRate() {
@@ -381,7 +439,6 @@ public abstract class PSRegion {
 
     /**
      * Get the period between tax payments for this region type.
-     *
      * @return the duration between tax payments
      */
     public Duration getTaxPeriod() {
@@ -390,7 +447,6 @@ public abstract class PSRegion {
 
     /**
      * Get the period allowed for the payment of tax.
-     *
      * @return the duration of time allowed to pay a tax
      */
     public Duration getTaxPaymentPeriod() {
@@ -399,21 +455,36 @@ public abstract class PSRegion {
 
     /**
      * Get the list of tax payments that are due.
-     *
      * @return the list of tax payments outstanding
      */
     public abstract List<TaxPayment> getTaxPaymentsDue();
 
     /**
+     * Save the list of tax payments due onto the region.
+     * @param taxPayments the full list of tax payments that are due
+     */
+    public abstract void setTaxPaymentsDue(List<TaxPayment> taxPayments);
+
+    /**
+     * Get the list of timestamps of the last time regions and sub regions have added to the tax payments list.
+     * @return the list of the last time regions and sub regions have added to the tax payment list
+     */
+    public abstract List<LastRegionTaxPaymentEntry> getRegionLastTaxPaymentAddedEntries();
+
+    /**
+     * Save the list of timestamps of the last time regions and sub regions have added to the tax payments list on to the base region.
+     * @param entries the full list of {@link LastRegionTaxPaymentEntry} entries.
+     */
+    public abstract void setRegionLastTaxPaymentAddedEntries(List<LastRegionTaxPaymentEntry> entries);
+
+    /**
      * Get the player that is set to autopay the tax amount.
-     *
      * @return the player that is set as the autopayer, or null if no player is set
      */
     public abstract UUID getTaxAutopayer();
 
     /**
      * Set a player to auto-pay taxes for this region.
-     *
      * @param player the player to use to auto-pay taxes
      */
     public abstract void setTaxAutopayer(UUID player);
@@ -431,7 +502,6 @@ public abstract class PSRegion {
 
     /**
      * Check if any tax payments are now late (exceeded tax payment time shown in config).
-     *
      * @return whether or not any tax payments are now late
      */
     public abstract boolean isTaxPaymentLate();
@@ -440,6 +510,8 @@ public abstract class PSRegion {
      * Update with the current time and calculate any tax payments that are now due.
      */
     public abstract void updateTaxPayments();
+
+    // -=-=-=-=- Other -=-=-=-=-=-
 
     /**
      * @return whether or not the protection block is hidden (/ps hide)
@@ -450,7 +522,6 @@ public abstract class PSRegion {
 
     /**
      * Hides the protection block, if it is not hidden.
-     *
      * @return whether or not the block was hidden
      */
     public boolean hide() {
@@ -464,7 +535,6 @@ public abstract class PSRegion {
 
     /**
      * Unhides the protection block, if it is hidden.
-     *
      * @return whether or not the block was unhidden
      */
     public boolean unhide() {
@@ -511,7 +581,6 @@ public abstract class PSRegion {
 
     /**
      * Change the type of the protection region.
-     *
      * @param type the type of protection region to switch to
      */
     public void setType(PSProtectBlock type) {
@@ -526,7 +595,6 @@ public abstract class PSRegion {
 
     /**
      * Get whether or not a player is an owner of this region.
-     *
      * @param uuid the player's uuid
      * @return whether or not the player is a member
      */
@@ -535,7 +603,6 @@ public abstract class PSRegion {
 
     /**
      * Get whether or not a player is a member of this region.
-     *
      * @param uuid the player's uuid
      * @return whether or not the player is a member
      */
