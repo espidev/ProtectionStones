@@ -173,16 +173,19 @@ public abstract class PSRegion {
         return world;
     }
 
+    @Deprecated
+    public String getID() {
+        return getId();
+    }
+
     /**
      * Get the WorldGuard ID of the region. Note that this is not guaranteed to be unique between worlds.
-     *
      * @return the id of the region
      */
-    public abstract String getID();
+    public abstract String getId();
 
     /**
      * Get the name (nickname) of the region from /ps name.
-     *
      * @return the name of the region, or null if the region does not have a name
      */
 
@@ -190,7 +193,6 @@ public abstract class PSRegion {
 
     /**
      * Set the name of the region (from /ps name).
-     *
      * @param name new name, or null to remove the name
      */
 
@@ -198,7 +200,6 @@ public abstract class PSRegion {
 
     /**
      * Set the parent of this region.
-     *
      * @param r the region to be the parent, or null for no parent
      * @throws ProtectedRegion.CircularInheritanceException thrown when the parent already inherits from the child
      */
@@ -207,7 +208,6 @@ public abstract class PSRegion {
 
     /**
      * Get the parent of this region, if there is one.
-     *
      * @return the parent of the region, or null if there isn't one
      */
 
@@ -215,14 +215,12 @@ public abstract class PSRegion {
 
     /**
      * Get the location of the set home the region has (for /ps tp).
-     *
      * @return the location of the home, or null if the ps_home flag is not set.
      */
     public abstract Location getHome();
 
     /**
      * Set the home of the region (internally changes the flag).
-     *
      * @param blockX block x location
      * @param blockY block y location
      * @param blockZ block z location
@@ -251,7 +249,6 @@ public abstract class PSRegion {
 
     /**
      * Sells the region to a player at the price listed.
-     *
      * @param player player to transfer the region to
      */
     public abstract void sell(UUID player);
@@ -263,42 +260,36 @@ public abstract class PSRegion {
 
     /**
      * Get the landlord of the region.
-     *
      * @return returns the UUID of the landlord, or null if there is none.
      */
     public abstract UUID getLandlord();
 
     /**
      * Set the landlord of the region.
-     *
      * @param landlord uuid of landlord, or null to remove
      */
     public abstract void setLandlord(UUID landlord);
 
     /**
      * Get the tenant of the region.
-     *
      * @return returns the UUID of the tenant, or null if there is none.
      */
     public abstract UUID getTenant();
 
     /**
      * Set the tenant of the region
-     *
      * @param tenant uuid of tenant, or null to remove
      */
     public abstract void setTenant(UUID tenant);
 
     /**
      * Get the rent period of the region
-     *
      * @return returns the rent duration, or null if there is none
      */
     public abstract String getRentPeriod();
 
     /**
      * Set the rent period of the region
-     *
      * @param s the duration between rent payments (d h m s), or null to remove
      */
     public abstract void setRentPeriod(String s);
@@ -321,14 +312,12 @@ public abstract class PSRegion {
 
     /**
      * Set the unix timestamp of when rent was last paid.
-     *
      * @param timestamp the unix timestamp of when rent was last paid, or null
      */
     public abstract void setRentLastPaid(Long timestamp);
 
     /**
      * Get the unix timestamp of when rent was last paid.
-     *
      * @return the unix timestamp of when rent was last paid, or null if not renting
      */
     public abstract Long getRentLastPaid();

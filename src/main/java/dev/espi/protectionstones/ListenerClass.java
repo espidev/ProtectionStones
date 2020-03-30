@@ -329,7 +329,7 @@ public class ListenerClass implements Listener {
 
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
-            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
         }
     }
 
@@ -342,9 +342,9 @@ public class ListenerClass implements Listener {
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
             if (event.getPlayer() == null) {
-                execEvent(action, null, null, event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+                execEvent(action, null, null, event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
             } else {
-                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getID() : event.getRegion().getName() + "(" + event.getRegion().getID() + ")");
+                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
             }
         }
     }

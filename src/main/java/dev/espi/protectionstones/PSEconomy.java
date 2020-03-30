@@ -133,7 +133,7 @@ public class PSEconomy {
                     if (psp.getPlayer() != null) {
                         PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
                                 .replace("%amount%", String.format("%.2f", res.amount))
-                                .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
                     }
                 }
 
@@ -159,12 +159,12 @@ public class PSEconomy {
         if (!tenant.hasAmount(r.getPrice())) {
             if (tenant.getOfflinePlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_EVICT_NO_MONEY_TENANT.msg()
-                        .replace("%region%", r.getName() != null ? r.getName() : r.getID())
+                        .replace("%region%", r.getName() != null ? r.getName() : r.getId())
                         .replace("%price%", String.format("%.2f", r.getPrice())));
             }
             if (landlord.getOfflinePlayer().isOnline()) {
                 PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_EVICT_NO_MONEY_LANDLORD.msg()
-                        .replace("%region%", r.getName() != null ? r.getName() : r.getID())
+                        .replace("%region%", r.getName() != null ? r.getName() : r.getId())
                         .replace("%tenant%", tenant.getName()));
             }
             r.removeRenting();
@@ -176,13 +176,13 @@ public class PSEconomy {
             PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%landlord%", landlord.getName())
-                    .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
+                    .replace("%region%", r.getName() != null ? r.getName() : r.getId()));
         }
         if (landlord.getOfflinePlayer().isOnline()) {
             PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_PAID_LANDLORD.msg()
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%tenant%", tenant.getName())
-                    .replace("%region%", r.getName() != null ? r.getName() : r.getID()));
+                    .replace("%region%", r.getName() != null ? r.getName() : r.getId()));
         }
 
         // update money must be run in main thread

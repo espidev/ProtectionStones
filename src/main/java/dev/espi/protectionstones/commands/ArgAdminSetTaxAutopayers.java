@@ -41,7 +41,7 @@ class ArgAdminSetTaxAutopayers {
 
                     if (psr != null && psr.getTypeOptions() != null && psr.getTypeOptions().taxPeriod != -1 && psr.getTaxAutopayer() == null) {
                         if (psr.getOwners().size() >= 1) {
-                            PSL.msg(s, ChatColor.GRAY + "Configured tax autopayer to be " + psr.getOwners().get(0).toString() + " for region " + psr.getID());
+                            PSL.msg(s, ChatColor.GRAY + "Configured tax autopayer to be " + psr.getOwners().get(0).toString() + " for region " + psr.getId());
                             psr.setTaxAutopayer(psr.getOwners().get(0));
                         }
                     }

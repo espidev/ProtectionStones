@@ -91,11 +91,11 @@ public class ArgTax implements PSCommandArg {
                     TextComponent component;
                     if (r.getTaxAutopayer() != null & r.getTaxAutopayer() == p.getUniqueId()) {
                         component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO_AUTOPAYER.msg()
-                                .replace("%region%", (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"))
+                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
                                 .replace("%money%", String.format("%.2f", amountDue)));
                     } else {
                         component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO.msg()
-                                .replace("%region%", (r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"))
+                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
                                 .replace("%money%", String.format("%.2f", amountDue)));
                     }
                     // todo hover information, pages
@@ -149,7 +149,7 @@ public class ArgTax implements PSCommandArg {
         val res = r.payTax(p, payment);
         PSL.msg(p, PSL.TAX_PAID.msg()
                 .replace("%amount%", ""+res.amount)
-                .replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
         return true;
     }
 
@@ -160,10 +160,10 @@ public class ArgTax implements PSCommandArg {
 
         if (r.getTaxAutopayer() != null && r.getTaxAutopayer().equals(p.getUuid())) { // if removing the the tax autopayer
             r.setTaxAutopayer(null);
-            PSL.msg(p, PSL.TAX_SET_NO_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+            PSL.msg(p, PSL.TAX_SET_NO_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
         } else { // if the player is setting themselves as the tax autopayer
             r.setTaxAutopayer(p.getUuid());
-            PSL.msg(p, PSL.TAX_SET_AS_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName() + "(" + r.getID() + ")"));
+            PSL.msg(p, PSL.TAX_SET_AS_AUTOPAYER.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
         }
         return true;
     }

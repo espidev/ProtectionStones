@@ -75,7 +75,7 @@ public class ArgHome implements PSCommandArg {
                 List<String> regionNames = new ArrayList<>();
                 for (PSRegion r : regions) {
                     if (r.getName() != null) regionNames.add(r.getName());
-                    regionNames.add(r.getID());
+                    regionNames.add(r.getId());
                 }
                 // cache home regions
                 tabCache.put(p.getUniqueId(), regionNames);
@@ -100,14 +100,14 @@ public class ArgHome implements PSCommandArg {
         for (PSRegion r : regions) {
             String msg;
             if (r.getName() == null) {
-                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID();
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getId();
             } else {
-                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")";
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getId() + ")";
             }
             TextComponent tc = new TextComponent(msg);
             tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
             if (r.getName() == null) {
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getID()));
+                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getId()));
             } else {
                 tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getName()));
             }

@@ -167,14 +167,14 @@ public class ArgRent implements PSCommandArg {
 
                     r.rentOut(r.getLandlord(), p.getUniqueId(), r.getRentPeriod(), r.getPrice());
                     PSL.msg(p, PSL.RENT_RENTING_TENANT.msg()
-                            .replace("%region%", r.getName() == null ? r.getID() : r.getName())
+                            .replace("%region%", r.getName() == null ? r.getId() : r.getName())
                             .replace("%price%", String.format("%.2f", r.getPrice()))
                             .replace("%period%", r.getRentPeriod()));
 
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
                         PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_RENTING_LANDLORD.msg()
                                 .replace("%player%", p.getName())
-                                .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                                .replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                     }
                     PSEconomy.doRentPayment(r);
 
@@ -189,11 +189,11 @@ public class ArgRent implements PSCommandArg {
                     r.getWGRegion().getMembers().removeAll();
                     r.getWGRegion().getOwners().addPlayer(r.getLandlord());
 
-                    PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                    PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
                         PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_TENANT_STOPPED_LANDLORD.msg()
                                 .replace("%player%", p.getName())
-                                .replace("%region%", r.getName() == null ? r.getID() : r.getName()));
+                                .replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                     }
 
                     break;

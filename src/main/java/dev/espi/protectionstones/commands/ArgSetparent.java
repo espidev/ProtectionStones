@@ -75,7 +75,7 @@ public class ArgSetparent implements PSCommandArg {
         if (args[1].equals("none")) { // remove parent
             try {
                 r.setParent(null);
-                PSL.msg(s, PSL.SETPARENT_SUCCESS_REMOVE.msg().replace("%id%", r.getName() == null ? r.getID() : r.getName()));
+                PSL.msg(s, PSL.SETPARENT_SUCCESS_REMOVE.msg().replace("%id%", r.getName() == null ? r.getId() : r.getName()));
             } catch (ProtectedRegion.CircularInheritanceException e) {
                 e.printStackTrace(); // won't happen ever
             }
@@ -102,8 +102,8 @@ public class ArgSetparent implements PSCommandArg {
                 return true;
             }
 
-            PSL.msg(s, PSL.SETPARENT_SUCCESS.msg().replace("%id%", r.getName() == null ? r.getID() : r.getName())
-                    .replace("%parent%", parent.get(0).getName() == null ? parent.get(0).getID() : parent.get(0).getName()));
+            PSL.msg(s, PSL.SETPARENT_SUCCESS.msg().replace("%id%", r.getName() == null ? r.getId() : r.getName())
+                    .replace("%parent%", parent.get(0).getName() == null ? parent.get(0).getId() : parent.get(0).getName()));
         }
         return false;
     }

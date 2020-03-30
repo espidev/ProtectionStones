@@ -16,7 +16,6 @@
 package dev.espi.protectionstones.utils;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -97,7 +96,7 @@ public class WGMerge {
         String blockType = toUnmerge.getType();
         try {
             // remove the actual region info
-            psr.removeMergedRegionInfo(toUnmerge.getID());
+            psr.removeMergedRegionInfo(toUnmerge.getId());
 
             // if there is only 1 region now, revert to standard region
             if (r.getFlag(FlagHandler.PS_MERGED_REGIONS).size() == 1) {
@@ -129,8 +128,8 @@ public class WGMerge {
 
                 // add decomposed regions
                 for (PSMergedRegion ps : psr.getMergedRegions()) {
-                    mergedRegions.put(ps.getID(), ps);
-                    toCheck.add(WGUtils.getDefaultProtectedRegion(ps.getTypeOptions(), WGUtils.parsePSRegionToLocation(ps.getID())));
+                    mergedRegions.put(ps.getId(), ps);
+                    toCheck.add(WGUtils.getDefaultProtectedRegion(ps.getTypeOptions(), WGUtils.parsePSRegionToLocation(ps.getId())));
                 }
 
                 // build set of groups of overlapping regions
@@ -150,7 +149,7 @@ public class WGMerge {
                         // loop over regions in a group
                         // add to cache and and also check if this set contains the original root region
                         for (String id : groupToIDs.get(key)) {
-                            if (id.equals(psr.getID())) { // original root region
+                            if (id.equals(psr.getId())) { // original root region
                                 found = true;
                                 foundOriginal = true;
                                 break;
@@ -181,7 +180,7 @@ public class WGMerge {
                     mergeRegions(w, rm, psr, Arrays.asList(psr));
                 } else {
                     psr.setName(null); // remove name from cache
-                    rm.removeRegion(psr.getID());
+                    rm.removeRegion(psr.getId());
                 }
 
                 // add all regions that do NOT contain the root ID region
@@ -195,15 +194,15 @@ public class WGMerge {
 
         } catch (RegionHoleException | RegionCannotMergeWhileRentedException e) {
             // if there is a region hole exception, put back the merged region info
-            psr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).add(toUnmerge.getID());
-            psr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).add(toUnmerge.getID() + " " + blockType);
+            psr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS).add(toUnmerge.getId());
+            psr.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).add(toUnmerge.getId() + " " + blockType);
             throw e;
         }
     }
 
     // each region in merge must not be of type PSMergedRegion
     public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
-        mergeRegions(root.getID(), w, rm, root, merge);
+        mergeRegions(root.getId(), w, rm, root, merge);
     }
 
     // merge contains ALL regions to be merged, and must ALL exist
@@ -227,11 +226,11 @@ public class WGMerge {
         // actually merge the base regions
         PSRegion nRegion = PSRegion.fromWGRegion(w, mergeRegions(newID, root, decomposedMerge));
         for (PSRegion r : merge) {
-            if (!r.getID().equals(newID)) {
+            if (!r.getId().equals(newID)) {
                 // run delete event for non-root real regions
                 Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> r.deleteRegion(false));
             } else {
-                rm.removeRegion(r.getID());
+                rm.removeRegion(r.getId());
             }
         }
         try {
@@ -298,8 +297,8 @@ public class WGMerge {
                 regionNames.addAll(r.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS));
                 regionLines.addAll(r.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES));
             } else {
-                regionNames.add(r.getID());
-                regionLines.add(r.getID() + " " + r.getType());
+                regionNames.add(r.getId());
+                regionLines.add(r.getId() + " " + r.getType());
             }
         }
 

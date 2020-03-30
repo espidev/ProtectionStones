@@ -87,13 +87,13 @@ public class ArgBuySell implements PSCommandArg {
                 return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", new DecimalFormat("#.##").format(r.getPrice())));
 
             PSL.msg(p, PSL.BUY_SOLD_BUYER.msg()
-                    .replace("%region%", r.getName() == null ? r.getID() : r.getName())
+                    .replace("%region%", r.getName() == null ? r.getId() : r.getName())
                     .replace("%price%", String.format("%.2f", r.getPrice()))
                     .replace("%player%", UUIDCache.getNameFromUUID(r.getLandlord())));
 
             if (Bukkit.getPlayer(r.getLandlord()) != null) {
                 PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.BUY_SOLD_SELLER.msg()
-                        .replace("%region%", r.getName() == null ? r.getID() : r.getName())
+                        .replace("%region%", r.getName() == null ? r.getId() : r.getName())
                         .replace("%price%", String.format("%.2f", r.getPrice()))
                         .replace("%player%", p.getName()));
             }

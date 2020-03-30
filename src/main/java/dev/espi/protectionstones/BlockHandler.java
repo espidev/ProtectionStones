@@ -277,7 +277,7 @@ public class BlockHandler {
                 Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                     try {
                         WGMerge.mergeRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
-                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getID()));
+                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
                     } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
                         // don't need to tell player that you can't merge
                     }
@@ -291,7 +291,7 @@ public class BlockHandler {
             if (!tc.isEmpty()) { // if there are regions you can merge into
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
                 PSL.msg(p, PSL.MERGE_INTO.msg());
-                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
                 for (TextComponent t : tc) p.spigot().sendMessage(t);
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
             }

@@ -30,7 +30,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +55,7 @@ public class PSMergedRegion extends PSRegion {
         for (String s : mergedGroup.getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
             String[] spl = s.split(" ");
             String did = spl[0], type = spl[1];
-            if (did.equals(getID())) {
+            if (did.equals(getId())) {
                 this.type = type;
                 break;
             }
@@ -103,7 +102,7 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public String getID() {
+    public String getId() {
         return id;
     }
 
@@ -296,7 +295,7 @@ public class PSMergedRegion extends PSRegion {
         for (String s : flag) {
             String[] spl = s.split(" ");
             String id = spl[0];
-            if (id.equals(getID())) {
+            if (id.equals(getId())) {
                 original = s;
                 break;
             }
@@ -304,7 +303,7 @@ public class PSMergedRegion extends PSRegion {
 
         if (original != null) {
             flag.remove(original);
-            flag.add(getID() + " " + type.type);
+            flag.add(getId() + " " + type.type);
         }
     }
 

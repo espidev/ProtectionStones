@@ -139,7 +139,7 @@ public class ArgAdminForceMerge {
                     } else if (!rOverlapGroup.equals(rGroup)) { // rOverlap is part of a group (both are part of group)
 
                         for (PSRegion pr : groupToMembers.get(rOverlapGroup)) {
-                            idToGroup.put(pr.getID(), rGroup);
+                            idToGroup.put(pr.getId(), rGroup);
                         }
                         groupToMembers.get(rGroup).addAll(groupToMembers.get(rOverlapGroup));
                         groupToMembers.remove(rOverlapGroup);
@@ -164,8 +164,8 @@ public class ArgAdminForceMerge {
             PSRegion root = null;
             p.sendMessage(ChatColor.GRAY + "Merging these regions into " + key + ":");
             for (PSRegion r : groupToMembers.get(key)) {
-                if (r.getID().equals(key)) root = r;
-                p.sendMessage(ChatColor.GRAY + r.getID());
+                if (r.getId().equals(key)) root = r;
+                p.sendMessage(ChatColor.GRAY + r.getId());
             }
             try {
                 WGMerge.mergeRegions(w, rm, root, groupToMembers.get(key));

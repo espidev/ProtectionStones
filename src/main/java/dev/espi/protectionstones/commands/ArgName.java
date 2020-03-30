@@ -72,14 +72,14 @@ public class ArgName implements PSCommandArg {
 
         if (args[1].equals("none")) {
             r.setName(null);
-            PSL.msg(p, PSL.NAME_REMOVED.msg().replace("%id%", r.getID()));
+            PSL.msg(p, PSL.NAME_REMOVED.msg().replace("%id%", r.getId()));
         } else {
             if (!ProtectionStones.getInstance().getConfigOptions().allowDuplicateRegionNames && ProtectionStones.isPSNameAlreadyUsed(args[1])) {
                 PSL.msg(p, PSL.NAME_TAKEN.msg().replace("%name%", args[1]));
                 return true;
             }
             r.setName(args[1]);
-            PSL.msg(p, PSL.NAME_SET_NAME.msg().replace("%id%", r.getID()).replace("%name%", r.getName()));
+            PSL.msg(p, PSL.NAME_SET_NAME.msg().replace("%id%", r.getId()).replace("%name%", r.getName()));
         }
         return true;
     }

@@ -16,13 +16,11 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -97,7 +95,7 @@ public class ArgAddRemove implements PSCommandArg {
                 if (flags.containsKey("-a")) {
                     PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
                             .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
-                            .replace("%region%", r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
+                            .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
                 } else {
                     PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
                 }
@@ -105,7 +103,7 @@ public class ArgAddRemove implements PSCommandArg {
                 if (flags.containsKey("-a")) {
                     PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
                             .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
-                            .replace("%region%", r.getName() == null ? r.getID() : r.getName() + " (" + r.getID() + ")"));
+                            .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
                 } else {
                     PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
                 }

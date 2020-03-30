@@ -20,7 +20,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.Objs;
 import lombok.val;
 import lombok.var;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -53,11 +52,11 @@ public class PSGroupRegion extends PSStandardRegion {
             var found = false;
             for (var last : lastAdded) {
                 // if the last region payment entry refers to this region
-                if (last.getRegionId().equals(r.getID())) {
+                if (last.getRegionId().equals(r.getId())) {
                     found = true;
                     // if it's time to pay
                     if (last.getLastPaymentAdded() + r.getTaxPeriod().toMillis() < currentTime) {
-                        payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getID()));
+                        payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getId()));
                         last.setLastPaymentAdded(currentTime);
                     }
                     break;
@@ -65,8 +64,8 @@ public class PSGroupRegion extends PSStandardRegion {
             }
 
             if (!found) {
-                payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getID()));
-                lastAdded.add(new LastRegionTaxPaymentEntry(r.getID(), currentTime));
+                payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getId()));
+                lastAdded.add(new LastRegionTaxPaymentEntry(r.getId(), currentTime));
             }
         }
         setTaxPaymentsDue(payments);
@@ -105,7 +104,7 @@ public class PSGroupRegion extends PSStandardRegion {
 
     public PSMergedRegion getRootRegion() {
         for (PSMergedRegion r : getMergedRegions()) {
-            if (r.getID().equals(getID())) return r;
+            if (r.getId().equals(getId())) return r;
         }
         return null;
     }

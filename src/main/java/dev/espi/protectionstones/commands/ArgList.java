@@ -87,16 +87,16 @@ public class ArgList implements PSCommandArg {
         for (PSRegion r : regions) {
             if (r.isOwner(pUUID)) {
                 if (r.getName() == null) {
-                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
+                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getId());
                 } else {
-                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
+                    ownerOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getId() + ")");
                 }
             }
             if (r.isMember(pUUID)) {
                 if (r.getName() == null) {
-                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getID());
+                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getId());
                 } else {
-                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getID() + ")");
+                    memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getId() + ")");
                 }
             }
         }

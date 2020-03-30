@@ -71,7 +71,7 @@ public class ArgSethome implements PSCommandArg {
         }
 
         r.setHome(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
-        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getID()));
+        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getId()));
         return true;
     }
 

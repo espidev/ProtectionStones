@@ -60,12 +60,12 @@ public class ArgMerge implements PSCommandArg {
     public static List<TextComponent> getGUI(Player p, PSRegion r) {
         return r.getMergeableRegions(p).stream()
                 .map(psr -> {
-                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + psr.getID());
+                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + psr.getId());
                     if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")"); // name
                     tc.addExtra(" (" + psr.getTypeOptions().alias + ")"); // region type
 
-                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getID() + " " + psr.getID()));
-                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", psr.getID())).create()));
+                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getId() + " " + psr.getId()));
+                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", psr.getId())).create()));
                     return tc;
                 })
                 .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class ArgMerge implements PSCommandArg {
                 PSL.msg(p, PSL.MERGE_NO_REGIONS.msg());
             } else {
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getID()));
+                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
                 PSL.msg(p, PSL.MERGE_WARNING.msg());
                 for (TextComponent tc : components) p.spigot().sendMessage(tc);
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
@@ -131,14 +131,14 @@ public class ArgMerge implements PSCommandArg {
                     PSL.msg(p, PSL.NO_REGION_HOLES.msg());
                     return;
                 } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
-                    PSL.msg(p, PSL.CANNOT_MERGE_RENTED_REGION.msg().replace("%region%", e.getRentedRegion().getName() == null ? e.getRentedRegion().getID() : e.getRentedRegion().getName()));
+                    PSL.msg(p, PSL.CANNOT_MERGE_RENTED_REGION.msg().replace("%region%", e.getRentedRegion().getName() == null ? e.getRentedRegion().getId() : e.getRentedRegion().getName()));
                     return;
                 }
                 PSL.msg(p, PSL.MERGE_MERGED.msg());
 
                 // show menu again if the new region still has overlapping regions
                 Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
-                    if (!getGUI(p, PSRegion.fromWGRegion(p.getWorld(), rm.getRegion(aRoot.getID()))).isEmpty()) {
+                    if (!getGUI(p, PSRegion.fromWGRegion(p.getWorld(), rm.getRegion(aRoot.getId()))).isEmpty()) {
                         Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " merge");
                     }
                 });

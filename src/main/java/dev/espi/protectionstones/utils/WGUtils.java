@@ -202,23 +202,23 @@ public class WGUtils {
             ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
 
             // algorithm to find adjacent regions
-            String adjacentGroup = idToGroup.get(r.getID());
+            String adjacentGroup = idToGroup.get(r.getId());
             for (ProtectedRegion pr : overlapping) {
-                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getID())) {
+                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getId())) {
 
                     if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
 
                         if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
-                            idToGroup.put(pr.getId(), r.getID());
-                            idToGroup.put(r.getID(), r.getID());
-                            groupToIDs.put(r.getID(), new ArrayList<>(Arrays.asList(pr.getId(), r.getID()))); // create new group
+                            idToGroup.put(pr.getId(), r.getId());
+                            idToGroup.put(r.getId(), r.getId());
+                            groupToIDs.put(r.getId(), new ArrayList<>(Arrays.asList(pr.getId(), r.getId()))); // create new group
                         } else { // if the overlapped region is part of a group
                             String groupID = idToGroup.get(pr.getId());
-                            idToGroup.put(r.getID(), groupID);
-                            groupToIDs.get(groupID).add(r.getID());
+                            idToGroup.put(r.getId(), groupID);
+                            groupToIDs.get(groupID).add(r.getId());
                         }
 
-                        adjacentGroup = idToGroup.get(r.getID());
+                        adjacentGroup = idToGroup.get(r.getId());
                     } else { // if the region is part of a group already
 
                         if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
@@ -237,8 +237,8 @@ public class WGUtils {
                 }
             }
             if (adjacentGroup == null) {
-                idToGroup.put(r.getID(), r.getID());
-                groupToIDs.put(r.getID(), new ArrayList<>(Collections.singletonList(r.getID())));
+                idToGroup.put(r.getId(), r.getId());
+                groupToIDs.put(r.getId(), new ArrayList<>(Collections.singletonList(r.getId())));
             }
         }
         return groupToIDs;

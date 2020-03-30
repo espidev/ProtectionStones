@@ -21,7 +21,6 @@ import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -51,7 +50,7 @@ class ArgAdminChangeblock {
 
         Consumer<PSRegion> convertFunction = (region) -> {
             if (region.getType().equals(fromBlock)) {
-                p.sendMessage(ChatColor.GRAY + "Changing " + region.getID() + "...");
+                p.sendMessage(ChatColor.GRAY + "Changing " + region.getId() + "...");
 
                 region.setType(ProtectionStones.getBlockOptions(toBlock));
             }

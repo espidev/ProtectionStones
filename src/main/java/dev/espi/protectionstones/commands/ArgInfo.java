@@ -77,9 +77,9 @@ public class ArgInfo implements PSCommandArg {
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
             if (r.getName() == null) {
-                PSL.msg(p, PSL.INFO_REGION.msg() + r.getID() + ", " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
+                PSL.msg(p, PSL.INFO_REGION.msg() + r.getId() + ", " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             } else {
-                PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getID() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
+                PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getId() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
             }
 
             if (r instanceof PSGroupRegion) {
@@ -96,9 +96,9 @@ public class ArgInfo implements PSCommandArg {
 
             if (r.getParent() != null) {
                 if (r.getName() != null) {
-                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getName() + " (" + r.getParent().getID() + ")");
+                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getName() + " (" + r.getParent().getId() + ")");
                 } else {
-                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getID());
+                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getId());
                 }
             }
 
@@ -144,7 +144,7 @@ public class ArgInfo implements PSCommandArg {
     private static void displayMerged(Player p, PSGroupRegion r) {
         StringBuilder msg = new StringBuilder();
         for (PSMergedRegion pr : r.getMergedRegions()) {
-            msg.append(pr.getID() + " (" + pr.getTypeOptions().alias + "), ");
+            msg.append(pr.getId() + " (" + pr.getTypeOptions().alias + "), ");
         }
         PSL.msg(p, PSL.INFO_MERGED.msg() + msg);
     }

@@ -68,7 +68,7 @@ public class LegacyUpgrade {
                                 for (String s : flag) {
                                     String[] spl = s.split(" ");
                                     String id = spl[0];
-                                    if (id.equals(psmr.getID())) {
+                                    if (id.equals(psmr.getId())) {
                                         original = s;
                                         break;
                                     }
@@ -76,7 +76,7 @@ public class LegacyUpgrade {
 
                                 if (original != null) {
                                     flag.remove(original);
-                                    flag.add(psmr.getID() + " " + oldToNew.get(type));
+                                    flag.add(psmr.getId() + " " + oldToNew.get(type));
                                 }
                             }
                         }

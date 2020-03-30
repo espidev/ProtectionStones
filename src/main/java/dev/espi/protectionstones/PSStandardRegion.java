@@ -51,7 +51,7 @@ public class PSStandardRegion extends PSRegion {
     // ~~~~~~~~~~~ instance ~~~~~~~~~~~~~~~~
 
     @Override
-    public String getID() {
+    public String getId() {
         return wgregion.getId();
     }
 
@@ -68,13 +68,13 @@ public class PSStandardRegion extends PSRegion {
             m = ProtectionStones.regionNameToID.get(getWorld());
         }
         if (m.get(getName()) != null) {
-            m.get(getName()).remove(getID());
+            m.get(getName()).remove(getId());
         }
         if (name != null) {
             if (m.containsKey(name)) {
-                m.get(name).add(getID());
+                m.get(name).add(getId());
             } else {
-                m.put(name, new ArrayList<>(Collections.singletonList(getID())));
+                m.put(name, new ArrayList<>(Collections.singletonList(getId())));
             }
         }
         wgregion.setFlag(FlagHandler.PS_NAME, name);
@@ -342,19 +342,19 @@ public class PSStandardRegion extends PSRegion {
 
         lastAdded = lastAdded.stream()
                 // remove entries that are not for this region
-                .filter(e -> e.getRegionId().equals(getID()))
+                .filter(e -> e.getRegionId().equals(getId()))
                 // add payment if it is time for the next payment cycle
                 .peek(e -> {
                     if (e.getLastPaymentAdded() + getTaxPeriod().toMillis() < currentTime) {
                         e.setLastPaymentAdded(currentTime);
-                        payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getID()));
+                        payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getId()));
                     }
                 }).collect(Collectors.toList());
 
         // if no entry was found, add a tax payment
         if (lastAdded.isEmpty()) {
-            lastAdded.add(new LastRegionTaxPaymentEntry(getID(), currentTime));
-            payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getID()));
+            lastAdded.add(new LastRegionTaxPaymentEntry(getId(), currentTime));
+            payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getId()));
         }
 
         setTaxPaymentsDue(payments);
@@ -415,7 +415,7 @@ public class PSStandardRegion extends PSRegion {
                 .getRegions()
                 .stream()
                 .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
-                .filter(r -> r != null && r.getTypeOptions() != null && r.getTypeOptions().allowMerging && !r.getID().equals(getID()) && (r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin")))
+                .filter(r -> r != null && r.getTypeOptions() != null && r.getTypeOptions().allowMerging && !r.getId().equals(getId()) && (r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin")))
                 .collect(Collectors.toList());
     }
 
@@ -441,7 +441,7 @@ public class PSStandardRegion extends PSRegion {
                 if (ProtectionStones.regionNameToID.get(getWorld()).get(getName()).size() == 1) {
                     ProtectionStones.regionNameToID.get(getWorld()).remove(getName());
                 } else {
-                    ProtectionStones.regionNameToID.get(getWorld()).get(getName()).remove(getID());
+                    ProtectionStones.regionNameToID.get(getWorld()).get(getName()).remove(getId());
                 }
             }
         }
