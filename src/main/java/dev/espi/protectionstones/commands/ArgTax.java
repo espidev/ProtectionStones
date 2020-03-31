@@ -16,8 +16,12 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.UUIDCache;
 import lombok.val;
 import lombok.var;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -31,8 +35,8 @@ import java.util.*;
 public class ArgTax implements PSCommandArg {
 
     static final String INFO_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax info [region (optional)]", // maybe put in /ps info
-            PAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax pay [amount]",
-            AUTOPAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax autopay";
+            PAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax pay [amount] [region (optional)]",
+            AUTOPAY_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax autopay [region (optional)]";
 
     @Override
     public List<String> getNames() {
@@ -78,49 +82,13 @@ public class ArgTax implements PSCommandArg {
             return true;
         }
 
-        // /ps tax info
-        if (args[1].equals("info")) {
-            PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
-            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                for (PSRegion r : psp.getTaxEligibleRegions()) {
-                    double amountDue = 0;
-                    for (var tp : r.getTaxPaymentsDue()) {
-                        amountDue += tp.getAmount();
-                    }
-
-                    TextComponent component;
-                    if (r.getTaxAutopayer() != null & r.getTaxAutopayer() == p.getUniqueId()) {
-                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO_AUTOPAYER.msg()
-                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
-                                .replace("%money%", String.format("%.2f", amountDue)));
-                    } else {
-                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO.msg()
-                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
-                                .replace("%money%", String.format("%.2f", amountDue)));
-                    }
-                    // todo hover information, pages
-                    p.spigot().sendMessage(component);
-                }
-            });
-            return true;
-        }
-
-        // other tax sub commands requiring a region
-        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
-        if (r == null)
-            return PSL.msg(p, PSL.NOT_IN_REGION.msg());
-
-        PSProtectBlock cp = r.getTypeOptions();
-
-        // if taxes disabled for this region
-        if (cp.taxPeriod == -1)
-            return PSL.msg(s, PSL.TAX_DISABLED_REGION.msg());
-
         switch (args[1]) {
+            case "info":
+                return taxInfo(args, psp);
             case "pay":
-                return taxPay(args, psp, r);
+                return taxPay(args, psp);
             case "autopay":
-                return taxAutoPay(args, psp, r);
+                return taxAutoPay(args, psp);
             default:
                 runHelp(s);
                 break;
@@ -129,13 +97,66 @@ public class ArgTax implements PSCommandArg {
         return true;
     }
 
-    public boolean taxPay(String[] args, PSPlayer p, PSRegion r) {
+    public boolean taxInfo(String[] args, PSPlayer p) {
+        if (args.length == 2) { // /ps tax info
+            PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
+            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                for (PSRegion r : p.getTaxEligibleRegions()) {
+                    double amountDue = 0;
+                    for (var tp : r.getTaxPaymentsDue()) {
+                        amountDue += tp.getAmount();
+                    }
+
+                    TextComponent component;
+                    if (r.getTaxAutopayer() != null & r.getTaxAutopayer() == p.getUuid()) {
+                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO_AUTOPAYER.msg()
+                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
+                                .replace("%money%", String.format("%.2f", amountDue)));
+                    } else {
+                        component = new TextComponent(PSL.TAX_PLAYER_REGION_INFO.msg()
+                                .replace("%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"))
+                                .replace("%money%", String.format("%.2f", amountDue)));
+                    }
+                    component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " tax info " + r.getId()));
+                    component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.TAX_CLICK_TO_SHOW_MORE_INFO.msg()).create()));
+                    p.getPlayer().spigot().sendMessage(component);
+                }
+            });
+        } else if (args.length == 3) { // /ps tax info [region]
+            var list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), args[2]);
+            if (list.isEmpty()) {
+                return PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
+            }
+            PSRegion r = list.get(0);
+            double taxesOwed = 0;
+            for (PSRegion.TaxPayment tp : r.getTaxPaymentsDue()) {
+                taxesOwed += tp.getAmount();
+            }
+
+            PSL.msg(p, PSL.TAX_REGION_INFO_HEADER.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+            PSL.msg(p, PSL.TAX_REGION_INFO.msg()
+                        .replace("%taxrate%", String.format("%.2f", r.getTaxRate()))
+                        .replace("%taxautopayer%", r.getTaxAutopayer() == null ? "none" : UUIDCache.getNameFromUUID(r.getTaxAutopayer()))
+                        .replace("%taxowed%", String.format("%.2f", taxesOwed)));
+        } else {
+            PSL.msg(p, INFO_HELP);
+        }
+        return true;
+    }
+
+    public boolean taxPay(String[] args, PSPlayer p) {
+        if (args.length != 3 && args.length != 4)
+            return PSL.msg(p, PAY_HELP);
+        // the amount to pay must be a number
+        if (!NumberUtils.isNumber(args[2]))
+            return PSL.msg(p, PAY_HELP);
+
+        PSRegion r = resolveRegion(args.length == 4 ? args[3] : null, p);
+        if (r == null) return true;
+
         // player must be owner to pay for taxes
         if (!r.isOwner(p.getUuid()))
             return PSL.msg(p, PSL.NOT_OWNER.msg());
-        // the amount to pay must be a number
-        if (args.length != 3 && !NumberUtils.isNumber(args[2]))
-            return PSL.msg(p, PAY_HELP);
 
         val payment = Double.parseDouble(args[2]);
         // must be higher than or equal to zero
@@ -148,12 +169,18 @@ public class ArgTax implements PSCommandArg {
         // pay tax amount
         val res = r.payTax(p, payment);
         PSL.msg(p, PSL.TAX_PAID.msg()
-                .replace("%amount%", ""+res.amount)
+                .replace("%amount%", String.format("%.2f", res.amount))
                 .replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
         return true;
     }
 
-    public boolean taxAutoPay(String[] args, PSPlayer p, PSRegion r) {
+    public boolean taxAutoPay(String[] args, PSPlayer p) {
+        if (args.length != 2 && args.length != 3)
+            return PSL.msg(p, AUTOPAY_HELP);
+
+        PSRegion r = resolveRegion(args.length == 3 ? args[2] : null, p);
+        if (r == null) return true;
+
         // player must be the owner of the region
         if (!r.isOwner(p.getUuid()))
             return PSL.msg(p, PSL.NOT_OWNER.msg());
@@ -168,9 +195,39 @@ public class ArgTax implements PSCommandArg {
         return true;
     }
 
+    public PSRegion resolveRegion(String region, PSPlayer p) {
+        PSRegion r;
+        if (region == null) { // region the player is standing in
+            r = PSRegion.fromLocationGroup(p.getPlayer().getLocation());
+            if (r == null) {
+                PSL.msg(p, PSL.NOT_IN_REGION.msg());
+                return null;
+            }
+
+            // if taxes are disabled for this region
+            if (r.getTypeOptions() == null || r.getTypeOptions().taxPeriod == -1) {
+                PSL.msg(p, PSL.TAX_DISABLED_REGION.msg());
+                return null;
+            }
+
+        } else { // region query
+            var list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), region);
+            if (list.isEmpty()) {
+                PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
+                return null;
+            } else {
+                r = list.get(0);
+            }
+        }
+        return r;
+    }
+
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> arg = Arrays.asList("info", "pay", "autopay");
-        return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
+        if (args.length == 2) {
+            List<String> arg = Arrays.asList("info", "pay", "autopay");
+            return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
+        }
+        return null;
     }
 }

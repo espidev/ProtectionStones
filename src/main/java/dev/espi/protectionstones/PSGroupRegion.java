@@ -38,6 +38,15 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     @Override
+    public double getTaxRate() {
+        double taxRate = 0;
+        for (PSMergedRegion r : getMergedRegions()) {
+            taxRate += r.getTaxRate();
+        }
+        return taxRate;
+    }
+
+    @Override
     public void updateTaxPayments() {
         val currentTime = System.currentTimeMillis();
 

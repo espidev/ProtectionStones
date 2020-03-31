@@ -321,6 +321,10 @@ public class PSStandardRegion extends PSRegion {
     public boolean isTaxPaymentLate() {
         // check if taxes disabled for block
         if (getTypeOptions().taxPeriod == -1) return false;
+
+        // update first
+        updateTaxPayments();
+
         long currentTime = System.currentTimeMillis();
         // loop through pending tax payments and see if the payment due date has passed
         for (TaxPayment tp : getTaxPaymentsDue()) {
