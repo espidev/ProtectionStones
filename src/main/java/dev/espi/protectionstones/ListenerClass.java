@@ -103,7 +103,7 @@ public class ListenerClass implements Listener {
         }
 
         // return protection stone if no drop option is off
-        if (!blockOptions.noDrop) {
+        if (blockOptions != null && !blockOptions.noDrop) {
             if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
                 // method will return not empty if item couldn't be added
                 if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {

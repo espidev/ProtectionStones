@@ -113,7 +113,9 @@ public class PSCommand extends Command {
 
                         if (command.getRegisteredFlags() != null && command.getRegisteredFlags().containsKey(args[i])) {
                             if (command.getRegisteredFlags().get(args[i])) { // has value after
-                                if (i != args.length-1) flags.put(args[i], args[++i]);
+                                if (i != args.length-1) {
+                                    flags.put(args[i], args[++i]);
+                                }
                             } else {
                                 flags.put(args[i], null);
                             }

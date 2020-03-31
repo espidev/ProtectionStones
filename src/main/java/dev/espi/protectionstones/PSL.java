@@ -176,6 +176,7 @@ public enum PSL {
     TAX_REGION_INFO("tax.region_info", ChatColor.BLUE + "Tax Rate: " + ChatColor.GRAY + "$%taxrate% (sum of all merged regions)" + "\n"
             + ChatColor.BLUE + "Tax Autopayer: " + ChatColor.GRAY + "%taxautopayer%" + "\n"
             + ChatColor.BLUE + "Taxes Owed: " + ChatColor.GRAY + "%taxowed%"),
+    TAX_NEXT("tax.next_page", ChatColor.GRAY + "Do /ps tax info -p %page% to go to the next page!"),
 
     // ps buy
     BUY_HELP("buy.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps buy"),

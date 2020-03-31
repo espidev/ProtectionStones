@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.TextGUI;
 import dev.espi.protectionstones.utils.UUIDCache;
 import lombok.val;
 import lombok.var;
@@ -23,6 +24,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,7 +57,9 @@ public class ArgTax implements PSCommandArg {
 
     @Override
     public HashMap<String, Boolean> getRegisteredFlags() {
-        return null;
+        HashMap<String, Boolean> m = new HashMap<>();
+        m.put("-p", true);
+        return m;
     }
 
     private void runHelp(CommandSender s) {
@@ -84,7 +88,7 @@ public class ArgTax implements PSCommandArg {
 
         switch (args[1]) {
             case "info":
-                return taxInfo(args, psp);
+                return taxInfo(args, flags, psp);
             case "pay":
                 return taxPay(args, psp);
             case "autopay":
@@ -97,10 +101,14 @@ public class ArgTax implements PSCommandArg {
         return true;
     }
 
-    public boolean taxInfo(String[] args, PSPlayer p) {
+    private static final int GUI_SIZE = 17;
+
+    public boolean taxInfo(String[] args, HashMap<String, String> flags, PSPlayer p) {
         if (args.length == 2) { // /ps tax info
-            PSL.msg(p, PSL.TAX_INFO_HEADER.msg());
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                int pageNum = (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p"))-1);
+
+                List<TextComponent> entries = new ArrayList<>();
                 for (PSRegion r : p.getTaxEligibleRegions()) {
                     double amountDue = 0;
                     for (var tp : r.getTaxPaymentsDue()) {
@@ -119,8 +127,13 @@ public class ArgTax implements PSCommandArg {
                     }
                     component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " tax info " + r.getId()));
                     component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.TAX_CLICK_TO_SHOW_MORE_INFO.msg()).create()));
-                    p.getPlayer().spigot().sendMessage(component);
+                    entries.add(component);
                 }
+
+                TextGUI.displayGUI(p.getPlayer(), PSL.TAX_INFO_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " tax info -p %page%", pageNum, GUI_SIZE, entries, true);
+
+                if (pageNum * GUI_SIZE + GUI_SIZE < entries.size())
+                    PSL.msg(p, PSL.TAX_NEXT.msg().replace("%page%", pageNum + 2 + ""));
             });
         } else if (args.length == 3) { // /ps tax info [region]
             var list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), args[2]);
