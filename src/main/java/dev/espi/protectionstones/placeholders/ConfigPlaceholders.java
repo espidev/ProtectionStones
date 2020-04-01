@@ -20,11 +20,12 @@ package dev.espi.protectionstones.placeholders;
 import dev.espi.protectionstones.PSConfig;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.MiscUtil;
 
 import java.time.Duration;
 import java.util.List;
 
-public class ConfigPlaceholders {
+class ConfigPlaceholders {
 
     private static PSConfig getConf() {
         return ProtectionStones.getInstance().getConfigOptions();
@@ -36,14 +37,16 @@ public class ConfigPlaceholders {
             if (spl[1].equals("block")) { // config-block-[alias]-...
                 if (spl.length > 3 && ProtectionStones.getProtectBlockFromAlias(spl[2]) != null) {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 3; i < spl.length; i++) sb.append(spl[i]).append("-");
-                    return resolveBlockConfig(ProtectionStones.getProtectBlockFromAlias(spl[2]), sb.toString().substring(0, sb.length()-1));
+                    for (int i = 3; i < spl.length; i++)
+                        sb.append(spl[i]).append(i == spl.length-1 ? "" : "-");
+
+                    return resolveBlockConfig(ProtectionStones.getProtectBlockFromAlias(spl[2]), sb.toString());
                 }
             } else { // config-...
                 return resolveGlobalConfig(identifier);
             }
         }
-        return null;
+        return "";
     }
 
     private static String resolveGlobalConfig(String identifier) {
@@ -84,20 +87,20 @@ public class ConfigPlaceholders {
             case "config-economy-max-rent-period":
                 return getConf().maxRentPeriod + "";
             case "config-economy-max-rent-period-pretty":
-                return describeDuration(Duration.ofSeconds(getConf().maxRentPeriod));
+                return MiscUtil.describeDuration(Duration.ofSeconds(getConf().maxRentPeriod));
             case "config-economy-min-rent-period":
                 return getConf().minRentPeriod + "";
             case "config-economy-min-rent-period-pretty":
-                return describeDuration(Duration.ofSeconds(getConf().minRentPeriod));
+                return MiscUtil.describeDuration(Duration.ofSeconds(getConf().minRentPeriod));
             case "config-economy-tax-enabled":
                 return getConf().taxEnabled + "";
             case "config-economy-tax-message-on-join":
                 return getConf().taxMessageOnJoin + "";
         }
-        return null;
+        return "";
     }
 
-    private static String resolveBlockConfig(PSProtectBlock b, String identifier) {
+    static String resolveBlockConfig(PSProtectBlock b, String identifier) {
         StringBuilder sb = new StringBuilder();
         switch (identifier) {
             case "type":
@@ -109,10 +112,7 @@ public class ConfigPlaceholders {
             case "world-list-type":
                 return b.worldListType;
             case "worlds": // comma separated list
-                for (int i = 0; i < b.worlds.size(); i++) {
-                    sb.append(b.worlds.get(i)).append(i == b.worlds.size()-1 ? "" : " ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.worlds, " ");
             case "prevent-block-place-in-restricted-world":
                 return b.preventBlockPlaceInRestrictedWorld + "";
 
@@ -137,20 +137,11 @@ public class ConfigPlaceholders {
             case "region-home-z-offset":
                 return b.homeZOffset + "";
             case "region-flags": // comma separated list
-                for (int i = 0; i < b.flags.size(); i++) {
-                    sb.append(b.flags.get(i)).append(i == b.flags.size()-1 ? "" : ", ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.flags, ", ");
             case "region-allowed-flags": // comma separated list
-                for (int i = 0; i < b.allowedFlagsRaw.size(); i++) {
-                    sb.append(b.allowedFlagsRaw.get(i)).append(i == b.flags.size()-1 ? "" : ", ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.allowedFlagsRaw, ", ");
             case "region-hidden-flags-from-info": // comma separated list
-                for (int i = 0; i < b.hiddenFlagsFromInfo.size(); i++) {
-                    sb.append(b.hiddenFlagsFromInfo.get(i)).append(i == b.flags.size()-1 ? "" : ", ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.hiddenFlagsFromInfo, ", ");
             case "region-priority":
                 return b.priority + "";
             case "region-allow-overlap-unowned-regions":
@@ -187,11 +178,11 @@ public class ConfigPlaceholders {
             case "economy-tax-period":
                 return b.taxPeriod + "";
             case "economy-tax-period-pretty":
-                return describeDuration(Duration.ofSeconds(b.taxPeriod));
+                return MiscUtil.describeDuration(Duration.ofSeconds(b.taxPeriod));
             case "economy-tax-payment-time":
                 return b.taxPaymentTime + "";
             case "economy-tax-payment-time-pretty":
-                return describeDuration(Duration.ofSeconds(b.taxPaymentTime));
+                return MiscUtil.describeDuration(Duration.ofSeconds(b.taxPaymentTime));
             case "economy-start-with-tax-autopay":
                 return b.startWithTaxAutopay + "";
 
@@ -228,20 +219,11 @@ public class ConfigPlaceholders {
             case "event-enable":
                 return b.eventsEnabled + "";
             case "event-on-region-create":
-                for (int i = 0; i < b.regionCreateCommands.size(); i++) {
-                    sb.append(b.regionCreateCommands.get(i)).append(i == b.flags.size()-1 ? "" : ", ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.regionCreateCommands, ", ");
             case "event-on-region-destroy":
-                for (int i = 0; i < b.regionDestroyCommands.size(); i++) {
-                    sb.append(b.regionDestroyCommands.get(i)).append(i == b.flags.size()-1 ? "" : ", ");
-                }
-                return sb.toString();
+                return MiscUtil.concatWithoutLast(b.regionDestroyCommands, ", ");
         }
-        return null;
+        return "";
     }
 
-    private static String describeDuration(Duration duration) {
-
-    }
 }

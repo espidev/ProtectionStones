@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.time.Duration;
+import java.util.List;
 
 public class MiscUtil {
 
@@ -54,6 +55,31 @@ public class MiscUtil {
             }
         }
         return n == -99999 ? def : n;
+    }
+
+    public static String concatWithoutLast(List<String> l, String separator) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < l.size(); i++) {
+            sb.append(l.get(i)).append(i == l.size()-1 ? "" : separator);
+        }
+        return sb.toString();
+    }
+
+    public static String describeDuration(Duration duration) {
+        long days = duration.toDays();
+        duration = duration.minusDays(days);
+        long hours = duration.toHours();
+        duration = duration.minusHours(hours);
+        long minutes = duration.toMinutes();
+        duration = duration.minusMinutes(minutes);
+        long seconds = duration.toMillis() / 1000;
+
+        String s = "";
+        if (days != 0) s += days + "d";
+        if (hours != 0) s += hours + "h";
+        if (minutes != 0) s += minutes + "m";
+        if (seconds != 0) s += seconds + "s";
+        return s;
     }
 
 }

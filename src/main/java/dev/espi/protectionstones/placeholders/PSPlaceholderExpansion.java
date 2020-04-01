@@ -53,13 +53,16 @@ public class PSPlaceholderExpansion extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player p, String identifier) {
         String[] split = identifier.split("-");
         if (split.length > 0) {
-            if (split[0].equals("config")) {
-                return ConfigPlaceholders.resolveConfig(identifier);
-            } else if (split[0].equals("currentregion")) {
-                return RegionPlaceholders
+            switch (split[0]) {
+                case "config":
+                    return ConfigPlaceholders.resolveConfig(identifier);
+                case "currentregion":
+                    return RegionPlaceholders.resolveCurrentRegionPlaceholders(p, identifier);
+                case "region":
+                    return RegionPlaceholders.resolveSpecifiedRegionPlaceholders(p, identifier);
             }
         }
 
-        return null;
+        return "";
     }
 }
