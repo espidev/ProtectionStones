@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import dev.espi.protectionstones.utils.UUIDCache;
 import lombok.val;
@@ -149,6 +150,8 @@ public class ArgTax implements PSCommandArg {
             PSL.msg(p, PSL.TAX_REGION_INFO_HEADER.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
             PSL.msg(p, PSL.TAX_REGION_INFO.msg()
                         .replace("%taxrate%", String.format("%.2f", r.getTaxRate()))
+                        .replace("%taxperiod%", r.getTaxPeriod())
+                        .replace("%taxpaymentperiod%", r.getTaxPaymentPeriod())
                         .replace("%taxautopayer%", r.getTaxAutopayer() == null ? "none" : UUIDCache.getNameFromUUID(r.getTaxAutopayer()))
                         .replace("%taxowed%", String.format("%.2f", taxesOwed)));
         } else {

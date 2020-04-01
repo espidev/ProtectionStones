@@ -20,6 +20,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -30,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -219,6 +221,16 @@ public class PSMergedRegion extends PSRegion {
     @Override
     public void removeRenting() {
         mergedGroup.removeRenting();
+    }
+
+    @Override
+    public String getTaxPeriod() {
+        return MiscUtil.describeDuration(Duration.ofSeconds(getTypeOptions().taxPeriod));
+    }
+
+    @Override
+    public String getTaxPaymentPeriod() {
+        return MiscUtil.describeDuration(Duration.ofSeconds(getTypeOptions().taxPaymentTime));
     }
 
     @Override

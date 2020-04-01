@@ -174,8 +174,10 @@ public enum PSL {
     TAX_CLICK_TO_SHOW_MORE_INFO("tax.click_to_show_more_info", "Click to show more information."),
     TAX_REGION_INFO_HEADER("tax.region_info_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " %region% Tax Info " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     TAX_REGION_INFO("tax.region_info", ChatColor.BLUE + "Tax Rate: " + ChatColor.GRAY + "$%taxrate% (sum of all merged regions)" + "\n"
+            + ChatColor.BLUE + "Time between tax cycles: " + ChatColor.GRAY + "%taxperiod%" + "\n"
+            + ChatColor.BLUE + "Time to pay taxes after cycle: " + ChatColor.GRAY + "%taxpaymentperiod%" + "\n"
             + ChatColor.BLUE + "Tax Autopayer: " + ChatColor.GRAY + "%taxautopayer%" + "\n"
-            + ChatColor.BLUE + "Taxes Owed: " + ChatColor.GRAY + "%taxowed%"),
+            + ChatColor.BLUE + "Taxes Owed: " + ChatColor.GRAY + "$%taxowed%"),
     TAX_NEXT("tax.next_page", ChatColor.GRAY + "Do /ps tax info -p %page% to go to the next page!"),
 
     // ps buy

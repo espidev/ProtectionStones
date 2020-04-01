@@ -427,20 +427,18 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the period between tax payments for this region type.
-     * @return the duration between tax payments
+     * Get the formatted period(s) between tax payments for this region type.
+     * If you simply wanted the number of seconds, use getTypeOptions().taxPeriod
+     * @return the duration between tax payments, or multiple if there are several different ones
      */
-    public Duration getTaxPeriod() {
-        return Duration.ofSeconds(getTypeOptions().taxPeriod);
-    }
+    public abstract String getTaxPeriod();
 
     /**
-     * Get the period allowed for the payment of tax.
-     * @return the duration of time allowed to pay a tax
+     * Get the formatted period(s) allowed for the payment of tax.
+     * If you simply wanted the number of seconds, use getTypeOptions().taxPaymentTime
+     * @return the duration of time allowed to pay a tax, or multiple if there are several different ones
      */
-    public Duration getTaxPaymentPeriod() {
-        return Duration.ofSeconds(getTypeOptions().taxPaymentTime);
-    }
+    public abstract String getTaxPaymentPeriod();
 
     /**
      * Get the list of tax payments that are due.

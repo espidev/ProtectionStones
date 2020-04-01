@@ -17,6 +17,7 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
 import lombok.val;
 import lombok.var;
@@ -24,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -47,6 +49,20 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     @Override
+    public String getTaxPeriod() {
+        Set<String> s = new HashSet<>();
+        getMergedRegions().forEach(r -> s.add(r.getTaxPeriod()));
+        return MiscUtil.concatWithoutLast(new ArrayList<>(s), ", ");
+    }
+
+    @Override
+    public String getTaxPaymentPeriod() {
+        Set<String> s = new HashSet<>();
+        getMergedRegions().forEach(r -> s.add(r.getTaxPaymentPeriod()));
+        return MiscUtil.concatWithoutLast(new ArrayList<>(s), ", ");
+    }
+
+    @Override
     public void updateTaxPayments() {
         val currentTime = System.currentTimeMillis();
 
@@ -64,8 +80,8 @@ public class PSGroupRegion extends PSStandardRegion {
                 if (last.getRegionId().equals(r.getId())) {
                     found = true;
                     // if it's time to pay
-                    if (last.getLastPaymentAdded() + r.getTaxPeriod().toMillis() < currentTime) {
-                        payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getId()));
+                    if (last.getLastPaymentAdded() + Duration.ofSeconds(r.getTypeOptions().taxPeriod).toMillis() < currentTime) {
+                        payments.add(new TaxPayment(currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(), r.getTaxRate(), r.getId()));
                         last.setLastPaymentAdded(currentTime);
                     }
                     break;
@@ -73,7 +89,7 @@ public class PSGroupRegion extends PSStandardRegion {
             }
 
             if (!found) {
-                payments.add(new TaxPayment(currentTime + r.getTaxPaymentPeriod().toMillis(), r.getTaxRate(), r.getId()));
+                payments.add(new TaxPayment(currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(), r.getTaxRate(), r.getId()));
                 lastAdded.add(new LastRegionTaxPaymentEntry(r.getId(), currentTime));
             }
         }

@@ -19,6 +19,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -230,8 +231,13 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public Duration getTaxPaymentPeriod() {
-        return Duration.ofSeconds(getTypeOptions().taxPaymentTime);
+    public String getTaxPeriod() {
+        return MiscUtil.describeDuration(Duration.ofSeconds(getTypeOptions().taxPeriod));
+    }
+
+    @Override
+    public String getTaxPaymentPeriod() {
+        return MiscUtil.describeDuration(Duration.ofSeconds(getTypeOptions().taxPaymentTime));
     }
 
     @Override
@@ -349,16 +355,16 @@ public class PSStandardRegion extends PSRegion {
                 .filter(e -> e.getRegionId().equals(getId()))
                 // add payment if it is time for the next payment cycle
                 .peek(e -> {
-                    if (e.getLastPaymentAdded() + getTaxPeriod().toMillis() < currentTime) {
+                    if (e.getLastPaymentAdded() + Duration.ofSeconds(getTypeOptions().taxPeriod).toMillis() < currentTime) {
                         e.setLastPaymentAdded(currentTime);
-                        payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getId()));
+                        payments.add(new TaxPayment(currentTime + Duration.ofSeconds(getTypeOptions().taxPaymentTime).toMillis(), getTaxRate(), getId()));
                     }
                 }).collect(Collectors.toList());
 
         // if no entry was found, add a tax payment
         if (lastAdded.isEmpty()) {
             lastAdded.add(new LastRegionTaxPaymentEntry(getId(), currentTime));
-            payments.add(new TaxPayment(currentTime + getTaxPaymentPeriod().toMillis(), getTaxRate(), getId()));
+            payments.add(new TaxPayment(currentTime + Duration.ofSeconds(getTypeOptions().taxPaymentTime).toMillis(), getTaxRate(), getId()));
         }
 
         setTaxPaymentsDue(payments);
