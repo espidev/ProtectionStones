@@ -51,7 +51,7 @@ public class PSPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player p, String identifier) {
-        String[] split = identifier.split("-");
+        String[] split = identifier.split("_");
         if (split.length > 0) {
             switch (split[0]) {
                 case "config":

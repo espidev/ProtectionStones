@@ -32,17 +32,17 @@ class ConfigPlaceholders {
     }
 
     static String resolveConfig(String identifier) {
-        String[] spl = identifier.split("-");
+        String[] spl = identifier.split("_");
         if (spl.length > 1) {
-            if (spl[1].equals("block")) { // config-block-[alias]-...
+            if (spl[1].equals("block")) { // config_block_[alias]_...
                 if (spl.length > 3 && ProtectionStones.getProtectBlockFromAlias(spl[2]) != null) {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 3; i < spl.length; i++)
-                        sb.append(spl[i]).append(i == spl.length-1 ? "" : "-");
+                        sb.append(spl[i]).append(i == spl.length-1 ? "" : "_");
 
                     return resolveBlockConfig(ProtectionStones.getProtectBlockFromAlias(spl[2]), sb.toString());
                 }
-            } else { // config-...
+            } else { // config_...
                 return resolveGlobalConfig(identifier);
             }
         }
@@ -52,49 +52,49 @@ class ConfigPlaceholders {
     private static String resolveGlobalConfig(String identifier) {
         StringBuilder sb = new StringBuilder();
         switch (identifier) {
-            case "config-config-version":
+            case "config_config_version":
                 return getConf().configVersion + "";
-            case "config-uuidupdated":
+            case "config_uuidupdated":
                 return getConf().uuidupdated + "";
-            case "config-placing-cooldown":
+            case "config_placing_cooldown":
                 return getConf().placingCooldown + "";
-            case "config-async-load-uuid-cache":
+            case "config_async_load_uuid_cache":
                 return getConf().asyncLoadUUIDCache + "";
-            case "config-allow-duplicate-region-names":
+            case "config_allow_duplicate_region_names":
                 return getConf().allowDuplicateRegionNames + "";
-            case "config-ps-view-cooldown":
+            case "config_ps_view_cooldown":
                 return getConf().psViewCooldown + "";
-            case "config-ps-base-command":
+            case "config_ps_base_command":
                 return getConf().base_command;
-            case "config-aliases": // comma separated list
+            case "config_aliases": // comma separated list
                 for (int i = 0; i < getConf().aliases.size(); i++) {
                     sb.append(getConf().aliases.get(i)).append(i == getConf().aliases.size()-1 ? "" : ", ");
                 }
                 return sb.toString();
-            case "config-drop-item-when-inventory-full":
+            case "config_drop_item_when_inventory_full":
                 return getConf().dropItemWhenInventoryFull + "";
-            case "config-regions-must-be-adjacent":
+            case "config_regions_must_be_adjacent":
                 return getConf().regionsMustBeAdjacent + "";
-            case "config-allow-merging-regions":
+            case "config_allow_merging_regions":
                 return getConf().allowMergingRegions + "";
-            case "config-allow-merging-holes":
+            case "config_allow_merging_holes":
                 return getConf().allowMergingHoles + "";
 
-            case "config-economy-max-rent-price":
+            case "config_economy_max_rent_price":
                 return String.format("%.2f", getConf().maxRentPrice);
-            case "config-economy-min-rent-price":
+            case "config_economy_min_rent_price":
                 return String.format("%.2f", getConf().minRentPrice);
-            case "config-economy-max-rent-period":
+            case "config_economy_max_rent_period":
                 return getConf().maxRentPeriod + "";
-            case "config-economy-max-rent-period-pretty":
+            case "config_economy_max_rent_period_pretty":
                 return MiscUtil.describeDuration(Duration.ofSeconds(getConf().maxRentPeriod));
-            case "config-economy-min-rent-period":
+            case "config_economy_min_rent_period":
                 return getConf().minRentPeriod + "";
-            case "config-economy-min-rent-period-pretty":
+            case "config_economy_min_rent_period_pretty":
                 return MiscUtil.describeDuration(Duration.ofSeconds(getConf().minRentPeriod));
-            case "config-economy-tax-enabled":
+            case "config_economy_tax_enabled":
                 return getConf().taxEnabled + "";
-            case "config-economy-tax-message-on-join":
+            case "config_economy_tax_message_on_join":
                 return getConf().taxMessageOnJoin + "";
         }
         return "";
@@ -107,62 +107,62 @@ class ConfigPlaceholders {
                 return b.type;
             case "alias":
                 return b.alias;
-            case "restrict-obtaining":
+            case "restrict_obtaining":
                 return b.restrictObtaining + "";
-            case "world-list-type":
+            case "world_list_type":
                 return b.worldListType;
             case "worlds": // comma separated list
                 return MiscUtil.concatWithoutLast(b.worlds, " ");
-            case "prevent-block-place-in-restricted-world":
+            case "prevent_block_place_in_restricted_world":
                 return b.preventBlockPlaceInRestrictedWorld + "";
 
-            case "region-distance-between-claims":
+            case "region_distance_between_claims":
                 return b.distanceBetweenClaims + "";
-            case "region-x-radius":
+            case "region_x_radius":
                 return b.xRadius + "";
-            case "region-y-radius":
+            case "region_y_radius":
                 return b.yRadius + "";
-            case "region-z-radius":
+            case "region_z_radius":
                 return b.zRadius + "";
-            case "region-x-offset":
+            case "region_x_offset":
                 return b.xOffset + "";
-            case "region-y-offset":
+            case "region_y_offset":
                 return b.yOffset + "";
-            case "region-z-offset":
+            case "region_z_offset":
                 return b.zOffset + "";
-            case "region-home-x-offset":
+            case "region_home_x_offset":
                 return b.homeXOffset + "";
-            case "region-home-y-offset":
+            case "region_home_y_offset":
                 return b.homeYOffset + "";
-            case "region-home-z-offset":
+            case "region_home_z_offset":
                 return b.homeZOffset + "";
-            case "region-flags": // comma separated list
+            case "region_flags": // comma separated list
                 return MiscUtil.concatWithoutLast(b.flags, ", ");
-            case "region-allowed-flags": // comma separated list
+            case "region_allowed_flags": // comma separated list
                 return MiscUtil.concatWithoutLast(b.allowedFlagsRaw, ", ");
-            case "region-hidden-flags-from-info": // comma separated list
+            case "region_hidden_flags_from_info": // comma separated list
                 return MiscUtil.concatWithoutLast(b.hiddenFlagsFromInfo, ", ");
-            case "region-priority":
+            case "region_priority":
                 return b.priority + "";
-            case "region-allow-overlap-unowned-regions":
+            case "region_allow_overlap_unowned_regions":
                 return b.allowOverlapUnownedRegions + "";
-            case "region-allow-other-regions-to-overlap":
+            case "region_allow_other_regions_to_overlap":
                 return b.allowOtherRegionsToOverlap;
-            case "region-allow-merging":
+            case "region_allow_merging":
                 return b.allowMerging + "";
 
-            case "block-data-display-name":
+            case "block_data_display_name":
                 return b.displayName;
-            case "block-data-lore": // \n separated list
+            case "block_data_lore": // \n separated list
                 for (int i = 0; i < b.lore.size(); i++) {
                     sb.append(b.lore.get(i)).append("\n");
                 }
                 return sb.toString();
-            case "block-data-price":
+            case "block_data_price":
                 return String.format("%.2f", b.price);
-            case "block-data-allow-craft-with-custom-recipe":
+            case "block_data_allow_craft_with_custom_recipe":
                 return b.allowCraftWithCustomRecipe + "";
-            case "block-data-custom-recipe":
+            case "block_data_custom_recipe":
                 for (List<String> l : b.customRecipe) {
                     for (String s : l) {
                         sb.append(s).append(" ");
@@ -170,57 +170,57 @@ class ConfigPlaceholders {
                     sb.append("\n");
                 }
                 return sb.toString();
-            case "block-data-recipe-amount":
+            case "block_data_recipe_amount":
                 return b.recipeAmount + "";
 
-            case "economy-tax-amount":
+            case "economy_tax_amount":
                 return String.format("%.2f", b.taxAmount);
-            case "economy-tax-period":
+            case "economy_tax_period":
                 return b.taxPeriod + "";
-            case "economy-tax-period-pretty":
+            case "economy_tax_period_pretty":
                 return MiscUtil.describeDuration(Duration.ofSeconds(b.taxPeriod));
-            case "economy-tax-payment-time":
+            case "economy_tax_payment_time":
                 return b.taxPaymentTime + "";
-            case "economy-tax-payment-time-pretty":
+            case "economy_tax_payment_time_pretty":
                 return MiscUtil.describeDuration(Duration.ofSeconds(b.taxPaymentTime));
-            case "economy-start-with-tax-autopay":
+            case "economy_start_with_tax_autopay":
                 return b.startWithTaxAutopay + "";
 
-            case "behaviour-auto-hide":
+            case "behaviour_auto_hide":
                 return b.autoHide + "";
-            case "behaviour-auto-merge":
+            case "behaviour_auto_merge":
                 return b.autoMerge + "";
-            case "behaviour-no-drop":
+            case "behaviour_no_drop":
                 return b.noDrop + "";
-            case "behaviour-prevent-piston-push":
+            case "behaviour_prevent_piston_push":
                 return b.preventPistonPush + "";
-            case "behaviour-prevent-explode":
+            case "behaviour_prevent_explode":
                 return b.preventExplode + "";
-            case "behaviour-destroy-region-when-explode":
+            case "behaviour_destroy_region_when_explode":
                 return b.destroyRegionWhenExplode + "";
-            case "behaviour-prevent-silk-touch":
+            case "behaviour_prevent_silk_touch":
                 return b.preventSilkTouch + "";
-            case "behaviour-cost-to-place":
+            case "behaviour_cost_to_place":
                 return String.format("%.2f", b.costToPlace);
 
-            case "player-allow-shift-right-break":
+            case "player_allow_shift_right_break":
                 return b.allowShiftRightBreak + "";
-            case "player-prevent-teleport-in":
+            case "player_prevent_teleport_in":
                 return b.preventTeleportIn + "";
-            case "player-no-moving-when-tp-waiting":
+            case "player_no_moving_when_tp_waiting":
                 return b.noMovingWhenTeleportWaiting + "";
-            case "player-tp-waiting-seconds":
+            case "player_tp_waiting_seconds":
                 return b.tpWaitingSeconds + "";
-            case "player-prevent-ps-get":
+            case "player_prevent_ps_get":
                 return b.preventPsGet + "";
-            case "player-permission":
+            case "player_permission":
                 return b.permission;
 
-            case "event-enable":
+            case "event_enable":
                 return b.eventsEnabled + "";
-            case "event-on-region-create":
+            case "event_on_region_create":
                 return MiscUtil.concatWithoutLast(b.regionCreateCommands, ", ");
-            case "event-on-region-destroy":
+            case "event_on_region_destroy":
                 return MiscUtil.concatWithoutLast(b.regionDestroyCommands, ", ");
         }
         return "";
