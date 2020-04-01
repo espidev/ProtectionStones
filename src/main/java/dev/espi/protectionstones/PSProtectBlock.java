@@ -157,9 +157,9 @@ public class PSProtectBlock {
     @Path("event.enable")
     public boolean eventsEnabled;
     @Path("event.on_region_create")
-    List<String> regionCreateCommands;
+    public List<String> regionCreateCommands;
     @Path("event.on_region_destroy")
-    List<String> regionDestroyCommands;
+    public List<String> regionDestroyCommands;
 
 
     // non-config items

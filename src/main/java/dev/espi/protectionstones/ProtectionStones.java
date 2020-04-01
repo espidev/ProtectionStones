@@ -24,6 +24,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
+import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -450,7 +451,7 @@ public class ProtectionStones extends JavaPlugin {
         configLocation = new File(this.getDataFolder() + "/config.toml");
         blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
-        // Metrics (bStats)
+        // metrics (bStats)
         new Metrics(this);
 
         // load command arguments
@@ -479,15 +480,16 @@ public class ProtectionStones extends JavaPlugin {
             getLogger().warning("Vault not enabled! There will be no economy support!");
         }
 
-        // check for placeholderapi
+        // check for PlaceholderAPI
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
             getLogger().info("PlaceholderAPI support enabled!");
             placeholderAPISupportEnabled = true;
+            new PSPlaceholderExpansion().register();
         } else {
             getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
         }
 
-        // Load configuration
+        // load configuration
         loadConfig(false);
 
         // register protectionstones.flags.edit.[flag] permission
@@ -537,11 +539,12 @@ public class ProtectionStones extends JavaPlugin {
             });
         }
 
-        // check if uuids have been upgraded already
+        // check if UUIDs have been upgraded already
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
 
-        // Update to UUIDs
-        if (configOptions.uuidupdated == null || !configOptions.uuidupdated) LegacyUpgrade.convertToUUID();
+        // update to UUIDs
+        if (configOptions.uuidupdated == null || !configOptions.uuidupdated)
+            LegacyUpgrade.convertToUUID();
 
         getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
     }
