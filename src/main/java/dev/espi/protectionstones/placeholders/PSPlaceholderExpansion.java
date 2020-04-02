@@ -60,6 +60,8 @@ public class PSPlaceholderExpansion extends PlaceholderExpansion {
                     return RegionPlaceholders.resolveCurrentRegionPlaceholders(p, identifier);
                 case "region":
                     return RegionPlaceholders.resolveSpecifiedRegionPlaceholders(p, identifier);
+                case "currentplayer":
+                    return PlayerPlaceholders.resolvePlayer(p, identifier);
             }
         }
 
