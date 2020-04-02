@@ -223,11 +223,6 @@ public class PSConfig {
             setupRecipes();
         }
 
-        // remove tax command if taxes are not enabled
-        if (!ProtectionStones.getInstance().getConfigOptions().taxEnabled) { // TODO doesn't work
-            ProtectionStones.getInstance().getCommandArguments().remove(new ArgTax());
-        }
-
     }
 
     static void removePSRecipes() {
