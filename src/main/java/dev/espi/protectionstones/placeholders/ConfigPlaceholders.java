@@ -185,6 +185,10 @@ class ConfigPlaceholders {
                 return MiscUtil.describeDuration(Duration.ofSeconds(b.taxPaymentTime));
             case "economy_start_with_tax_autopay":
                 return b.startWithTaxAutopay + "";
+            case "economy_tenant_rent_role":
+                return b.tenantRentRole;
+            case "economy_landlord_still_owner":
+                return b.landlordStillOwner + "";
 
             case "behaviour_auto_hide":
                 return b.autoHide + "";

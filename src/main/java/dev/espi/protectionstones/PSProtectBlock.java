@@ -118,6 +118,10 @@ public class PSProtectBlock {
     public int taxPaymentTime;
     @Path("economy.start_with_tax_autopay")
     public boolean startWithTaxAutopay;
+    @Path("economy.tenant_rent_role")
+    public String tenantRentRole;
+    @Path("economy.landlord_still_owner")
+    public boolean landlordStillOwner;
 
     // behaviour section
     @Path("behaviour.auto_hide")

@@ -207,15 +207,22 @@ public class PSStandardRegion extends PSRegion {
         setRentLastPaid(Instant.now().getEpochSecond());
 
         ProtectionStones.getEconomy().getRentedList().add(this);
-        getWGRegion().getOwners().removeAll();
-        getWGRegion().getMembers().removeAll();
-        addOwner(tenant);
+
+        if (!getTypeOptions().landlordStillOwner) {
+            getWGRegion().getOwners().removeAll();
+            getWGRegion().getMembers().removeAll();
+        }
+        if (getTypeOptions().tenantRentRole.equals("member")) {
+            addMember(tenant);
+        } else if (getTypeOptions().tenantRentRole.equals("owner")) {
+            addOwner(tenant);
+        }
     }
 
     @Override
     public void removeRenting() {
-        getWGRegion().getOwners().removeAll();
-        getWGRegion().getMembers().removeAll();
+        removeMember(getTenant());
+        removeOwner(getTenant());
         addOwner(getLandlord());
 
         setLandlord(null);
