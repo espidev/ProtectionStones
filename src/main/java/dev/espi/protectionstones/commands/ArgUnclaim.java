@@ -15,7 +15,6 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -52,7 +51,6 @@ public class ArgUnclaim implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (!p.hasPermission("protectionstones.unclaim")) {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
@@ -62,9 +60,15 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
-        if (!r.getWGRegion().isOwner(wg.wrapPlayer(p)) && !p.hasPermission("protectionstones.superowner") || r.getRentStage() == PSRegion.RentStage.RENTING) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return true;
+        }
+
+        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
+        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+            PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
+            return false;
         }
 
         PSProtectBlock cpb = r.getTypeOptions();

@@ -137,11 +137,18 @@ public class ArgRent implements PSCommandArg {
                     return PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
 
                 case "stoplease":
-                    if ((!r.isOwner(p.getUniqueId()) && r.getRentStage() != PSRegion.RentStage.RENTING) || (r.getLandlord() != null && !p.getUniqueId().equals(r.getLandlord()) && r.getRentStage() == PSRegion.RentStage.RENTING))
-                        return PSL.msg(p, PSL.NOT_OWNER.msg());
-
                     if (r.getRentStage() == PSRegion.RentStage.NOT_RENTING)
                         return PSL.msg(p, PSL.RENT_NOT_RENTED.msg());
+
+                    if (r.getTypeOptions().landlordStillOwner) {
+                        // landlord can be any of the region's owner; doesn't really matter if tenant calls /ps rent stoplease
+                        if (!r.isOwner(p.getUniqueId()))
+                            return PSL.msg(p, PSL.NOT_OWNER.msg());
+                    } else {
+                        // landlord must be the specified landlord
+                        if (r.getLandlord() != null && !p.getUniqueId().equals(r.getLandlord()))
+                            return PSL.msg(p, PSL.NOT_OWNER.msg());
+                    }
 
                     UUID tenant = r.getTenant();
                     r.removeRenting();
@@ -149,6 +156,10 @@ public class ArgRent implements PSCommandArg {
                     PSL.msg(p, PSL.RENT_STOPPED.msg());
                     if (tenant != null) {
                         PSL.msg(p, PSL.RENT_EVICTED.msg().replace("%tenant%", UUIDCache.getNameFromUUID(tenant)));
+                        Player tenantPlayer = Bukkit.getPlayer(tenant);
+                        if (tenantPlayer != null && tenantPlayer.isOnline()) {
+                            PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName()));
+                        }
                     }
                     break;
 

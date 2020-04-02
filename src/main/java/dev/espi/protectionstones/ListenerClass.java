@@ -97,8 +97,14 @@ public class ListenerClass implements Listener {
         }
 
         // check if player is owner of region
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner") || r.getRentStage() == PSRegion.RentStage.RENTING) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
+            return false;
+        }
+
+        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
+        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+            PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
             return false;
         }
 

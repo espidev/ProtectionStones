@@ -419,16 +419,19 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void addOwner(UUID uuid) {
+        if (uuid == null) return;
         wgregion.getOwners().addPlayer(uuid);
     }
 
     @Override
     public void addMember(UUID uuid) {
+        if (uuid == null) return;
         wgregion.getMembers().addPlayer(uuid);
     }
 
     @Override
     public void removeOwner(UUID uuid) {
+        if (uuid == null) return;
         // remove tax autopayer if the player is the autopayer
         if (getTaxAutopayer() != null && getTaxAutopayer().equals(uuid)) {
             setTaxAutopayer(null);
@@ -445,12 +448,15 @@ public class PSStandardRegion extends PSRegion {
                 removeRenting(); // this needs to be called before removing the player, since it adds the player back
             }
         }
-        wgregion.getOwners().removePlayer(uuid);
+        if (wgregion.getOwners().contains(uuid))
+            wgregion.getOwners().removePlayer(uuid);
     }
 
     @Override
     public void removeMember(UUID uuid) {
-        wgregion.getMembers().removePlayer(uuid);
+        if (uuid == null) return;
+        if (wgregion.getMembers().contains(uuid))
+            wgregion.getMembers().removePlayer(uuid);
     }
 
     @Override

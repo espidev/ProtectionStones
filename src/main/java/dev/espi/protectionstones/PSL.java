@@ -158,6 +158,7 @@ public enum PSL {
     RENT_PERIOD_TOO_SHORT("rent.period_too_short", ChatColor.RED + "The rent period is too short (must be longer than %period% seconds)."),
     RENT_PERIOD_TOO_LONG("rent.period_too_long", ChatColor.RED + "The rent period is too long (must be shorter than %period% seconds)."),
     RENT_PERIOD_INVALID("rent.period_invalid", ChatColor.RED + "Invalid period format! Example: 24h for once a day."),
+    RENT_CANNOT_BREAK_WHILE_RENTING("rent.cannot_break_while_renting", ChatColor.RED + "You cannot break the region when it is being rented out."),
 
     // ps tax
     TAX_HELP("tax.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps tax"),
@@ -185,14 +186,14 @@ public enum PSL {
     BUY_HELP_DESC("buy.help_desc", "Buy the region you are currently in."),
     BUY_NOT_FOR_SALE("buy.not_for_sale", ChatColor.RED + "This region is not for sale."),
     BUY_STOP_SELL("buy.stop_sell", ChatColor.GRAY + "The region is now not for sale."),
-    BUY_SOLD_BUYER("buy.sold_buyer", ChatColor.GRAY + "Bought region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " from " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
-    BUY_SOLD_SELLER("buy.sold_seller", ChatColor.GRAY + "Sold region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+    BUY_SOLD_BUYER("buy.sold_buyer", ChatColor.GRAY + "Bought region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "$%price%" + ChatColor.GRAY + " from " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
+    BUY_SOLD_SELLER("buy.sold_seller", ChatColor.GRAY + "Sold region " + ChatColor.AQUA + "%region%" + ChatColor.GRAY + " for " + ChatColor.AQUA + "$%price%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
 
     // ps sell
     SELL_HELP("sell.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps sell [price|stop]"),
     SELL_HELP_DESC("sell.help_desc", "Sell the region you are currently in."),
     SELL_RENTED_OUT("sell.rented_out", ChatColor.RED + "The region is being rented out! You must stop renting it out to sell."),
-    SELL_FOR_SALE("sell.for_sale", ChatColor.GRAY + "The region is now for sale for " + ChatColor.AQUA + "%price%" + ChatColor.GRAY + "."),
+    SELL_FOR_SALE("sell.for_sale", ChatColor.GRAY + "The region is now for sale for " + ChatColor.AQUA + "$%price%" + ChatColor.GRAY + "."),
 
     // ps hide/unhide
     VISIBILITY_HIDE_HELP("visibility.hide_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps hide"),
