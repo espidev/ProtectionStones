@@ -340,6 +340,26 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public void addOwner(UUID uuid) {
+        mergedGroup.addOwner(uuid);
+    }
+
+    @Override
+    public void addMember(UUID uuid) {
+        mergedGroup.addMember(uuid);
+    }
+
+    @Override
+    public void removeOwner(UUID uuid) {
+        mergedGroup.removeOwner(uuid);
+    }
+
+    @Override
+    public void removeMember(UUID uuid) {
+        mergedGroup.removeMember(uuid);
+    }
+
+    @Override
     public List<BlockVector2> getPoints() {
         return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id)).getPoints();
     }

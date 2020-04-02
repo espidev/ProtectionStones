@@ -106,12 +106,10 @@ public class ArgRegion implements PSCommandArg {
                         found = true;
 
                         // remove as owner
-                        DefaultDomain owners = r.getOwners();
-                        owners.removePlayer(playerUuid);
-                        r.setOwners(owners);
+                        psr.removeOwner(playerUuid);
 
                         // remove region if empty and is "remove" mode
-                        if (owners.size() == 0 && args[1].equalsIgnoreCase("remove")) {
+                        if (psr.getOwners().size() == 0 && args[1].equalsIgnoreCase("remove")) {
                             psr.deleteRegion(true);
                         }
                     }

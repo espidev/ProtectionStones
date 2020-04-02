@@ -16,7 +16,6 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -69,14 +68,14 @@ class ArgAdminCleanup {
                         .replace("%arg%", args[2])
                         .replace("%days%", "" + days));
 
-                List<LocalPlayer> inactivePlayers = new ArrayList<>();
+                List<UUID> inactivePlayers = new ArrayList<>();
 
                 // loop over offline players and add to list if they haven't joined recently
                 for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
                     long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                     if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
                     try {
-                        inactivePlayers.add(wg.wrapOfflinePlayer(op));
+                        inactivePlayers.add(op.getUniqueId());
                     } catch (NullPointerException ignored) {} // wg.wrapOfflinePlayer can return null if the player isn't in WG cache
                 }
 
@@ -84,19 +83,19 @@ class ArgAdminCleanup {
 
                 // Loop over regions and check if offline player is in
                 for (String idname : regions.keySet()) {
-                    ProtectedRegion region = regions.get(idname);
-                    if (!ProtectionStones.isPSRegion(region)) continue;
+                    PSRegion r = PSRegion.fromWGRegion(w, regions.get(idname));
+                    if (r == null) continue;
                     // remove inactive players from being owner
-                    for (LocalPlayer lp : inactivePlayers) {
+                    for (UUID uuid : inactivePlayers) {
                         try {
-                            if (region.isOwner(lp)) {
-                                region.getOwners().removePlayer(lp);
+                            if (r.isOwner(uuid)) {
+                                r.removeOwner(uuid);
                             }
                         } catch (NullPointerException ignored){}
                     }
 
                     // remove region if there are no owners left
-                    if (args[2].equalsIgnoreCase("remove") && region.getOwners().size() == 0) {
+                    if (args[2].equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
                         p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
                         PSLocation psl = WGUtils.parsePSRegionToLocation(idname);
                         Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);

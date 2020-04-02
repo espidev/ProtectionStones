@@ -31,7 +31,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -605,6 +604,31 @@ public abstract class PSRegion {
      * @return returns a list of the members of the protected region
      */
     public abstract ArrayList<UUID> getMembers();
+
+    /**
+     * Add an owner to the region.
+     * @param uuid the uuid of the player to add
+     */
+    public abstract void addOwner(UUID uuid);
+
+    /**
+     * Add a member to the region.
+     * @param uuid the uuid of the player to add
+     */
+    public abstract void addMember(UUID uuid);
+
+    /**
+     * Remove an owner of the region, and deal with side-effects.
+     * Examples of side-effects: removing player as landlord, removing player as auto taxpayer
+     * @param uuid the uuid of the player to remove
+     */
+    public abstract void removeOwner(UUID uuid);
+
+    /**
+     * Remove a member of the region, and deal with side-effects
+     * @param uuid the uuid of the player to remove
+     */
+    public abstract void removeMember(UUID uuid);
 
     /**
      * @return returns a list of the bounding points of the protected region

@@ -23,10 +23,7 @@ import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -128,7 +125,7 @@ public class PSStandardRegion extends PSRegion {
         setSellable(false, null, 0);
         getWGRegion().getOwners().removeAll();
         getWGRegion().getMembers().removeAll();
-        getWGRegion().getOwners().addPlayer(player);
+        addOwner(player);
     }
 
     @Override
@@ -212,14 +209,14 @@ public class PSStandardRegion extends PSRegion {
         ProtectionStones.getEconomy().getRentedList().add(this);
         getWGRegion().getOwners().removeAll();
         getWGRegion().getMembers().removeAll();
-        getWGRegion().getOwners().addPlayer(tenant);
+        addOwner(tenant);
     }
 
     @Override
     public void removeRenting() {
         getWGRegion().getOwners().removeAll();
         getWGRegion().getMembers().removeAll();
-        getWGRegion().getOwners().addPlayer(getLandlord());
+        addOwner(getLandlord());
 
         setLandlord(null);
         setTenant(null);
@@ -411,6 +408,42 @@ public class PSStandardRegion extends PSRegion {
     @Override
     public ArrayList<UUID> getMembers() {
         return new ArrayList<>(wgregion.getMembers().getUniqueIds());
+    }
+
+    @Override
+    public void addOwner(UUID uuid) {
+        wgregion.getOwners().addPlayer(uuid);
+    }
+
+    @Override
+    public void addMember(UUID uuid) {
+        wgregion.getMembers().addPlayer(uuid);
+    }
+
+    @Override
+    public void removeOwner(UUID uuid) {
+        // remove tax autopayer if the player is the autopayer
+        if (getTaxAutopayer() != null && getTaxAutopayer().equals(uuid)) {
+            setTaxAutopayer(null);
+        }
+        if (getLandlord() != null && getLandlord().equals(uuid)) {
+            // remove rents if the player is the landlord
+            if (getRentStage() == RentStage.LOOKING_FOR_TENANT || getRentStage() == RentStage.RENTING) {
+                PSPlayer tenant = PSPlayer.fromUUID(getTenant());
+                if (tenant.getOfflinePlayer().isOnline()) {
+                    PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
+                            .replace("%region%", getName() != null ? getName() : getId()));
+                }
+
+                removeRenting(); // this needs to be called before removing the player, since it adds the player back
+            }
+        }
+        wgregion.getOwners().removePlayer(uuid);
+    }
+
+    @Override
+    public void removeMember(UUID uuid) {
+        wgregion.getMembers().removePlayer(uuid);
     }
 
     @Override

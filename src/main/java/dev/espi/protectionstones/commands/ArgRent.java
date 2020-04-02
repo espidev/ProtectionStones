@@ -187,7 +187,7 @@ public class ArgRent implements PSCommandArg {
                     r.setTenant(null);
                     r.getWGRegion().getOwners().removeAll();
                     r.getWGRegion().getMembers().removeAll();
-                    r.getWGRegion().getOwners().addPlayer(r.getLandlord());
+                    r.addOwner(r.getLandlord());
 
                     PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
