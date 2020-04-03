@@ -276,7 +276,7 @@ public class BlockHandler {
                 PSRegion finalMergeTo = mergeTo;
                 Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                     try {
-                        WGMerge.mergeRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
+                        WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
                         PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
                     } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
                         // don't need to tell player that you can't merge

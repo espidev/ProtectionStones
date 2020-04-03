@@ -200,14 +200,45 @@ public class WGMerge {
         }
     }
 
+    // additional behaviour for merging region flags
+    private static void mergeRegionFlags(List<PSRegion> baseRegions, PSRegion mergedRegion) {
+        Set<String> taxPaymentsDue = mergedRegion.getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE);
+        Set<String> lastTaxAdditions = mergedRegion.getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED);
+        if (taxPaymentsDue == null) taxPaymentsDue = new HashSet<>();
+        if (lastTaxAdditions == null) lastTaxAdditions = new HashSet<>();
+
+        for (PSRegion r : baseRegions) {
+            // merge owners and members list
+            mergedRegion.getWGRegion().getOwners().addAll(r.getWGRegion().getOwners());
+            mergedRegion.getWGRegion().getMembers().addAll(r.getWGRegion().getMembers());
+
+            // merge tax payments
+            if (r.getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE) != null) {
+                taxPaymentsDue.addAll(r.getWGRegion().getFlag(FlagHandler.PS_TAX_PAYMENTS_DUE));
+            }
+            if (r.getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) != null) {
+                lastTaxAdditions.addAll(r.getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED));
+            }
+        }
+
+        mergedRegion.getWGRegion().setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, taxPaymentsDue);
+        mergedRegion.getWGRegion().setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastTaxAdditions);
+    }
+
+    public static PSRegion mergeRealRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
+        PSRegion r = mergeRegions(w, rm, root, merge);
+        mergeRegionFlags(merge, r);
+        return r;
+    }
+
     // each region in merge must not be of type PSMergedRegion
-    public static void mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
-        mergeRegions(root.getId(), w, rm, root, merge);
+    private static PSRegion mergeRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
+        return mergeRegions(root.getId(), w, rm, root, merge);
     }
 
     // merge contains ALL regions to be merged, and must ALL exist
     // root is the base flags to be copied
-    public static void mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
+    public static PSRegion mergeRegions(String newID, World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
         List<PSRegion> decomposedMerge = new ArrayList<>();
 
         // decompose merged regions into their bases
@@ -239,6 +270,7 @@ public class WGMerge {
         } // catch nulls
 
         rm.addRegion(nRegion.getWGRegion());
+        return nRegion;
     }
 
     // returns a merged region; root and merge must be overlapping
@@ -304,6 +336,7 @@ public class WGMerge {
 
         // create new merged region
         ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, 0, WGUtils.MAX_BUILD_HEIGHT);
+
         r.copyFrom(root.getWGRegion());
         // only make it a merged region if there is more than one contained region
         if (regionNames.size() > 1 && regionLines.size() > 1) {

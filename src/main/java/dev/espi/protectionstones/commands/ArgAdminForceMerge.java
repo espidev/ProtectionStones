@@ -168,7 +168,7 @@ public class ArgAdminForceMerge {
                 p.sendMessage(ChatColor.GRAY + r.getId());
             }
             try {
-                WGMerge.mergeRegions(w, rm, root, groupToMembers.get(key));
+                WGMerge.mergeRealRegions(w, rm, root, groupToMembers.get(key));
             } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
                 // TODO
             }
