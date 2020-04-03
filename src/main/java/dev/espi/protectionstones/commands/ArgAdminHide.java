@@ -15,8 +15,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
@@ -45,7 +44,7 @@ class ArgAdminHide {
                 return true;
             }
             w = Bukkit.getWorld(args[2]);
-            mgr = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+            mgr = WorldGuardPlugin.inst().getRegionManager(w);
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

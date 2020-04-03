@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
@@ -48,7 +48,7 @@ class ArgAdminFlag {
             for (int i = 4; i < args.length; i++) value += args[i] + " ";
         }
 
-        if (WorldGuard.getInstance().getFlagRegistry().get(flag) == null)
+        if (WorldGuardPlugin.inst().getFlagRegistry().get(flag) == null)
             return PSL.msg(p, PSL.FLAG_NOT_SET.msg());
 
         final String fValue = value, fGee = gee;

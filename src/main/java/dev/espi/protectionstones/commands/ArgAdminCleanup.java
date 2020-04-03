@@ -15,8 +15,6 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -33,7 +31,6 @@ class ArgAdminCleanup {
 
     // /ps admin cleanup
     static boolean argumentAdminCleanup(CommandSender p, String[] args) {
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             PSL.msg(p, ArgAdmin.CLEANUP_HELP);
             return true;
@@ -54,7 +51,7 @@ class ArgAdminCleanup {
                 return true;
             }
             w = Bukkit.getWorld(args[4]);
-            rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+            rgm = WorldGuardPlugin.inst().getRegionContainer().get(w);
         }
 
         Map<String, ProtectedRegion> regions = rgm.getRegions();

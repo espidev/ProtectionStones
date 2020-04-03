@@ -38,7 +38,7 @@ public class WGUtils {
     static final int MAX_BUILD_HEIGHT = 256;
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+        return WorldGuardPlugin.inst().getRegionContainer().get(p.getWorld());
     }
 
     /**
@@ -49,7 +49,7 @@ public class WGUtils {
      */
 
     public static RegionManager getRegionManagerWithWorld(World w) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+        return WorldGuardPlugin.inst().getRegionContainer().get(w);
     }
 
     /**
