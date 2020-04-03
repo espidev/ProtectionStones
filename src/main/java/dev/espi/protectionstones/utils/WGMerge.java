@@ -225,6 +225,8 @@ public class WGMerge {
         mergedRegion.getWGRegion().setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, lastTaxAdditions);
     }
 
+    // the regions in the merge list must actually exist
+    // this is used by player merge interfaces
     public static PSRegion mergeRealRegions(World w, RegionManager rm, PSRegion root, List<PSRegion> merge) throws RegionHoleException, RegionCannotMergeWhileRentedException {
         PSRegion r = mergeRegions(w, rm, root, merge);
         mergeRegionFlags(merge, r);
