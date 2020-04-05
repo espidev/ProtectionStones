@@ -26,31 +26,38 @@ public class UUIDCache {
     // toLowerCase for case insensitive search
 
     public static UUID getUUIDFromName(String name) {
+        if (name == null) return null;
         return nameToUUID.get(name.toLowerCase());
     }
 
     public static String getNameFromUUID(UUID uuid) {
+        if (uuid == null) return null;
         return uuidToName.get(uuid);
     }
 
     public static boolean containsName(String name) {
+        if (name == null) return false;
         return nameToUUID.containsKey(name.toLowerCase());
     }
 
     public static boolean containsUUID(UUID uuid) {
+        if (uuid == null) return false;
         return uuidToName.containsKey(uuid);
     }
 
     public static void storeUUIDNamePair(UUID uuid, String name) {
+        if (uuid == null || name == null) return;
         uuidToName.put(uuid, name);
         nameToUUID.put(name.toLowerCase(), uuid);
     }
 
     public static void removeUUID(UUID uuid) {
+        if (uuid == null) return;
         uuidToName.remove(uuid);
     }
 
     public static void removeName(String name) {
+        if (name == null) return;
         nameToUUID.remove(name.toLowerCase());
     }
 }
