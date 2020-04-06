@@ -521,8 +521,9 @@ public class ProtectionStones extends JavaPlugin {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                     UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
+
                     if (op.getName() != null)
-                        WorldGuard.getInstance().getProfileCache().put(new Profile(op.getUniqueId(), op.getName()));
+                        UUIDCache.storeWGProfile(op.getUniqueId(), op.getName());
                 }
             });
         } else { // sync load

@@ -15,9 +15,8 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -32,7 +31,7 @@ class ArgAdminStats {
 
         int size = 0;
         for (World w : Bukkit.getWorlds()) {
-            size += WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w)).size();
+            size += WGUtils.getRegionManagerWithWorld(w).size();
         }
 
         if (args.length > 2) {
@@ -40,7 +39,7 @@ class ArgAdminStats {
             OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
             int count = 0;
             for (World w : Bukkit.getWorlds()) {
-                count += WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w)).getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
+                count += WGUtils.getRegionManagerWithWorld(w).getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
             }
             p.sendMessage(ChatColor.YELLOW + playerName + ":");
             p.sendMessage(ChatColor.YELLOW + "================");

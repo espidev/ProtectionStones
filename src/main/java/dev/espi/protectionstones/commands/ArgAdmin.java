@@ -15,7 +15,6 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.LegacyUpgrade;
 import dev.espi.protectionstones.PSL;
@@ -78,7 +77,6 @@ public class ArgAdmin implements PSCommandArg {
                 s.sendMessage(ChatColor.AQUA + "Developers: " + ChatColor.GRAY + ProtectionStones.getInstance().getDescription().getAuthors());
                 s.sendMessage(ChatColor.AQUA + "Bukkit:  " + ChatColor.GRAY + Bukkit.getVersion());
                 s.sendMessage(ChatColor.AQUA + "WG: " + ChatColor.GRAY + WorldGuardPlugin.inst().getDescription().getVersion());
-                s.sendMessage(ChatColor.AQUA + "WE: " +ChatColor.GRAY +  WorldEdit.getVersion());
                 break;
             case "hide":
                 return ArgAdminHide.argumentAdminHide(s, args);

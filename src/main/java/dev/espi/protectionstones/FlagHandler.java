@@ -24,6 +24,7 @@ import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.session.handler.ExitFlag;
 import dev.espi.protectionstones.flags.FarewellFlagHandler;
 import dev.espi.protectionstones.flags.GreetingFlagHandler;
+import dev.espi.protectionstones.utils.WGUtils;
 import lombok.var;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -63,7 +64,7 @@ public class FlagHandler {
 
     // called on initial start
     static void registerFlags() {
-        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+        FlagRegistry registry = WGUtils.getFlagRegistry();
         try {
             registry.register(PS_HOME);
             registry.register(PS_BLOCK_MATERIAL);
@@ -104,7 +105,7 @@ public class FlagHandler {
     // adds flag permissions for ALL registered WorldGuard flags
     // by default, all players have access to it
     static void initializePermissions() {
-        for (var flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
+        for (var flag : WGUtils.getFlagRegistry().getAll()) {
             Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags.edit." + flag.getName(),
                     "Given to all players by default. Remove if you do not want the player to have the ability to edit this flag with /ps flag.",
                     PermissionDefault.TRUE));
@@ -124,12 +125,12 @@ public class FlagHandler {
     // Edit flags that require placeholders (variables)
     public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
         List<Flag<?>> replaceFlags = new ArrayList<>();
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting"));
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-title"));
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("greeting-action"));
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell"));
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-title"));
-        replaceFlags.add(WorldGuard.getInstance().getFlagRegistry().get("farewell-action"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting-title"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting-action"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-title"));
+        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-action"));
 
         for (Flag<?> f : replaceFlags) {
             if (flags.get(f) != null) {
@@ -201,7 +202,7 @@ public class FlagHandler {
                 }
 
                 // apply flag
-                Flag<?> flag = Flags.fuzzyMatchFlag(WorldGuard.getInstance().getFlagRegistry(), flagName);
+                Flag<?> flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
                 FlagContext fc = FlagContext.create().setInput(settings).build();
 
                 if (isEmpty) { // empty flag

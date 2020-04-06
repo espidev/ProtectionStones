@@ -15,14 +15,11 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
@@ -58,9 +55,7 @@ public class ListenerClass implements Listener {
         UUIDCache.storeUUIDNamePair(e.getPlayer().getUniqueId(), e.getPlayer().getName());
 
         // allow worldguard to resolve all UUIDs to names
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            WorldGuard.getInstance().getProfileCache().put(new Profile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
 
         PSPlayer psp = PSPlayer.fromPlayer(e.getPlayer());
 
@@ -279,7 +274,7 @@ public class ListenerClass implements Listener {
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(event.getTo().getWorld()));
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(event.getTo().getWorld());
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
         // check if player can teleport into region (no region with preventTeleportIn = true)

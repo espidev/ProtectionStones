@@ -15,25 +15,27 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSLocation;
+import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 class ArgAdminCleanup {
 
     // /ps admin cleanup
     static boolean argumentAdminCleanup(CommandSender p, String[] args) {
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
             PSL.msg(p, ArgAdmin.CLEANUP_HELP);
             return true;
@@ -54,7 +56,7 @@ class ArgAdminCleanup {
                 return true;
             }
             w = Bukkit.getWorld(args[4]);
-            rgm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+            rgm = WGUtils.getRegionManagerWithWorld(w);
         }
 
         Map<String, ProtectedRegion> regions = rgm.getRegions();

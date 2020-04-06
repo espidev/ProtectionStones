@@ -16,8 +16,6 @@
 package dev.espi.protectionstones;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -52,7 +50,7 @@ public class LegacyUpgrade {
         }
 
         for (World world : Bukkit.getWorlds()) {
-            var rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            var rm = WGUtils.getRegionManagerWithWorld(world);
             for (val r : rm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion psr = PSRegion.fromWGRegion(world, r);
@@ -105,7 +103,7 @@ public class LegacyUpgrade {
             hideFile = YamlConfiguration.loadConfiguration(new File(ProtectionStones.getInstance().getDataFolder() + "/hiddenpstones.yml"));
         }
         for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
             for (String regionName : rm.getRegions().keySet()) {
                 if (regionName.startsWith("ps")) {
                     try {
@@ -149,7 +147,7 @@ public class LegacyUpgrade {
     static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
 
             // iterate over regions in world
             for (String regionName : rm.getRegions().keySet()) {

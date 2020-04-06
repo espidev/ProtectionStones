@@ -16,7 +16,6 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -172,7 +171,7 @@ public class ArgInfo implements PSCommandArg {
 
         StringBuilder flagDisp = new StringBuilder();
         String flagValue;
-        for (Flag<?> flag : WorldGuard.getInstance().getFlagRegistry().getAll()) {
+        for (Flag<?> flag : WGUtils.getFlagRegistry().getAll()) {
             if (region.getFlag(flag) != null && !r.getTypeOptions().hiddenFlagsFromInfo.contains(flag.getName())) {
                 flagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
