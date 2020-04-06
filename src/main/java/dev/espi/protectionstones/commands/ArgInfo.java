@@ -158,7 +158,7 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, PSL.INFO_AVAILABLE_FOR_RENT.msg());
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.getNameFromUUID(r.getTenant()));
+            PSL.msg(p, PSL.INFO_TENANT.msg() + UUIDCache.getNameFromUUID(r.getTenant()));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
             PSL.msg(p, PSL.INFO_LANDLORD.msg() + UUIDCache.getNameFromUUID(r.getLandlord()));
