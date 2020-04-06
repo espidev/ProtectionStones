@@ -21,12 +21,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+
 public class Particles {
     public static void persistRedstoneParticle(Player p, Location l, int occ, int r, int g, int b) {
         for (int i = 0; i < occ; i++) {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                 if (p.isOnline())
-                    ParticleEffect.REDSTONE.display(new ParticleEffect.OrdinaryColor(r, g, b), l, 257);
+                    ParticleEffect.REDSTONE.display(new ParticleEffect.OrdinaryColor(r, g, b), l, Arrays.asList(p));
             }, i*20);
         }
     }
