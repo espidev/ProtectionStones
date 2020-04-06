@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -97,7 +97,7 @@ public class FlagHandler {
     }
 
     static void registerHandlers() {
-        SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
+        SessionManager sessionManager = WorldGuardPlugin.inst().getSessionManager();
         sessionManager.registerHandler(GreetingFlagHandler.FACTORY, ExitFlag.FACTORY);
         sessionManager.registerHandler(FarewellFlagHandler.FACTORY, ExitFlag.FACTORY);
     }
@@ -105,7 +105,7 @@ public class FlagHandler {
     // adds flag permissions for ALL registered WorldGuard flags
     // by default, all players have access to it
     static void initializePermissions() {
-        for (var flag : WGUtils.getFlagRegistry().getAll()) {
+        for (var flag : WGUtils.getFlagRegistry()) {
             Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags.edit." + flag.getName(),
                     "Given to all players by default. Remove if you do not want the player to have the ability to edit this flag with /ps flag.",
                     PermissionDefault.TRUE));
@@ -202,7 +202,7 @@ public class FlagHandler {
                 }
 
                 // apply flag
-                Flag<?> flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
+                Flag<?> flag = DefaultFlag.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
                 FlagContext fc = FlagContext.create().setInput(settings).build();
 
                 if (isEmpty) { // empty flag

@@ -17,7 +17,6 @@ package dev.espi.protectionstones;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
 import lombok.val;
@@ -35,64 +34,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class LegacyUpgrade {
-
-    // for one day when we switch to proper base64 generation (no hashcode, use nameuuidfrombytes)
-    // problem is, currently I don't know how to convert all items to use this uuid
-    public static void fixBase64HeadRegions() {
-
-        HashMap<String, String> oldToNew = new HashMap<>();
-
-        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if (b.type.startsWith("PLAYER_HEAD:") && b.type.split(":").length > 1) {
-                String base64 = b.type.split(":")[1];
-                oldToNew.put(new UUID(base64.hashCode(), base64.hashCode()).toString(), UUID.nameUUIDFromBytes(base64.getBytes()).toString());
-            }
-        }
-
-        for (World world : Bukkit.getWorlds()) {
-            var rm = WGUtils.getRegionManagerWithWorld(world);
-            for (val r : rm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion psr = PSRegion.fromWGRegion(world, r);
-
-                    if (psr instanceof PSGroupRegion) {
-                        PSGroupRegion psgr = (PSGroupRegion) psr;
-                        for (PSMergedRegion psmr : psgr.getMergedRegions()) {
-
-                            String type = psmr.getType();
-                            if (oldToNew.containsKey(type)) {
-                                Set<String> flag = psmr.getGroupRegion().getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
-                                String original = null;
-                                for (String s : flag) {
-                                    String[] spl = s.split(" ");
-                                    String id = spl[0];
-                                    if (id.equals(psmr.getId())) {
-                                        original = s;
-                                        break;
-                                    }
-                                }
-
-                                if (original != null) {
-                                    flag.remove(original);
-                                    flag.add(psmr.getId() + " " + oldToNew.get(type));
-                                }
-                            }
-                        }
-                    }
-
-                    if (oldToNew.containsKey(psr.getType())) {
-                        psr.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, oldToNew.get(psr.getType()));
-                    }
-
-                }
-            }
-            try {
-                rm.save();
-            } catch (StorageException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     // check that all of the PS custom flags are in ps regions and upgrade if not
     // originally used for the v1 -> v2 transition

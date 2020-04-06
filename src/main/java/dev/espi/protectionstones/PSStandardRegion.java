@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -460,7 +460,7 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
-    public List<BlockVector2> getPoints() {
+    public List<BlockVector2D> getPoints() {
         return wgregion.getPoints();
     }
 

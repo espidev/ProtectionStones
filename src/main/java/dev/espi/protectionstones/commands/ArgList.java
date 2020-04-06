@@ -101,6 +101,7 @@ public class ArgList implements PSCommandArg {
             }
         }
 
+        ProtectionStones.getPluginLogger().info("HIII" + UUIDCache.getNameFromUUID(pUUID)); // TODO
         PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
 
         if (!ownerOf.isEmpty()) {

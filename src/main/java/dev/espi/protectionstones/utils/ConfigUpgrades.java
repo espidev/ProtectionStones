@@ -64,12 +64,7 @@ public class ConfigUpgrades {
                     CommentedFileConfig c = CommentedFileConfig.builder(file).sync().build();
                     c.load();
                     c.setComment("type", " Define your protection block below\n" +
-                            " Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html\n" +
-                            " --------------------------------------------------------------------------------------------------\n" +
-                            " If you want to use player heads, you can use \"PLAYER_HEAD:player_name\" (ex. \"PLAYER_HEAD:Notch\")\n" +
-                            " To use custom player heads, you need the base64 value of the head. On minecraft-heads.com, you will find this value in the Other section under \"Value:\".\n" +
-                            " To use UUIDs for player heads, go to https://sessionserver.mojang.com/session/minecraft/profile/PUT-UUID-HERE and copy the value from the \"value\" field not including quotes.\n" +
-                            " When you have the value, you can set the type to \"PLAYER_HEAD:value\"");
+                            " Use block type from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html\n");
 
                     try {
                         c.set("region.home_x_offset", ((Integer) c.get("region.home_x_offset")).doubleValue());

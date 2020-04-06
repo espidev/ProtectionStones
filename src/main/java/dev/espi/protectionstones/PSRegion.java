@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.BlockUtil;
@@ -525,14 +525,7 @@ public abstract class PSRegion {
      */
     public boolean unhide() {
         if (isHidden()) {
-            if (getType().startsWith("PLAYER_HEAD")) {
-                getProtectBlock().setType(Material.PLAYER_HEAD);
-                if (getType().split(":").length > 1) {
-                    BlockUtil.setHeadType(getType(), getProtectBlock());
-                }
-            } else {
-                getProtectBlock().setType(Material.getMaterial(getType()));
-            }
+            getProtectBlock().setType(Material.getMaterial(getType()));
             return true;
         } else {
             return false;
@@ -561,7 +554,7 @@ public abstract class PSRegion {
     public abstract PSProtectBlock getTypeOptions();
 
     /**
-     * @return returns the protect block type (may include custom player heads PLAYER_HEAD:playername) that the region is
+     * @return returns the protect block type that the region is
      */
     public abstract String getType();
 
@@ -571,11 +564,8 @@ public abstract class PSRegion {
      */
     public void setType(PSProtectBlock type) {
         if (!isHidden()) {
-            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
+            Material set = Material.matchMaterial(type.type) == null ? Material.SKULL : Material.matchMaterial(type.type);
             getProtectBlock().setType(set);
-            if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
-                BlockUtil.setHeadType(type.type, getProtectBlock());
-            }
         }
     }
 
@@ -633,7 +623,7 @@ public abstract class PSRegion {
     /**
      * @return returns a list of the bounding points of the protected region
      */
-    public abstract List<BlockVector2> getPoints();
+    public abstract List<BlockVector2D> getPoints();
 
     /**
      * Get a list of regions that the current region can merge into, taking into account a player's permissions.

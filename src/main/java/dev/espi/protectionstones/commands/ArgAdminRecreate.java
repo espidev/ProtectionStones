@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -48,8 +48,8 @@ class ArgAdminRecreate {
                     double bx = wr.getProtectBlock().getLocation().getX(), bxo = blockOptions.xOffset;
                     double by = wr.getProtectBlock().getLocation().getY(), bxy = blockOptions.yOffset;
                     double bz = wr.getProtectBlock().getLocation().getZ(), bxz = blockOptions.zOffset;
-                    BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
-                    BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
+                    BlockVector min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
+                    BlockVector max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
 
                     ProtectedRegion nr = new ProtectedCuboidRegion(r.getId(), min, max);
                     WGUtils.copyRegionValues(r, nr);

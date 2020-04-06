@@ -15,8 +15,8 @@
 
 package dev.espi.protectionstones.utils;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import java.util.ArrayList;
@@ -26,15 +26,15 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class RegionTraverse {
-    private static final ArrayList<Vector2> DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(0, 1), Vector2.at(1, 0), Vector2.at(-1, 0), Vector2.at(0, -1)));
-    private static final ArrayList<Vector2> CORNER_DIRECTIONS = new ArrayList<>(Arrays.asList(Vector2.at(1, 1), Vector2.at(-1, -1), Vector2.at(-1, 1), Vector2.at(1, -1)));
+    private static final ArrayList<Vector2D> DIRECTIONS = new ArrayList<>(Arrays.asList(new Vector2D(0, 1), new Vector2D(1, 0), new Vector2D(-1, 0), new Vector2D(0, -1)));
+    private static final ArrayList<Vector2D> CORNER_DIRECTIONS = new ArrayList<>(Arrays.asList(new Vector2D(1, 1), new Vector2D(-1, -1), new Vector2D(-1, 1), new Vector2D(1, -1)));
 
     public static class TraverseReturn {
-        public BlockVector2 point;
+        public BlockVector2D point;
         public boolean isVertex;
         public int vertexGroupID;
         public int numberOfExposedEdges;
-        public TraverseReturn(BlockVector2 point, boolean isVertex, int vertexGroupID, int numberOfExposedEdges) {
+        public TraverseReturn(BlockVector2D point, boolean isVertex, int vertexGroupID, int numberOfExposedEdges) {
             this.point = point;
             this.isVertex = isVertex;
             this.vertexGroupID = vertexGroupID;
@@ -43,17 +43,17 @@ public class RegionTraverse {
     }
 
     private static class TraverseData {
-        BlockVector2 v, previous;
+        BlockVector2D v, previous;
         boolean first;
 
-        TraverseData(BlockVector2 v, BlockVector2 previous, boolean first) {
+        TraverseData(BlockVector2D v, BlockVector2D previous, boolean first) {
             this.v = v;
             this.previous = previous;
             this.first = first;
         }
     }
 
-    private static boolean isInRegion(BlockVector2 point, List<ProtectedRegion> regions) {
+    private static boolean isInRegion(BlockVector2D point, List<ProtectedRegion> regions) {
         for (ProtectedRegion r : regions)
             if (r.contains(point)) return true;
         return false;
@@ -62,10 +62,10 @@ public class RegionTraverse {
 
     // can't use recursion because stack overflow
     // doesn't do so well with 1 block wide segments jutting out
-    public static void traverseRegionEdge(HashSet<BlockVector2> points, List<ProtectedRegion> regions, Consumer<TraverseReturn> run) {
+    public static void traverseRegionEdge(HashSet<BlockVector2D> points, List<ProtectedRegion> regions, Consumer<TraverseReturn> run) {
         int pointID = 0;
         while (!points.isEmpty()) {
-            BlockVector2 start = points.iterator().next();
+            BlockVector2D start = points.iterator().next();
             TraverseData td = new TraverseData(start, null, true);
 
             // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ algorithm starts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,14 +73,14 @@ public class RegionTraverse {
             boolean cont = true;
             while (cont) {
                 cont = false;
-                BlockVector2 v = td.v, previous = td.previous;
+                BlockVector2D v = td.v, previous = td.previous;
 
                 if (!td.first && v.equals(start)) break;
 
                 int exposedEdges = 0;
-                List<BlockVector2> insideVertex = new ArrayList<>();
-                for (Vector2 dir : DIRECTIONS) {
-                    BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
+                List<BlockVector2D> insideVertex = new ArrayList<>();
+                for (Vector2D dir : DIRECTIONS) {
+                    BlockVector2D test = new BlockVector2D(v.getX() + dir.getX(), v.getZ() + dir.getZ());
                     if (!isInRegion(test, regions)) {
                         exposedEdges++;
                     } else {
@@ -100,7 +100,7 @@ public class RegionTraverse {
                                 previous = insideVertex.get(1);
                             }
                         }
-                        td = new TraverseData(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, false);
+                        td = new TraverseData(new BlockVector2D(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, false);
                         cont = true;
                         break;
                     case 2: // convex vertex
@@ -119,9 +119,9 @@ public class RegionTraverse {
                         // it's fine right now but it'd be nice if it worked
                         break;
                     case 0: // concave vertex, or point in middle of region
-                        List<Vector2> cornersNotIn = new ArrayList<>();
-                        for (Vector2 dir : CORNER_DIRECTIONS) {
-                            BlockVector2 test = BlockVector2.at(v.getX() + dir.getX(), v.getZ() + dir.getZ());
+                        List<Vector2D> cornersNotIn = new ArrayList<>();
+                        for (Vector2D dir : CORNER_DIRECTIONS) {
+                            BlockVector2D test = new BlockVector2D(v.getX() + dir.getX(), v.getZ() + dir.getZ());
 
                             if (!isInRegion(test, regions)) cornersNotIn.add(dir);
                         }
@@ -129,19 +129,19 @@ public class RegionTraverse {
                         if (cornersNotIn.size() == 1) { // concave vertex
                             run.accept(new TraverseReturn(v, true, pointID, exposedEdges)); // run consumer
 
-                            Vector2 dir = cornersNotIn.get(0);
-                            if (previous == null || previous.equals(BlockVector2.at(v.getX() + dir.getX(), v.getZ()))) {
-                                td = new TraverseData(BlockVector2.at(v.getX(), v.getZ() + dir.getZ()), v, false);
+                            Vector2D dir = cornersNotIn.get(0);
+                            if (previous == null || previous.equals(new BlockVector2D(v.getX() + dir.getX(), v.getZ()))) {
+                                td = new TraverseData(new BlockVector2D(v.getX(), v.getZ() + dir.getZ()), v, false);
                                 cont = true;
                             } else {
-                                td = new TraverseData(BlockVector2.at(v.getX() + dir.getX(), v.getZ()), v, false);
+                                td = new TraverseData(new BlockVector2D(v.getX() + dir.getX(), v.getZ()), v, false);
                                 cont = true;
                             }
                         } else if (cornersNotIn.size() == 2) { // 1 block diagonal perfect overlap
                             run.accept(new TraverseReturn(v, false, pointID, exposedEdges)); // run consumer
 
                             if (previous == null) previous = insideVertex.get(0);
-                            td = new TraverseData(BlockVector2.at(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, false);
+                            td = new TraverseData(new BlockVector2D(v.getX() + (v.getX() - previous.getX()), v.getZ() + (v.getZ() - previous.getZ())), v, false);
                             cont = true;
                         }
                         // ignore if in middle of region (cornersNotIn size = 0)

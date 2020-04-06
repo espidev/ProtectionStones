@@ -15,11 +15,10 @@
 
 package dev.espi.protectionstones.utils;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -39,11 +38,11 @@ public class WGUtils {
     static final int MAX_BUILD_HEIGHT = 256;
 
     public static FlagRegistry getFlagRegistry() {
-        return WorldGuard.getInstance().getFlagRegistry();
+        return WorldGuardPlugin.inst().getFlagRegistry();
     }
 
     public static RegionManager getRegionManagerWithPlayer(Player p) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+        return WorldGuardPlugin.inst().getRegionContainer().get(p.getWorld());
     }
 
     /**
@@ -54,7 +53,7 @@ public class WGUtils {
      */
 
     public static RegionManager getRegionManagerWithWorld(World w) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+        return WorldGuardPlugin.inst().getRegionContainer().get(w);
     }
 
     /**
@@ -126,7 +125,7 @@ public class WGUtils {
 
     // returns "" if there is no psregion
     public static String matchLocationToPSID(Location l) {
-        BlockVector3 v = BlockVector3.at(l.getX(), l.getY(), l.getZ());
+        com.sk89q.worldedit.Vector v = new Vector(l.getX(), l.getY(), l.getZ());
         String currentPSID = "";
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
@@ -153,20 +152,20 @@ public class WGUtils {
     }
 
     // remember to call with offsets
-    public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
+    public static BlockVector getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
         if (yRadius == -1) {
-            return BlockVector3.at(bx - xRadius, 0, bz - zRadius);
+            return new BlockVector(bx - xRadius, 0, bz - zRadius);
         } else {
-            return BlockVector3.at(bx - xRadius, by - yRadius, bz - zRadius);
+            return new BlockVector(bx - xRadius, by - yRadius, bz - zRadius);
         }
     }
 
     // remember to call with offsets
-    public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
+    public static BlockVector getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
         if (yRadius == -1) {
-            return BlockVector3.at(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);
+            return new BlockVector(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);
         } else {
-            return BlockVector3.at(bx + xRadius, by + yRadius, bz + zRadius);
+            return new BlockVector(bx + xRadius, by + yRadius, bz + zRadius);
         }
     }
 
@@ -200,8 +199,8 @@ public class WGUtils {
                     fby = r.getProtectBlock().getLocation().getY(),
                     fbz = r.getProtectBlock().getLocation().getZ();
 
-            BlockVector3 minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
-            BlockVector3 maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+            BlockVector minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
+            BlockVector maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
 
             ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", true, minT, maxT);
             ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
@@ -253,28 +252,28 @@ public class WGUtils {
         int bx = v.x, by = v.y, bz = v.z;
         int bxo = b.xOffset, bxy = b.yOffset, bxz = b.zOffset;
 
-        BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
-        BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
+        BlockVector min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
+        BlockVector max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
 
         return new ProtectedCuboidRegion(createPSID(bx, by, bz), min, max);
     }
 
-    public static List<BlockVector2> getPointsFromDecomposedRegion(PSRegion r) {
+    public static List<BlockVector2D> getPointsFromDecomposedRegion(PSRegion r) {
         assert r.getPoints().size() == 4;
         List<Integer> xs = new ArrayList<>(), zs = new ArrayList<>();
-        for (BlockVector2 p : r.getPoints()) {
-            if (!xs.contains(p.getX())) xs.add(p.getX());
-            if (!zs.contains(p.getZ())) zs.add(p.getZ());
+        for (BlockVector2D p : r.getPoints()) {
+            if (!xs.contains((int)p.getX())) xs.add((int)p.getX());
+            if (!zs.contains((int)p.getZ())) zs.add((int)p.getZ());
         }
 
-        List<BlockVector2> points = new ArrayList<>();
+        List<BlockVector2D> points = new ArrayList<>();
         for (int x = xs.get(0); x != xs.get(1); x += (xs.get(0) > xs.get(1)) ? -1 : 1) {
-            points.add(BlockVector2.at(x, zs.get(0)));
-            points.add(BlockVector2.at(x, zs.get(1)));
+            points.add(new BlockVector2D(x, zs.get(0)));
+            points.add(new BlockVector2D(x, zs.get(1)));
         }
         for (int z = zs.get(0); z != zs.get(1); z += (zs.get(0) > zs.get(1)) ? -1 : 1) {
-            points.add(BlockVector2.at(xs.get(0), z));
-            points.add(BlockVector2.at(xs.get(1), z));
+            points.add(new BlockVector2D(xs.get(0), z));
+            points.add(new BlockVector2D(xs.get(1), z));
         }
 
         return points;

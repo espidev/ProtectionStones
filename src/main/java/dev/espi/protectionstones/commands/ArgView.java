@@ -106,18 +106,11 @@ public class ArgView implements PSCommandArg {
 
             RegionTraverse.traverseRegionEdge(new HashSet<>(r.getWGRegion().getPoints()), Collections.singletonList(r.getWGRegion()), tr -> {
                 if (tr.isVertex) {
-                    // if (handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
                     handleBlueParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+playerY, 0.5+tr.point.getZ()));
                     for (int y = minY; y <= maxY; y += 5) {
-                        //if (handleFakeBlock(p, tr.point.getX(), y, tr.point.getZ(), tempBlock, blocks, 1, wait.get())) wait.incrementAndGet();
                         handleBlueParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+y, 0.5+tr.point.getZ()));
                     }
                 } else {
-                    /*if (modU.get() % 4 == 0) {
-                        handleFakeBlock(p, tr.point.getX(), playerY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
-                        handleFakeBlock(p, tr.point.getX(), minY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
-                        handleFakeBlock(p, tr.point.getX(), maxY, tr.point.getZ(), tempBlock, blocks, 1, wait.get());
-                    } else {*/
                     if (modU.get() % 2 == 0) {
                         handlePinkParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+playerY, 0.5+tr.point.getZ()));
                         handlePinkParticle(p, new Location(p.getWorld(), 0.5+tr.point.getX(), 0.5+minY, 0.5+tr.point.getZ()));
@@ -127,22 +120,6 @@ public class ArgView implements PSCommandArg {
                 }
             });
 
-            /*
-            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> PSL.msg(p, PSL.VIEW_GENERATE_DONE.msg()), wait.get());
-
-            Bukkit.getScheduler().runTaskLaterAsynchronously(ProtectionStones.getInstance(), () -> {
-                PSL.msg(p, PSL.VIEW_REMOVING.msg());
-                for (Block b : blocks) {
-                    if (b.getWorld().isChunkLoaded(b.getLocation().getBlockX() / 16, b.getLocation().getBlockZ() / 16)) {
-                        p.sendBlockChange(b.getLocation(), b.getBlockData());
-                        try {
-                            Thread.sleep(20);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }, wait.get() + 600L); // remove after 10 seconds */
         });
         return true;
     }
@@ -154,35 +131,20 @@ public class ArgView implements PSCommandArg {
 
     private static boolean handlePinkParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 2), 30);
+        Particles.persistRedstoneParticle(p, l, 30, 233, 30, 99);
         return true;
     }
 
     private static boolean handleBlueParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 2), 30);
+        Particles.persistRedstoneParticle(p, l, 30, 0, 255, 255);
         return true;
     }
 
     private static boolean handlePurpleParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > 60 || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        Particles.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 10), 30);
+        Particles.persistRedstoneParticle(p, l, 30, 255, 0, 255);
         return true;
     }
 
-    /*
-    private static boolean handleFakeBlock(Player p, int x, int y, int z, BlockData tempBlock, List<Block> restore, long delay, long multiplier) {
-        if (p.getLocation().distance(new Location(p.getWorld(), x, y, z)) > 100 || Math.abs(y-p.getLocation().getY()) > 30) return false;
-
-        //Particles.persistRedstoneParticle(p, new Location(p.getWorld(), x, y, z), new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1), 30);
-
-        Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
-            //p.spawnParticle(Particle.REDSTONE, new Location(p.getWorld(), x, y, z), 50, new Particle.DustOptions(Color.fromRGB(0, 127, 255), 1));
-            if (p.getWorld().isChunkLoaded(x / 16, z / 16)) {
-                restore.add(p.getWorld().getBlockAt(x, y, z));
-                p.sendBlockChange(p.getWorld().getBlockAt(x, y, z).getLocation(), tempBlock);
-            }
-        }, delay * multiplier);
-        return true;
-    }*/
 }

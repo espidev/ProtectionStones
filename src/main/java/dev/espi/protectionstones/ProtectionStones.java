@@ -18,16 +18,15 @@ package dev.espi.protectionstones;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.pre113.NBTEditor;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
@@ -36,9 +35,6 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
-import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -188,10 +184,10 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Gets the config options for the protection block type specified. It is recommended to use the block paramemter overloaded
+     * Gets the config options for the protection block type specified. It is recommended to use the block parameter overloaded
      * method instead if possible, since it deals better with heads.
      *
-     * @param blockType the material type name (Bukkit) of the protect block to get the options for, or "PLAYER_HEAD name" for heads
+     * @param blockType the material type name (Bukkit) of the protect block to get the options for
      * @return the config options for the protect block specified (null if not found)
      */
     public static PSProtectBlock getBlockOptions(String blockType) {
@@ -206,7 +202,7 @@ public class ProtectionStones extends JavaPlugin {
      * Get whether or not a material is used as a protection block. It is recommended to use the block
      * parameter overloaded method if possible since player heads have a different format.
      *
-     * @param material material type to check (Bukkit material name), or "PLAYER_HEAD name" for heads
+     * @param material material type to check (Bukkit material name)
      * @return whether or not that material is being used for a protection block
      */
     public static boolean isProtectBlockType(String material) {
@@ -345,17 +341,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // otherwise, check if the item was created by protection stones (stored in custom tag)
         if (item.getItemMeta() != null) {
-            CustomItemTagContainer tagContainer = item.getItemMeta().getCustomTagContainer();
-            try { // check if tag byte is 1
-                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
-                tag = isPSBlock != null && isPSBlock == 1;
-            } catch (IllegalArgumentException es) {
-                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
-                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
-                    tag = isPSBlock != null && isPSBlock.equals("true");
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
+            tag = NBTEditor.contains(item, "isPSBlock") && NBTEditor.getByte(item, "isPSBlock") == 1;
         }
 
         return tag; // whether or not the nbt tag was found
@@ -375,12 +361,6 @@ public class ProtectionStones extends JavaPlugin {
         ItemMeta im = is.getItemMeta();
         assert im != null;
 
-        // add skull metadata, must be before others since it resets item metadata
-        if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
-            is = BlockUtil.setHeadType(b.type, is);
-            im = is.getItemMeta();
-        }
-
         // add display name and lore
         if (!b.displayName.equals("")) {
             im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
@@ -389,10 +369,11 @@ public class ProtectionStones extends JavaPlugin {
         for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
         im.setLore(lore);
 
-        // add identifier for protection stone created items
-        im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.BYTE, (byte) 1);
-
         is.setItemMeta(im);
+
+        // add identifier for protection stone created items
+        is = NBTEditor.set(is, (byte) 1, "isPSBlock");
+
         return is;
     }
 
@@ -521,23 +502,12 @@ public class ProtectionStones extends JavaPlugin {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                     UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
-
-                    if (op.getName() != null)
-                        UUIDCache.storeWGProfile(op.getUniqueId(), op.getName());
                 }
             });
         } else { // sync load
-            List<Profile> profiles = new ArrayList<>();
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                 UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
-                if (op.getName() != null) profiles.add(new Profile(op.getUniqueId(), op.getName()));
             }
-
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                for (Profile p : profiles) {
-                    WorldGuard.getInstance().getProfileCache().put(p);
-                }
-            });
         }
 
         // check if UUIDs have been upgraded already
@@ -547,7 +517,7 @@ public class ProtectionStones extends JavaPlugin {
         if (configOptions.uuidupdated == null || !configOptions.uuidupdated)
             LegacyUpgrade.convertToUUID();
 
-        getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
+        getLogger().info("ProtectionStones has successfully started!");
     }
 
 }

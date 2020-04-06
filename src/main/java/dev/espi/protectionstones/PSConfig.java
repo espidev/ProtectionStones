@@ -19,9 +19,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import dev.espi.protectionstones.commands.ArgTax;
-import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.ConfigUpgrades;
+import dev.espi.protectionstones.utils.pre113.NBTEditor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
@@ -185,7 +184,7 @@ public class PSConfig {
                 PSProtectBlock b = new ObjectConverter().toObject(c, PSProtectBlock::new);
 
                 // check if material is valid, and is not a player head (since player heads also have the player name after)
-                if (Material.getMaterial(b.type) == null && !(b.type.startsWith(Material.PLAYER_HEAD.toString()))) {
+                if (Material.getMaterial(b.type) == null) {
                     ProtectionStones.getPluginLogger().warning("Unrecognized material: " + b.type);
                     ProtectionStones.getPluginLogger().warning("Block will not be added. Please fix this in your config.");
                     continue;
@@ -203,14 +202,6 @@ public class PSConfig {
 
                 ProtectionStones.getPluginLogger().info("- " + b.type + " (" + b.alias + ")");
                 FlagHandler.initDefaultFlagsForBlock(b); // process flags for block and set regionFlags field
-
-                // for PLAYER_HEAD:base64, we need to change the entry to link to a UUID hash instead of storing the giant base64
-                if (BlockUtil.isBase64PSHead(b.type)) {
-                    String nuuid = BlockUtil.getUUIDFromBase64PS(b);
-
-                    BlockUtil.uuidToBase64Head.put(nuuid, b.type.split(":")[1]);
-                    b.type = "PLAYER_HEAD:" + nuuid;
-                }
 
                 ProtectionStones.protectionStonesOptions.put(b.type, b); // add block
             }
@@ -231,8 +222,10 @@ public class PSConfig {
         while (iter.hasNext()) {
             try {
                 Recipe r = iter.next();
-                if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
-                    iter.remove();
+                if (r instanceof ShapedRecipe) {
+                    ItemStack item = r.getResult();
+                    if (NBTEditor.contains(item, "isPSBlock") && NBTEditor.getByte(item, "isPSBlock") == 1)
+                        iter.remove();
                 }
             } catch (Exception ignored) {
             }
@@ -254,7 +247,7 @@ public class PSConfig {
         item.setAmount(b.recipeAmount);
 
         // create recipe
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.alias), item);
+        ShapedRecipe recipe = new ShapedRecipe(item);
         HashMap<String, Character> items = new HashMap<>();
         List<String> recipeLine = new ArrayList<>();
         char id = 'a';
@@ -276,20 +269,7 @@ public class PSConfig {
         recipe.shape(recipeLine.toArray(new String[0]));
         for (String mat : items.keySet()) {
             if (Material.matchMaterial(mat) != null) { // general material type
-
                 recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
-
-            } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
-
-                // format PROTECTION_STONES:alias
-                String alias = mat.substring(mat.indexOf(":")+1);
-                PSProtectBlock use = ProtectionStones.getProtectBlockFromAlias(alias);
-                if (use != null && use.createItem() != null) {
-                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(use.createItem()));
-                } else {
-                    ProtectionStones.getPluginLogger().warning("Unable to resolve material " + mat + " for the crafting recipe for " + b.alias + ".");
-                }
-
             } else {
                 ProtectionStones.getPluginLogger().warning("Unable to find material " + mat + " for the crafting recipe for " + b.alias + ".");
             }

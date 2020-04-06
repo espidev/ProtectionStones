@@ -15,18 +15,17 @@
 
 package dev.espi.protectionstones.flags;
 
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.FlagValueChangeHandler;
 import com.sk89q.worldguard.session.handler.Handler;
 import dev.espi.protectionstones.FlagHandler;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import dev.espi.protectionstones.utils.pre113.ActionBar;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 // farewell-action flag
 public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
@@ -43,21 +42,23 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
     }
 
     @Override
-    protected void onInitialValue(LocalPlayer localPlayer, ApplicableRegionSet applicableRegionSet, String s) {
+    protected void onInitialValue(Player localPlayer, ApplicableRegionSet applicableRegionSet, String s) {
 
     }
 
     @Override
-    protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
-        if (lastValue != null && !lastValue.equals(currentValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null)
-            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+    protected boolean onSetValue(Player localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
+        if (lastValue != null && !lastValue.equals(currentValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
+            ActionBar.sendActionBar(localPlayer, ChatColor.translateAlternateColorCodes('&', lastValue));
+        }
         return true;
     }
 
     @Override
-    protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
-        if (lastValue != null && Bukkit.getPlayer(localPlayer.getUniqueId()) != null)
-            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+    protected boolean onAbsentValue(Player localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
+        if (lastValue != null && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
+            ActionBar.sendActionBar(localPlayer, ChatColor.translateAlternateColorCodes('&', lastValue));
+        }
         return true;
     }
 }

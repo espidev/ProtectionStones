@@ -6,7 +6,6 @@ authors: [EspiDev]
 depend: [WorldGuard, WorldEdit]
 softdepend: [Vault, PlaceholderAPI]
 main: dev.espi.protectionstones.ProtectionStones
-api-version: 1.13
 
 permissions:
   protectionstones.create:

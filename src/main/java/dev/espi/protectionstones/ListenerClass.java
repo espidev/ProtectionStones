@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -53,9 +53,6 @@ public class ListenerClass implements Listener {
         UUIDCache.removeUUID(e.getPlayer().getUniqueId());
         UUIDCache.removeName(e.getPlayer().getName());
         UUIDCache.storeUUIDNamePair(e.getPlayer().getUniqueId(), e.getPlayer().getName());
-
-        // allow worldguard to resolve all UUIDs to names
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
 
         PSPlayer psp = PSPlayer.fromPlayer(e.getPlayer());
 
@@ -162,12 +159,11 @@ public class ListenerClass implements Listener {
         if (!ProtectionStones.isProtectBlock(pb)) {
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
-                ItemStack left = p.getInventory().getItemInMainHand();
-                ItemStack right = p.getInventory().getItemInOffHand();
-                if (!left.containsEnchantment(Enchantment.SILK_TOUCH) && !right.containsEnchantment(Enchantment.SILK_TOUCH)) {
+                ItemStack left = p.getInventory().getItemInHand();
+                if (!left.containsEnchantment(Enchantment.SILK_TOUCH)) {
                     return;
                 }
-                e.setDropItems(false);
+                pb.setType(Material.AIR);
             }
             return;
         }
@@ -176,7 +172,7 @@ public class ListenerClass implements Listener {
 
         // break protection
         if (playerBreakProtection(p, r)) { // successful
-            e.setDropItems(false);
+            pb.setType(Material.AIR);
             e.setExpToDrop(0);
         } else { // unsuccessful
             e.setCancelled(true);
@@ -259,23 +255,16 @@ public class ListenerClass implements Listener {
         pistonUtil(e.getBlocks(), e);
     }
 
-    @EventHandler
-    public void onSpongeAbsorb(SpongeAbsorbEvent event) {
-        if (ProtectionStones.isProtectBlock(event.getBlock())) {
-            event.setCancelled(true);
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled()) return;
-        if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
+        if (event.getCause() == TeleportCause.ENDER_PEARL) return;
 
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(event.getTo().getWorld());
-        BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
+        BlockVector v = new BlockVector(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
         // check if player can teleport into region (no region with preventTeleportIn = true)
         ApplicableRegionSet regions = rgm.getApplicableRegions(v);

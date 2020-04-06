@@ -22,6 +22,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class TextGUI {
 
     // page starts at zero, but displays start at one
     // pageCommand will be replacing %page%
-    public static void displayGUI(CommandSender s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines, boolean sendBlankLines) {
+    public static void displayGUI(Player s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines, boolean sendBlankLines) {
         PSL.msg(s, header);
 
         for (int i = currentPage*guiSize; i < Math.min((currentPage+1) * guiSize, lines.size()); i++) {

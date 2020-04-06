@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
@@ -101,8 +101,8 @@ public class ArgInfo implements PSCommandArg {
                 }
             }
 
-            BlockVector3 min = r.getWGRegion().getMinimumPoint();
-            BlockVector3 max = r.getWGRegion().getMaximumPoint();
+            BlockVector min = r.getWGRegion().getMinimumPoint();
+            BlockVector max = r.getWGRegion().getMaximumPoint();
             PSL.msg(p, PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
 
         } else if (args.length == 2) { // get specific information on current region
@@ -171,7 +171,7 @@ public class ArgInfo implements PSCommandArg {
 
         StringBuilder flagDisp = new StringBuilder();
         String flagValue;
-        for (Flag<?> flag : WGUtils.getFlagRegistry().getAll()) {
+        for (Flag<?> flag : WGUtils.getFlagRegistry()) {
             if (region.getFlag(flag) != null && !r.getTypeOptions().hiddenFlagsFromInfo.contains(flag.getName())) {
                 flagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();

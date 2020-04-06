@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones.utils;
 
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -278,7 +278,7 @@ public class WGMerge {
     // returns a merged region; root and merge must be overlapping
     // merge parameter must all be decomposed regions (down to cuboids, no polygon)
     private static ProtectedRegion mergeRegions(String newID, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
-        HashSet<BlockVector2> points = new HashSet<>();
+        HashSet<BlockVector2D> points = new HashSet<>();
         List<ProtectedRegion> regions = new ArrayList<>();
 
         // decompose regions down to their points
@@ -288,8 +288,8 @@ public class WGMerge {
         }
 
         // points of new region
-        List<BlockVector2> vertex = new ArrayList<>();
-        HashMap<Integer, ArrayList<BlockVector2>> vertexGroups = new HashMap<>();
+        List<BlockVector2D> vertex = new ArrayList<>();
+        HashMap<Integer, ArrayList<BlockVector2D>> vertexGroups = new HashMap<>();
 
         // traverse region edges for vertex
         RegionTraverse.traverseRegionEdge(points, regions, tr -> {
@@ -311,8 +311,8 @@ public class WGMerge {
         // assemble vertex group
         // draw in and out lines between holes
         boolean first = true;
-        BlockVector2 backPoint = null;
-        for (List<BlockVector2> l : vertexGroups.values()) {
+        BlockVector2D backPoint = null;
+        for (List<BlockVector2D> l : vertexGroups.values()) {
             if (first) {
                 first = false;
                 vertex.addAll(l);
