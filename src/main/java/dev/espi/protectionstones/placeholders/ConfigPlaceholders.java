@@ -152,6 +152,8 @@ class ConfigPlaceholders {
                 return b.allowOtherRegionsToOverlap;
             case "region_allow_merging":
                 return b.allowMerging + "";
+            case "region_allowed_merging_into_types":
+                return MiscUtil.concatWithoutLast(b.allowedMergingIntoTypes, ", ");
 
             case "block_data_display_name":
                 return b.displayName;

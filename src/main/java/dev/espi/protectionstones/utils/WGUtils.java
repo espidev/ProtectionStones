@@ -290,6 +290,19 @@ public class WGUtils {
         return points;
     }
 
+    public static boolean canMergeRegionTypes(PSProtectBlock current, PSRegion mergeInto) {
+        if (current.allowedMergingIntoTypes.contains("all"))
+            return true;
+
+        if (mergeInto instanceof PSGroupRegion) {
+            for (PSMergedRegion r : ((PSGroupRegion) mergeInto).getMergedRegions()) {
+                if (!current.allowedMergingIntoTypes.contains(r.getTypeOptions().alias))
+                    return false;
+            }
+        }
+        return current.allowedMergingIntoTypes.contains(mergeInto.getTypeOptions().alias);
+    }
+
     public static void copyRegionValues(ProtectedRegion root, ProtectedRegion copyTo) {
         copyTo.copyFrom(root);
     }

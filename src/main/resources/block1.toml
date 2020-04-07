@@ -125,6 +125,13 @@ prevent_block_place_in_restricted_world = true
     # allow_merging_regions must be set to true in config.toml
     allow_merging = true
 
+    # Allowed types of regions to merge into (referred to by alias)
+    # Be sure to add the alias of this current region type to allow merging with it ex. ["64"]
+    # Add "all" if you want to allow this region to merge into any region
+    allowed_merging_into_types = [
+        "all"
+    ]
+
 [block_data]
     # Name given to protection block when obtained with /ps give or /ps get
     # Also affects custom crafted items (see custom_recipe)
@@ -241,7 +248,6 @@ prevent_block_place_in_restricted_world = true
     # console_command - Execute command by console
     # message - Send message to player or console if applicable (colour support with &)
     # global_message - Send message to all players and console (colour support with &)
-
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Whether or not to enable event tracking (API events will still be enabled)
     enable = false

@@ -19,9 +19,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -117,11 +115,17 @@ public class ArgMerge implements PSCommandArg {
             if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp)))
                 return PSL.msg(p, PSL.NO_ACCESS.msg());
 
+            // check if region is actually overlapping the region
             if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region))
                 return PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
 
+            // check if merging is allowed in config
             PSRegion aRegion = PSRegion.fromWGRegion(p.getWorld(), region), aRoot = PSRegion.fromWGRegion(p.getWorld(), root);
             if (!aRegion.getTypeOptions().allowMerging || !aRoot.getTypeOptions().allowMerging)
+                return PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
+
+            // check if the region types allow for it
+            if (!WGUtils.canMergeRegionTypes(aRegion.getTypeOptions(), aRoot))
                 return PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

@@ -475,7 +475,10 @@ public class PSStandardRegion extends PSRegion {
                 .getRegions()
                 .stream()
                 .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
-                .filter(r -> r != null && r.getTypeOptions() != null && r.getTypeOptions().allowMerging && !r.getId().equals(getId()) && (r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin")))
+                .filter(r -> r != null && r.getTypeOptions() != null && !r.getId().equals(getId()))
+                .filter(r -> r.getTypeOptions().allowMerging)
+                .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))
+                .filter(r -> WGUtils.canMergeRegionTypes(getTypeOptions(), r))
                 .collect(Collectors.toList());
     }
 
