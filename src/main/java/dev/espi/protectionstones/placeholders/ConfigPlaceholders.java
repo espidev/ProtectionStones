@@ -107,6 +107,8 @@ class ConfigPlaceholders {
                 return b.type;
             case "alias":
                 return b.alias;
+            case "description":
+                return b.description;
             case "restrict_obtaining":
                 return b.restrictObtaining + "";
             case "world_list_type":

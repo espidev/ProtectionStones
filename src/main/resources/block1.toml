@@ -12,6 +12,10 @@ type = "EMERALD_ORE"
 # Must be one word (no spaces)
 alias = "64"
 
+# Description of the protection block type
+# Shows up in /ps get menu
+description = "64 block radius protection zone."
+
 # Whether or not to restrict obtaining of the protection stone to only /ps get and /ps give and custom crafting recipes.
 # Other ways to obtain this block (ex. mining) will not work as a protection stone.
 # Useful to allow the protection block to only be obtained from a shop or command.
@@ -38,9 +42,9 @@ prevent_block_place_in_restricted_world = true
     # Set to -1 for no minimum, but will still check for overlapping regions
     distance_between_claims = -1
 
-    # Protection radius of block
+    # Protection radius of block (radius of 64 -> 129 x 129 region)
     # Set y_radius to -1 if you want it to protect from sky to bedrock. If this doesn't appear to work set it to 256.
-    # Turn "allow_merging_regions" in config.toml to false if editing the y_radius to not be -1
+    # y_radius must be -1 if you are allowing the region to be merged ("allow_merging" option)
     x_radius = 64
     y_radius = -1
     z_radius = 64

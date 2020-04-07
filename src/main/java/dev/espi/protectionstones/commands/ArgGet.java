@@ -66,6 +66,7 @@ public class ArgGet implements PSCommandArg {
             TextComponent tc = new TextComponent(PSL.GET_GUI_BLOCK.msg()
                     .replace("%alias%", b.alias)
                     .replace("%price%", price)
+                    .replace("%description%", b.description)
                     .replace("%xradius%", ""+b.xRadius)
                     .replace("%yradius%", ""+b.yRadius)
                     .replace("%zradius%", ""+b.zRadius));
@@ -73,6 +74,7 @@ public class ArgGet implements PSCommandArg {
             tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GET_GUI_HOVER.msg()
                     .replace("%alias%", b.alias)
                     .replace("%price%", price)
+                    .replace("%description%", b.description)
                     .replace("%xradius%", ""+b.xRadius)
                     .replace("%yradius%", ""+b.yRadius)
                     .replace("%zradius%", ""+b.zRadius)).create()));

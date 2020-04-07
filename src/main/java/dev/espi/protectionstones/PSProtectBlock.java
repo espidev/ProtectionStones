@@ -37,6 +37,8 @@ public class PSProtectBlock {
 
     // main section
     public String type, alias;
+    @Path("description")
+    public String description;
     @Path("restrict_obtaining")
     public boolean restrictObtaining;
     @Path("world_list_type")
