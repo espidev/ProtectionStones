@@ -113,6 +113,7 @@ prevent_block_place_in_restricted_world = true
     # "owner" - only allow owners to overlap this (default)
     # "member" - allow members and owners to overlap this region type. (useful for city plots)
     # "all" - allow all players to overlap this region type.
+    # "none" - no players, not even the owners of the region can overlap it
     # allow_overlap_unowned_regions does not need to be true for this to work.
     allow_other_regions_to_overlap = "owner"
 

@@ -439,7 +439,7 @@ public class PSStandardRegion extends PSRegion {
         if (getLandlord() != null && getLandlord().equals(uuid)) {
             // remove rents if the player is the landlord
             if (getRentStage() == RentStage.LOOKING_FOR_TENANT || getRentStage() == RentStage.RENTING) {
-                
+
                 if (getTenant() != null) {
                     PSPlayer tenant = PSPlayer.fromUUID(getTenant());
                     if (tenant.getOfflinePlayer().isOnline()) {

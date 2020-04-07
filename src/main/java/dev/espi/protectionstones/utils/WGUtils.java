@@ -85,22 +85,36 @@ public class WGUtils {
     public static boolean overlapsStrongerRegion(World w, ProtectedRegion r, LocalPlayer lp) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
 
+        ApplicableRegionSet rp = rgm.getApplicableRegions(r);
+
+        // loop through all regions to check for "none" option
+        for (ProtectedRegion rg : rp.getRegions()) {
+            if (rg.getId().equals(r.getId())) continue;
+
+            if (ProtectionStones.isPSRegion(rg)) {
+                PSRegion psr = PSRegion.fromWGRegion(w, rg);
+
+                // if no overlap allowed by this region type, even if owner
+                if (psr.getTypeOptions().allowOtherRegionsToOverlap.equals("none")) {
+                    return true;
+                }
+            }
+        }
+
         if (rgm.overlapsUnownedRegion(r, lp)) { // check if the lp is not owner of a intersecting region
-            ApplicableRegionSet rp = rgm.getApplicableRegions(r);
-            boolean powerfulOverLap = false;
             for (ProtectedRegion rg : rp) {
                 // ignore itself it has already has been added to the rgm
                 if (rg.getId().equals(r.getId())) continue;
                 if (rg.isOwner(lp)) continue;
 
                 if (rg.getPriority() > r.getPriority()) { // if protection priority < overlap priority
-                    powerfulOverLap = true;
-                    break;
+                    return true;
                 }
 
                 // check ProtectionStones allow_other_regions_to_overlap settings
                 if (ProtectionStones.isPSRegion(rg)) {
                     PSRegion pr = PSRegion.fromWGRegion(w, rg);
+
                     // don't need to check for owner, since all of these are unowned regions.
                     if (pr.isMember(lp.getUniqueId()) && pr.getTypeOptions().allowOtherRegionsToOverlap.equals("member")) {
                         // if members are allowed to overlap this region
@@ -111,15 +125,11 @@ public class WGUtils {
                         continue;
                     }
                     // otherwise, this region is not allowed to be overlapped
-                    powerfulOverLap = true;
-                    break;
+                    return true;
                 } else if (rg.getPriority() >= r.getPriority()) { // if the priorities are the same for plain WorldGuard regions, prevent overlap
-                    powerfulOverLap = true;
-                    break;
+                    return true;
                 }
             }
-            // if we overlap a more powerful region
-            return powerfulOverLap;
         }
         return false;
     }
