@@ -439,14 +439,18 @@ public class PSStandardRegion extends PSRegion {
         if (getLandlord() != null && getLandlord().equals(uuid)) {
             // remove rents if the player is the landlord
             if (getRentStage() == RentStage.LOOKING_FOR_TENANT || getRentStage() == RentStage.RENTING) {
-                PSPlayer tenant = PSPlayer.fromUUID(getTenant());
-                if (tenant.getOfflinePlayer().isOnline()) {
-                    PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
-                            .replace("%region%", getName() != null ? getName() : getId()));
+                
+                if (getTenant() != null) {
+                    PSPlayer tenant = PSPlayer.fromUUID(getTenant());
+                    if (tenant.getOfflinePlayer().isOnline()) {
+                        PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
+                                .replace("%region%", getName() != null ? getName() : getId()));
+                    }
                 }
 
                 removeRenting(); // this needs to be called before removing the player, since it adds the player back
             }
+            setLandlord(null); // in case the player was selling the region
         }
         if (wgregion.getOwners().contains(uuid))
             wgregion.getOwners().removePlayer(uuid);
