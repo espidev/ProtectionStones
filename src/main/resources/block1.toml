@@ -147,6 +147,7 @@ prevent_block_place_in_restricted_world = true
 
     # Add price when using /ps get
     # Must have compatible economy plugin (requires Vault, ie. Essentials)
+    # Must be a decimal (ex. not 10, but 10.0)
     price = 0.0
 
     # Whether or not to allow crafting this item using a custom recipe
@@ -167,6 +168,7 @@ prevent_block_place_in_restricted_world = true
 [economy]
     # Taxes must be enabled in config.toml first (tax_enabled)
     # The amount to tax the region per tax cycle.
+    # Must be a decimal (ex. not 10, but 10.0)
     tax_amount = 0.0
 
     # The amount of seconds between tax cycles. Set to -1 to disable taxes.
