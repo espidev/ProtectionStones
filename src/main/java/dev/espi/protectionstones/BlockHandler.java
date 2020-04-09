@@ -278,7 +278,9 @@ public class BlockHandler {
                     try {
                         WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
                         PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
-                    } catch (WGMerge.RegionHoleException | WGMerge.RegionCannotMergeWhileRentedException e) {
+                    } catch (WGMerge.RegionHoleException e) {
+                        PSL.msg(p, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI is true
+                    } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
                         // don't need to tell player that you can't merge
                     }
                 });

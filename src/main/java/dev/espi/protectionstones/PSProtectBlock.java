@@ -37,6 +37,8 @@ public class PSProtectBlock {
 
     // main section
     public String type, alias;
+    @Path("description")
+    public String description;
     @Path("restrict_obtaining")
     public boolean restrictObtaining;
     @Path("world_list_type")
@@ -90,6 +92,8 @@ public class PSProtectBlock {
     public String allowOtherRegionsToOverlap;
     @Path("region.allow_merging")
     public boolean allowMerging;
+    @Path("region.allowed_merging_into_types")
+    public List<String> allowedMergingIntoTypes;
 
     // block data section
     @Path("block_data.display_name")

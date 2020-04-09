@@ -306,7 +306,7 @@ public enum PSL {
     GET_GOTTEN("get.gotten", ChatColor.AQUA + "Added protection block to inventory!"),
     GET_NO_PERMISSION_BLOCK("get.no_permission_block", ChatColor.RED + "You don't have permission to get this block."),
     GET_HEADER("get.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Protect Blocks (click to get) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
-    GET_GUI_BLOCK("get.gui_block", ChatColor.GRAY + "> " + ChatColor.AQUA + "%alias% (%xradius% x %zradius%) ($%price%)"),
+    GET_GUI_BLOCK("get.gui_block", ChatColor.GRAY + "> " + ChatColor.AQUA + "%alias% " + ChatColor.GRAY + "- %description% (" + ChatColor.WHITE + "$%price%" + ChatColor.GRAY + ")"),
     GET_GUI_HOVER("get.gui_hover", "Click to buy a %alias%!"),
 
     // ps give

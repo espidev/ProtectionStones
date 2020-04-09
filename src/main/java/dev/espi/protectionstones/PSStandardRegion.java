@@ -439,14 +439,18 @@ public class PSStandardRegion extends PSRegion {
         if (getLandlord() != null && getLandlord().equals(uuid)) {
             // remove rents if the player is the landlord
             if (getRentStage() == RentStage.LOOKING_FOR_TENANT || getRentStage() == RentStage.RENTING) {
-                PSPlayer tenant = PSPlayer.fromUUID(getTenant());
-                if (tenant.getOfflinePlayer().isOnline()) {
-                    PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
-                            .replace("%region%", getName() != null ? getName() : getId()));
+
+                if (getTenant() != null) {
+                    PSPlayer tenant = PSPlayer.fromUUID(getTenant());
+                    if (tenant.getOfflinePlayer().isOnline()) {
+                        PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
+                                .replace("%region%", getName() != null ? getName() : getId()));
+                    }
                 }
 
                 removeRenting(); // this needs to be called before removing the player, since it adds the player back
             }
+            setLandlord(null); // in case the player was selling the region
         }
         if (wgregion.getOwners().contains(uuid))
             wgregion.getOwners().removePlayer(uuid);
@@ -471,7 +475,10 @@ public class PSStandardRegion extends PSRegion {
                 .getRegions()
                 .stream()
                 .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
-                .filter(r -> r != null && r.getTypeOptions() != null && r.getTypeOptions().allowMerging && !r.getId().equals(getId()) && (r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin")))
+                .filter(r -> r != null && r.getTypeOptions() != null && !r.getId().equals(getId()))
+                .filter(r -> r.getTypeOptions().allowMerging)
+                .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))
+                .filter(r -> WGUtils.canMergeRegionTypes(getTypeOptions(), r))
                 .collect(Collectors.toList());
     }
 

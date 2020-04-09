@@ -158,6 +158,7 @@ public class LegacyUpgrade {
 
                 b.set("type", type);
                 b.set("alias", type);
+                b.set("description", yml.getInt("Region." + type + ".X Radius") + " radius protected area.");
                 b.set("restrict_obtaining", false);
                 b.set("world_list_type", "blacklist");
                 b.set("worlds", worldsDenied);

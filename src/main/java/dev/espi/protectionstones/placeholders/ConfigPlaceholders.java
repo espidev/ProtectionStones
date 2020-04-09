@@ -107,6 +107,8 @@ class ConfigPlaceholders {
                 return b.type;
             case "alias":
                 return b.alias;
+            case "description":
+                return b.description;
             case "restrict_obtaining":
                 return b.restrictObtaining + "";
             case "world_list_type":
@@ -150,6 +152,8 @@ class ConfigPlaceholders {
                 return b.allowOtherRegionsToOverlap;
             case "region_allow_merging":
                 return b.allowMerging + "";
+            case "region_allowed_merging_into_types":
+                return MiscUtil.concatWithoutLast(b.allowedMergingIntoTypes, ", ");
 
             case "block_data_display_name":
                 return b.displayName;
