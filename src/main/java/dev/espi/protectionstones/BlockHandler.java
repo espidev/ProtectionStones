@@ -93,7 +93,7 @@ public class BlockHandler {
 
         // check if it is in a WorldGuard region
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-        if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(BlockVector3.at(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ())).size() == 0) {
+        if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(new BlockVector(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ())).size() == 0) {
             PSL.msg(p, PSL.MUST_BE_PLACED_IN_EXISTING_REGION.msg());
             e.setCancelled(true);
             return;
