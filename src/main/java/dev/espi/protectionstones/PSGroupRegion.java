@@ -19,8 +19,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
-import lombok.val;
-import lombok.var;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -64,18 +62,18 @@ public class PSGroupRegion extends PSStandardRegion {
 
     @Override
     public void updateTaxPayments() {
-        val currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
 
         List<TaxPayment> payments = Objs.replaceNull(getTaxPaymentsDue(), new ArrayList<>());
         List<LastRegionTaxPaymentEntry> lastAdded = Objs.replaceNull(getRegionLastTaxPaymentAddedEntries(), new ArrayList<>());
 
         // loop over merged regions
-        for (val r : getMergedRegions()) {
+        for (PSMergedRegion r : getMergedRegions()) {
             // taxes disabled
             if (getTypeOptions().taxPeriod == -1) continue;
 
-            var found = false;
-            for (var last : lastAdded) {
+            boolean found = false;
+            for (LastRegionTaxPaymentEntry last : lastAdded) {
                 // if the last region payment entry refers to this region
                 if (last.getRegionId().equals(r.getId())) {
                     found = true;
@@ -165,7 +163,7 @@ public class PSGroupRegion extends PSStandardRegion {
         // remove from taxes
         if (getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) != null) {
             String entry = "";
-            for (val e : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)) {
+            for (String e : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)) {
                 if (e.startsWith(id)) entry = e;
             }
             getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED).remove(entry);

@@ -19,8 +19,6 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.val;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;

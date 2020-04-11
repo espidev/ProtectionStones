@@ -19,6 +19,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.ConfigUpgrades;
 import dev.espi.protectionstones.utils.pre113.NBTEditor;
 import org.bukkit.Bukkit;
@@ -270,6 +271,18 @@ public class PSConfig {
         for (String mat : items.keySet()) {
             if (Material.matchMaterial(mat) != null) { // general material type
                 recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
+
+            } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
+
+                // format PROTECTION_STONES:alias
+                String alias = mat.substring(mat.indexOf(":") + 1);
+                PSProtectBlock use = ProtectionStones.getProtectBlockFromAlias(alias);
+                if (use != null && use.createItem() != null) {
+                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(use.createItem()));
+                } else {
+                    ProtectionStones.getPluginLogger().warning("Unable to resolve material " + mat + " for the crafting recipe for " + b.alias + ".");
+                }
+
             } else {
                 ProtectionStones.getPluginLogger().warning("Unable to find material " + mat + " for the crafting recipe for " + b.alias + ".");
             }
