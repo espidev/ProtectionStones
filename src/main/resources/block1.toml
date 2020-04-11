@@ -135,7 +135,7 @@ allow_placing_in_wild = true
     # Name given to protection block when obtained with /ps give or /ps get
     # Also affects custom crafted items (see custom_recipe)
     # Leave as '' for no name
-    display_name = "&a&m<---&r&b 64x64 Protection Stone &r&a&m--->"
+    display_name = "&a&m<---&r&b 64 Radius Protection Stone &r&a&m--->"
 
     # Lore given to protection block when obtained with /ps give or /ps get
     # Also affects custom crafted items (see custom_recipe)

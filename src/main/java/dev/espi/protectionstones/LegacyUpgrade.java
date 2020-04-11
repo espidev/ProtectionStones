@@ -166,8 +166,8 @@ public class LegacyUpgrade {
                 b.set("region.flags", flags);
                 b.set("region.allowed_flags", allowedFlags);
                 b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
-                b.set("block_data.display_name", "");
-                b.set("block_data.lore", Arrays.asList());
+                b.set("block_data.display_name", "&a&m<---&r&b " + (1+2*yml.getInt("Region." + type + ".X Radius")) + "x" + (1+2*yml.getInt("Region." + type + ".Z Radius")) + " Protection Stone &r&a&m--->");
+                b.set("block_data.lore", Arrays.asList("&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"));
                 b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
                 b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
                 b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));
