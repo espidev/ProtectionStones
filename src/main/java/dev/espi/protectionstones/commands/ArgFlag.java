@@ -82,7 +82,7 @@ public class ArgFlag implements PSCommandArg {
             } else {
                 String flag = allowedFlags.get(i);
                 List<String> currentFlagGroups = r.getTypeOptions().allowedFlags.get(flag);
-                TextComponent flagLine = new TextComponent();
+                TextComponent flagLine = new TextComponent("");
 
                 // calculate flag command
                 String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
@@ -152,7 +152,7 @@ public class ArgFlag implements PSCommandArg {
                 String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
                         toLowerCase().
                         replace("_", "");
-                TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
+                TextComponent groupChange = new TextComponent(ChatColor.DARK_GRAY + " [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
 
                 String nextGroup;
                 if (currentFlagGroups.contains(groupfValue)) { // if the current flag group is an allowed flag group

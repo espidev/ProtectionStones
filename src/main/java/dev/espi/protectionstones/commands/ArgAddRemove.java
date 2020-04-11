@@ -164,7 +164,7 @@ public class ArgAddRemove implements PSCommandArg {
                         }
                         break;
                 }
-
+                
                 return StringUtil.copyPartialMatches(args[args.length-1], ret, new ArrayList<>());
             }
         } catch (Exception e) {

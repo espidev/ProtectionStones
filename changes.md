@@ -9,3 +9,11 @@
 * Removed adding WG profiles on startup (random chance of an error) 
 * Remove SpongePhysicsEvent listener since BlockPhysicsEvent should do it (and it doesn't work for some reason) 
 * Removed WG profiles for UUID cache (no squirrelID)
+* Removed javadoc plugin
+* Added several utility classes using reflection for /ps view particles, and NBT data manipulation
+
+## Bugs dealt with
+* /ps view particles only show up at a certain range from where the player originally called /ps view
+* /ps flag clickable text GUI causes client to crash
+    * Fixed by adding "" in the TextComponent for flagLine constructor (requires a String to start with)
+    * Added an extra ChatColor.WHITE before the flag group (colour didn't inherit for some reason?)
