@@ -105,6 +105,7 @@ public enum PSL {
     CANNOT_MERGE_RENTED_REGION("psregion.cannot_merge_rented_region", ChatColor.RED + "Cannot merge regions because region %region% is in the process of being rented out!"),
     NO_PERMISSION_REGION_TYPE("psregion.no_permission_region_type", ChatColor.RED + "You do not have permission to have this region type."),
     REGION_HIDDEN("psregion.hidden", ChatColor.GRAY + "The protection block is now hidden."),
+    MUST_BE_PLACED_IN_EXISTING_REGION("psregion.must_be_placed_in_existing_region", ChatColor.RED + "This must be placed inside of an existing region!"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
