@@ -56,7 +56,7 @@ class PlayerPlaceholders {
                 return psp.getGlobalRegionLimits() + "";
             }
         } else if (identifier.startsWith("currentplayer_total_tax_owed")) {
-            int amount = 0;
+            double amount = 0;
             for (PSRegion psr : psp.getTaxEligibleRegions()) {
                 for (var tp : psr.getTaxPaymentsDue()) {
                     amount += tp.getAmount();

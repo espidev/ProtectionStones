@@ -44,7 +44,7 @@ public class ArgAdminHelp {
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin settaxautopayers", "Add a tax autopayer for every region on the server that does not have one.");
         send(p, ArgAdmin.FORCEMERGE_HELP, "Merge overlapping PS regions together if they have the same owners, members and flags.");
         send(p, ArgAdmin.CHANGEBLOCK_HELP, "Change all of the PS blocks and regions in a world to a different block. Both blocks must be configured in config.");
-        send(p, ArgAdmin.CHANGEREGIONTYPE_HELP, "Change the internal type of all PS regions of a certain type. Used for pre 1.13 -> 1.13+ upgrades.");
+        send(p, ArgAdmin.CHANGEREGIONTYPE_HELP, "Change the internal type of all PS regions of a certain type. Useful for error correction.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin fixregions", "Use this command to correct errors for all of the PS regions in a world. Useful if you have issues with the plugin.");
 
         return true;
