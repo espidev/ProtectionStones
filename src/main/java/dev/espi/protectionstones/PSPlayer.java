@@ -19,10 +19,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.var;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -47,8 +44,6 @@ public class PSPlayer {
         NONMEMBER,
     }
 
-    @Getter
-    @Setter
     UUID uuid;
 
     Player p;
@@ -90,6 +85,15 @@ public class PSPlayer {
 
     public PSPlayer(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    /**
+     * Get the wrapped player's uuid.
+     * @return the uuid
+     */
+
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     /**
@@ -229,7 +233,7 @@ public class PSPlayer {
      * @return the regions that the player owes tax money to
      */
     public List<PSRegion> getTaxEligibleRegions() {
-        var m = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
         List<PSRegion> ret = new ArrayList<>();
 
         for (World w : m.keySet()) {

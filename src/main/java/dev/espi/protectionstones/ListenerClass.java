@@ -24,7 +24,6 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,7 +63,7 @@ public class ListenerClass implements Listener {
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                 int amount = 0;
                 for (PSRegion psr : psp.getTaxEligibleRegions()) {
-                    for (var tp : psr.getTaxPaymentsDue()) {
+                    for (PSRegion.TaxPayment tp : psr.getTaxPaymentsDue()) {
                         amount += tp.getAmount();
                     }
                 }

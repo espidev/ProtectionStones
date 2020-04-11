@@ -16,15 +16,13 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import dev.espi.protectionstones.utils.UUIDCache;
-import lombok.val;
-import lombok.var;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -112,7 +110,7 @@ public class ArgTax implements PSCommandArg {
                 List<TextComponent> entries = new ArrayList<>();
                 for (PSRegion r : p.getTaxEligibleRegions()) {
                     double amountDue = 0;
-                    for (var tp : r.getTaxPaymentsDue()) {
+                    for (PSRegion.TaxPayment tp : r.getTaxPaymentsDue()) {
                         amountDue += tp.getAmount();
                     }
 
@@ -137,7 +135,7 @@ public class ArgTax implements PSCommandArg {
                     PSL.msg(p, PSL.TAX_NEXT.msg().replace("%page%", pageNum + 2 + ""));
             });
         } else if (args.length == 3) { // /ps tax info [region]
-            var list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), args[2]);
+            List<PSRegion> list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), args[2]);
             if (list.isEmpty()) {
                 return PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
             }
@@ -174,7 +172,7 @@ public class ArgTax implements PSCommandArg {
         if (!r.isOwner(p.getUuid()))
             return PSL.msg(p, PSL.NOT_OWNER.msg());
 
-        val payment = Double.parseDouble(args[2]);
+        double payment = Double.parseDouble(args[2]);
         // must be higher than or equal to zero
         if (payment <= 0)
             return PSL.msg(p, PAY_HELP);
@@ -183,7 +181,7 @@ public class ArgTax implements PSCommandArg {
             return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg());
 
         // pay tax amount
-        val res = r.payTax(p, payment);
+        EconomyResponse res = r.payTax(p, payment);
         PSL.msg(p, PSL.TAX_PAID.msg()
                 .replace("%amount%", String.format("%.2f", res.amount))
                 .replace("%region%", r.getName() == null ? r.getId() : r.getName() + "(" + r.getId() + ")"));
@@ -227,7 +225,7 @@ public class ArgTax implements PSCommandArg {
             }
 
         } else { // region query
-            var list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), region);
+            List<PSRegion> list = ProtectionStones.getPSRegions(p.getPlayer().getWorld(), region);
             if (list.isEmpty()) {
                 PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
                 return null;

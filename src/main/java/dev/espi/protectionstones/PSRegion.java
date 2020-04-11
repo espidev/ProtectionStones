@@ -20,9 +20,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,7 +28,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -349,13 +349,16 @@ public abstract class PSRegion {
 
     // -=-=-=-=- Taxes -=-=-=-=-
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
     public static class TaxPayment implements Comparable<TaxPayment> {
         long whenPaymentIsDue;
         double amount;
         String regionId; // the region that caused the payment (especially applicable for group regions); also used since hashsets don't have duplicates
+
+        public TaxPayment(long whenPaymentIsDue, double amount, String regionId) {
+            this.whenPaymentIsDue = whenPaymentIsDue;
+            this.amount = amount;
+            this.regionId = regionId;
+        }
 
         /**
          * Convert a flag entry to a tax payment object. The flag entry is in the form "timestamp amount regionId".
@@ -384,14 +387,40 @@ public abstract class PSRegion {
         public int compareTo(TaxPayment t) {
             return Long.compare(whenPaymentIsDue, t.whenPaymentIsDue);
         }
+
+        public long getWhenPaymentIsDue() {
+            return this.whenPaymentIsDue;
+        }
+
+        public double getAmount() {
+            return this.amount;
+        }
+
+        public String getRegionId() {
+            return this.regionId;
+        }
+
+        public void setWhenPaymentIsDue(long whenPaymentIsDue) {
+            this.whenPaymentIsDue = whenPaymentIsDue;
+        }
+
+        public void setAmount(double amount) {
+            this.amount = amount;
+        }
+
+        public void setRegionId(String regionId) {
+            this.regionId = regionId;
+        }
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
     public static class LastRegionTaxPaymentEntry {
         String regionId;
         long lastPaymentAdded;
+
+        public LastRegionTaxPaymentEntry(String regionId, long lastPaymentAdded) {
+            this.regionId = regionId;
+            this.lastPaymentAdded = lastPaymentAdded;
+        }
 
         /**
          * Convert a flag entry to a last region tax payment entry object. The flag entry is in the form "regionId timestamp".
@@ -414,6 +443,22 @@ public abstract class PSRegion {
          */
         public String toFlagEntry() {
             return regionId + " " + lastPaymentAdded;
+        }
+
+        public String getRegionId() {
+            return this.regionId;
+        }
+
+        public long getLastPaymentAdded() {
+            return this.lastPaymentAdded;
+        }
+
+        public void setRegionId(String regionId) {
+            this.regionId = regionId;
+        }
+
+        public void setLastPaymentAdded(long lastPaymentAdded) {
+            this.lastPaymentAdded = lastPaymentAdded;
         }
     }
 

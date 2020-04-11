@@ -17,8 +17,9 @@
 
 package dev.espi.protectionstones.placeholders;
 
-import dev.espi.protectionstones.PSPlayer;
-import dev.espi.protectionstones.PSProtectBlock;
+import dev.espi.protectionstones.*;
+import lombok.var;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -54,6 +55,14 @@ class PlayerPlaceholders {
             } else {
                 return psp.getGlobalRegionLimits() + "";
             }
+        } else if (identifier.startsWith("currentplayer_total_tax_owed")) {
+            int amount = 0;
+            for (PSRegion psr : psp.getTaxEligibleRegions()) {
+                for (var tp : psr.getTaxPaymentsDue()) {
+                    amount += tp.getAmount();
+                }
+            }
+            return String.format("%.2f", amount);
         }
         return "";
     }

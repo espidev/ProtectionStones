@@ -20,8 +20,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.val;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -50,8 +48,8 @@ public class LegacyUpgrade {
         }
 
         for (World world : Bukkit.getWorlds()) {
-            var rm = WGUtils.getRegionManagerWithWorld(world);
-            for (val r : rm.getRegions().values()) {
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
+            for (ProtectedRegion r : rm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion psr = PSRegion.fromWGRegion(world, r);
 
