@@ -58,8 +58,7 @@ class ArgAdminChangeblock {
 
         World w = Bukkit.getWorld(world);
         if (w == null) {
-            PSL.msg(p, ChatColor.GRAY + "The world is not valid!");
-            return true;
+            return PSL.msg(p, PSL.INVALID_WORLD.msg());
         }
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) {

@@ -35,6 +35,7 @@ public class ArgAdmin implements PSCommandArg {
     static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]",
                         FLAG_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]",
                         CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtypealias] [newtypealias]",
+                        CHANGEREGIONTYPE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeregiontype [world] [oldtype] [newtype]",
                         FORCEMERGE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]";
 
     @Override
@@ -96,6 +97,8 @@ public class ArgAdmin implements PSCommandArg {
                 return ArgAdminRecreate.argumentAdminRecreate(s, args);
             case "changeblock":
                 return ArgAdminChangeblock.argumentAdminChangeblock(s, args);
+            case "changeregiontype":
+                return ArgAdminChangeType.argumentAdminChangeType(s, args);
             case "forcemerge":
                 return ArgAdminForceMerge.argumentAdminForceMerge(s, args);
             case "settaxautopayers":
@@ -112,7 +115,7 @@ public class ArgAdmin implements PSCommandArg {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (args.length == 2) {
-            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock", "settaxautopayers");
+            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock", "changeregiontype", "settaxautopayers");
             return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
         } else if (args.length >= 3 && args[1].equals("forcemerge")) {
             return ArgAdminForceMerge.tabComplete(sender, alias, args);

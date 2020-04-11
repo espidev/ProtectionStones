@@ -19,7 +19,6 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import dev.espi.protectionstones.commands.ArgTax;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.ConfigUpgrades;
 import org.bukkit.Bukkit;
@@ -282,7 +281,7 @@ public class PSConfig {
             } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
 
                 // format PROTECTION_STONES:alias
-                String alias = mat.substring(mat.indexOf(":")+1);
+                String alias = mat.substring(mat.indexOf(":") + 1);
                 PSProtectBlock use = ProtectionStones.getProtectBlockFromAlias(alias);
                 if (use != null && use.createItem() != null) {
                     recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(use.createItem()));
