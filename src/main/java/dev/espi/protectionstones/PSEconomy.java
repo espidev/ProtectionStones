@@ -29,10 +29,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class PSEconomy {
-    private List<PSRegion> rentedList = new ArrayList<>();
+    private List<PSRegion> rentedList = new CopyOnWriteArrayList<>();
     private static int rentRunner = -1, taxRunner = -1;
 
     public PSEconomy() {
@@ -130,7 +131,7 @@ public class PSEconomy {
                     PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
                     val res = r.payTax(psp, psp.getBalance());
 
-                    if (psp.getPlayer() != null) {
+                    if (psp.getPlayer() != null && res.amount != 0) {
                         PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
                                 .replace("%amount%", String.format("%.2f", res.amount))
                                 .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
