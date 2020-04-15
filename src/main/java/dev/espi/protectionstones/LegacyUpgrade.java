@@ -44,7 +44,6 @@ public class LegacyUpgrade {
         }
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
-            List<String> regionsToDelete = new ArrayList<>();
             for (ProtectedRegion r : rm.getRegions().values()) {
                 if (r.getId().startsWith("ps")) {
                     ProtectionStones.getPluginLogger().info("Upgrading region " + r.getId() + "...");
@@ -62,8 +61,8 @@ public class LegacyUpgrade {
                         }
 
                         if (material.equals("AIR")) {
-                            regionsToDelete.add(r.getId());
-                            continue;
+                            ProtectionStones.getPluginLogger().info("Changed " + r.getId() + " from AIR to COAL_ORE...");
+                            material = "COAL_ORE";
                         }
 
                         if (r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) == null) {
@@ -82,12 +81,6 @@ public class LegacyUpgrade {
                         e.printStackTrace();
                     }
                 }
-            }
-
-            // delete AIR regions
-            for (String id : regionsToDelete) {
-                ProtectionStones.getPluginLogger().info("Deleting AIR region " + id + "...");
-                rm.removeRegion(id);
             }
 
             try {
