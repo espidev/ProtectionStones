@@ -388,6 +388,9 @@ public enum PSL {
 
     public static void loadConfig() {
         keyToMsg.clear();
+
+        YamlConfiguration yml = new YamlConfiguration();
+
         if (!conf.exists()) {
             try {
                 conf.createNewFile();
@@ -396,26 +399,33 @@ public enum PSL {
             }
         }
 
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(conf);
-        for (PSL psl : PSL.values()) {
-            if (yml.getString(psl.key) == null) {
-                yml.set(psl.key, psl.msg.replace('§', '&'));
-            } else {
+        try {
+            yml.load(conf); // can throw error
+            for (PSL psl : PSL.values()) {
+                if (yml.getString(psl.key) == null) {
+                    yml.set(psl.key, psl.msg.replace('§', '&'));
+                } else {
 
-                // psl conversions
-                if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
-                    yml.set(psl.key, psl.msg.replace('§', '&'));
-                } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
-                    yml.set(psl.key, psl.msg.replace('§', '&'));
-                } else { // use custom setting
-                    keyToMsg.put(psl.key, yml.getString(psl.key));
+                    // psl conversions
+                    if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
+                        yml.set(psl.key, psl.msg.replace('§', '&'));
+                    } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
+                        yml.set(psl.key, psl.msg.replace('§', '&'));
+                    } else { // use custom setting
+                        keyToMsg.put(psl.key, yml.getString(psl.key));
+                    }
                 }
             }
-        }
-        try {
-            yml.save(conf);
-        } catch (IOException e) {
+            try {
+                yml.save(conf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) { // prevent bad messages.yml file from resetting the file
             e.printStackTrace();
+            for (PSL psl : PSL.values()) {
+                keyToMsg.put(psl.key, psl.msg);
+            }
         }
     }
 
