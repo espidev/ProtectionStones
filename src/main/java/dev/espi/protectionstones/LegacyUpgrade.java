@@ -18,6 +18,7 @@ package dev.espi.protectionstones;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,18 +44,26 @@ public class LegacyUpgrade {
         }
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
-            for (String regionName : rm.getRegions().keySet()) {
-                if (regionName.startsWith("ps")) {
+            List<String> regionsToDelete = new ArrayList<>();
+            for (ProtectedRegion r : rm.getRegions().values()) {
+                if (r.getId().startsWith("ps")) {
+                    ProtectionStones.getPluginLogger().info("Upgrading region " + r.getId() + "...");
                     try {
-                        PSLocation psl = WGUtils.parsePSRegionToLocation(regionName);
-                        ProtectedRegion r = rm.getRegion(regionName);
+                        PSLocation psl = WGUtils.parsePSRegionToLocation(r.getId());
 
                         // get material of ps
                         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z", material;
                         if (hideFile != null && hideFile.contains(entry)) {
                             material = hideFile.getString(entry);
                         } else {
+                            world.loadChunk(psl.x >> 16, psl.z >> 16);
                             material = world.getBlockAt(psl.x, psl.y, psl.z).getType().toString();
+                            world.unloadChunk(psl.x >> 16, psl.y >> 16);
+                        }
+
+                        if (material.equals("AIR")) {
+                            regionsToDelete.add(r.getId());
+                            continue;
                         }
 
                         if (r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) == null) {
@@ -74,6 +83,13 @@ public class LegacyUpgrade {
                     }
                 }
             }
+
+            // delete AIR regions
+            for (String id : regionsToDelete) {
+                ProtectionStones.getPluginLogger().info("Deleting AIR region " + id + "...");
+                rm.removeRegion(id);
+            }
+
             try {
                 rm.save();
             } catch (Exception e) {
@@ -89,9 +105,9 @@ public class LegacyUpgrade {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
 
             // iterate over regions in world
-            for (String regionName : rm.getRegions().keySet()) {
-                if (regionName.startsWith("ps")) {
-                    ProtectedRegion region = rm.getRegion(regionName);
+            for (ProtectedRegion region : rm.getRegions().values()) {
+                if (region.getId().startsWith("ps")) {
+                    ProtectionStones.getPluginLogger().info("Updating region " + region.getId() + "...");
 
                     // convert owners with player names to UUIDs
                     List<String> owners, members;
@@ -100,12 +116,12 @@ public class LegacyUpgrade {
 
                     // convert
                     for (String owner : owners) {
-                        UUID uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
+                        UUID uuid = UUIDCache.containsName(owner) ? UUIDCache.getUUIDFromName(owner) : Bukkit.getOfflinePlayer(owner).getUniqueId();
                         region.getOwners().removePlayer(owner);
                         region.getOwners().addPlayer(uuid);
                     }
                     for (String member : members) {
-                        UUID uuid = Bukkit.getOfflinePlayer(member).getUniqueId();
+                        UUID uuid = UUIDCache.containsName(member) ? UUIDCache.getUUIDFromName(member) : Bukkit.getOfflinePlayer(member).getUniqueId();
                         region.getMembers().removePlayer(member);
                         region.getMembers().addPlayer(uuid);
                     }
