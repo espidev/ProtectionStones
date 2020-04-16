@@ -133,7 +133,7 @@ public class ListenerClass implements Listener {
         if (e.isCancelled()) return;
 
         // shift-right click block with hand to break
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlockType(e.getClickedBlock())) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlock(e.getClickedBlock())) {
             PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
             if (ppb.allowShiftRightBreak) {
                 if (e.getPlayer().isSneaking()) {
