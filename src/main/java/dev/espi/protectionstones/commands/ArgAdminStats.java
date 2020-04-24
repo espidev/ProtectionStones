@@ -16,12 +16,15 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+
+import java.util.HashMap;
 
 class ArgAdminStats {
 
@@ -38,8 +41,9 @@ class ArgAdminStats {
             String playerName = args[2];
             OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
             int count = 0;
-            for (World w : Bukkit.getWorlds()) {
-                count += WGUtils.getRegionManagerWithWorld(w).getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
+            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+            for (RegionManager rgm : m.values()) {
+                count += rgm.getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
             }
             p.sendMessage(ChatColor.YELLOW + playerName + ":");
             p.sendMessage(ChatColor.YELLOW + "================");
