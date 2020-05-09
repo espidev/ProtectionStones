@@ -137,7 +137,7 @@ public class ListenerClass implements Listener {
             PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
             if (ppb.allowShiftRightBreak) {
                 if (e.getPlayer().isSneaking()) {
-                    if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
+                    if (ProtectionStones.isProtectBlock(e.getClickedBlock()) && playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
                         e.getClickedBlock().setType(Material.AIR);
                     }
                 }
