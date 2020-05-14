@@ -142,7 +142,7 @@ public class ArgHome implements PSCommandArg {
 
                 // remove regions not owned by the player
                 for (int i = 0; i < regions.size(); i++) {
-                    if (!regions.get(i).isOwner(p.getUniqueId())) {
+                    if (!regions.get(i).isOwner(p.getUniqueId()) || (regions.get(i).getTypeOptions() != null && regions.get(i).getTypeOptions().preventPsHome)) {
                         regions.remove(i);
                         i--;
                     }
