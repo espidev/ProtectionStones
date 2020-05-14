@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Wrapper for a Bukkit player so that it exposes ProtectionStones related methods.
@@ -290,6 +291,22 @@ public class PSPlayer {
         });
 
         return regions;
+    }
+
+    /**
+     * Get the list of homes a player owns. It is recommended to run this asynchronously.
+     *
+     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
+     *
+     * @param w world to search for regions in
+     * @return list of regions that are the player's homes
+     */
+
+    public List<PSRegion> getHomes(World w) {
+        return getPSRegions(w, false)
+                .stream()
+                .filter(r -> r.getTypeOptions() == null || (r.getTypeOptions() != null && !r.getTypeOptions().preventPsHome))
+                .collect(Collectors.toList());
     }
 
 }

@@ -221,6 +221,8 @@ class ConfigPlaceholders {
                 return b.tpWaitingSeconds + "";
             case "player_prevent_ps_get":
                 return b.preventPsGet + "";
+            case "player_prevent_ps_home":
+                return b.preventPsHome + "";
             case "player_permission":
                 return b.permission;
 
