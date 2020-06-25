@@ -544,7 +544,7 @@ public class ProtectionStones extends JavaPlugin {
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
 
         // update to UUIDs
-        if (configOptions.uuidupdated == null || !configOptions.uuidupdated)
+        if (!configOptions.uuidupdated)
             LegacyUpgrade.convertToUUID();
 
         getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
