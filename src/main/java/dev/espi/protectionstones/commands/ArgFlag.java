@@ -161,7 +161,7 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 // put group it applies to
-                TextComponent groupChange = new TextComponent(" [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
+                TextComponent groupChange = new TextComponent(ChatColor.DARK_GRAY + " [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
 
                 String nextGroup;
                 if (currentFlagGroups.contains(groupfValue)) { // if the current flag group is an allowed flag group
