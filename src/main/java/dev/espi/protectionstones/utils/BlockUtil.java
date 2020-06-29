@@ -128,7 +128,7 @@ public class BlockUtil {
                 block.getX(),
                 block.getY(),
                 block.getZ(),
-                "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+                "{SkullOwner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
 
         // fake entity to run command at its location
