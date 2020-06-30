@@ -373,7 +373,6 @@ public class ProtectionStones extends JavaPlugin {
         ItemStack is = BlockUtil.getProtectBlockItemFromType(b.type);
 
         ItemMeta im = is.getItemMeta();
-        assert im != null;
 
         // add skull metadata, must be before others since it resets item metadata
         if (im instanceof SkullMeta && is.getType().equals(Material.PLAYER_HEAD) && b.type.split(":").length > 1) {
@@ -393,6 +392,7 @@ public class ProtectionStones extends JavaPlugin {
         im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.BYTE, (byte) 1);
 
         is.setItemMeta(im);
+
         return is;
     }
 

@@ -110,7 +110,16 @@ public class BlockUtil {
     public static ItemStack setHeadType(String psType, ItemStack item) {
         String name = psType.split(":")[1];
         if (name.length() > MAX_USERNAME_LENGTH) { // base 64 head
-            return Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\",Id:\"" + name + "\",Properties:{textures:[{Value:\"" + uuidToBase64Head.get(name) + "\"}]}}}");
+            String uuid = name;
+
+            // if 1.16 or above, use new uuid format
+            if (Integer.parseInt(MiscUtil.getVersionString().split("\\.")[1]) >= 16 || !MiscUtil.getVersionString().split("\\.")[0].equals("1")) {
+                uuid = MiscUtil.getUniqueIdIntArray(UUID.fromString(uuid));
+            } else { // quotes are needed for pre 1.16 uuids
+                uuid = "\"" + uuid + "\"";
+            }
+
+            return Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + uuidToBase64Head.get(name) + "\"}]}}}");
         } else { // normal name head
             SkullMeta sm = (SkullMeta) item.getItemMeta();
             sm.setOwningPlayer(Bukkit.getOfflinePlayer(name));
@@ -123,12 +132,19 @@ public class BlockUtil {
     private static void blockWithBase64(Block block, String uuid) {
         String base64 = uuidToBase64Head.get(uuid);
 
+        // if 1.16 or above, use new uuid format
+        if (Integer.parseInt(MiscUtil.getVersionString().split("\\.")[1]) >= 16 || !MiscUtil.getVersionString().split("\\.")[0].equals("1")) {
+            uuid = MiscUtil.getUniqueIdIntArray(UUID.fromString(uuid));
+        } else { // quotes are needed for pre 1.16 uuids
+            uuid = "\"" + uuid + "\"";
+        }
+
         String args = String.format(
                 "%d %d %d %s",
                 block.getX(),
                 block.getY(),
                 block.getZ(),
-                "{SkullOwner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+                "{SkullOwner:{Name:\"" + uuid + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
         );
 
         // fake entity to run command at its location

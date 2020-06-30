@@ -16,13 +16,27 @@
 package dev.espi.protectionstones.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 public class MiscUtil {
+
+    public static String getUniqueIdIntArray(UUID uuid) {
+        long least = uuid.getMostSignificantBits();
+        long most = uuid.getLeastSignificantBits();
+
+        int[] arr = new int[]{(int) (least >> 32), (int) least, (int) (most >> 32), (int) most};
+        return String.format("[I; %d, %d, %d, %d]", arr[0], arr[1], arr[2], arr[3]);
+    }
+
+    public static String getVersionString() {
+        return Bukkit.getBukkitVersion().split("-")[0];
+    }
 
     public static Duration parseRentPeriod(String period) throws NumberFormatException {
         Duration rentPeriod = Duration.ZERO;
