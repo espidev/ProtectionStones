@@ -130,22 +130,27 @@ public class BlockUtil {
 
     // Note: this code is really weird
     private static void blockWithBase64(Block block, String uuid) {
-        String base64 = uuidToBase64Head.get(uuid);
+        String base64 = uuidToBase64Head.get(uuid), args;
 
         // if 1.16 or above, use new uuid format
         if (Integer.parseInt(MiscUtil.getVersionString().split("\\.")[1]) >= 16 || !MiscUtil.getVersionString().split("\\.")[0].equals("1")) {
             uuid = MiscUtil.getUniqueIdIntArray(UUID.fromString(uuid));
-        } else { // quotes are needed for pre 1.16 uuids
-            uuid = "\"" + uuid + "\"";
+            args = String.format(
+                    "%d %d %d %s",
+                    block.getX(),
+                    block.getY(),
+                    block.getZ(),
+                    "{SkullOwner:{Name:\"" + uuid + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+            );
+        } else { // tag was different pre 1.16
+            args = String.format(
+                    "%d %d %d %s",
+                    block.getX(),
+                    block.getY(),
+                    block.getZ(),
+                    "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
+            );
         }
-
-        String args = String.format(
-                "%d %d %d %s",
-                block.getX(),
-                block.getY(),
-                block.getZ(),
-                "{SkullOwner:{Name:\"" + uuid + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
-        );
 
         // fake entity to run command at its location
         Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), ArmorStand.class, ent -> {
