@@ -68,12 +68,13 @@ public class BlockUtil {
 
             Skull s = (Skull) block.getState();
             if (s.hasOwner()) {
-                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + s.getOwningPlayer().getUniqueId().toString()) != null) {
+                OfflinePlayer op = s.getOwningPlayer();
+                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + op.getUniqueId().toString()) != null) {
                     // PLAYER_HEAD:base64
-                    return Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getUniqueId().toString();
+                    return Material.PLAYER_HEAD.toString() + ":" + op.getUniqueId().toString();
                 } else {
                     // PLAYER_HEAD:name
-                    return Material.PLAYER_HEAD.toString() + ":" + s.getOwningPlayer().getName(); // return name if doesn't exist
+                    return Material.PLAYER_HEAD.toString() + ":" + op.getName(); // return name if doesn't exist
                 }
 
             } else { // PLAYER_HEAD
