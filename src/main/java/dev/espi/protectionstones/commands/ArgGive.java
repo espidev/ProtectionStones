@@ -18,9 +18,11 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
@@ -52,7 +54,7 @@ public class ArgGive implements PSCommandArg {
         if (!p.hasPermission("protectionstones.give"))
             return PSL.msg(p, PSL.NO_PERMISSION_GIVE.msg());
 
-        if (args.length != 3)
+        if (args.length < 3)
             return PSL.msg(p, PSL.GIVE_HELP.msg());
 
         // check if player online
@@ -66,7 +68,12 @@ public class ArgGive implements PSCommandArg {
 
         // check if item was able to be added (inventory not full)
         Player ps = Bukkit.getPlayer(args[2]);
-        if (!ps.getInventory().addItem(cp.createItem()).isEmpty()) {
+
+        ItemStack item = cp.createItem();
+        if (args.length >= 4 && NumberUtils.isNumber(args[3]))
+            item.setAmount(Integer.parseInt(args[3]));
+
+        if (!ps.getInventory().addItem(item).isEmpty()) {
             if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
                 PSL.msg(ps, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
                 ps.getWorld().dropItem(ps.getLocation(), cp.createItem());

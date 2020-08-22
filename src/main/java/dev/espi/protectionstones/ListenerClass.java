@@ -66,7 +66,7 @@ public class ListenerClass implements Listener {
                 }
 
                 if (amount != 0) {
-                    PSL.msg(psp, PSL.TAX_JOIN_MSG_PENDING_PAYMENTS.msg().replace("%money%", ""+amount));
+                    PSL.msg(psp, PSL.TAX_JOIN_MSG_PENDING_PAYMENTS.msg().replace("%money%", "" + amount));
                 }
             });
         }
@@ -130,13 +130,13 @@ public class ListenerClass implements Listener {
         if (e.isCancelled()) return;
 
         // shift-right click block with hand to break
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand() && e.getClickedBlock() != null && ProtectionStones.isProtectBlockType(e.getClickedBlock())) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand()
+                && e.getClickedBlock() != null && ProtectionStones.isProtectBlock(e.getClickedBlock())) {
+
             PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
-            if (ppb.allowShiftRightBreak) {
-                if (e.getPlayer().isSneaking()) {
-                    if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
-                        e.getClickedBlock().setType(Material.AIR);
-                    }
+            if (ppb.allowShiftRightBreak && e.getPlayer().isSneaking()) {
+                if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
+                    e.getClickedBlock().setType(Material.AIR);
                 }
             }
         }
@@ -282,16 +282,22 @@ public class ListenerClass implements Listener {
         }
     }
 
-    private void execEvent(String action, CommandSender s, String player, String region) {
+    private void execEvent(String action, CommandSender s, String player, PSRegion region) {
         if (player == null) player = "";
 
+        // split action_type: action
         String[] sp = action.split(": ");
         if (sp.length == 0) return;
 
         StringBuilder act = new StringBuilder(sp[1]);
-        for (int i = 2; i < sp.length; i++) act.append(": ").append(sp[i]);
+        for (int i = 2; i < sp.length; i++) act.append(": ").append(sp[i]); // add anything extra that has a colon
 
-        act = new StringBuilder(act.toString().replace("%player%", player).replace("%region%", region));
+        act = new StringBuilder(act.toString()
+                .replace("%player%", player)
+                .replace("%region%", region.getName() == null ? region.getId() : region.getName() + " (" + region.getId() + ")")
+                .replace("%block_x%", region.getProtectBlock().getX() + "")
+                .replace("%block_y%", region.getProtectBlock().getY() + "")
+                .replace("%block_z%", region.getProtectBlock().getZ() + ""));
 
         switch (sp[0]) {
             case "player_command":
@@ -318,7 +324,7 @@ public class ListenerClass implements Listener {
 
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
-            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
+            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion());
         }
     }
 
@@ -331,9 +337,9 @@ public class ListenerClass implements Listener {
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
             if (event.getPlayer() == null) {
-                execEvent(action, null, null, event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
+                execEvent(action, null, null, event.getRegion());
             } else {
-                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion().getName() == null ? event.getRegion().getId() : event.getRegion().getName() + "(" + event.getRegion().getId() + ")");
+                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion());
             }
         }
     }

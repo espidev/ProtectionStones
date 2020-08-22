@@ -91,6 +91,17 @@ public class ArgFlag implements PSCommandArg {
                 if (f == null) continue;
                 Object fValue = r.getWGRegion().getFlag(f);
 
+                // check current flag's set group
+                String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
+                        toLowerCase().
+                        replace("_", "");
+
+                // add flag group if there is one set for the flag(for use in click commands)
+                String flagGroup = "";
+                if (r.getWGRegion().getFlag(f.getRegionGroupFlag()) != null) {
+                    flagGroup = "-g " + groupfValue + " ";
+                }
+
                 // replace § with & to prevent "illegal characters in chat" disconnection
                 if (fValue instanceof String) {
                     fValue = ((String) fValue).replace("§", "&");
@@ -104,14 +115,14 @@ public class ArgFlag implements PSCommandArg {
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     if (fValue == StateFlag.State.ALLOW) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
                     } else if (fValue == StateFlag.State.DENY) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
                     } else {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " allow"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " deny"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
                     }
 
                     flagLine.addExtra(allow);
@@ -125,14 +136,14 @@ public class ArgFlag implements PSCommandArg {
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     if (fValue == Boolean.TRUE) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " false"));
                     } else if (fValue == Boolean.FALSE) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " none"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " true"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
                     } else {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " true"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + page + ":" + flag + " false"));
+                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " true"));
+                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " false"));
                     }
 
                     flagLine.addExtra(allow);
@@ -143,7 +154,7 @@ public class ArgFlag implements PSCommandArg {
                     TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
                     edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
                             .replace("%value%", fValue == null ? "none" : fValue.toString())).create()));
-                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flag + " "));
+                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flagGroup + flag + " "));
                     flagLine.addExtra(edit);
                     flagLine.addExtra(getDots(22));
                 }
@@ -168,7 +179,9 @@ public class ArgFlag implements PSCommandArg {
                 } else {
                     hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
                 }
-                groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                if (!nextGroup.equals(groupfValue)) { // only display hover message if the group is not the same
+                    groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                }
                 groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
 
                 flagLine.addExtra(groupChange);

@@ -18,7 +18,7 @@ This project was forked from (OUTDATED) https://github.com/vik1395/ProtectionSto
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.7.3pre1.13
+* ProtectionStones 2.7.7pre1.13
   * WorldGuard 6.2
   * WorldEdit 6.x
   * Vault (Optional)

@@ -178,7 +178,7 @@ public class ArgTax implements PSCommandArg {
             return PSL.msg(p, PAY_HELP);
         // player must have this amount of money
         if (!p.hasAmount(payment))
-            return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg());
+            return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", payment)));
 
         // pay tax amount
         EconomyResponse res = r.payTax(p, payment);

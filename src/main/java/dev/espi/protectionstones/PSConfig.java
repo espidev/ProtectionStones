@@ -48,40 +48,40 @@ public class PSConfig {
     @Path("config_version")
     public int configVersion;
     @Path("uuidupdated")
-    public Boolean uuidupdated;
+    public boolean uuidupdated;
     @Path("placing_cooldown")
     public int placingCooldown;
     @Path("allow_duplicate_region_names")
-    public Boolean allowDuplicateRegionNames;
+    public boolean allowDuplicateRegionNames;
     @Path("async_load_uuid_cache")
-    public Boolean asyncLoadUUIDCache;
+    public boolean asyncLoadUUIDCache;
     @Path("ps_view_cooldown")
-    public Integer psViewCooldown;
+    public int psViewCooldown;
     @Path("base_command")
     public String base_command;
     @Path("aliases")
     public List<String> aliases;
     @Path("drop_item_when_inventory_full")
-    public Boolean dropItemWhenInventoryFull;
+    public boolean dropItemWhenInventoryFull;
     @Path("regions_must_be_adjacent")
-    public Boolean regionsMustBeAdjacent;
+    public boolean regionsMustBeAdjacent;
     @Path("allow_merging_regions")
-    public Boolean allowMergingRegions;
+    public boolean allowMergingRegions;
     @Path("allow_merging_holes")
-    public Boolean allowMergingHoles;
+    public boolean allowMergingHoles;
 
     @Path("economy.max_rent_price")
-    public Double maxRentPrice;
+    public double maxRentPrice;
     @Path("economy.min_rent_price")
-    public Double minRentPrice;
+    public double minRentPrice;
     @Path("economy.max_rent_period")
-    public Integer maxRentPeriod;
+    public int maxRentPeriod;
     @Path("economy.min_rent_period")
-    public Integer minRentPeriod;
+    public int minRentPeriod;
     @Path("economy.tax_enabled")
-    public Boolean taxEnabled;
+    public boolean taxEnabled;
     @Path("economy.tax_message_on_join")
-    public Boolean taxMessageOnJoin;
+    public boolean taxMessageOnJoin;
 
     static void initConfig() {
 

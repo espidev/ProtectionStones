@@ -71,7 +71,7 @@ public class ArgHome implements PSCommandArg {
 
             // add to cache if not already
             if (tabCache.get(p.getUniqueId()) == null) {
-                List<PSRegion> regions = psp.getPSRegions(p.getWorld(), false);
+                List<PSRegion> regions = psp.getHomes(p.getWorld());
                 List<String> regionNames = new ArrayList<>();
                 for (PSRegion r : regions) {
                     if (r.getName() != null) regionNames.add(r.getName());
@@ -94,7 +94,7 @@ public class ArgHome implements PSCommandArg {
 
     private void openHomeGUI(Player p, int page) {
         PSPlayer psp = PSPlayer.fromPlayer(p);
-        List<PSRegion> regions = psp.getPSRegions(p.getWorld(), false);
+        List<PSRegion> regions = psp.getHomes(p.getWorld());
 
         List<TextComponent> entries = new ArrayList<>();
         for (PSRegion r : regions) {
@@ -142,7 +142,7 @@ public class ArgHome implements PSCommandArg {
 
                 // remove regions not owned by the player
                 for (int i = 0; i < regions.size(); i++) {
-                    if (!regions.get(i).isOwner(p.getUniqueId())) {
+                    if (!regions.get(i).isOwner(p.getUniqueId()) || (regions.get(i).getTypeOptions() != null && regions.get(i).getTypeOptions().preventPsHome)) {
                         regions.remove(i);
                         i--;
                     }

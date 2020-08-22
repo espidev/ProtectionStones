@@ -160,6 +160,8 @@ public class PSProtectBlock {
     public int tpWaitingSeconds;
     @Path("player.prevent_ps_get")
     public boolean preventPsGet;
+    @Path("player.prevent_ps_home")
+    public boolean preventPsHome;
     @Path("player.permission")
     public String permission;
 

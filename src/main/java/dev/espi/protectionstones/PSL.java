@@ -311,7 +311,7 @@ public enum PSL {
     GET_GUI_HOVER("get.gui_hover", "Click to buy a %alias%!"),
 
     // ps give
-    GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player]"),
+    GIVE_HELP("give.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps give [block] [player] [amount (optional)]"),
     GIVE_HELP_DESC("give.help_desc", "Use this command to give a player a protection block."),
     GIVE_GIVEN("give.given", ChatColor.GRAY + "Gave " + ChatColor.AQUA + "%block%" + ChatColor.GRAY + " to " + ChatColor.AQUA + "%player%" + ChatColor.GRAY + "."),
     GIVE_NO_INVENTORY_ROOM("give.no_inventory_room", ChatColor.RED + "The player does not have enough inventory room."),
@@ -388,6 +388,9 @@ public enum PSL {
 
     public static void loadConfig() {
         keyToMsg.clear();
+
+        YamlConfiguration yml = new YamlConfiguration();
+
         if (!conf.exists()) {
             try {
                 conf.createNewFile();
@@ -396,26 +399,33 @@ public enum PSL {
             }
         }
 
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(conf);
-        for (PSL psl : PSL.values()) {
-            if (yml.getString(psl.key) == null) {
-                yml.set(psl.key, psl.msg.replace('§', '&'));
-            } else {
+        try {
+            yml.load(conf); // can throw error
+            for (PSL psl : PSL.values()) {
+                if (yml.getString(psl.key) == null) {
+                    yml.set(psl.key, psl.msg.replace('§', '&'));
+                } else {
 
-                // psl conversions
-                if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
-                    yml.set(psl.key, psl.msg.replace('§', '&'));
-                } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
-                    yml.set(psl.key, psl.msg.replace('§', '&'));
-                } else { // use custom setting
-                    keyToMsg.put(psl.key, yml.getString(psl.key));
+                    // psl conversions
+                    if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
+                        yml.set(psl.key, psl.msg.replace('§', '&'));
+                    } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
+                        yml.set(psl.key, psl.msg.replace('§', '&'));
+                    } else { // use custom setting
+                        keyToMsg.put(psl.key, yml.getString(psl.key));
+                    }
                 }
             }
-        }
-        try {
-            yml.save(conf);
-        } catch (IOException e) {
+            try {
+                yml.save(conf);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) { // prevent bad messages.yml file from resetting the file
             e.printStackTrace();
+            for (PSL psl : PSL.values()) {
+                keyToMsg.put(psl.key, psl.msg);
+            }
         }
     }
 

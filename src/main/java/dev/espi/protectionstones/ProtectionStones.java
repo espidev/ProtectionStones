@@ -359,7 +359,6 @@ public class ProtectionStones extends JavaPlugin {
         ItemStack is = BlockUtil.getProtectBlockItemFromType(b.type);
 
         ItemMeta im = is.getItemMeta();
-        assert im != null;
 
         // add display name and lore
         if (!b.displayName.equals("")) {
@@ -373,7 +372,6 @@ public class ProtectionStones extends JavaPlugin {
 
         // add identifier for protection stone created items
         is = NBTEditor.set(is, (byte) 1, "isPSBlock");
-
         return is;
     }
 
@@ -514,7 +512,7 @@ public class ProtectionStones extends JavaPlugin {
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
 
         // update to UUIDs
-        if (configOptions.uuidupdated == null || !configOptions.uuidupdated)
+        if (!configOptions.uuidupdated)
             LegacyUpgrade.convertToUUID();
 
         getLogger().info("ProtectionStones has successfully started!");
