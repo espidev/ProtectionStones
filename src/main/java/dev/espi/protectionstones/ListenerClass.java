@@ -72,7 +72,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);
     }
@@ -142,7 +142,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
 

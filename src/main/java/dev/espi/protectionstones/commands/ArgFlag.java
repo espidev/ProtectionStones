@@ -159,10 +159,6 @@ public class ArgFlag implements PSCommandArg {
                     flagLine.addExtra(getDots(22));
                 }
 
-                // put group it applies to
-                String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
-                        toLowerCase().
-                        replace("_", "");
                 TextComponent groupChange = new TextComponent(ChatColor.DARK_GRAY + " [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
 
                 String nextGroup;
