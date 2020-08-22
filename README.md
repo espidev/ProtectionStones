@@ -1,4 +1,4 @@
-# ProtectionStones
+# ProtectionStones (1.8.8 - 1.12.2)
 [![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
 ![Open issues](https://img.shields.io/github/issues-raw/espidev/ProtectionStones)
 ![Closed issues](https://img.shields.io/github/issues-closed-raw/espidev/ProtectionStones)
@@ -18,9 +18,9 @@ This project was forked from (OUTDATED) https://github.com/vik1395/ProtectionSto
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
 ## Dependencies
-* ProtectionStones 2.7.5
-  * WorldGuard 7.0+
-  * WorldEdit 7.0+
+* ProtectionStones 2.7.7pre1.13
+  * WorldGuard 6.2
+  * WorldEdit 6.x
   * Vault (Optional)
   * PlaceholderAPI (Optional)
   

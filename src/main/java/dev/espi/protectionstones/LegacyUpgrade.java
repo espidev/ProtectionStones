@@ -17,8 +17,8 @@ package dev.espi.protectionstones;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,64 +34,6 @@ import java.util.*;
 
 public class LegacyUpgrade {
 
-    // for one day when we switch to proper base64 generation (no hashcode, use nameuuidfrombytes)
-    // problem is, currently I don't know how to convert all items to use this uuid
-    public static void fixBase64HeadRegions() {
-
-        HashMap<String, String> oldToNew = new HashMap<>();
-
-        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if (b.type.startsWith("PLAYER_HEAD:") && b.type.split(":").length > 1) {
-                String base64 = b.type.split(":")[1];
-                oldToNew.put(new UUID(base64.hashCode(), base64.hashCode()).toString(), UUID.nameUUIDFromBytes(base64.getBytes()).toString());
-            }
-        }
-
-        for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
-            for (ProtectedRegion r : rm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(r)) {
-                    PSRegion psr = PSRegion.fromWGRegion(world, r);
-
-                    if (psr instanceof PSGroupRegion) {
-                        PSGroupRegion psgr = (PSGroupRegion) psr;
-                        for (PSMergedRegion psmr : psgr.getMergedRegions()) {
-
-                            String type = psmr.getType();
-                            if (oldToNew.containsKey(type)) {
-                                Set<String> flag = psmr.getGroupRegion().getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
-                                String original = null;
-                                for (String s : flag) {
-                                    String[] spl = s.split(" ");
-                                    String id = spl[0];
-                                    if (id.equals(psmr.getId())) {
-                                        original = s;
-                                        break;
-                                    }
-                                }
-
-                                if (original != null) {
-                                    flag.remove(original);
-                                    flag.add(psmr.getId() + " " + oldToNew.get(type));
-                                }
-                            }
-                        }
-                    }
-
-                    if (oldToNew.containsKey(psr.getType())) {
-                        psr.getWGRegion().setFlag(FlagHandler.PS_BLOCK_MATERIAL, oldToNew.get(psr.getType()));
-                    }
-
-                }
-            }
-            try {
-                rm.save();
-            } catch (StorageException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     // check that all of the PS custom flags are in ps regions and upgrade if not
     // originally used for the v1 -> v2 transition
     public static void upgradeRegions() {
@@ -102,18 +44,25 @@ public class LegacyUpgrade {
         }
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
-            for (String regionName : rm.getRegions().keySet()) {
-                if (regionName.startsWith("ps")) {
+            for (ProtectedRegion r : rm.getRegions().values()) {
+                if (r.getId().startsWith("ps")) {
+                    ProtectionStones.getPluginLogger().info("Upgrading region " + r.getId() + "...");
                     try {
-                        PSLocation psl = WGUtils.parsePSRegionToLocation(regionName);
-                        ProtectedRegion r = rm.getRegion(regionName);
+                        PSLocation psl = WGUtils.parsePSRegionToLocation(r.getId());
 
                         // get material of ps
                         String entry = psl.x + "x" + psl.y + "y" + psl.z + "z", material;
                         if (hideFile != null && hideFile.contains(entry)) {
                             material = hideFile.getString(entry);
                         } else {
+                            world.loadChunk(psl.x >> 16, psl.z >> 16);
                             material = world.getBlockAt(psl.x, psl.y, psl.z).getType().toString();
+                            world.unloadChunk(psl.x >> 16, psl.y >> 16);
+                        }
+
+                        if (material.equals("AIR")) {
+                            ProtectionStones.getPluginLogger().info("Changed " + r.getId() + " from AIR to COAL_ORE...");
+                            material = "COAL_ORE";
                         }
 
                         if (r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) == null) {
@@ -133,6 +82,7 @@ public class LegacyUpgrade {
                     }
                 }
             }
+
             try {
                 rm.save();
             } catch (Exception e) {
@@ -148,9 +98,9 @@ public class LegacyUpgrade {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
 
             // iterate over regions in world
-            for (String regionName : rm.getRegions().keySet()) {
-                if (regionName.startsWith("ps")) {
-                    ProtectedRegion region = rm.getRegion(regionName);
+            for (ProtectedRegion region : rm.getRegions().values()) {
+                if (region.getId().startsWith("ps")) {
+                    ProtectionStones.getPluginLogger().info("Updating region " + region.getId() + "...");
 
                     // convert owners with player names to UUIDs
                     List<String> owners, members;
@@ -159,12 +109,12 @@ public class LegacyUpgrade {
 
                     // convert
                     for (String owner : owners) {
-                        UUID uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
+                        UUID uuid = UUIDCache.containsName(owner) ? UUIDCache.getUUIDFromName(owner) : Bukkit.getOfflinePlayer(owner).getUniqueId();
                         region.getOwners().removePlayer(owner);
                         region.getOwners().addPlayer(uuid);
                     }
                     for (String member : members) {
-                        UUID uuid = Bukkit.getOfflinePlayer(member).getUniqueId();
+                        UUID uuid = UUIDCache.containsName(member) ? UUIDCache.getUUIDFromName(member) : Bukkit.getOfflinePlayer(member).getUniqueId();
                         region.getMembers().removePlayer(member);
                         region.getMembers().addPlayer(uuid);
                     }
@@ -225,8 +175,8 @@ public class LegacyUpgrade {
                 b.set("region.flags", flags);
                 b.set("region.allowed_flags", allowedFlags);
                 b.set("region.priority", yml.getInt("Region." + type + ".Priority"));
-                b.set("block_data.display_name", "");
-                b.set("block_data.lore", Arrays.asList());
+                b.set("block_data.display_name", "&a&m<---&r&b " + (1+2*yml.getInt("Region." + type + ".X Radius")) + "x" + (1+2*yml.getInt("Region." + type + ".Z Radius")) + " Protection Stone &r&a&m--->");
+                b.set("block_data.lore", Arrays.asList("&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!"));
                 b.set("behaviour.auto_hide", yml.getBoolean("Region." + type + ".Auto Hide"));
                 b.set("behaviour.no_drop", yml.getBoolean("Region." + type + ".No Drop"));
                 b.set("behaviour.prevent_piston_push", yml.getBoolean("Region." + type + ".Block Piston"));

@@ -20,13 +20,14 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class ArgAdminHelp {
 
     private static void send(CommandSender p, String text, String info) {
         TextComponent tc = new TextComponent(text);
         tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(info).create()));
-        p.spigot().sendMessage(tc);
+        ((Player)p).spigot().sendMessage(tc);
     }
 
     static boolean argumentAdminHelp(CommandSender p, String[] args) {

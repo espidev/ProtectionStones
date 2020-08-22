@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -118,7 +119,7 @@ public class ArgHelp implements PSCommandArg {
             }
         }
 
-        TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries, false);
+        TextGUI.displayGUI((Player) p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries, false);
 
         if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
 

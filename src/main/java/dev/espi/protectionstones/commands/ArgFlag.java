@@ -82,13 +82,12 @@ public class ArgFlag implements PSCommandArg {
             } else {
                 String flag = allowedFlags.get(i);
                 List<String> currentFlagGroups = r.getTypeOptions().allowedFlags.get(flag);
-                TextComponent flagLine = new TextComponent();
+                TextComponent flagLine = new TextComponent("");
 
                 // calculate flag command
                 String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
-
-                // match flag
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flag);
+                Flag<?> f = DefaultFlag.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flag);
+                // null check
                 if (f == null) continue;
                 Object fValue = r.getWGRegion().getFlag(f);
 
@@ -161,6 +160,9 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 // put group it applies to
+                String groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()) == null ? "all" : r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString().
+                        toLowerCase().
+                        replace("_", "");
                 TextComponent groupChange = new TextComponent(ChatColor.DARK_GRAY + " [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
 
                 String nextGroup;
@@ -294,7 +296,7 @@ public class ArgFlag implements PSCommandArg {
             } else if (args.length == 3) { // flag options
                 keywords.addAll(Arrays.asList("null", "default"));
 
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[1]);
+                Flag<?> f = DefaultFlag.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[1]);
                 if (f instanceof StateFlag) {
                     keywords.addAll(Arrays.asList("allow", "deny"));
                 } else if (f instanceof BooleanFlag) {
@@ -313,7 +315,7 @@ public class ArgFlag implements PSCommandArg {
             } else if (args.length == 5 && args[1].equals("-g")) { // -g option flag arg
                 keywords.addAll(Arrays.asList("null", "default"));
 
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[3]);
+                Flag<?> f = DefaultFlag.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[3]);
                 if (f instanceof StateFlag) {
                     keywords.addAll(Arrays.asList("allow", "deny"));
                 } else if (f instanceof BooleanFlag) {
@@ -332,7 +334,7 @@ public class ArgFlag implements PSCommandArg {
         String[] flagSplit = flagName.split(":");
         if (flagSplit.length == 2) flagName = flagSplit[1];
 
-        Flag flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
+        Flag flag = DefaultFlag.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
         ProtectedRegion region = r.getWGRegion();
 
         try {

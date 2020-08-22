@@ -15,9 +15,6 @@
 
 package dev.espi.protectionstones.utils;
 
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.util.profile.Profile;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -64,7 +61,4 @@ public class UUIDCache {
         nameToUUID.remove(name.toLowerCase());
     }
 
-    public static void storeWGProfile(UUID uuid, String name) {
-        WorldGuard.getInstance().getProfileCache().put(new Profile(uuid, name));
-    }
 }

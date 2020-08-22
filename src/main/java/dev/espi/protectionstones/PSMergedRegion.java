@@ -15,8 +15,8 @@
 
 package dev.espi.protectionstones;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
@@ -77,7 +77,7 @@ public class PSMergedRegion extends PSRegion {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
-        for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
+        for (ProtectedRegion pr : rgm.getApplicableRegions(new BlockVector(l.getX(), l.getY(), l.getZ()))) {
             if (pr.getFlag(FlagHandler.PS_MERGED_REGIONS) != null && pr.getFlag(FlagHandler.PS_MERGED_REGIONS).contains(psID)) {
                 for (String s : pr.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
                     String[] spl = s.split(" ");
@@ -360,7 +360,7 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
-    public List<BlockVector2> getPoints() {
+    public List<BlockVector2D> getPoints() {
         return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id)).getPoints();
     }
 
