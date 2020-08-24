@@ -253,8 +253,8 @@ public class PSConfig {
         item.setAmount(b.recipeAmount);
 
         // create recipe
-        // encode alias to base64, because special characters (non ascii) will not work with recipes
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), Base64.getEncoder().encodeToString(b.alias.getBytes())), item);
+        // key must adhere to [a-z0-9/._-]
+        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.type.replaceAll("[+/=]", "")), item);
         HashMap<String, Character> items = new HashMap<>();
         List<String> recipeLine = new ArrayList<>();
         char id = 'a';
