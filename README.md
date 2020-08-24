@@ -17,6 +17,11 @@ This project was forked from (OUTDATED) https://github.com/vik1395/ProtectionSto
 
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
+## Compiling Instructions
+* Download BuildTools from the spigot website: https://hub.spigotmc.org/jenkins/job/BuildTools/
+* Compile the 1.8.8 version: `java -jar BuildTools.jar --rev 1.8.8` (this will add the craftbukkit library to the system)
+* Compile the plugin with maven: `mvn clean install`
+
 ## Dependencies
 * ProtectionStones 2.7.7pre1.13
   * WorldGuard 6.2
