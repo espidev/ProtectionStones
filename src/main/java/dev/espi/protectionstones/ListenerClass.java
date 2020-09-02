@@ -75,7 +75,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);
     }
@@ -143,14 +143,14 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
         PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(pb);
 
-        // check if block broken is protection stone
+        // check if block broken is protection stone type
         if (blockOptions == null) return;
 
         // check if that is actually a protection stone block (owns a region)
