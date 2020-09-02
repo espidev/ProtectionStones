@@ -47,7 +47,7 @@ import java.util.List;
 
 public class ListenerClass implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
         UUIDCache.removeUUID(e.getPlayer().getUniqueId());
         UUIDCache.removeName(e.getPlayer().getName());
@@ -75,7 +75,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);
     }
@@ -128,10 +128,8 @@ public class ListenerClass implements Listener {
         return true;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if (e.isCancelled()) return;
-
         // shift-right click block with hand to break
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand()
                 && e.getClickedBlock() != null && ProtectionStones.isProtectBlock(e.getClickedBlock())) {
@@ -145,10 +143,8 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
-        if (e.isCancelled()) return;
-
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
@@ -191,14 +187,14 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
         if (ProtectionStones.isProtectBlock(e.getBlock())) {
             e.setCancelled(true);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
         Block clicked = e.getBlockClicked();
         BlockFace bf = e.getBlockFace();
@@ -210,14 +206,14 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent e) {
         if (ProtectionStones.isProtectBlock(e.getToBlock())) {
             e.setCancelled(true);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
         // loop through exploded blocks
         for (int i = 0; i < e.blockList().size(); i++) {
@@ -248,26 +244,25 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e) {
         pistonUtil(e.getBlocks(), e);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e) {
         pistonUtil(e.getBlocks(), e);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
         if (ProtectionStones.isProtectBlock(event.getBlock())) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (event.isCancelled()) return;
         if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
