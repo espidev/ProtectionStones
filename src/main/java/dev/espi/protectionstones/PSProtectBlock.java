@@ -69,13 +69,10 @@ public class PSProtectBlock {
     @Path("region.z_offset")
     public int zOffset;
     @Path("region.home_x_offset")
-    @SpecDoubleInRange(min = 0, max = Integer.MAX_VALUE)
     public double homeXOffset;
     @Path("region.home_y_offset")
-    @SpecDoubleInRange(min = 0, max = Integer.MAX_VALUE)
     public double homeYOffset;
     @Path("region.home_z_offset")
-    @SpecDoubleInRange(min = 0, max = Integer.MAX_VALUE)
     public double homeZOffset;
     @Path("region.flags")
     public List<String> flags;
