@@ -68,7 +68,7 @@ public class BlockHandler {
     }
 
     // create PS region from a block place event
-    public static void createPSRegion(BlockPlaceEvent e) { // editing event is useless, as we are listening on MONITOR
+    public static void createPSRegion(BlockPlaceEvent e) {
         Player p = e.getPlayer();
         Block b = e.getBlock();
 
