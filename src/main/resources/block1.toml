@@ -55,7 +55,7 @@ allow_placing_in_wild = true
 
     # Offset the protection block
     # If you would like to make the protection block not be at the center of new regions, you can offset it here
-    # ex. x_offset = 32, y_offset = 0, z_offset = 32 would make it at the corner of a created region
+    # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
     x_offset = 0
     y_offset = 0
     z_offset = 0
