@@ -254,7 +254,7 @@ public class PSConfig {
 
         // create recipe
         // key must adhere to [a-z0-9/._-]
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.type.replaceAll("[+/=]", "")), item);
+        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.type.replaceAll("[+/=:]", "")), item);
         HashMap<String, Character> items = new HashMap<>();
         List<String> recipeLine = new ArrayList<>();
         char id = 'a';
