@@ -159,13 +159,13 @@ public class ArgTp implements PSCommandArg {
             // add teleport wait tasks to queue
             waitCounter.put(uuid, 0);
             taskCounter.put(uuid, Bukkit.getScheduler().runTaskTimer(ProtectionStones.getInstance(), () -> {
+                        Player pl = Bukkit.getPlayer(uuid);
                         // cancel if the player is not on the server
-                        if (Bukkit.getPlayer(uuid) == null) {
+                        if (pl == null) {
                             removeUUIDTimer(uuid);
                             return;
                         }
 
-                        Player pl = Bukkit.getPlayer(uuid);
                         if (waitCounter.get(uuid) == null) {
                             removeUUIDTimer(uuid);
                             return;
@@ -173,7 +173,7 @@ public class ArgTp implements PSCommandArg {
                         // increment seconds
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
                         // if the player moved cancel it
-                        if (l.getBlockX() != pl.getLocation().getBlockX() || l.getBlockY() != pl.getLocation().getBlockY() || l.getBlockZ() != pl.getLocation().getBlockZ()) {
+                        if (!inThreshold(l.getX(), pl.getLocation().getX()) || !inThreshold(l.getY(), pl.getLocation().getY()) || !inThreshold(l.getZ(), pl.getLocation().getZ())) {
                             PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
                             removeUUIDTimer(uuid);
                         } else if (waitCounter.get(uuid) == r.getTypeOptions().tpWaitingSeconds * 4) { // * 4 since this loops 4 times a second
@@ -185,6 +185,10 @@ public class ArgTp implements PSCommandArg {
                     }, 5, 5) // loop 4 times a second
             );
         }
+    }
+
+    private static boolean inThreshold(double location, double playerLoc) {
+        return playerLoc <= location + 1.0 && playerLoc >= location - 1.0;
     }
 
     private static void removeUUIDTimer(UUID uuid) {
