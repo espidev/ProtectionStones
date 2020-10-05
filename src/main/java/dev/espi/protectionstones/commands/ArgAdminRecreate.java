@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -44,6 +45,11 @@ class ArgAdminRecreate {
                     PSRegion wr = PSRegion.fromWGRegion(w, r);
                     if (wr instanceof PSGroupRegion) continue; // skip group regions for now TODO
                     PSProtectBlock blockOptions = wr.getTypeOptions();
+
+                    if (blockOptions == null) {
+                        Bukkit.getLogger().info("Region " + r.getId() + " in world " + w.getName() + " is not configured in the block config! Skipping...");
+                        continue;
+                    }
 
                     double bx = wr.getProtectBlock().getLocation().getX(), bxo = blockOptions.xOffset;
                     double by = wr.getProtectBlock().getLocation().getY(), bxy = blockOptions.yOffset;
