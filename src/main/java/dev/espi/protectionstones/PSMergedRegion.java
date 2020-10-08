@@ -67,10 +67,10 @@ public class PSMergedRegion extends PSRegion {
     // ~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~
 
     /**
-     * Finds the {@link PSMergedRegion} at a location that is a part of a merged region.
+     * Finds the {@link PSMergedRegion} at a location if the block at that location is the source protection block for it.
      *
      * @param l location to look at
-     * @return the {@link PSMergedRegion} the location is in, or null if not applicable
+     * @return the {@link PSMergedRegion} of the source block location, or null if not applicable
      */
     public static PSMergedRegion getMergedRegion(Location l) {
         String psID = WGUtils.createPSID(l);

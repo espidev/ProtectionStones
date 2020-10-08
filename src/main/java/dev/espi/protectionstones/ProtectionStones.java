@@ -223,7 +223,7 @@ public class ProtectionStones extends JavaPlugin {
         if (!isProtectBlockType(b)) return false;
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(b.getWorld());
         if (rgm == null) return false;
-        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSRegion.fromLocation(b.getLocation()) instanceof PSMergedRegion;
+        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSMergedRegion.fromLocation(b.getLocation()) != null;
     }
 
     /**
