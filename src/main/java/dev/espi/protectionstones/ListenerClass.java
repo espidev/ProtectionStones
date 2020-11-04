@@ -26,6 +26,7 @@ import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -214,18 +215,27 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent e) {
+        explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
+        explodeUtil(e.blockList(), e.getLocation().getWorld());
+    }
+
+    private void explodeUtil(List<Block> blockList, World w) {
         // loop through exploded blocks
-        for (int i = 0; i < e.blockList().size(); i++) {
-            Block b = e.blockList().get(i);
+        for (int i = 0; i < blockList.size(); i++) {
+            Block b = blockList.get(i);
 
             if (ProtectionStones.isProtectBlock(b)) {
                 String id = WGUtils.createPSID(b.getLocation());
 
                 PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
 
-                // remove block from exploded list if prevent_explode is enabled
-                e.blockList().remove(i);
+                // remove protection block from exploded list if prevent_explode is enabled
+                blockList.remove(i);
                 i--;
 
                 // if allow explode
@@ -237,7 +247,7 @@ public class ListenerClass implements Listener {
                     }
                     // remove region from worldguard if destroy_region_when_explode is enabled
                     if (blockOptions.destroyRegionWhenExplode) {
-                        ProtectionStones.removePSRegion(e.getLocation().getWorld(), id);
+                        ProtectionStones.removePSRegion(w, id);
                     }
                 }
             }
