@@ -17,11 +17,15 @@
 
 package dev.espi.protectionstones.placeholders;
 
-import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.PSPlayer;
+import dev.espi.protectionstones.PSProtectBlock;
+import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.WGUtils;
 import lombok.var;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,6 +67,14 @@ class PlayerPlaceholders {
                 }
             }
             return String.format("%.2f", amount);
+        } else if (identifier.startsWith("currentplayer_num_of_owned_regions")) {
+            List<PSRegion> regions = new ArrayList<>();
+            WGUtils.getAllRegionManagers().forEach((w, rgm) -> rgm.getRegions().values().forEach(r -> {
+                if (ProtectionStones.isPSRegion(r) && (r.getOwners().contains(psp.getUuid()))) {
+                    regions.add(PSRegion.fromWGRegion(w, r));
+                }
+            }));
+            return "" + regions.size();
         }
         return "";
     }
