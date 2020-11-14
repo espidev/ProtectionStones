@@ -258,6 +258,7 @@ allow_placing_in_wild = true
     # console_command - Execute command by console
     # message - Send message to player or console if applicable (colour support with &)
     # global_message - Send message to all players and console (colour support with &)
+    # console_message - Send message to console (colour support with &)
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Whether or not to enable event tracking (API events will still be enabled)
     enable = false

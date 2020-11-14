@@ -25,6 +25,7 @@ import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -323,12 +324,16 @@ public class ListenerClass implements Listener {
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act.toString());
                 break;
             case "message":
-                if (s != null) s.sendMessage(act.toString().replace('&', '§'));
+                if (s != null) s.sendMessage(ChatColor.translateAlternateColorCodes('&', act.toString()));
                 break;
             case "global_message":
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendMessage(act.toString().replace('&', '§'));
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', act.toString()));
                 }
+                Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', act.toString()));
+                break;
+            case "console_message":
+                Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', act.toString()));
                 break;
         }
     }
