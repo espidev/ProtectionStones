@@ -343,10 +343,13 @@ public class ListenerClass implements Listener {
         if (event.isCancelled()) return;
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
-        // run custom commands (in config)
-        for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
-            execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion());
-        }
+        // run on next tick (after the region is created to allow for edits to the region)
+        Bukkit.getServer().getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+            // run custom commands (in config)
+            for (String action : event.getRegion().getTypeOptions().regionCreateCommands) {
+                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion());
+            }
+        });
     }
 
     @EventHandler
