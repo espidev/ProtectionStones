@@ -217,7 +217,7 @@ public class FlagHandler {
                 }
 
             } catch (Exception e) {
-                Bukkit.getLogger().info("Error parsing flag: " + split[0] + "\nError: ");
+                ProtectionStones.getPluginLogger().warning("Error parsing flag: " + split[0] + "\nError: ");
                 e.printStackTrace();
             }
         }
