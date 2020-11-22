@@ -35,92 +35,95 @@ import java.util.UUID;
 class ArgAdminCleanup {
 
     // /ps admin cleanup
-    static boolean argumentAdminCleanup(CommandSender p, String[] args) {
-        if (args.length < 3 || (!args[2].equalsIgnoreCase("remove") && !args[2].equalsIgnoreCase("disown"))) {
+    static boolean argumentAdminCleanup(CommandSender p, String[] preParseArgs) {
+        if (preParseArgs.length < 3 || (!preParseArgs[2].equalsIgnoreCase("remove") && !preParseArgs[2].equalsIgnoreCase("disown"))) {
             PSL.msg(p, ArgAdmin.CLEANUP_HELP);
             return true;
         }
 
-        RegionManager rgm;
+        String cleanupOperation = preParseArgs[2]; // [remove|disown]
+
         World w;
-        if (p instanceof Player) {
-            rgm = WGUtils.getRegionManagerWithPlayer((Player) p);
-            w = ((Player) p).getWorld();
-        } else {
-            if (args.length != 5) {
-                PSL.msg(p, PSL.ADMIN_CONSOLE_WORLD.msg());
-                return true;
+        String alias = null;
+
+        List<String> args = new ArrayList<>();
+
+        // determine if there is an alias flag selected, and remove [-t typealias] if there is
+        for (int i = 3; i < preParseArgs.length; i++) {
+            if (preParseArgs[i].equals("-t") && i != preParseArgs.length-1) {
+                alias = preParseArgs[++i];
+            } else {
+                args.add(preParseArgs[i]);
             }
-            if (Bukkit.getWorld(args[4]) == null) {
-                PSL.msg(p, PSL.INVALID_WORLD.msg());
-                return true;
-            }
-            w = Bukkit.getWorld(args[4]);
-            rgm = WGUtils.getRegionManagerWithWorld(w);
         }
+
+        // the args array should consist of: [days, world (optional)]
+
+        if (args.size() > 1 && Bukkit.getWorld(args.get(1)) != null) {
+            w = Bukkit.getWorld(args.get(1));
+        } else {
+            if (p instanceof Player) {
+                w = ((Player) p).getWorld();
+            } else {
+                PSL.msg(p, args.size() > 1 ? PSL.INVALID_WORLD.msg() : PSL.ADMIN_CONSOLE_WORLD.msg());
+                return true;
+            }
+        }
+
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
 
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
         // async cleanup task
+        String finalAlias = alias;
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            if ((args[2].equalsIgnoreCase("remove")) || (args[2].equalsIgnoreCase("disown"))) {
-                int days = (args.length > 3) ? Integer.parseInt(args[3]) : 30; // 30 days is default if days aren't specified
+            int days = (args.size() > 0) ? Integer.parseInt(args.get(0)) : 30; // 30 days is default if days aren't specified
 
-                PSL.msg(p, PSL.ADMIN_CLEANUP_HEADER.msg()
-                        .replace("%arg%", args[2])
-                        .replace("%days%", "" + days));
+            PSL.msg(p, PSL.ADMIN_CLEANUP_HEADER.msg()
+                    .replace("%arg%", cleanupOperation)
+                    .replace("%days%", "" + days));
 
-                List<UUID> inactivePlayers = new ArrayList<>();
+            List<UUID> inactivePlayers = new ArrayList<>();
 
-                // loop over offline players and add to list if they haven't joined recently
-                for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
-                    long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
-                    if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
-                    try {
-                        inactivePlayers.add(op.getUniqueId());
-                    } catch (NullPointerException ignored) {} // wg.wrapOfflinePlayer can return null if the player isn't in WG cache
-                }
-
-                List<String> toRemove = new ArrayList<>();
-
-                // Loop over regions and check if offline player is in
-                for (String idname : regions.keySet()) {
-                    PSRegion r = PSRegion.fromWGRegion(w, regions.get(idname));
-                    if (r == null) continue;
-                    // remove inactive players from being owner
-                    for (UUID uuid : inactivePlayers) {
-                        try {
-                            if (r.isOwner(uuid)) {
-                                r.removeOwner(uuid);
-                            }
-                        } catch (NullPointerException ignored){}
-                    }
-
-                    // remove region if there are no owners left
-                    if (args[2].equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
-                        p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
-                        PSLocation psl = WGUtils.parsePSRegionToLocation(idname);
-                        Block blockToRemove = w.getBlockAt(psl.x, psl.y, psl.z);
-                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), ()->blockToRemove.setType(Material.AIR));
-                        toRemove.add(idname);
-                    }
-                }
-
-                for (String r : toRemove) {
-                    // remove region
-                    // check if removing the region and firing region remove event blocked it
-                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> ProtectionStones.removePSRegion(w, r));
-                }
-
+            // loop over offline players and add to list if they haven't joined recently
+            for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
+                long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
+                if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
                 try {
-                    rgm.save();
-                } catch (Exception e) {
-                    Bukkit.getLogger().severe("[ProtectionStones] WorldGuard Error [" + e + "] during Region File Save");
+                    inactivePlayers.add(op.getUniqueId());
+                } catch (NullPointerException ignored) {} // wg.wrapOfflinePlayer can return null if the player isn't in WG cache
+            }
+
+            // Loop over regions and check if offline player is in
+            for (String idname : regions.keySet()) {
+                PSRegion r = PSRegion.fromWGRegion(w, regions.get(idname));
+                if (r == null) continue;
+
+                // if an alias is specified, skip regions that aren't of the type
+                if (finalAlias != null && (r.getTypeOptions() == null || !r.getTypeOptions().alias.equals(finalAlias))) continue;
+
+                // remove inactive players from being owner
+                for (UUID uuid : inactivePlayers) {
+                    try {
+                        if (r.isOwner(uuid)) {
+                            r.removeOwner(uuid);
+                        }
+                    } catch (NullPointerException ignored) {}
                 }
 
-                PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
-                        .replace("%arg%", args[2]));
+                // remove region if there are no owners left
+                if (cleanupOperation.equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
+                    p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
+                    Block blockToRemove = r.getProtectBlock();
+                    if (!r.isHidden()) {
+                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToRemove.setType(Material.AIR));
+                    }
+                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> ProtectionStones.removePSRegion(w, idname));
+                }
             }
+
+            PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
+                    .replace("%arg%", cleanupOperation));
         });
         return true;
     }

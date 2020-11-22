@@ -32,7 +32,7 @@ import java.util.*;
 
 public class ArgAdmin implements PSCommandArg {
 
-    static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [days] [world (console)]",
+    static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [-t typealias (optional)] [days] [world (optional)]",
                         FLAG_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]",
                         CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtypealias] [newtypealias]",
                         CHANGEREGIONTYPE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeregiontype [world] [oldtype] [newtype]",

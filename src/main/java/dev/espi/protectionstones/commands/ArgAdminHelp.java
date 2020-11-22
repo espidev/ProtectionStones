@@ -34,8 +34,8 @@ public class ArgAdminHelp {
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin version", "Show the version number of the plugin.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin hide", "Hide all of the protection stone blocks in the world you are in.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin unhide", "Unhide all of the protection stone blocks in the world you are in.");
-        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup remove [days] [world (console)]", "Remove inactive players that haven't joined within the last [days] days from protected regions in the world you are in (or specified). Then, remove any regions with no owners left.");
-        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup disown [days] [world (console)]", "Remove inactive players that haven't joined within the last [days] days from protected regions in the world you are in (or specified).");
+        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup remove [days] [-t typealias (optional)] [world (console)]", "Remove inactive players that haven't joined within the last [days] days from protected regions in the world you are in (or specified). Then, remove any regions with no owners left.");
+        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup disown [days] [-t typealias (optional)] [world (console)]", "Remove inactive players that haven't joined within the last [days] days from protected regions in the world you are in (or specified).");
         send(p, ArgAdmin.FLAG_HELP, "Set a flag for all protection stone regions in a world.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin lastlogon [player]", "Get the last time a player logged on.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin lastlogons", "List all of the last logons of each player.");
