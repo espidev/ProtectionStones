@@ -106,6 +106,11 @@ public class ConfigUpgrades {
                     c.close();
                 }
                 break;
+            case 12:
+                ProtectionStones.config.set("config_version", 13);
+                ProtectionStones.config.set("default_protection_block_placement_off", false);
+                ProtectionStones.config.setComment("default_protection_block_placement_off", " Whether when players join, by default they have protection block placement toggled off (equivalent to running /ps toggle)");
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

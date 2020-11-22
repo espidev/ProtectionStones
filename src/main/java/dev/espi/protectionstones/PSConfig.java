@@ -46,44 +46,46 @@ public class PSConfig {
 
     // config options
     // config.toml will be loaded into these fields
-    // uses autoboxing for primitives to allow for null
+    // uses autoboxing for primitives to allow for null (because of the way config upgrades work)
     @Path("config_version")
     public int configVersion;
     @Path("uuidupdated")
-    public boolean uuidupdated;
+    public Boolean uuidupdated;
     @Path("placing_cooldown")
-    public int placingCooldown;
+    public Integer placingCooldown;
     @Path("allow_duplicate_region_names")
-    public boolean allowDuplicateRegionNames;
+    public Boolean allowDuplicateRegionNames;
     @Path("async_load_uuid_cache")
-    public boolean asyncLoadUUIDCache;
+    public Boolean asyncLoadUUIDCache;
     @Path("ps_view_cooldown")
-    public int psViewCooldown;
+    public Integer psViewCooldown;
     @Path("base_command")
     public String base_command;
     @Path("aliases")
     public List<String> aliases;
     @Path("drop_item_when_inventory_full")
-    public boolean dropItemWhenInventoryFull;
+    public Boolean dropItemWhenInventoryFull;
     @Path("regions_must_be_adjacent")
-    public boolean regionsMustBeAdjacent;
+    public Boolean regionsMustBeAdjacent;
     @Path("allow_merging_regions")
-    public boolean allowMergingRegions;
+    public Boolean allowMergingRegions;
     @Path("allow_merging_holes")
-    public boolean allowMergingHoles;
+    public Boolean allowMergingHoles;
+    @Path("default_protection_block_placement_off")
+    public Boolean defaultProtectionBlockPlacementOff;
 
     @Path("economy.max_rent_price")
-    public double maxRentPrice;
+    public Double maxRentPrice;
     @Path("economy.min_rent_price")
-    public double minRentPrice;
+    public Double minRentPrice;
     @Path("economy.max_rent_period")
-    public int maxRentPeriod;
+    public Integer maxRentPeriod;
     @Path("economy.min_rent_period")
-    public int minRentPeriod;
+    public Integer minRentPeriod;
     @Path("economy.tax_enabled")
-    public boolean taxEnabled;
+    public Boolean taxEnabled;
     @Path("economy.tax_message_on_join")
-    public boolean taxMessageOnJoin;
+    public Boolean taxMessageOnJoin;
 
     static void initConfig() {
 

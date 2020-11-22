@@ -79,6 +79,8 @@ class ConfigPlaceholders {
                 return getConf().allowMergingRegions + "";
             case "config_allow_merging_holes":
                 return getConf().allowMergingHoles + "";
+            case "default_protection_block_placement_off":
+                return getConf().defaultProtectionBlockPlacementOff + "";
 
             case "config_economy_max_rent_price":
                 return String.format("%.2f", getConf().maxRentPrice);

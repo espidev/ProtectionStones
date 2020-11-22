@@ -52,14 +52,20 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
-        UUIDCache.removeUUID(e.getPlayer().getUniqueId());
-        UUIDCache.removeName(e.getPlayer().getName());
-        UUIDCache.storeUUIDNamePair(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        Player p = e.getPlayer();
+        UUIDCache.removeUUID(p.getUniqueId());
+        UUIDCache.removeName(p.getName());
+        UUIDCache.storeUUIDNamePair(p.getUniqueId(), p.getName());
 
         // allow worldguard to resolve all UUIDs to names
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(e.getPlayer().getUniqueId(), e.getPlayer().getName()));
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(p.getUniqueId(), p.getName()));
 
-        PSPlayer psp = PSPlayer.fromPlayer(e.getPlayer());
+        PSPlayer psp = PSPlayer.fromPlayer(p);
+
+        // if by default, players should have protection block placement toggled off
+        if (ProtectionStones.getInstance().getConfigOptions().defaultProtectionBlockPlacementOff) {
+            ProtectionStones.toggleList.add(p.getUniqueId());
+        }
 
         // tax join message
         if (ProtectionStones.getInstance().getConfigOptions().taxEnabled && ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {

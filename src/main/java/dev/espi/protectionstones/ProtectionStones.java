@@ -57,7 +57,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
-    public static final int CONFIG_VERSION = 12;
+    public static final int CONFIG_VERSION = 13;
 
     public static File configLocation, blockDataFolder;
     public static CommentedFileConfig config;
@@ -80,7 +80,7 @@ public class ProtectionStones extends JavaPlugin {
 
     private boolean placeholderAPISupportEnabled = false;
 
-    public static List<UUID> toggleList = new ArrayList<>();
+    public static Set<UUID> toggleList = new HashSet<>();
 
     /* ~~~~~~~~~~ Instance methods ~~~~~~~~~~~~ */
 
