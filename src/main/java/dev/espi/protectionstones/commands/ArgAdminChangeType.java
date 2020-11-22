@@ -35,7 +35,7 @@ class ArgAdminChangeType {
     // /ps admin changeregiontype [world] [fromblocktype] [toblocktype]
     static boolean argumentAdminChangeType(CommandSender p, String[] args) {
         if (args.length < 5) {
-            return PSL.msg(p, ArgAdmin.CHANGEREGIONTYPE_HELP);
+            return PSL.msg(p, ArgAdmin.getChangeRegionTypeHelp());
         }
 
         World w = Bukkit.getWorld(args[2]);

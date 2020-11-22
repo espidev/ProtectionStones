@@ -31,7 +31,7 @@ class ArgAdminChangeblock {
     // /ps admin changeblock [world] [fromblockalias] [toblockalias]
     static boolean argumentAdminChangeblock(CommandSender p, String[] args) {
         if (args.length < 5) {
-            PSL.msg(p, ArgAdmin.CHANGEBLOCK_HELP);
+            PSL.msg(p, ArgAdmin.getChangeBlockHelp());
             return true;
         }
 

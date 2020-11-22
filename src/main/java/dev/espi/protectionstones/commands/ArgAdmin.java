@@ -32,11 +32,31 @@ import java.util.*;
 
 public class ArgAdmin implements PSCommandArg {
 
-    static final String CLEANUP_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin cleanup [remove|disown] [-t typealias (optional)] [days] [world (optional)]",
-                        FLAG_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin flag [world] [flagname] [value|null|default]",
-                        CHANGEBLOCK_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeblock [world] [oldtypealias] [newtypealias]",
-                        CHANGEREGIONTYPE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin changeregiontype [world] [oldtype] [newtype]",
-                        FORCEMERGE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps admin forcemerge [world]";
+    // has to be a method, because the base command config option is not available until the plugin is loaded
+    public static String getCleanupHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " admin cleanup [remove|disown] [-t typealias (optional)] [days] [world (optional)]";
+    }
+
+    public static String getFlagHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " admin flag [world] [flagname] [value|null|default]";
+    }
+
+    public static String getChangeBlockHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " admin changeblock [world] [oldtypealias] [newtypealias]";
+    }
+
+    public static String getChangeRegionTypeHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " admin changeregiontype [world] [oldtype] [newtype]";
+    }
+
+    public static String getForceMergeHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " admin forcemerge [world]";
+    }
 
     @Override
     public List<String> getNames() {

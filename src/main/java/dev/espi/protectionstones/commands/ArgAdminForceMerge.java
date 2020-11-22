@@ -72,7 +72,7 @@ public class ArgAdminForceMerge {
     // /ps admin forcemerge [world]
     public static boolean argumentAdminForceMerge(CommandSender p, String[] args) {
         if (args.length < 3) {
-            PSL.msg(p, ArgAdmin.FORCEMERGE_HELP);
+            PSL.msg(p, ArgAdmin.getForceMergeHelp());
             return true;
         }
 

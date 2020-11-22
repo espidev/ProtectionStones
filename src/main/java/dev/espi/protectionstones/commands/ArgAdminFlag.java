@@ -29,7 +29,7 @@ class ArgAdminFlag {
     static boolean argumentAdminFlag(CommandSender p, String[] args) {
 
         if (args.length < 5) {
-            PSL.msg(p, ArgAdmin.FLAG_HELP);
+            PSL.msg(p, ArgAdmin.getFlagHelp());
             return true;
         }
 

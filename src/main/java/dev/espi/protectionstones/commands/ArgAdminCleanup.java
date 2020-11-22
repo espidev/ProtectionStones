@@ -37,7 +37,7 @@ class ArgAdminCleanup {
     // /ps admin cleanup
     static boolean argumentAdminCleanup(CommandSender p, String[] preParseArgs) {
         if (preParseArgs.length < 3 || (!preParseArgs[2].equalsIgnoreCase("remove") && !preParseArgs[2].equalsIgnoreCase("disown"))) {
-            PSL.msg(p, ArgAdmin.CLEANUP_HELP);
+            PSL.msg(p, ArgAdmin.getCleanupHelp());
             return true;
         }
 

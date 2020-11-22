@@ -34,10 +34,25 @@ import java.util.*;
 
 public class ArgRent implements PSCommandArg {
 
-    static final String LEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent lease [price] [period]",
-            STOPLEASE_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoplease",
-            RENT_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent rent",
-            STOPRENTING_HELP = ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps rent stoprenting";
+    public static String getLeaseHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " rent lease [price] [period]";
+    }
+
+    public static String getStopLeaseHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " rent stoplease";
+    }
+
+    public static String getRentHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " rent rent";
+    }
+
+    public static String getStopRentingHelp() {
+        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
+                " rent stoprenting";
+    }
 
     @Override
     public List<String> getNames() {
@@ -61,10 +76,10 @@ public class ArgRent implements PSCommandArg {
 
     private void runHelp(CommandSender s) {
         PSL.msg(s, PSL.RENT_HELP_HEADER.msg());
-        PSL.msg(s, LEASE_HELP);
-        PSL.msg(s, STOPLEASE_HELP);
-        PSL.msg(s, RENT_HELP);
-        PSL.msg(s, STOPRENTING_HELP);
+        PSL.msg(s, getLeaseHelp());
+        PSL.msg(s, getStopLeaseHelp());
+        PSL.msg(s, getRentHelp());
+        PSL.msg(s, getStopRentingHelp());
     }
 
     @Override
@@ -104,10 +119,10 @@ public class ArgRent implements PSCommandArg {
                         return PSL.msg(p, PSL.RENT_ALREADY_RENTING.msg());
 
                     if (args.length < 4)
-                        return PSL.msg(p, LEASE_HELP);
+                        return PSL.msg(p, getLeaseHelp());
 
                     if (!NumberUtils.isNumber(args[2])) // check price
-                        return PSL.msg(p, LEASE_HELP);
+                        return PSL.msg(p, getLeaseHelp());
 
                     if (r.forSale()) // if region is already being sold
                         return PSL.msg(p, PSL.RENT_BEING_SOLD.msg());
