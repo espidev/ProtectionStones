@@ -30,6 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -180,21 +181,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
-        for (Block b : pushedBlocks) {
-            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b);
-            if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
-                e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock())) {
-            e.setCancelled(true);
-        }
-    }
+    // -=-=-=- block changes to protection block related events -=-=-=-
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
@@ -209,9 +196,85 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockIgnite(BlockIgniteEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockBurn(BlockBurnEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent e) {
         if (ProtectionStones.isProtectBlock(e.getToBlock())) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSpongeAbsorb(SpongeAbsorbEvent event) {
+        if (ProtectionStones.isProtectBlock(event.getBlock())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock()) || ProtectionStones.isProtectBlock(e.getSourceBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockFade(BlockFadeEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockDropItem(BlockDropItemEvent e) {
+        // unfortunately, the below fix does not really work because Spigot only triggers for the source block, despite
+        // what the documentation says: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/block/BlockDropItemEvent.html
+
+        // we want to replace protection blocks that have their protection block broken (ex. signs, banners)
+        // the block may not exist anymore, and so we have to recreate the isProtectBlock method here
+        BlockState bs = e.getBlockState();
+        if (!ProtectionStones.isProtectBlockType(bs.getType().toString())) return;
+
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(bs.getWorld());
+        if (rgm == null) return;
+
+        // break region, and tell player about it
+        PSRegion r = PSRegion.fromLocation(bs.getLocation());
+        if (r == null) return;
+
+        // replaces the block
+        r.unhide();
+        e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent e) {
+        pistonUtil(e.getBlocks(), e);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent e) {
+        pistonUtil(e.getBlocks(), e);
+    }
+
+    private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
+        for (Block b : pushedBlocks) {
+            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b);
+            if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
+                e.setCancelled(true);
+            }
         }
     }
 
@@ -255,25 +318,10 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPistonExtend(BlockPistonExtendEvent e) {
-        pistonUtil(e.getBlocks(), e);
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPistonRetract(BlockPistonRetractEvent e) {
-        pistonUtil(e.getBlocks(), e);
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onSpongeAbsorb(SpongeAbsorbEvent event) {
-        if (ProtectionStones.isProtectBlock(event.getBlock())) {
-            event.setCancelled(true);
-        }
-    }
-
+    // check player teleporting into region behaviour
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        // we only want plugin triggered teleports, ignore natural teleportation
         if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
@@ -298,6 +346,8 @@ public class ListenerClass implements Listener {
             event.setCancelled(true);
         }
     }
+
+    // -=-=-=- player defined events -=-=-=-
 
     private void execEvent(String action, CommandSender s, String player, PSRegion region) {
         if (player == null) player = "";
