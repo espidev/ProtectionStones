@@ -264,13 +264,13 @@ allow_placing_in_wild = true
     enable = false
 
     # Execute commands when a region is created (ex. player place protection block)
-    # Variables: %player%, %region%, %block_x%, %block_y%, %block_z%
+    # Variables: %player%, %world%, %region%, %block_x%, %block_y%, %block_z%
     on_region_create = [
         'global_message: &l%player% created the region %region%!',
     ]
 
     # Execute commands when a region is destroyed (ex. when player destroy protection block)
-    # Variables: %player%, %region%, %block_x%, %block_y%, %block_z%
+    # Variables: %player%, %world%, %region%, %block_x%, %block_y%, %block_z%
     on_region_destroy = [
         'console_command: say %player% has destroyed region %region%!',
     ]
