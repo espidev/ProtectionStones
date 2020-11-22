@@ -256,11 +256,14 @@ public class ListenerClass implements Listener {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(bs.getWorld());
         if (rgm == null) return;
 
-        // break region, and tell player about it
+        // check if the block is a source block
+        ProtectedRegion br = rgm.getRegion(WGUtils.createPSID(bs.getLocation()));
+        if (!ProtectionStones.isPSRegion(br) && PSMergedRegion.getMergedRegion(bs.getLocation()) == null) return;
+
         PSRegion r = PSRegion.fromLocation(bs.getLocation());
         if (r == null) return;
 
-        // replaces the block
+        // puts the block back
         r.unhide();
         e.setCancelled(true);
     }
