@@ -16,9 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSPlayer;
-import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -27,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ArgAddRemove implements PSCommandArg {
 
@@ -55,7 +54,7 @@ public class ArgAddRemove implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        String operationType = args[0]; // add, remove, addowner, removeowner
+        String operationType = args[0].toLowerCase(); // add, remove, addowner, removeowner
 
         // check permission
         if ((operationType.equals("add") || operationType.equals("remove")) && !p.hasPermission("protectionstones.members")) {
@@ -71,59 +70,74 @@ public class ArgAddRemove implements PSCommandArg {
         if (!UUIDCache.containsName(args[1])) {
             return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg());
         }
-        UUID addUuid = UUIDCache.getUUIDFromName(args[1]);
 
-        List<PSRegion> regions;
+        // user being added
+        UUID addPlayerUuid = UUIDCache.getUUIDFromName(args[1]);
+        String addPlayerName = UUIDCache.getNameFromUUID(addPlayerUuid);
 
-        if (flags.containsKey("-a")) { // add or remove to all regions a player owns
-            regions = PSPlayer.fromPlayer(p).getPSRegions(p.getWorld(), false);
-        } else { // add or remove to one region (the region currently in)
-            PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
+        // getting player regions is slow, so run it async
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            List<PSRegion> regions;
 
-            if (r == null) {
-                return PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            } else if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
-                return PSL.msg(p, PSL.NO_ACCESS.msg());
-            }
-            regions = Collections.singletonList(r);
-        }
+            // obtain region list that player is being added to or removed from
+            if (flags.containsKey("-a")) { // add or remove to all regions a player owns
+                regions = PSPlayer.fromPlayer(p).getPSRegions(p.getWorld(), false);
+            } else { // add or remove to one region (the region currently in)
+                PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
-        // apply to regions
-        for (PSRegion r : regions) {
-
-            if (operationType.equals("add") || operationType.equals("addowner")) {
-                if (flags.containsKey("-a")) {
-                    PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
-                            .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
-                            .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
-                } else {
-                    PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
+                if (r == null) {
+                    PSL.msg(p, PSL.NOT_IN_REGION.msg());
+                    return;
+                } else if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
+                    PSL.msg(p, PSL.NO_ACCESS.msg());
+                    return;
                 }
-            } else if ((operationType.equals("remove") && r.getWGRegion().getMembers().contains(addUuid)) || (operationType.equals("removeowner") && r.getWGRegion().getOwners().contains(addUuid))) {
-                if (flags.containsKey("-a")) {
-                    PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
-                            .replace("%player%", UUIDCache.getNameFromUUID(addUuid))
-                            .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
-                } else {
-                    PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", UUIDCache.getNameFromUUID(addUuid)));
-                }
+                regions = Collections.singletonList(r);
             }
 
-            switch (operationType) {
-                case "add":
-                    r.addMember(addUuid);
-                    break;
-                case "remove":
-                    r.removeMember(addUuid);
-                    break;
-                case "addowner":
-                    r.addOwner(addUuid);
-                    break;
-                case "removeowner":
-                    r.removeOwner(addUuid);
-                    break;
+            // check that the player is not over their limit if they are being set owner
+            if (operationType.equals("addowner") && determinePlayerSurpassedLimit(regions, PSPlayer.fromUUID(addPlayerUuid))) {
+                return;
             }
-        }
+
+            // apply operation to regions
+            for (PSRegion r : regions) {
+
+                if (operationType.equals("add") || operationType.equals("addowner")) {
+                    if (flags.containsKey("-a")) {
+                        PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
+                                .replace("%player%", addPlayerName)
+                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                    } else {
+                        PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", addPlayerName));
+                    }
+                } else if ((operationType.equals("remove") && r.getWGRegion().getMembers().contains(addPlayerUuid))
+                        || (operationType.equals("removeowner") && r.getWGRegion().getOwners().contains(addPlayerUuid))) {
+                    if (flags.containsKey("-a")) {
+                        PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
+                                .replace("%player%", addPlayerName)
+                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                    } else {
+                        PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", addPlayerName));
+                    }
+                }
+
+                switch (operationType) {
+                    case "add":
+                        r.addMember(addPlayerUuid);
+                        break;
+                    case "remove":
+                        r.removeMember(addPlayerUuid);
+                        break;
+                    case "addowner":
+                        r.addOwner(addPlayerUuid);
+                        break;
+                    case "removeowner":
+                        r.removeOwner(addPlayerUuid);
+                        break;
+                }
+            }
+        });
         return true;
     }
 
@@ -175,6 +189,46 @@ public class ArgAddRemove implements PSCommandArg {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean determinePlayerSurpassedLimit(List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
+        // find total region amounts after player is added to the regions, and their existing total
+        HashMap<String, Integer> regionAmounts = new HashMap<>(); // <type, amount>
+        regionsToBeAddedTo.forEach(r -> {
+            if (regionAmounts.containsKey(r.getType())) {
+                regionAmounts.put(r.getType(), regionAmounts.get(r.getType()) + 1);
+            } else {
+                regionAmounts.put(r.getType(), 1);
+            }
+        });
+
+        AtomicInteger totalRegions = new AtomicInteger(regionsToBeAddedTo.size());
+        WGUtils.getAllRegionManagers().keySet().stream()
+                .flatMap(w -> addedPlayer.getPSRegions(w, false).stream())
+                .forEach(r -> {
+                    totalRegions.getAndIncrement();
+                    if (regionAmounts.containsKey(r.getType())) {
+                        regionAmounts.put(r.getType(), regionAmounts.get(r.getType())+1);
+                    } else {
+                        regionAmounts.put(r.getType(), 1);
+                    }
+                });
+
+        // if player passed global region limit
+        if (totalRegions.get() > addedPlayer.getGlobalRegionLimits()) {
+            PSL.msg(addedPlayer, PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg());
+            return true;
+        }
+
+        // if player surpassed a block type limit
+        HashMap<PSProtectBlock, Integer> limits = addedPlayer.getRegionLimits();
+        for (PSProtectBlock b : limits.keySet()) {
+            if (limits.get(b) < regionAmounts.get(b.type)) {
+                PSL.msg(addedPlayer, PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg());
+                return true;
+            }
+        }
+        return false;
     }
 
 }
