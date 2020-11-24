@@ -24,13 +24,49 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class LimitUtil {
+
+    public static String checkAddOwner(PSPlayer psp, List<PSProtectBlock> blocksAdded) {
+        HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
+        int maxPS = psp.getGlobalRegionLimits();
+
+        if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
+
+            // count player's protection blocks
+            int total = 0;
+            HashMap<PSProtectBlock, Integer> playerRegionCounts = getOwnedRegionTypeCounts(psp);
+
+            // add the blocks
+            for (PSProtectBlock b : blocksAdded) {
+                if (playerRegionCounts.containsKey(b)) {
+                    playerRegionCounts.put(b, playerRegionCounts.get(b)+1);
+                } else {
+                    playerRegionCounts.put(b, 1);
+                }
+            }
+
+            // check each limit
+            for (PSProtectBlock type : playerRegionCounts.keySet()) {
+                if (regionLimits.containsKey(type) && (playerRegionCounts.get(type) > regionLimits.get(type))) {
+                    return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
+                }
+                total += playerRegionCounts.get(type);
+            }
+
+            // check if player has passed region limit
+            if (total > maxPS && maxPS != -1) {
+                return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
+            }
+        }
+        return "";
+    }
 
     public static boolean check(Player p, PSProtectBlock b) {
         if (!p.hasPermission("protectionstones.admin")) {
             // check if player has limit on protection stones
-            String msg = LimitUtil.hasPlayerPassedRegionLimit(p, b);
+            String msg = LimitUtil.hasPlayerPassedRegionLimit(PSPlayer.fromPlayer(p), b);
             if (!msg.isEmpty()) {
                 PSL.msg(p, msg);
                 return false;
@@ -63,8 +99,45 @@ public class LimitUtil {
         return false;
     }
 
-    private static String hasPlayerPassedRegionLimit(Player p, PSProtectBlock b) {
-        PSPlayer psp = PSPlayer.fromPlayer(p);
+    /**
+     * Returns the region counts of a player (for all worlds).
+     * @param psp player
+     * @return map of region types to the counts
+     */
+    private static HashMap<PSProtectBlock, Integer> getOwnedRegionTypeCounts(PSPlayer psp) {
+        HashMap<PSProtectBlock, Integer> counts = new HashMap<>();
+        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+        for (World w : m.keySet()) {
+            RegionManager rgm = m.get(w);
+
+            rgm.getRegions().values().stream()
+                    .filter(r -> ProtectionStones.isPSRegion(r))
+                    .filter(r -> r.getOwners().contains(psp.getUuid()))
+                    .map(r -> PSRegion.fromWGRegion(w, r))
+                    .forEach(r -> {
+                        if (r instanceof PSGroupRegion) {
+                            for (PSMergedRegion psmr : ((PSGroupRegion) r).getMergedRegions()) {
+                                if (psmr.getTypeOptions() == null) continue;
+                                if (counts.containsKey(psmr.getTypeOptions())) {
+                                    counts.put(psmr.getTypeOptions(), 1);
+                                } else {
+                                    counts.put(psmr.getTypeOptions(), counts.get(psmr.getTypeOptions())+1);
+                                }
+                            }
+                        } else {
+                            if (r.getTypeOptions() == null) return;
+                            if (counts.containsKey(r.getTypeOptions())) {
+                                counts.put(r.getTypeOptions(), 1);
+                            } else {
+                                counts.put(r.getTypeOptions(), counts.get(r.getTypeOptions())+1);
+                            }
+                        }
+                    });
+        }
+        return counts;
+    }
+
+    private static String hasPlayerPassedRegionLimit(PSPlayer psp, PSProtectBlock b) {
         HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
         int maxPS = psp.getGlobalRegionLimits();
 
@@ -72,24 +145,12 @@ public class LimitUtil {
 
             // count player's protection stones
             int total = 0, bFound = 0;
-            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
-            for (World w : m.keySet()) {
-                RegionManager rgm = m.get(w);
-                for (ProtectedRegion r : rgm.getRegions().values()) {
-                    if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
-                        PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
-
-                        if (psr instanceof PSGroupRegion) {
-                            for (PSMergedRegion psmr : ((PSGroupRegion) psr).getMergedRegions()) {
-                                total++;
-                                if (psmr.getType().equals(b.type)) bFound++; // if the specific block was found
-                            }
-                        } else {
-                            total++;
-                            if (psr.getType().equals(b.type)) bFound++; // if the specific block was found
-                        }
-                    }
+            HashMap<PSProtectBlock, Integer> playerRegionCounts = getOwnedRegionTypeCounts(psp);
+            for (PSProtectBlock type : playerRegionCounts.keySet()) {
+                if (type.equals(b)) {
+                    bFound = playerRegionCounts.get(type);
                 }
+                total += playerRegionCounts.get(type);
             }
 
             // check if player has passed region limit

@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -26,6 +27,7 @@ import org.bukkit.util.StringUtil;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ArgAddRemove implements PSCommandArg {
 
@@ -193,42 +195,12 @@ public class ArgAddRemove implements PSCommandArg {
 
     public boolean determinePlayerSurpassedLimit(List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
         // find total region amounts after player is added to the regions, and their existing total
-        HashMap<String, Integer> regionAmounts = new HashMap<>(); // <type, amount>
-        regionsToBeAddedTo.forEach(r -> {
-            if (regionAmounts.containsKey(r.getType())) {
-                regionAmounts.put(r.getType(), regionAmounts.get(r.getType()) + 1);
-            } else {
-                regionAmounts.put(r.getType(), 1);
-            }
-        });
-
-        AtomicInteger totalRegions = new AtomicInteger(regionsToBeAddedTo.size());
-        WGUtils.getAllRegionManagers().keySet().stream()
-                .flatMap(w -> addedPlayer.getPSRegions(w, false).stream())
-                .forEach(r -> {
-                    totalRegions.getAndIncrement();
-                    if (regionAmounts.containsKey(r.getType())) {
-                        regionAmounts.put(r.getType(), regionAmounts.get(r.getType())+1);
-                    } else {
-                        regionAmounts.put(r.getType(), 1);
-                    }
-                });
-
-        // if player passed global region limit
-        if (totalRegions.get() > addedPlayer.getGlobalRegionLimits()) {
-            PSL.msg(addedPlayer, PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg());
+        String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream().filter(r -> r.getTypeOptions() != null).map(PSRegion::getTypeOptions).collect(Collectors.toList()));
+        if (err.equals("")) {
+            return false;
+        } else {
+            PSL.msg(addedPlayer, err);
             return true;
         }
-
-        // if player surpassed a block type limit
-        HashMap<PSProtectBlock, Integer> limits = addedPlayer.getRegionLimits();
-        for (PSProtectBlock b : limits.keySet()) {
-            if (limits.get(b) < regionAmounts.get(b.type)) {
-                PSL.msg(addedPlayer, PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg());
-                return true;
-            }
-        }
-        return false;
     }
-
 }
