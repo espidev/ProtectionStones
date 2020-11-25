@@ -545,6 +545,7 @@ public abstract class PSRegion {
     // -=-=-=-=- Other -=-=-=-=-=-
 
     /**
+     * Must be run sync (calls Bukkit API)
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {

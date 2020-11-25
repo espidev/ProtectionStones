@@ -118,7 +118,7 @@ public class LimitUtil {
                         if (r instanceof PSGroupRegion) {
                             for (PSMergedRegion psmr : ((PSGroupRegion) r).getMergedRegions()) {
                                 if (psmr.getTypeOptions() == null) continue;
-                                if (counts.containsKey(psmr.getTypeOptions())) {
+                                if (!counts.containsKey(psmr.getTypeOptions())) {
                                     counts.put(psmr.getTypeOptions(), 1);
                                 } else {
                                     counts.put(psmr.getTypeOptions(), counts.get(psmr.getTypeOptions())+1);
@@ -126,7 +126,7 @@ public class LimitUtil {
                             }
                         } else {
                             if (r.getTypeOptions() == null) return;
-                            if (counts.containsKey(r.getTypeOptions())) {
+                            if (!counts.containsKey(r.getTypeOptions())) {
                                 counts.put(r.getTypeOptions(), 1);
                             } else {
                                 counts.put(r.getTypeOptions(), counts.get(r.getTypeOptions())+1);
