@@ -115,10 +115,14 @@ class ArgAdminCleanup {
                 if (cleanupOperation.equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
                     p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
                     Block blockToRemove = r.getProtectBlock();
-                    if (!r.isHidden()) {
-                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> blockToRemove.setType(Material.AIR));
-                    }
-                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> ProtectionStones.removePSRegion(w, idname));
+
+                    // must be sync (both isHidden, and setType)
+                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+                        if (!r.isHidden()) {
+                            blockToRemove.setType(Material.AIR);
+                        }
+                        ProtectionStones.removePSRegion(w, idname);
+                    });
                 }
             }
 
