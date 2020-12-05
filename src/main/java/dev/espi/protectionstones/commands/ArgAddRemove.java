@@ -98,7 +98,7 @@ public class ArgAddRemove implements PSCommandArg {
             }
 
             // check that the player is not over their limit if they are being set owner
-            if (operationType.equals("addowner") && determinePlayerSurpassedLimit(regions, PSPlayer.fromUUID(addPlayerUuid))) {
+            if (operationType.equals("addowner") && determinePlayerSurpassedLimit(p, regions, PSPlayer.fromUUID(addPlayerUuid))) {
                 return;
             }
 
@@ -193,13 +193,16 @@ public class ArgAddRemove implements PSCommandArg {
         return null;
     }
 
-    public boolean determinePlayerSurpassedLimit(List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
+    public boolean determinePlayerSurpassedLimit(Player commandSender, List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
         // find total region amounts after player is added to the regions, and their existing total
-        String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream().filter(r -> r.getTypeOptions() != null).map(PSRegion::getTypeOptions).collect(Collectors.toList()));
+        String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream()
+                .map(PSRegion::getTypeOptions)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
         if (err.equals("")) {
             return false;
         } else {
-            PSL.msg(addedPlayer, err);
+            PSL.msg(commandSender, err);
             return true;
         }
     }
