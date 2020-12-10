@@ -301,6 +301,7 @@ public enum PSL {
     ADDREMOVE_OWNER_HELP("addremove.owner_help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps addowner|removeowner [playername]"),
     ADDREMOVE_OWNER_HELP_DESC("addremove.owner_help_desc", "Use this command to add or remove an owner of your protected region."),
     ADDREMOVE_PLAYER_REACHED_LIMIT("addremove.player_reached_limit", ChatColor.RED + "This player has reached their region limit."),
+    ADDREMOVE_PLAYER_NEEDS_TO_BE_ONLINE("addremove.player_needs_to_be_online", ChatColor.RED + "The player needs to be online to add them."),
 
     // ps get
     GET_HELP("get.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps get [block]"),

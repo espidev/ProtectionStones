@@ -98,8 +98,10 @@ public class ArgAddRemove implements PSCommandArg {
             }
 
             // check that the player is not over their limit if they are being set owner
-            if (operationType.equals("addowner") && determinePlayerSurpassedLimit(p, regions, PSPlayer.fromUUID(addPlayerUuid))) {
-                return;
+            if (operationType.equals("addowner")) {
+                if (determinePlayerSurpassedLimit(p, regions, PSPlayer.fromUUID(addPlayerUuid))) {
+                    return;
+                }
             }
 
             // apply operation to regions
@@ -194,6 +196,13 @@ public class ArgAddRemove implements PSCommandArg {
     }
 
     public boolean determinePlayerSurpassedLimit(Player commandSender, List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
+
+        if (addedPlayer.getPlayer() == null && !ProtectionStones.getInstance().isLuckPermsSupportEnabled()) { // offline player
+            // we need luckperms to determine region limits for offline players, so if luckperms isn't detected, prevent the action
+            PSL.msg(commandSender, PSL.ADDREMOVE_PLAYER_NEEDS_TO_BE_ONLINE.msg());
+            return true;
+        }
+
         // find total region amounts after player is added to the regions, and their existing total
         String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream()
                 .map(PSRegion::getTypeOptions)

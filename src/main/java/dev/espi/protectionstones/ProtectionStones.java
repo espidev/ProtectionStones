@@ -41,6 +41,7 @@ import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.luckperms.api.LuckPerms;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -77,6 +78,10 @@ public class ProtectionStones extends JavaPlugin {
     // vault economy integration
     private boolean vaultSupportEnabled = false;
     private Economy vaultEconomy;
+
+    // luckperms integration
+    private boolean luckPermsSupportEnabled = false;
+    private LuckPerms luckPerms;
 
     private boolean placeholderAPISupportEnabled = false;
 
@@ -123,6 +128,14 @@ public class ProtectionStones extends JavaPlugin {
 
     public PSEconomy getPSEconomy() {
         return economy;
+    }
+
+    public boolean isLuckPermsSupportEnabled() {
+        return luckPermsSupportEnabled;
+    }
+
+    public LuckPerms getLuckPerms() {
+        return luckPerms;
     }
 
     /**
@@ -487,6 +500,17 @@ public class ProtectionStones extends JavaPlugin {
             new PSPlaceholderExpansion().register();
         } else {
             getLogger().info("PlaceholderAPI not found! There will be no PlaceholderAPI support.");
+        }
+
+        // check for LuckPerms
+        if (getServer().getPluginManager().getPlugin("LuckPerms") != null && getServer().getPluginManager().getPlugin("LuckPerms").isEnabled()) {
+            try {
+                luckPermsSupportEnabled = true;
+                luckPerms = getServer().getServicesManager().load(LuckPerms.class);
+                getLogger().info("LuckPerms support enabled!");
+            } catch (NoClassDefFoundError err) { // incompatible luckperms api
+                getLogger().warning("Incompatible LuckPerms version found! Please upgrade your LuckPerms!");
+            }
         }
 
         // load configuration

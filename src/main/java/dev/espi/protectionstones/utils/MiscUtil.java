@@ -23,6 +23,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class MiscUtil {
 
@@ -56,11 +57,13 @@ public class MiscUtil {
         return rentPeriod;
     }
 
-    public static int getPermissionNumber(Player p, String perm, int def /* default */) {
-        int n = -99999;
-        for (PermissionAttachmentInfo pia : p.getEffectivePermissions()) {
-            String permission = pia.getPermission();
+    public static int getPermissionNumber(Player p, String perm, int def) {
+        return getPermissionNumber(p.getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList()), perm, def);
+    }
 
+    public static int getPermissionNumber(List<String> permissions, String perm, int def /* default */) {
+        int n = -99999;
+        for (String permission : permissions) {
             if (permission.startsWith(perm)) {
                 String value = permission.substring(perm.length());
                 if (StringUtils.isNumeric(value)) {

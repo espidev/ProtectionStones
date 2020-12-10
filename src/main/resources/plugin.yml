@@ -4,7 +4,7 @@ description: ${description}
 authors: [EspiDev]
 
 depend: [WorldGuard, WorldEdit]
-softdepend: [Vault, PlaceholderAPI]
+softdepend: [Vault, PlaceholderAPI, LuckPerms]
 main: dev.espi.protectionstones.ProtectionStones
 api-version: 1.13
 
