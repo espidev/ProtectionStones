@@ -56,7 +56,7 @@ public class ArgInfo implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
+        PSRegion r = PSRegion.fromLocationGroupUnsafe(p.getLocation());
 
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());

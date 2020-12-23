@@ -141,14 +141,14 @@ public class WGUtils {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
         if (idList.size() == 1) { // if the location is only in one region
-            if (ProtectionStones.isPSRegion(rgm.getRegion(idList.get(0)))) {
+            if (ProtectionStones.isPSRegionFormat(rgm.getRegion(idList.get(0)))) {
                 currentPSID = idList.get(0);
             }
         } else {
             // Get nearest protection stone if in overlapping region
             double distanceToPS = -1, tempToPS;
             for (String currentID : idList) {
-                if (ProtectionStones.isPSRegion(rgm.getRegion(currentID))) {
+                if (ProtectionStones.isPSRegionFormat(rgm.getRegion(currentID))) {
                     PSLocation psl = WGUtils.parsePSRegionToLocation(currentID);
                     Location psLocation = new Location(l.getWorld(), psl.x, psl.y, psl.z);
                     tempToPS = l.distance(psLocation);

@@ -58,25 +58,28 @@ public abstract class PSRegion {
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
      */
     public static PSRegion fromLocation(Location l) {
+        PSRegion r = fromLocationUnsafe(l);
+        return r == null || r.getTypeOptions() == null ? null : r;
+    }
+
+    /**
+     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
+     * May return a region with an unconfigured block type (getTypeOptions returns null).
+     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or {@link PSMergedRegion}.
+     *
+     * @param l the location
+     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     */
+    public static PSRegion fromLocationUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
-        // check exact location first
+        // check exact location first for merged region block
         PSMergedRegion pr = PSMergedRegion.getMergedRegion(l);
         if (pr != null) return pr;
 
-        // check if location is in a region
-        String psID = WGUtils.matchLocationToPSID(l);
-        ProtectedRegion r = rgm.getRegion(psID);
-
-        if (r == null) {
-            return null;
-        } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
-            return new PSGroupRegion(r, rgm, l.getWorld());
-        } else {
-            return new PSStandardRegion(r, rgm, l.getWorld());
-        }
+        return fromLocationGroupUnsafe(l);
     }
 
     /**
@@ -87,6 +90,19 @@ public abstract class PSRegion {
      * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
      */
     public static PSRegion fromLocationGroup(Location l) {
+        PSRegion r = fromLocationGroupUnsafe(l);
+        return r == null || r.getTypeOptions() == null ? null : r;
+    }
+
+    /**
+     * Get the protection stone parent region that the location is in.
+     * May return a region with an unconfigured block type (getTypeOptions returns null).
+     * Returns either {@link PSGroupRegion} or {@link PSStandardRegion}.
+     *
+     * @param l the location
+     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     */
+    public static PSRegion fromLocationGroupUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
@@ -112,7 +128,7 @@ public abstract class PSRegion {
      * @return the {@link PSRegion} based on the parameters, or null if the region given is not a protectionstones region
      */
     public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
-        if (!ProtectionStones.isPSRegion(r)) return null;
+        if (!ProtectionStones.isPSRegionFormat(r)) return null;
         if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
             return new PSGroupRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
         } else {
