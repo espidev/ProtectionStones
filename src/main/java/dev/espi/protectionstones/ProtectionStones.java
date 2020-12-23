@@ -240,12 +240,23 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region.
+     * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region, and is configured in the config.
      *
      * @param r the region to check
      * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
      */
     public static boolean isPSRegion(ProtectedRegion r) {
+        return isPSRegionFormat(r) && getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL)) != null;
+    }
+
+    /**
+     * Check if a WorldGuard {@link ProtectedRegion} has the format of a ProtectionStones region, but is not necessarily configured
+     * in the config.
+     *
+     * @param r the region to check
+     * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
+     */
+    public static boolean isPSRegionFormat(ProtectedRegion r) {
         return r != null && r.getId().startsWith("ps") && r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null;
     }
 
