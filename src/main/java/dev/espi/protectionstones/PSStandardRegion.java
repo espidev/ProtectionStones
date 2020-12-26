@@ -60,10 +60,10 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setName(String name) {
-        HashMap<String, ArrayList<String>> m = ProtectionStones.regionNameToID.get(getWorld());
+        HashMap<String, ArrayList<String>> m = ProtectionStones.regionNameToID.get(getWorld().getUID());
         if (m == null) { // if the world has not been added
-            ProtectionStones.regionNameToID.put(getWorld(), new HashMap<>());
-            m = ProtectionStones.regionNameToID.get(getWorld());
+            ProtectionStones.regionNameToID.put(getWorld().getUID(), new HashMap<>());
+            m = ProtectionStones.regionNameToID.get(getWorld().getUID());
         }
         if (m.get(getName()) != null) {
             m.get(getName()).remove(getId());
@@ -500,11 +500,12 @@ public class PSStandardRegion extends PSRegion {
         }
 
         if (getName() != null) { // remove name from cache
-            if (ProtectionStones.regionNameToID.get(getWorld()).containsKey(getName())) {
-                if (ProtectionStones.regionNameToID.get(getWorld()).get(getName()).size() == 1) {
-                    ProtectionStones.regionNameToID.get(getWorld()).remove(getName());
+            HashMap<String, ArrayList<String>> rIds = ProtectionStones.regionNameToID.get(getWorld().getUID());
+            if (rIds != null && rIds.containsKey(getName())) {
+                if (rIds.get(getName()).size() == 1) {
+                    rIds.remove(getName());
                 } else {
-                    ProtectionStones.regionNameToID.get(getWorld()).get(getName()).remove(getId());
+                    rIds.get(getName()).remove(getId());
                 }
             }
         }

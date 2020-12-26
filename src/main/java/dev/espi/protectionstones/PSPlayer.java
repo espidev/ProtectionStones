@@ -319,14 +319,15 @@ public class PSPlayer {
 
         // obtain cross-world named worlds
         ProtectionStones.regionNameToID.forEach((rw, rs) -> {
-            RegionManager rm = WGUtils.getRegionManagerWithWorld(rw);
-            if (rm != null) {
+            World world = Bukkit.getWorld(rw);
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
+            if (rm != null && world != null) {
                 rs.values().forEach(rIds -> rIds.forEach(rId -> {
                     ProtectedRegion r = rm.getRegion(rId);
                     if (r != null && r.getOwners().contains(uuid) && ProtectionStones.isPSRegion(r)) {
                         // check if it has already been added
-                        if (!rw.getName().equals(w.getName()) || !regionIdAdded.contains(r.getId())) {
-                            regions.add(PSRegion.fromWGRegion(rw, r));
+                        if (!world.getName().equals(w.getName()) || !regionIdAdded.contains(r.getId())) {
+                            regions.add(PSRegion.fromWGRegion(world, r));
                         }
                     }
                 }));

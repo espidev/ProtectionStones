@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -150,12 +151,13 @@ public abstract class PSRegion {
 
         List<PSRegion> l = new ArrayList<>();
 
-        if (ProtectionStones.regionNameToID.get(w).get(name) == null) return l;
+        List<String> rIds = ProtectionStones.regionNameToID.get(w.getUID()).get(name);
+        if (rIds == null) return l;
 
-        for (int i = 0; i < ProtectionStones.regionNameToID.get(w).get(name).size(); i++) {
-            String id = ProtectionStones.regionNameToID.get(w).get(name).get(i);
+        for (int i = 0; i < rIds.size(); i++) {
+            String id = rIds.get(i);
             if (rgm.getRegion(id) == null) { // cleanup cache
-                ProtectionStones.regionNameToID.get(w).get(name).remove(i);
+                rIds.remove(i);
                 i--;
             } else {
                 l.add(fromWGRegion(w, rgm.getRegion(id)));
@@ -173,7 +175,8 @@ public abstract class PSRegion {
 
     public static HashMap<World, List<PSRegion>> fromName(String name) {
         HashMap<World, List<PSRegion>> regions = new HashMap<>();
-        for (World w : ProtectionStones.regionNameToID.keySet()) {
+        for (UUID worldUid : ProtectionStones.regionNameToID.keySet()) {
+            World w = Bukkit.getWorld(worldUid);
             regions.put(w, fromName(w, name));
         }
         return regions;

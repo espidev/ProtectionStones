@@ -73,7 +73,8 @@ public class ProtectionStones extends JavaPlugin {
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
 
     // ps alias to id cache
-    static HashMap<World, HashMap<String, ArrayList<String>>> regionNameToID = new HashMap<>();
+    // <world-name, <alias, [ids]>>
+    static HashMap<UUID, HashMap<String, ArrayList<String>>> regionNameToID = new HashMap<>();
 
     // vault economy integration
     private boolean vaultSupportEnabled = false;
@@ -268,10 +269,10 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean isPSNameAlreadyUsed(String name) {
-        for (World w : regionNameToID.keySet()) {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        for (UUID worldUid : regionNameToID.keySet()) {
+            RegionManager rgm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(worldUid));
 
-            List<String> l = regionNameToID.get(w).get(name);
+            List<String> l = regionNameToID.get(worldUid).get(name);
             if (l == null) continue;
             for (int i = 0; i < l.size(); i++) { // remove outdated cache
                 if (rgm.getRegion(l.get(i)) == null) {
@@ -547,7 +548,7 @@ public class ProtectionStones extends JavaPlugin {
                     }
                 }
             }
-            regionNameToID.put(w, m);
+            regionNameToID.put(w.getUID(), m);
         }
 
         // uuid cache
