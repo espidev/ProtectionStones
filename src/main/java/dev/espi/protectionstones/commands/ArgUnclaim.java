@@ -101,6 +101,9 @@ public class ArgUnclaim implements PSCommandArg {
         // remove region
         // check if removing the region and firing region remove event blocked it
         if (!r.deleteRegion(true, p)) {
+            if (!ProtectionStones.getInstance().getConfigOptions().allowMergingHoles) { // side case if the removing creates a hole and those are prevented
+                PSL.msg(p, PSL.DELETE_REGION_PREVENTED_NO_HOLES.msg());
+            }
             return true;
         }
 
