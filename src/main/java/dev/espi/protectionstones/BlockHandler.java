@@ -183,6 +183,12 @@ public class BlockHandler {
 
         String id = WGUtils.createPSID(bx, by, bz);
 
+        // if the region's id already exists, possibly placing block where a region is hidden
+        if (rm.hasRegion(id)) {
+            PSL.msg(p, PSL.REGION_ALREADY_IN_LOCATION_IS_HIDDEN.msg());
+            return false;
+        }
+
         // check for minimum distance between claims by using fake region
         if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
             if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx + bxo, by + bxy, bz + bxz)) {

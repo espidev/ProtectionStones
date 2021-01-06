@@ -106,6 +106,7 @@ public enum PSL {
     NO_PERMISSION_REGION_TYPE("psregion.no_permission_region_type", ChatColor.RED + "You do not have permission to have this region type."),
     REGION_HIDDEN("psregion.hidden", ChatColor.GRAY + "The protection block is now hidden."),
     MUST_BE_PLACED_IN_EXISTING_REGION("psregion.must_be_placed_in_existing_region", ChatColor.RED + "This must be placed inside of an existing region!"),
+    REGION_ALREADY_IN_LOCATION_IS_HIDDEN("psregion.already_in_location_is_hidden", ChatColor.RED + "A region already exists in this location (is the protection block hidden?)"),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
