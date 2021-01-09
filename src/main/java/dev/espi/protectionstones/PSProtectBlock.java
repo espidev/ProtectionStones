@@ -141,6 +141,8 @@ public class PSProtectBlock {
     @Path("behaviour.cost_to_place")
     @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
     public double costToPlace;
+    @Path("behaviour.allow_smelt_item")
+    public boolean allowSmeltItem;
 
     // player section
     @Path("player.allow_shift_right_break")

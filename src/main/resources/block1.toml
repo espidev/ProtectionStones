@@ -219,6 +219,9 @@ allow_placing_in_wild = true
     # Set cost for when a protection block is placed (separate from /ps get cost)
     cost_to_place = 0.0
 
+    # Allow protect block item to be smelt in furnaces
+    allow_smelt_item = true
+
 [player]
     # Whether or not to allow breaking the protection block with a shift-right click
     # Useful if the protection block is unbreakable (bedrock, command block), etc.

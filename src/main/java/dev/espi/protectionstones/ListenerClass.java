@@ -31,6 +31,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Furnace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -39,6 +40,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.FurnaceBurnEvent;
+import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -184,6 +187,30 @@ public class ListenerClass implements Listener {
             e.setExpToDrop(0);
         } else { // unsuccessful
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onFurnaceSmelt(FurnaceSmeltEvent e) {
+        // prevent protect block item to be smelt
+        Furnace f = (Furnace) e.getBlock().getState();
+        PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource().getType().toString());
+        if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(e.getSource(), options.restrictObtaining)) {
+            if (f.getCookTime() != 0) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onFurnaceBurnItem(FurnaceBurnEvent e) {
+        // prevent protect block item to be smelt
+        Furnace f = (Furnace) e.getBlock().getState();
+        if (f.getInventory().getSmelting() != null) {
+            PSProtectBlock options = ProtectionStones.getBlockOptions(f.getInventory().getSmelting().getType().toString());
+            if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(f.getInventory().getSmelting(), options.restrictObtaining)) {
+                e.setCancelled(true);
+            }
         }
     }
 

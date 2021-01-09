@@ -212,6 +212,8 @@ class ConfigPlaceholders {
                 return b.preventSilkTouch + "";
             case "behaviour_cost_to_place":
                 return String.format("%.2f", b.costToPlace);
+            case "behaviour_allow_smelt_item":
+                return b.allowSmeltItem + "";
 
             case "player_allow_shift_right_break":
                 return b.allowShiftRightBreak + "";
