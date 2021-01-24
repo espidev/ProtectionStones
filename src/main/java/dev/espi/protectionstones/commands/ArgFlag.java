@@ -352,8 +352,9 @@ public class ArgFlag implements PSCommandArg {
 
                 // HACK: pvp flag should never be allowed to set null when the flag group is restricted to all, since
                 // the default is that nonmembers can be killed, but members cannot.
-                if (r.getTypeOptions().regionFlags.get(flag) != null && groupValue.toLowerCase().equals("all") && flagName.toLowerCase().equals("pvp")) {
-                    PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", flagName));
+                boolean isGroupValueAll = groupValue.equalsIgnoreCase("all") || groupValue.isEmpty();
+                if (r.getTypeOptions().regionFlags.get(flag) != null && isGroupValueAll && flagName.equalsIgnoreCase("pvp")) {
+                    PSL.msg(p, PSL.FLAG_PREVENT_EXPLOIT.msg());
                     return;
                 }
 
