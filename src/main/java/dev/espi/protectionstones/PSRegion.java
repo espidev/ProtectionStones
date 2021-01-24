@@ -123,6 +123,7 @@ public abstract class PSRegion {
 
     /**
      * Get the protection stone region with the world and region.
+     * It returns a WGRegion with a null type if the block type isn't configured in the config.
      *
      * @param w the world
      * @param r the WorldGuard region

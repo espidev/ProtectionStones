@@ -27,10 +27,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 
 class ArgAdminCleanup {
 
@@ -83,29 +81,39 @@ class ArgAdminCleanup {
                     .replace("%arg%", cleanupOperation)
                     .replace("%days%", "" + days));
 
-            List<UUID> inactivePlayers = new ArrayList<>();
+            HashSet<UUID> activePlayers = new HashSet<>();
 
             // loop over offline players and add to list if they haven't joined recently
             for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
                 long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
-                if (lastPlayed < days) continue; // skip if the player hasn't been gone for that long
                 try {
-                    inactivePlayers.add(op.getUniqueId());
-                } catch (NullPointerException ignored) {} // wg.wrapOfflinePlayer can return null if the player isn't in WG cache
+                    // a player is active if they have joined within the days
+                    if (lastPlayed < days) {
+                        activePlayers.add(op.getUniqueId());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
-            // Loop over regions and check if offline player is in
-            for (String idname : regions.keySet()) {
-                PSRegion r = PSRegion.fromWGRegion(w, regions.get(idname));
-                if (r == null) continue;
+            // loop over all regions async and find regions to delete
+            List<PSRegion> toDelete = new ArrayList<>();
+            for (String regionId : regions.keySet()) {
+                PSRegion r = PSRegion.fromWGRegion(w, regions.get(regionId));
+                if (r == null) { // not a ps region (unconfigured types still count as ps regions)
+                    continue;
+                }
 
                 // if an alias is specified, skip regions that aren't of the type
-                if (finalAlias != null && (r.getTypeOptions() == null || !r.getTypeOptions().alias.equals(finalAlias))) continue;
+                if (finalAlias != null && (r.getTypeOptions() == null || !r.getTypeOptions().alias.equals(finalAlias))) {
+                    continue;
+                }
 
                 // remove inactive players from being owner
-                for (UUID uuid : inactivePlayers) {
+                List<UUID> owners = new ArrayList<>(r.getOwners()); // copy
+                for (UUID uuid : owners) {
                     try {
-                        if (r.isOwner(uuid)) {
+                        if (!activePlayers.contains(uuid)) {
                             r.removeOwner(uuid);
                         }
                     } catch (NullPointerException ignored) {}
@@ -113,23 +121,38 @@ class ArgAdminCleanup {
 
                 // remove region if there are no owners left
                 if (cleanupOperation.equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
-                    p.sendMessage(ChatColor.YELLOW + "Removed region " + idname + " due to inactive owners.");
-                    Block blockToRemove = r.getProtectBlock();
-
-                    // must be sync (both isHidden, and setType)
-                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
-                        if (!r.isHidden()) {
-                            blockToRemove.setType(Material.AIR);
-                        }
-                        ProtectionStones.removePSRegion(w, idname);
-                    });
+                    toDelete.add(r);
                 }
             }
 
-            PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
-                    .replace("%arg%", cleanupOperation));
+            // start recursive iteration to delete a region each tick
+            Iterator<PSRegion> deleteRegionsIterator = toDelete.iterator();
+            regionLoop(deleteRegionsIterator, p, cleanupOperation.equalsIgnoreCase("remove"));
         });
         return true;
     }
 
+    static private void regionLoop(Iterator<PSRegion> deleteRegionsIterator, CommandSender p, boolean isRemoveOperation) {
+        if (deleteRegionsIterator.hasNext()) {
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () ->
+                    processRegion(deleteRegionsIterator, p, isRemoveOperation), 1);
+        } else {
+            PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
+                    .replace("%arg%", isRemoveOperation ? "remove" : "disown"));
+        }
+    }
+
+    // Process a region, and then iterate to the next region on the next tick.
+    // This is to prevent the server from pausing for the entire duration of the cleanup.
+    // (lag from loading chunks to remove protection blocks)
+    static private void processRegion(Iterator<PSRegion> deleteRegionsIterator, CommandSender p, boolean isRemoveOperation) {
+        PSRegion r = deleteRegionsIterator.next();
+        p.sendMessage(ChatColor.YELLOW + "Removed region " + r.getId() + " due to inactive owners.");
+
+        // must be sync
+        r.deleteRegion(true);
+
+        // go to next region
+        regionLoop(deleteRegionsIterator, p, isRemoveOperation);
+    }
 }
