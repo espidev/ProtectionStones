@@ -299,7 +299,7 @@ public class ProtectionStones extends JavaPlugin {
 
         PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
         if (r != null) { // return id based query
-            return Collections.singletonList(r);
+            return new ArrayList<>(Collections.singletonList(r));
         } else { // return alias based query
             List<PSRegion> regions = new ArrayList<>();
             PSRegion.fromName(identifier).values().forEach(regions::addAll);
