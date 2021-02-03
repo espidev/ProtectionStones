@@ -20,6 +20,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 public class ArgMerge implements PSCommandArg {
     @Override
     public List<String> getNames() {
-        return Arrays.asList("merge");
+        return Collections.singletonList("merge");
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ArgMerge implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.merge");
+        return Collections.singletonList(Permissions.MERGE);
     }
 
     @Override
@@ -71,7 +72,7 @@ public class ArgMerge implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.merge"))
+        if (!s.hasPermission(Permissions.MERGE))
             return PSL.msg(s, PSL.NO_PERMISSION_MERGE.msg());
 
         if (!ProtectionStones.getInstance().getConfigOptions().allowMergingRegions)
@@ -112,7 +113,7 @@ public class ArgMerge implements PSCommandArg {
             if (!ProtectionStones.isPSRegion(region) || !ProtectionStones.isPSRegion(root))
                 return PSL.msg(p, PSL.MULTI_REGION_DOES_NOT_EXIST.msg());
 
-            if (!p.hasPermission("protectionstones.admin") && (!region.isOwner(lp) || !root.isOwner(lp)))
+            if (!p.hasPermission(Permissions.ADMIN) && (!region.isOwner(lp) || !root.isOwner(lp)))
                 return PSL.msg(p, PSL.NO_ACCESS.msg());
 
             // check if region is actually overlapping the region

@@ -27,14 +27,18 @@ import java.util.List;
 
 public class TextGUI {
 
+    private static final TextComponent EMPTY_COMPONENT = new TextComponent("");
+
     // page starts at zero, but displays start at one
     // pageCommand will be replacing %page%
     public static void displayGUI(CommandSender s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines, boolean sendBlankLines) {
         PSL.msg(s, header);
 
         for (int i = currentPage*guiSize; i < Math.min((currentPage+1) * guiSize, lines.size()); i++) {
-            if (sendBlankLines || !lines.get(i).equals(new TextComponent("")))
-                s.spigot().sendMessage(lines.get(i));
+            final TextComponent line = lines.get(0);
+
+            if (sendBlankLines || !line.equals(EMPTY_COMPONENT))
+                s.spigot().sendMessage(line);
         }
 
         // footer page buttons

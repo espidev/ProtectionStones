@@ -19,6 +19,7 @@ import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -46,7 +47,7 @@ public class ArgGet implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.get");
+        return Collections.singletonList(Permissions.GET);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class ArgGet implements PSCommandArg {
     private boolean openGetGUI(Player p) {
         PSL.msg(p, PSL.GET_HEADER.msg());
         for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if ((!b.permission.equals("") && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
+            if ((!b.permission.isEmpty() && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission(Permissions.ADMIN))) {
                 continue; // no permission
             }
 
@@ -89,7 +90,7 @@ public class ArgGet implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
         PSPlayer psp = PSPlayer.fromPlayer(p);
-        if (!p.hasPermission("protectionstones.get"))
+        if (!p.hasPermission(Permissions.GET))
             return PSL.msg(p, PSL.NO_PERMISSION_GET.msg());
 
         // /ps get (for GUI)
@@ -104,11 +105,11 @@ public class ArgGet implements PSCommandArg {
             return PSL.msg(p, PSL.INVALID_BLOCK.msg());
 
         // check for block permission (custom)
-        if (!cp.permission.equals("") && !p.hasPermission(cp.permission))
+        if (!cp.permission.isEmpty() && !p.hasPermission(cp.permission))
             return PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
 
         // check if /ps get is disabled on this
-        if (cp.preventPsGet && !p.hasPermission("protectionstones.admin"))
+        if (cp.preventPsGet && !p.hasPermission(Permissions.ADMIN))
             return PSL.msg(p, PSL.GET_NO_PERMISSION_BLOCK.msg());
 
         // check if player has enough money
@@ -151,12 +152,17 @@ public class ArgGet implements PSCommandArg {
     // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        List<String> l = new ArrayList<>();
-        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if ((!b.permission.equals("") && !sender.hasPermission(b.permission)) || (b.preventPsGet && !sender.hasPermission("protectionstones.admin"))) continue; // no permission
-            l.add(b.alias);
+        List<String> list = new ArrayList<>();
+
+        for (PSProtectBlock block : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            if ((!block.permission.isEmpty() && !sender.hasPermission(block.permission)) || (block.preventPsGet && !sender.hasPermission(Permissions.ADMIN))){
+                continue; // no permission
+            }
+
+            list.add(block.alias);
         }
-        return args.length == 2 ? StringUtil.copyPartialMatches(args[1], l, new ArrayList<>()) : null;
+
+        return args.length == 2 ? StringUtil.copyPartialMatches(args[1], list, new ArrayList<>()) : null;
     }
 
 }

@@ -23,8 +23,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UUIDCache {
-    private static Map<UUID, String> uuidToName = new HashMap<>();
-    private static Map<String, UUID> nameToUUID = new HashMap<>();
+
+    private static final Map<UUID, String> uuidToName = new HashMap<>();
+    private static final Map<String, UUID> nameToUUID = new HashMap<>();
 
     // toLowerCase for case insensitive search
 
@@ -67,4 +68,5 @@ public class UUIDCache {
     public static void storeWGProfile(UUID uuid, String name) {
         WorldGuard.getInstance().getProfileCache().put(new Profile(uuid, name));
     }
+
 }

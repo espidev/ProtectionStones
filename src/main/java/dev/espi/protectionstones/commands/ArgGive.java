@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -41,7 +42,7 @@ public class ArgGive implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.give");
+        return Collections.singletonList(Permissions.GIVE);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ArgGive implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
-        if (!p.hasPermission("protectionstones.give"))
+        if (!p.hasPermission(Permissions.GIVE))
             return PSL.msg(p, PSL.NO_PERMISSION_GIVE.msg());
 
         if (args.length < 3)

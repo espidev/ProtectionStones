@@ -16,16 +16,19 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.Permissions;
+import dev.espi.protectionstones.utils.Strings;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -50,33 +53,49 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ListenerClass implements Listener {
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        UUIDCache.removeUUID(p.getUniqueId());
-        UUIDCache.removeName(p.getName());
-        UUIDCache.storeUUIDNamePair(p.getUniqueId(), p.getName());
+    /**
+     * Placeholders for {@link this#execEvent(String, CommandSender, String, PSRegion)}
+     */
+    private final String[] ACTION_PLACEHOLDERS = new String[] {
+            "%player%", "%world%", "%region%",
+            "%block_x%", "%block_y%", "%block_z%"
+    };
+
+    private final Pattern ACTION_PATTERN = Pattern.compile(": ");
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        UUIDCache.removeUUID(player.getUniqueId());
+        UUIDCache.removeName(player.getName());
+        UUIDCache.storeUUIDNamePair(player.getUniqueId(), player.getName());
+
+        ProtectionStones plugin = ProtectionStones.getInstance();
 
         // allow worldguard to resolve all UUIDs to names
-        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(p.getUniqueId(), p.getName()));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+                UUIDCache.storeWGProfile(player.getUniqueId(), player.getName())
+        );
 
-        PSPlayer psp = PSPlayer.fromPlayer(p);
+        PSPlayer psp = PSPlayer.fromPlayer(player);
 
         // if by default, players should have protection block placement toggled off
-        if (ProtectionStones.getInstance().getConfigOptions().defaultProtectionBlockPlacementOff) {
-            ProtectionStones.toggleList.add(p.getUniqueId());
+        if (plugin.getConfigOptions().defaultProtectionBlockPlacementOff) {
+            ProtectionStones.toggleList.add(player.getUniqueId());
         }
 
         // tax join message
-        if (ProtectionStones.getInstance().getConfigOptions().taxEnabled && ProtectionStones.getInstance().getConfigOptions().taxMessageOnJoin) {
-            Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+        if (plugin.getConfigOptions().taxEnabled && plugin.getConfigOptions().taxMessageOnJoin) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 int amount = 0;
-                for (PSRegion psr : psp.getTaxEligibleRegions()) {
-                    for (PSRegion.TaxPayment tp : psr.getTaxPaymentsDue()) {
-                        amount += tp.getAmount();
+
+                for (PSRegion psRegion : psp.getTaxEligibleRegions()) {
+                    for (PSRegion.TaxPayment taxPayment : psRegion.getTaxPaymentsDue()) {
+                        amount += taxPayment.getAmount();
                     }
                 }
 
@@ -88,8 +107,8 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent e) {
-        BlockHandler.createPSRegion(e);
+    public void onBlockPlace(BlockPlaceEvent event) {
+        BlockHandler.createPSRegion(event);
     }
 
     // helper method for breaking protection blocks
@@ -97,19 +116,19 @@ public class ListenerClass implements Listener {
         PSProtectBlock blockOptions = r.getTypeOptions();
 
         // check for destroy permission
-        if (!p.hasPermission("protectionstones.destroy")) {
+        if (!p.hasPermission(Permissions.DESTROY)) {
             PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
             return false;
         }
 
         // check if player is owner of region
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission(Permissions.SUPER_OWNER)) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return false;
         }
 
         // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
-        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission(Permissions.SUPER_OWNER)) {
             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
             return false;
         }
@@ -141,24 +160,24 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent e) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
         // shift-right click block with hand to break
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && !e.isBlockInHand()
-                && e.getClickedBlock() != null && ProtectionStones.isProtectBlock(e.getClickedBlock())) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isBlockInHand()
+                && event.getClickedBlock() != null && ProtectionStones.isProtectBlock(event.getClickedBlock())) {
 
-            PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
-            if (ppb.allowShiftRightBreak && e.getPlayer().isSneaking()) {
-                if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
-                    e.getClickedBlock().setType(Material.AIR);
+            PSProtectBlock ppb = ProtectionStones.getBlockOptions(event.getClickedBlock());
+            if (ppb.allowShiftRightBreak && event.getPlayer().isSneaking()) {
+                if (playerBreakProtection(event.getPlayer(), PSRegion.fromLocation(event.getClickedBlock().getLocation()))) { // successful
+                    event.getClickedBlock().setType(Material.AIR);
                 }
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent e) {
-        Player p = e.getPlayer();
-        Block pb = e.getBlock();
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        Block pb = event.getBlock();
 
         PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(pb);
 
@@ -169,12 +188,12 @@ public class ListenerClass implements Listener {
         if (!ProtectionStones.isProtectBlock(pb)) {
             // prevent silk touching of protection stone blocks (that aren't holding a region)
             if (blockOptions.preventSilkTouch) {
-                ItemStack left = p.getInventory().getItemInMainHand();
-                ItemStack right = p.getInventory().getItemInOffHand();
+                ItemStack left = player.getInventory().getItemInMainHand();
+                ItemStack right = player.getInventory().getItemInOffHand();
                 if (!left.containsEnchantment(Enchantment.SILK_TOUCH) && !right.containsEnchantment(Enchantment.SILK_TOUCH)) {
                     return;
                 }
-                e.setDropItems(false);
+                event.setDropItems(false);
             }
             return;
         }
@@ -182,92 +201,93 @@ public class ListenerClass implements Listener {
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
         // break protection
-        if (playerBreakProtection(p, r)) { // successful
-            e.setDropItems(false);
-            e.setExpToDrop(0);
+        if (playerBreakProtection(player, r)) { // successful
+            event.setDropItems(false);
+            event.setExpToDrop(0);
         } else { // unsuccessful
-            e.setCancelled(true);
+            event.setCancelled(true);
         }
     }
 
+    /**
+     * Prevent protect block item to be smelt
+     * @param event event
+     */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onFurnaceSmelt(FurnaceSmeltEvent e) {
-        // prevent protect block item to be smelt
-        Furnace f = (Furnace) e.getBlock().getState();
-        PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource().getType().toString());
-        if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(e.getSource(), options.restrictObtaining)) {
-            if (f.getCookTime() != 0) {
-                e.setCancelled(true);
-            }
+    public void onFurnaceSmelt(FurnaceSmeltEvent event) {
+        Furnace furnace = (Furnace) event.getBlock().getState();
+        PSProtectBlock options = ProtectionStones.getBlockOptions(event.getSource().getType().toString());
+
+        if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(event.getSource(), options.restrictObtaining)) {
+            event.setCancelled(furnace.getCookTime() != 0);
         }
     }
 
+    /**
+     * Prevent protect block item to be smelt
+     * @param event event
+     */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onFurnaceBurnItem(FurnaceBurnEvent e) {
-        // prevent protect block item to be smelt
-        Furnace f = (Furnace) e.getBlock().getState();
-        if (f.getInventory().getSmelting() != null) {
-            PSProtectBlock options = ProtectionStones.getBlockOptions(f.getInventory().getSmelting().getType().toString());
-            if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(f.getInventory().getSmelting(), options.restrictObtaining)) {
-                e.setCancelled(true);
-            }
+    public void onFurnaceBurnItem(FurnaceBurnEvent event) {
+        Furnace furnace = (Furnace) event.getBlock().getState();
+
+        if (furnace.getInventory().getSmelting() == null) {
+            return;
         }
+
+        PSProtectBlock options = ProtectionStones.getBlockOptions(furnace.getInventory().getSmelting().getType().toString());
+        event.setCancelled(options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(furnace.getInventory().getSmelting(), options.restrictObtaining));
     }
 
     // -=-=-=- block changes to protection block related events -=-=-=-
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
-        Block clicked = e.getBlockClicked();
-        BlockFace bf = e.getBlockFace();
-        Block check = clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ());
+    public void onPlayerBucketFill(PlayerBucketEmptyEvent event) {
+        Block clicked = event.getBlockClicked();
+        BlockFace blockFace = event.getBlockFace();
+        Block check = clicked.getWorld().getBlockAt(
+                clicked.getX() + blockFace.getModX(),
+                clicked.getY() + blockFace.getModY(),
+                clicked.getZ() + blockFace.getModZ()
+        );
+
+        event.setCancelled(ProtectionStones.isProtectBlock(check));
+        /*
         if (ProtectionStones.isProtectBlock(check)) {
-            e.setCancelled(true);
+            event.setCancelled(true);
             // fix for dumb head texture changing
             // Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> MiscUtil.setHeadType(ProtectionStones.getBlockOptions(check).type, check));
-        }
+        }*/
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockIgnite(BlockIgniteEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock())) {
-            e.setCancelled(true);
-        }
+    public void onBlockIgnite(BlockIgniteEvent event) {
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockBurn(BlockBurnEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock())) {
-            e.setCancelled(true);
-        }
+    public void onBlockBurn(BlockBurnEvent event) {
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockFromTo(BlockFromToEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getToBlock())) {
-            e.setCancelled(true);
-        }
+    public void onBlockFromTo(BlockFromToEvent event) {
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getToBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpongeAbsorb(SpongeAbsorbEvent event) {
-        if (ProtectionStones.isProtectBlock(event.getBlock())) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock()) || ProtectionStones.isProtectBlock(e.getSourceBlock())) {
-            e.setCancelled(true);
-        }
+    public void onBlockPhysicsEvent(BlockPhysicsEvent event) {
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getBlock()) || ProtectionStones.isProtectBlock(event.getSourceBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockFade(BlockFadeEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock())) {
-            e.setCancelled(true);
-        }
+    public void onBlockFade(BlockFadeEvent event) {
+        event.setCancelled(ProtectionStones.isProtectBlock(event.getBlock()));
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -277,21 +297,21 @@ public class ListenerClass implements Listener {
 
         // we want to replace protection blocks that have their protection block broken (ex. signs, banners)
         // the block may not exist anymore, and so we have to recreate the isProtectBlock method here
-        BlockState bs = e.getBlockState();
-        if (!ProtectionStones.isProtectBlockType(bs.getType().toString())) return;
+        BlockState blockState = e.getBlockState();
+        if (!ProtectionStones.isProtectBlockType(blockState.getType().toString())) return;
 
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(bs.getWorld());
-        if (rgm == null) return;
+        RegionManager regionManager = WGUtils.getRegionManagerWithWorld(blockState.getWorld());
+        if (regionManager == null) return;
 
         // check if the block is a source block
-        ProtectedRegion br = rgm.getRegion(WGUtils.createPSID(bs.getLocation()));
-        if (!ProtectionStones.isPSRegion(br) && PSMergedRegion.getMergedRegion(bs.getLocation()) == null) return;
+        ProtectedRegion br = regionManager.getRegion(WGUtils.createPSID(blockState.getLocation()));
+        if (!ProtectionStones.isPSRegion(br) && PSMergedRegion.getMergedRegion(blockState.getLocation()) == null) return;
 
-        PSRegion r = PSRegion.fromLocation(bs.getLocation());
-        if (r == null) return;
+        PSRegion psRegion = PSRegion.fromLocation(blockState.getLocation());
+        if (psRegion == null) return;
 
         // puts the block back
-        r.unhide();
+        psRegion.unhide();
         e.setCancelled(true);
     }
 
@@ -306,9 +326,10 @@ public class ListenerClass implements Listener {
     }
 
     private void pistonUtil(List<Block> pushedBlocks, BlockPistonEvent e) {
-        for (Block b : pushedBlocks) {
-            PSProtectBlock cpb = ProtectionStones.getBlockOptions(b);
-            if (cpb != null && ProtectionStones.isProtectBlock(b) && cpb.preventPistonPush) {
+        for (Block block : pushedBlocks) {
+            PSProtectBlock cpb = ProtectionStones.getBlockOptions(block);
+
+            if (cpb != null && ProtectionStones.isProtectBlock(block) && cpb.preventPistonPush) {
                 e.setCancelled(true);
             }
         }
@@ -327,28 +348,28 @@ public class ListenerClass implements Listener {
     private void explodeUtil(List<Block> blockList, World w) {
         // loop through exploded blocks
         for (int i = 0; i < blockList.size(); i++) {
-            Block b = blockList.get(i);
+            Block block = blockList.get(i);
 
-            if (ProtectionStones.isProtectBlock(b)) {
-                String id = WGUtils.createPSID(b.getLocation());
+            if (!ProtectionStones.isProtectBlock(block)) {
+                continue;
+            }
 
-                PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
+            PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(block);
 
-                // remove protection block from exploded list if prevent_explode is enabled
-                blockList.remove(i);
-                i--;
+            // remove protection block from exploded list if prevent_explode is enabled
+            blockList.remove(i);
+            i--;
 
-                // if allow explode
-                if (!blockOptions.preventExplode) {
-                    b.setType(Material.AIR); // manually set to air
-                    // manually add drop
-                    if (!blockOptions.noDrop) {
-                        b.getWorld().dropItem(b.getLocation(), blockOptions.createItem());
-                    }
-                    // remove region from worldguard if destroy_region_when_explode is enabled
-                    if (blockOptions.destroyRegionWhenExplode) {
-                        ProtectionStones.removePSRegion(w, id);
-                    }
+            // if allow explode
+            if (!blockOptions.preventExplode) {
+                block.setType(Material.AIR); // manually set to air
+                // manually add drop
+                if (!blockOptions.noDrop) {
+                    block.getWorld().dropItem(block.getLocation(), blockOptions.createItem());
+                }
+                // remove region from worldguard if destroy_region_when_explode is enabled
+                if (blockOptions.destroyRegionWhenExplode) {
+                    ProtectionStones.removePSRegion(w, WGUtils.createPSID(block.getLocation()));
                 }
             }
         }
@@ -360,21 +381,25 @@ public class ListenerClass implements Listener {
         // we only want plugin triggered teleports, ignore natural teleportation
         if (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT) return;
 
-        if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
+        if (event.getPlayer().hasPermission(Permissions.TP__BYPASS_PREVENT)) return;
 
-        WorldGuardPlugin wg = WorldGuardPlugin.inst();
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(event.getTo().getWorld());
-        BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
         // check if player can teleport into region (no region with preventTeleportIn = true)
-        ApplicableRegionSet regions = rgm.getApplicableRegions(v);
+        ApplicableRegionSet regions = rgm.getApplicableRegions(
+               BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ())
+        );
+
         if (regions.getRegions().isEmpty()) return;
+
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
         boolean foundNoTeleport = false;
-        for (ProtectedRegion r : regions) {
-            String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+
+        for (ProtectedRegion region : regions) {
+            String f = region.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
             if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn)
                 foundNoTeleport = true;
-            if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
+            if (region.getOwners().contains(localPlayer)) return;
         }
 
         if (foundNoTeleport) {
@@ -384,45 +409,52 @@ public class ListenerClass implements Listener {
     }
 
     // -=-=-=- player defined events -=-=-=-
-
-    private void execEvent(String action, CommandSender s, String player, PSRegion region) {
+    
+    private void execEvent(String actionString, CommandSender s, String player, PSRegion region) {
         if (player == null) player = "";
 
         // split action_type: action
-        String[] sp = action.split(": ");
-        if (sp.length == 0) return;
+        String[] parts = ACTION_PATTERN.split(actionString, 2);
+        if (parts.length == 0) return;
 
-        StringBuilder act = new StringBuilder(sp[1]);
-        for (int i = 2; i < sp.length; i++) act.append(": ").append(sp[i]); // add anything extra that has a colon
+        String action = Strings.color(
+                StringUtils.replaceEach( // Apache StringUtils#replace is better than String#replace
+                        parts[1],
+                        ACTION_PLACEHOLDERS,
+                        createActionPlaceholdersReplacements(player, region)
+                )
+        );
 
-        act = new StringBuilder(act.toString()
-                .replace("%player%", player)
-                .replace("%world%", region.getWorld().getName())
-                .replace("%region%", region.getName() == null ? region.getId() : region.getName() + " (" + region.getId() + ")")
-                .replace("%block_x%", region.getProtectBlock().getX() + "")
-                .replace("%block_y%", region.getProtectBlock().getY() + "")
-                .replace("%block_z%", region.getProtectBlock().getZ() + ""));
-
-        switch (sp[0]) {
+        switch (parts[0].toLowerCase()) {
             case "player_command":
-                if (s != null) Bukkit.getServer().dispatchCommand(s, act.toString());
+                if (s != null) Bukkit.getServer().dispatchCommand(s, action);
                 break;
             case "console_command":
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), act.toString());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), action);
                 break;
             case "message":
-                if (s != null) s.sendMessage(ChatColor.translateAlternateColorCodes('&', act.toString()));
+                if (s != null) s.sendMessage(action);
                 break;
             case "global_message":
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', act.toString()));
-                }
-                ProtectionStones.getPluginLogger().info(ChatColor.translateAlternateColorCodes('&', act.toString()));
+                Bukkit.broadcastMessage(action);
                 break;
             case "console_message":
-                ProtectionStones.getPluginLogger().info(ChatColor.translateAlternateColorCodes('&', act.toString()));
+                ProtectionStones.getPluginLogger().info(action);
                 break;
         }
+    }
+
+    private String[] createActionPlaceholdersReplacements(String playerName, PSRegion region) {
+        Block protection = region.getProtectBlock();
+
+        return new String[] {
+                playerName,
+                region.getWorld().getName(),
+                region.getName() == null ? region.getId() : region.getName() + " (" + region.getId() + ")",
+                Integer.toString(protection.getX()),
+                Integer.toString(protection.getY()),
+                Integer.toString(protection.getZ())
+        };
     }
 
     @EventHandler
@@ -439,19 +471,14 @@ public class ListenerClass implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPSRemove(PSRemoveEvent event) {
-        if (event.isCancelled()) return;
         if (event.getRegion().getTypeOptions() == null) return;
         if (!event.getRegion().getTypeOptions().eventsEnabled) return;
 
         // run custom commands (in config)
         for (String action : event.getRegion().getTypeOptions().regionDestroyCommands) {
-            if (event.getPlayer() == null) {
-                execEvent(action, null, null, event.getRegion());
-            } else {
-                execEvent(action, event.getPlayer(), event.getPlayer().getName(), event.getRegion());
-            }
+            execEvent(action, event.getPlayer(), event.getPlayer() == null ? null : event.getPlayer().getName(), event.getRegion());
         }
     }
 

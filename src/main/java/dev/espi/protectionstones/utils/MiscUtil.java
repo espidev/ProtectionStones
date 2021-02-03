@@ -15,7 +15,7 @@
 
 package dev.espi.protectionstones.utils;
 
-import org.apache.commons.lang.StringUtils;
+import com.google.common.primitives.Ints;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 public class MiscUtil {
 
+    private static final String VERSION = Bukkit.getBukkitVersion().split("-")[0];
+
     public static String getUniqueIdIntArray(UUID uuid) {
         long least = uuid.getMostSignificantBits();
         long most = uuid.getLeastSignificantBits();
@@ -36,7 +38,7 @@ public class MiscUtil {
     }
 
     public static String getVersionString() {
-        return Bukkit.getBukkitVersion().split("-")[0];
+        return VERSION;
     }
 
     public static Duration parseRentPeriod(String period) throws NumberFormatException {
@@ -57,29 +59,38 @@ public class MiscUtil {
         return rentPeriod;
     }
 
-    public static int getPermissionNumber(Player p, String perm, int def) {
-        return getPermissionNumber(p.getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList()), perm, def);
+    public static int getPermissionNumber(Player player, String permission, int def) {
+        return getPermissionNumber(
+                player.getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList()),
+                permission,
+                def
+        );
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public static int getPermissionNumber(List<String> permissions, String perm, int def /* default */) {
         int n = -99999;
+
         for (String permission : permissions) {
-            if (permission.startsWith(perm)) {
-                String value = permission.substring(perm.length());
-                if (StringUtils.isNumeric(value)) {
-                    n = Math.max(n, Integer.parseInt(value));
-                }
+            if (!permission.startsWith(perm)) {
+                continue;
             }
+
+            String value = permission.substring(perm.length());
+            Integer number = Ints.tryParse(value);
+
+            if (number == null) {
+                continue;
+            }
+
+            n = Math.max(n, number);
         }
+
         return n == -99999 ? def : n;
     }
 
-    public static String concatWithoutLast(List<String> l, String separator) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < l.size(); i++) {
-            sb.append(l.get(i)).append(i == l.size()-1 ? "" : separator);
-        }
-        return sb.toString();
+    public static String concatWithoutLast(List<String> list, String separator) {
+        return list.size() <= 1 ? "" : String.join(separator, list.subList(0, list.size() - 2));
     }
 
     public static String describeDuration(Duration duration) {
@@ -91,12 +102,25 @@ public class MiscUtil {
         duration = duration.minusMinutes(minutes);
         long seconds = duration.toMillis() / 1000;
 
-        String s = "";
-        if (days != 0) s += days + "d";
-        if (hours != 0) s += hours + "h";
-        if (minutes != 0) s += minutes + "m";
-        if (seconds != 0) s += seconds + "s";
-        return s;
+        final StringBuilder builder = new StringBuilder();
+
+        if (days != 0) {
+            builder.append(days).append('d');
+        }
+
+        if (hours != 0) {
+            builder.append(hours).append('h');
+        }
+
+        if (minutes != 0) {
+            builder.append(minutes).append('m');
+        }
+
+        if (seconds != 0) {
+            builder.append(seconds).append('s');
+        }
+
+        return builder.toString();
     }
 
 }

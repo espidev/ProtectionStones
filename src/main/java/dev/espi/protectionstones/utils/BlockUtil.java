@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class BlockUtil {
+
     static final int MAX_USERNAME_LENGTH = 16;
     public static HashMap<String, String> uuidToBase64Head = new HashMap<>();
 
@@ -72,26 +73,24 @@ public class BlockUtil {
                 if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + op.getUniqueId().toString()) != null) {
                     // PLAYER_HEAD:base64
                     return Material.PLAYER_HEAD.toString() + ":" + op.getUniqueId().toString();
-                } else {
-                    // PLAYER_HEAD:name
-                    return Material.PLAYER_HEAD.toString() + ":" + op.getName(); // return name if doesn't exist
                 }
 
-            } else { // PLAYER_HEAD
-                return Material.PLAYER_HEAD.toString();
+                // PLAYER_HEAD:name
+                return Material.PLAYER_HEAD.toString() + ":" + op.getName(); // return name if doesn't exist
+
             }
-        } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
-            return Material.CREEPER_HEAD.toString();
-        } else if (block.getType() == Material.DRAGON_WALL_HEAD) {
-            return Material.DRAGON_HEAD.toString();
-        } else if (block.getType() == Material.ZOMBIE_WALL_HEAD) {
-            return Material.ZOMBIE_HEAD.toString();
-        } else if (block.getType() == Material.SKELETON_WALL_SKULL) {
-            return Material.SKELETON_SKULL.toString();
-        } else if (block.getType() == Material.WITHER_SKELETON_WALL_SKULL) {
-            return Material.WITHER_SKELETON_SKULL.toString();
-        } else {
-            return block.getType().toString();
+
+            // PLAYER_HEAD
+            return Material.PLAYER_HEAD.toString();
+        }
+
+        switch (block.getType()) {
+            case CREEPER_WALL_HEAD: return Material.CREEPER_HEAD.toString();
+            case DRAGON_WALL_HEAD: return Material.DRAGON_HEAD.toString();
+            case ZOMBIE_WALL_HEAD: return Material.ZOMBIE_HEAD.toString();
+            case SKELETON_WALL_SKULL: return Material.SKELETON_SKULL.toString();
+            case WITHER_SKELETON_WALL_SKULL: return Material.WITHER_SKELETON_SKULL.toString();
+            default: return block.getType().toString();
         }
     }
 

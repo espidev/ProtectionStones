@@ -23,15 +23,18 @@ import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.FlagValueChangeHandler;
 import com.sk89q.worldguard.session.handler.Handler;
 import dev.espi.protectionstones.FlagHandler;
+import dev.espi.protectionstones.utils.Strings;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 // greeting-action flag
 public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
 
     public static final Factory FACTORY = new Factory();
+
     public static class Factory extends Handler.Factory<GreetingFlagHandler> {
         @Override
         public GreetingFlagHandler create(Session session) {
@@ -48,11 +51,20 @@ public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
 
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
-        if (currentValue != null && !currentValue.equals(lastValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
-            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', currentValue)));
+        if (currentValue == null || currentValue.equals(lastValue)) {
+            return true;
         }
+
+        final Player player = Bukkit.getPlayer(localPlayer.getUniqueId());
+
+        if (player == null) {
+            return true;
+        }
+
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Strings.color(currentValue)));
         return true;
     }
 
@@ -60,4 +72,5 @@ public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
     protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
         return true;
     }
+
 }

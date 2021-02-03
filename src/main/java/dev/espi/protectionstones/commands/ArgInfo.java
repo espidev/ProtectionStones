@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -45,7 +46,7 @@ public class ArgInfo implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.info");
+        return Collections.singletonList(Permissions.INFO);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class ArgInfo implements PSCommandArg {
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());
 
-        if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
+        if (!p.hasPermission(Permissions.INFO__OTHERS) && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
             return PSL.msg(p, PSL.NO_ACCESS.msg());
 
         if (r.getTypeOptions() == null) {
@@ -71,7 +72,7 @@ public class ArgInfo implements PSCommandArg {
         }
 
         if (args.length == 1) { // info of current region player is in
-            if (!p.hasPermission("protectionstones.info"))
+            if (!p.hasPermission(Permissions.INFO))
                 return PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
@@ -109,19 +110,19 @@ public class ArgInfo implements PSCommandArg {
 
             switch (args[1].toLowerCase()) {
                 case "members":
-                    if (!p.hasPermission("protectionstones.members"))
+                    if (!p.hasPermission(Permissions.MEMBERS))
                         return PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
 
                     displayMembers(p, r.getWGRegion());
                     break;
                 case "owners":
-                    if (!p.hasPermission("protectionstones.owners"))
+                    if (!p.hasPermission(Permissions.OWNERS))
                         return PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
 
                     displayOwners(p, r.getWGRegion());
                     break;
                 case "flags":
-                    if (!p.hasPermission("protectionstones.flags"))
+                    if (!p.hasPermission(Permissions.FLAGS))
                         return PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
                         displayFlags(p, r);
                     break;

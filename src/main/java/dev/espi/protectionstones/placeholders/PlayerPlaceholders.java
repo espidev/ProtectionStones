@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import lombok.var;
 import org.bukkit.entity.Player;
@@ -37,7 +38,7 @@ class PlayerPlaceholders {
         PSPlayer psp = PSPlayer.fromPlayer(p);
 
         if (identifier.equals("currentplayer_global_region_limit")) {
-            if (p.hasPermission("protectionstones.admin")) {
+            if (p.hasPermission(Permissions.ADMIN)) {
                 return "-1";
             } else {
                 return psp.getGlobalRegionLimits() + "";
@@ -50,7 +51,7 @@ class PlayerPlaceholders {
                     .filter(e -> e.getKey().alias.equals(alias))
                     .collect(Collectors.toList());
 
-            if (p.hasPermission("protectionstones.admin")) {
+            if (p.hasPermission(Permissions.ADMIN)) {
                 return "-1";
             }
 

@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +45,7 @@ public class ArgFlag implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.flags");
+        return Collections.singletonList(Permissions.FLAGS);
     }
 
     @Override
@@ -215,7 +216,7 @@ public class ArgFlag implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
-        if (!p.hasPermission("protectionstones.flags")) {
+        if (!p.hasPermission(Permissions.FLAGS)) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
             return true;
         }
@@ -253,12 +254,16 @@ public class ArgFlag implements PSCommandArg {
             LinkedHashMap<String, List<String>> allowedFlags = r.getTypeOptions().allowedFlags;
 
             // check if flag is allowed and its group is also allowed
-            if (allowedFlags.keySet().contains(flagName) && allowedFlags.get(flagName).contains(flags.getOrDefault("-g", "all")) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
-                String value = "";
-                for (int i = 2; i < args.length; i++) value += args[i] + " ";
-                setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));
+            if (allowedFlags.containsKey(flagName) && allowedFlags.get(flagName).contains(flags.getOrDefault("-g", "all")) && p.hasPermission(Permissions.FLAGS__EDIT + flagName)) {
+                StringBuilder value = new StringBuilder();
+
+                for (int i = 2; i < args.length; i++){
+                    value.append(args[i]).append(" ");
+                }
+
+                setFlag(r, p, args[1], value.toString().trim(), flags.getOrDefault("-g", ""));
                 // reshow GUI
-                if (!gui.equals("")) {
+                if (!gui.isEmpty()) {
                     Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
                 }
             } else {

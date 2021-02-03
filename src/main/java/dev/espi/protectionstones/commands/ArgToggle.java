@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -39,7 +40,7 @@ public class ArgToggle implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.toggle");
+        return Collections.singletonList(Permissions.TOGGLE);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ArgToggle implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        if (p.hasPermission("protectionstones.toggle")) {
+        if (p.hasPermission(Permissions.TOGGLE)) {
             if (!ProtectionStones.toggleList.contains(p.getUniqueId())) {
                 ProtectionStones.toggleList.add(p.getUniqueId());
                 p.sendMessage(PSL.TOGGLE_OFF.msg());

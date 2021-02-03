@@ -24,6 +24,7 @@ import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.session.handler.ExitFlag;
 import dev.espi.protectionstones.flags.FarewellFlagHandler;
 import dev.espi.protectionstones.flags.GreetingFlagHandler;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import lombok.var;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -106,7 +107,7 @@ public class FlagHandler {
     // by default, all players have access to it
     static void initializePermissions() {
         for (var flag : WGUtils.getFlagRegistry().getAll()) {
-            Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags.edit." + flag.getName(),
+            Bukkit.getPluginManager().addPermission(new Permission(Permissions.FLAGS__EDIT + flag.getName(),
                     "Given to all players by default. Remove if you do not want the player to have the ability to edit this flag with /ps flag.",
                     PermissionDefault.TRUE));
         }

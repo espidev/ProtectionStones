@@ -19,6 +19,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,7 +41,7 @@ public class ArgList implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.list");
+        return Collections.singletonList(Permissions.LIST);
     }
 
     @Override
@@ -50,10 +51,10 @@ public class ArgList implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.list"))
+        if (!s.hasPermission(Permissions.LIST))
             return PSL.msg(s, PSL.NO_PERMISSION_LIST.msg());
 
-        if (args.length == 2 && !s.hasPermission("protectionstones.list.others"))
+        if (args.length == 2 && !s.hasPermission(Permissions.LIST__OTHERS))
             return PSL.msg(s, PSL.NO_PERMISSION_LIST_OTHERS.msg());
 
         if (args.length == 2 && !UUIDCache.containsName(args[1]))

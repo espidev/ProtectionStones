@@ -26,6 +26,7 @@ import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
+import dev.espi.protectionstones.utils.Strings;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -93,10 +95,10 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Add a command argument to /ps.
      *
-     * @param psca PSCommandArg object to be added
+     * @param psCommandArg PSCommandArg object to be added
      */
-    public void addCommandArgument(PSCommandArg psca) {
-        commandArgs.add(psca);
+    public void addCommandArgument(PSCommandArg psCommandArg) {
+        commandArgs.add(psCommandArg);
     }
 
     /**
@@ -224,7 +226,7 @@ public class ProtectionStones extends JavaPlugin {
      * @return whether or not that material is being used for a protection block
      */
     public static boolean isProtectBlockType(String material) {
-        return protectionStonesOptions.containsKey(material);
+        return protectionStonesOptions.get(material) != null;
     }
 
     /**
@@ -406,12 +408,11 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // add display name and lore
-        if (!b.displayName.equals("")) {
-            im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
+        if (!b.displayName.isEmpty()) {
+            im.setDisplayName(Strings.color(b.displayName));
         }
-        List<String> lore = new ArrayList<>();
-        for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
-        im.setLore(lore);
+
+        im.setLore(b.lore.stream().map(Strings::color).collect(Collectors.toList()));
 
         // add identifier for protection stone created items
         im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.BYTE, (byte) 1);

@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
@@ -477,7 +478,7 @@ public class PSStandardRegion extends PSRegion {
                 .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
                 .filter(r -> r != null && r.getTypeOptions() != null && !r.getId().equals(getId()))
                 .filter(r -> r.getTypeOptions().allowMerging)
-                .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))
+                .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission(Permissions.ADMIN))
                 .filter(r -> WGUtils.canMergeRegionTypes(getTypeOptions(), r))
                 .collect(Collectors.toList());
     }

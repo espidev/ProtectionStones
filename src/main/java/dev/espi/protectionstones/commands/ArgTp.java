@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,7 +47,7 @@ public class ArgTp implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.tp");
+        return Collections.singletonList(Permissions.TP);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ArgTp implements PSCommandArg {
         Player p = (Player) s;
 
         // preliminary checks
-        if (!p.hasPermission("protectionstones.tp"))
+        if (!p.hasPermission(Permissions.TP))
             return PSL.msg(p, PSL.NO_PERMISSION_TP.msg());
 
         if (args.length < 2 || args.length > 3)
@@ -135,7 +136,7 @@ public class ArgTp implements PSCommandArg {
         }
 
         // teleport player
-        if (r.getTypeOptions().tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) {
+        if (r.getTypeOptions().tpWaitingSeconds == 0 || p.hasPermission(Permissions.TP)) {
             // no teleport delay
             PSL.msg(p, PSL.TPING.msg());
             Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> p.teleport(r.getHome())); // run on main thread, not async

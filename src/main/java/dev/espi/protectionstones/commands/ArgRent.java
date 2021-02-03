@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -56,7 +57,7 @@ public class ArgRent implements PSCommandArg {
 
     @Override
     public List<String> getNames() {
-        return Arrays.asList("rent");
+        return Collections.singletonList("rent");
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ArgRent implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.rent");
+        return Collections.singletonList(Permissions.RENT);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ArgRent implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.rent")) {
+        if (!s.hasPermission(Permissions.RENT)) {
             return PSL.msg(s, PSL.NO_PERMISSION_RENT.msg());
         }
 

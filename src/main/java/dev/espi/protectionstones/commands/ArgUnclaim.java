@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,7 @@ public class ArgUnclaim implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.unclaim");
+        return Collections.singletonList(Permissions.UNCLAIM);
     }
 
     @Override
@@ -51,7 +52,7 @@ public class ArgUnclaim implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocationGroupUnsafe(p.getLocation()); // allow unclaiming unconfigured regions
 
-        if (!p.hasPermission("protectionstones.unclaim")) {
+        if (!p.hasPermission(Permissions.UNCLAIM)) {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
@@ -60,13 +61,13 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission(Permissions.SUPER_OWNER)) {
             PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
             return true;
         }
 
         // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
-        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission(Permissions.SUPER_OWNER)) {
             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
             return false;
         }

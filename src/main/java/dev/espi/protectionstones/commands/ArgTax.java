@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.TextGUI;
 import dev.espi.protectionstones.utils.UUIDCache;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -51,7 +52,7 @@ public class ArgTax implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.tax");
+        return Collections.singletonList(Permissions.TAX);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class ArgTax implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.tax")) {
+        if (!s.hasPermission(Permissions.TAX)) {
             return PSL.msg(s, PSL.NO_PERMISSION_TAX.msg());
         }
         if (!ProtectionStones.getInstance().getConfigOptions().taxEnabled) {

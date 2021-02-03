@@ -20,6 +20,7 @@ import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.LimitUtil;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class ArgBuySell implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.buysell");
+        return Collections.singletonList(Permissions.BUY_SELL);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class ArgBuySell implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        if (!p.hasPermission("protectionstones.buysell")) {
+        if (!p.hasPermission(Permissions.BUY_SELL)) {
             PSL.msg(p, PSL.NO_PERMISSION_BUYSELL.msg());
             return true;
         }
@@ -76,7 +78,7 @@ public class ArgBuySell implements PSCommandArg {
             if (!r.forSale())
                 return PSL.msg(p, PSL.BUY_NOT_FOR_SALE.msg());
 
-            if ((!r.getTypeOptions().permission.equals("") && !p.hasPermission(r.getTypeOptions().permission)))
+            if ((!r.getTypeOptions().permission.isEmpty() && !p.hasPermission(r.getTypeOptions().permission)))
                 return PSL.msg(p, PSL.NO_PERMISSION_REGION_TYPE.msg());
 
             // check if player reached region limit

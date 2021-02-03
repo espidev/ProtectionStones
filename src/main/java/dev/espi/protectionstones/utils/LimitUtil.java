@@ -15,16 +15,17 @@
 
 package dev.espi.protectionstones.utils;
 
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class LimitUtil {
 
@@ -39,12 +40,8 @@ public class LimitUtil {
             HashMap<PSProtectBlock, Integer> playerRegionCounts = getOwnedRegionTypeCounts(psp);
 
             // add the blocks
-            for (PSProtectBlock b : blocksAdded) {
-                if (playerRegionCounts.containsKey(b)) {
-                    playerRegionCounts.put(b, playerRegionCounts.get(b)+1);
-                } else {
-                    playerRegionCounts.put(b, 1);
-                }
+            for (PSProtectBlock block : blocksAdded) {
+                playerRegionCounts.merge(block, 1, Integer::sum);
             }
 
             // check each limit
@@ -52,6 +49,7 @@ public class LimitUtil {
                 if (regionLimits.containsKey(type) && (playerRegionCounts.get(type) > regionLimits.get(type))) {
                     return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
                 }
+
                 total += playerRegionCounts.get(type);
             }
 
@@ -60,80 +58,102 @@ public class LimitUtil {
                 return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
             }
         }
+
         return "";
     }
 
-    public static boolean check(Player p, PSProtectBlock b) {
-        if (!p.hasPermission("protectionstones.admin")) {
-            // check if player has limit on protection stones
-            String msg = LimitUtil.hasPlayerPassedRegionLimit(PSPlayer.fromPlayer(p), b);
-            if (!msg.isEmpty()) {
-                PSL.msg(p, msg);
-                return false;
-            }
+    public static boolean check(Player player, PSProtectBlock protectBlock) {
+        if (player.hasPermission(Permissions.ADMIN)) {
+            return true;
         }
 
-        return true;
+        String message = LimitUtil.hasPlayerPassedRegionLimit(PSPlayer.fromPlayer(player), protectBlock);
+
+        if (!message.isEmpty()) {
+            PSL.msg(player, message);
+        }
+
+        return false;
     }
 
-    public static boolean hasPassedOrEqualsRentLimit(Player p) {
-        int lim = MiscUtil.getPermissionNumber(p, "protectionstones.rent.limit.", -1);
-        if (lim != -1) {
-            int total = 0;
+    public static boolean hasPassedOrEqualsRentLimit(Player player) {
+        int limit = MiscUtil.getPermissionNumber(player, Permissions.RENT__LIMIT, -1);
 
-            // find total number of rented regions
-            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
-            for (World w : m.keySet()) {
-                RegionManager rgm = m.get(w);
-                for (ProtectedRegion r : rgm.getRegions().values()) {
-                    if (ProtectionStones.isPSRegion(r) && r.getOwners().contains(WorldGuardPlugin.inst().wrapPlayer(p))) {
-                        PSRegion psr = PSRegion.fromWGRegion(p.getWorld(), r);
-
-                        if (psr != null && psr.getTenant() != null && psr.getTenant().equals(p.getUniqueId())) total++;
-                    }
-                }
-            }
-
-            return total >= lim;
+        if (limit == -1) {
+            return false;
         }
-        return false;
+
+        int total = 0;
+
+        // find total number of rented regions
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+
+        for (RegionManager regionManager : WGUtils.getAllRegionManagers().values()) {
+            for (ProtectedRegion protectedRegion : regionManager.getRegions().values()) {
+                if (!ProtectionStones.isPSRegion(protectedRegion)) {
+                    continue;
+                }
+
+                // Player is not an owner of this region
+                if (!protectedRegion.getOwners().contains(localPlayer)) {
+                    continue;
+                }
+
+                PSRegion psRegion = PSRegion.fromWGRegion(player.getWorld(), protectedRegion);
+
+                if (psRegion == null) {
+                    continue;
+                }
+
+                // Player is not the tenant of this region
+                if (!player.getUniqueId().equals(psRegion.getTenant())) {
+                    continue;
+                }
+
+                total++;
+            }
+        }
+
+        return total >= limit;
     }
 
     /**
      * Returns the region counts of a player (for all worlds).
+     *
      * @param psp player
      * @return map of region types to the counts
      */
     private static HashMap<PSProtectBlock, Integer> getOwnedRegionTypeCounts(PSPlayer psp) {
         HashMap<PSProtectBlock, Integer> counts = new HashMap<>();
-        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
-        for (World w : m.keySet()) {
-            RegionManager rgm = m.get(w);
+        HashMap<World, RegionManager> worldRegionManagers = WGUtils.getAllRegionManagers();
+
+        for (World world : worldRegionManagers.keySet()) {
+            RegionManager rgm = worldRegionManagers.get(world);
 
             rgm.getRegions().values().stream()
-                    .filter(r -> ProtectionStones.isPSRegion(r))
-                    .filter(r -> r.getOwners().contains(psp.getUuid()))
-                    .map(r -> PSRegion.fromWGRegion(w, r))
-                    .forEach(r -> {
-                        if (r instanceof PSGroupRegion) {
-                            for (PSMergedRegion psmr : ((PSGroupRegion) r).getMergedRegions()) {
-                                if (psmr.getTypeOptions() == null) continue;
-                                if (!counts.containsKey(psmr.getTypeOptions())) {
-                                    counts.put(psmr.getTypeOptions(), 1);
-                                } else {
-                                    counts.put(psmr.getTypeOptions(), counts.get(psmr.getTypeOptions())+1);
+                    .filter(ProtectionStones::isPSRegion)
+                    .filter(region -> region.getOwners().contains(psp.getUuid()))
+                    .map(region -> PSRegion.fromWGRegion(world, region))
+                    .filter(Objects::nonNull)
+                    .forEach(region -> {
+                        if (region instanceof PSGroupRegion) {
+                            for (PSMergedRegion groupRegion : ((PSGroupRegion) region).getMergedRegions()) {
+                                if (groupRegion.getTypeOptions() == null) {
+                                    continue;
                                 }
+
+                                counts.merge(groupRegion.getTypeOptions(), 1, Integer::sum);
                             }
                         } else {
-                            if (r.getTypeOptions() == null) return;
-                            if (!counts.containsKey(r.getTypeOptions())) {
-                                counts.put(r.getTypeOptions(), 1);
-                            } else {
-                                counts.put(r.getTypeOptions(), counts.get(r.getTypeOptions())+1);
+                            if (region.getTypeOptions() == null) {
+                                return;
                             }
+
+                            counts.merge(region.getTypeOptions(), 1, Integer::sum);
                         }
                     });
         }
+
         return counts;
     }
 
@@ -155,14 +175,15 @@ public class LimitUtil {
 
             // check if player has passed region limit
             if (total >= maxPS && maxPS != -1) {
-                return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", ""+maxPS);
+                return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", "" + maxPS);
             }
 
             // check if player has passed per block limit
             if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
-                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg().replace("%limit%", ""+regionLimits.get(b));
+                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg().replace("%limit%", "" + regionLimits.get(b));
             }
         }
+
         return "";
     }
 

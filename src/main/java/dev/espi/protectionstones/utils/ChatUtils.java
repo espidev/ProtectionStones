@@ -20,15 +20,16 @@ import dev.espi.protectionstones.PSRegion;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatUtils {
-    public static void displayDuplicateRegionAliases(Player p, List<PSRegion> r) {
-        StringBuilder rep = new StringBuilder(r.get(0).getId() + " (" + r.get(0).getWorld().getName() + ")");
 
-        for (int i = 1; i < r.size(); i++) {
-            rep.append(String.format(", %s (%s)", r.get(i).getId(), r.get(i).getWorld().getName()));
-        }
+    public static void displayDuplicateRegionAliases(Player player, List<PSRegion> regions) {
+        final String list = regions.stream()
+                .map(region -> region.getId() + " (" + region.getWorld().getName() + ")")
+                .collect(Collectors.joining(", "));
 
-        PSL.msg(p, PSL.SPECIFY_ID_INSTEAD_OF_ALIAS.msg().replace("%regions%", rep.toString()));
+        PSL.msg(player, PSL.SPECIFY_ID_INSTEAD_OF_ALIAS.msg().replace("%regions%", list));
     }
+
 }

@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class ArgHideUnhide implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.hide", "protectionstones.unhide");
+        return Arrays.asList(Permissions.HIDE, Permissions.UNHIDE);
     }
 
     @Override
@@ -53,10 +54,10 @@ public class ArgHideUnhide implements PSCommandArg {
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         // preliminary checks
-        if (arg[0].equals("unhide") && !p.hasPermission("protectionstones.unhide"))
+        if (arg[0].equals("unhide") && !p.hasPermission(Permissions.UNHIDE))
             return PSL.msg(p, PSL.NO_PERMISSION_UNHIDE.msg());
 
-        if (arg[0].equals("hide") && !p.hasPermission("protectionstones.hide"))
+        if (arg[0].equals("hide") && !p.hasPermission(Permissions.HIDE))
             return PSL.msg(p, PSL.NO_PERMISSION_HIDE.msg());
 
         if (r == null)

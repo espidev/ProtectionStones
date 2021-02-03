@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.LegacyUpgrade;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -70,7 +71,7 @@ public class ArgAdmin implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Collections.singletonList("protectionstones.admin");
+        return Collections.singletonList(Permissions.ADMIN);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class ArgAdmin implements PSCommandArg {
     // /ps admin [arg]
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.admin")) {
+        if (!s.hasPermission(Permissions.ADMIN)) {
             return PSL.msg(s, PSL.NO_PERMISSION_ADMIN.msg());
         }
 

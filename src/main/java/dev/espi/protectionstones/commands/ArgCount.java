@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSGroupRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public class ArgCount implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.count", "protectionstones.count.others");
+        return Arrays.asList(Permissions.COUNT, Permissions.COUNT__OTHERS);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class ArgCount implements PSCommandArg {
             int[] count;
 
             if (args.length == 1) {
-                if (!p.hasPermission("protectionstones.count")) {
+                if (!p.hasPermission(Permissions.COUNT)) {
                     PSL.msg(p, PSL.NO_PERMISSION_COUNT.msg());
                     return;
                 }
@@ -95,7 +96,7 @@ public class ArgCount implements PSCommandArg {
 
             } else if (args.length == 2) {
 
-                if (!p.hasPermission("protectionstones.count.others")) {
+                if (!p.hasPermission(Permissions.COUNT__OTHERS)) {
                     PSL.msg(p, PSL.NO_PERMISSION_COUNT_OTHERS.msg());
                     return;
                 }

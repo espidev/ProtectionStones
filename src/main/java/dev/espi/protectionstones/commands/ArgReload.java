@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class ArgReload implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.admin");
+        return Collections.singletonList(Permissions.ADMIN);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ArgReload implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
-        if (!p.hasPermission("protectionstones.admin")) {
+        if (!p.hasPermission(Permissions.ADMIN)) {
             PSL.msg(p, PSL.NO_PERMISSION_ADMIN.msg());
             return true;
         }

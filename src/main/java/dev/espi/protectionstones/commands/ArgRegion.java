@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
@@ -45,7 +46,7 @@ public class ArgRegion implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.region");
+        return Collections.singletonList(Permissions.REGION);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ArgRegion implements PSCommandArg {
         Player p = (Player) s;
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
 
-        if (!p.hasPermission("protectionstones.region")) {
+        if (!p.hasPermission(Permissions.REGION)) {
             PSL.msg(p, PSL.NO_PERMISSION_REGION.msg());
             return true;
         }

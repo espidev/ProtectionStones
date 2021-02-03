@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.Particles;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.RegionTraverse;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.*;
@@ -44,7 +45,7 @@ public class ArgView implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.view");
+        return Collections.singletonList(Permissions.VIEW);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ArgView implements PSCommandArg {
 
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
-        if (!p.hasPermission("protectionstones.view")) {
+        if (!p.hasPermission(Permissions.VIEW)) {
             PSL.msg(p, PSL.NO_PERMISSION_VIEW.msg());
             return true;
         }

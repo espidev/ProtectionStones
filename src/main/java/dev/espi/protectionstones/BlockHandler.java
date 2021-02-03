@@ -24,10 +24,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
-import dev.espi.protectionstones.utils.LimitUtil;
-import dev.espi.protectionstones.utils.MiscUtil;
-import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.*;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
@@ -41,99 +38,103 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BlockHandler {
-    private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
+    
+    private static final HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
 
-    private static String checkCooldown(Player p) {
+    private static String checkCooldown(Player player) {
         double currentTime = System.currentTimeMillis();
-        if (lastProtectStonePlaced.containsKey(p)) {
-            double cooldown = ProtectionStones.getInstance().getConfigOptions().placingCooldown; // seconds
-            double lastPlace = lastProtectStonePlaced.get(p); // milliseconds
+        Double lastPlace = lastProtectStonePlaced.get(player);
 
-            if (lastPlace + cooldown * 1000 > currentTime) { // if cooldown has not been finished
-                return String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000));
-            }
-            lastProtectStonePlaced.remove(p);
+        if (lastPlace == null) {
+            lastProtectStonePlaced.put(player, currentTime);
+            return null;
         }
-        lastProtectStonePlaced.put(p, currentTime);
+
+        double cooldown = ProtectionStones.getInstance().getConfigOptions().placingCooldown; // seconds
+
+        if (lastPlace + cooldown * 1000 > currentTime) { // if cooldown has not been finished
+            return String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000));
+        }
+
         return null;
     }
 
-    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World w, LocalPlayer lp, double bx, double by, double bz) {
+    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World world, LocalPlayer localPlayer, double bx, double by, double bz) {
         BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
         BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
         ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), true, min, max);
         td.setPriority(blockOptions.priority);
-        return !WGUtils.overlapsStrongerRegion(w, td, lp);
+        return !WGUtils.overlapsStrongerRegion(world, td, localPlayer);
     }
 
     // create PS region from a block place event
-    public static void createPSRegion(BlockPlaceEvent e) {
-        Player p = e.getPlayer();
-        Block b = e.getBlock();
+    public static void createPSRegion(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
 
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlockType(b)) return;
-        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
+        if (!ProtectionStones.isProtectBlockType(block)) return;
+        PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(block);
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
-        if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(e.getItemInHand(), true)) return;
+        if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(event.getItemInHand(), true)) return;
 
         // check if player has toggled off placement of protection stones
-        if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
+        if (ProtectionStones.toggleList.contains(player.getUniqueId())) return;
 
         // check if player can place block in that area
-        if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
-            PSL.msg(p, PSL.CANT_PROTECT_THAT.msg());
-            e.setCancelled(true);
+        if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(player, block.getLocation(), block.getType())) {
+            PSL.msg(player, PSL.CANT_PROTECT_THAT.msg());
+            event.setCancelled(true);
             return;
         }
 
         // check if it is in a WorldGuard region
-        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-        if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(BlockVector3.at(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ())).size() == 0) {
-            PSL.msg(p, PSL.MUST_BE_PLACED_IN_EXISTING_REGION.msg());
-            e.setCancelled(true);
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(player);
+        if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(BlockVector3.at(block.getLocation().getX(), block.getLocation().getY(), block.getLocation().getZ())).size() == 0) {
+            PSL.msg(player, PSL.MUST_BE_PLACED_IN_EXISTING_REGION.msg());
+            event.setCancelled(true);
             return;
         }
 
         // create region, and cancel if it fails
-        if (!createPSRegion(p, b.getLocation(), blockOptions)) {
-            e.setCancelled(true);
+        if (!createPSRegion(player, block.getLocation(), blockOptions)) {
+            event.setCancelled(true);
         }
     }
 
     // create a PS region (no checks for items)
-    public static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static boolean createPSRegion(Player player, Location location, PSProtectBlock blockOptions) {
         // check permission
-        if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
-            PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
+        if (!player.hasPermission(Permissions.CREATE) || (!blockOptions.permission.isEmpty() && !player.hasPermission(blockOptions.permission))) {
+            PSL.msg(player, PSL.NO_PERMISSION_CREATE.msg());
             return false;
         }
 
         // check cooldown
         if (ProtectionStones.getInstance().getConfigOptions().placingCooldown != -1) {
-            String time = checkCooldown(p);
+            String time = checkCooldown(player);
             if (time != null) {
-                PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", time));
+                PSL.msg(player, PSL.COOLDOWN.msg().replace("%time%", time));
                 return false;
             }
         }
 
         // check if player reached region limit
-        if (!LimitUtil.check(p, blockOptions)) {
+        if (!LimitUtil.check(player, blockOptions)) {
             return false;
         }
 
         // non-admin checks
-        if (!p.hasPermission("protectionstones.admin")) {
+        if (!player.hasPermission(Permissions.ADMIN)) {
             // check if in world blacklist or not in world whitelist
-            boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
+            boolean containsWorld = blockOptions.worlds.contains(player.getLocation().getWorld().getName());
 
             if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
                 if (blockOptions.preventBlockPlaceInRestrictedWorld) {
-                    PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
+                    PSL.msg(player, PSL.WORLD_DENIED_CREATE.msg());
                     return false;
                 } else {
                     return true;
@@ -143,8 +144,8 @@ public class BlockHandler {
         } // end of non-admin checks
 
         // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
-            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(player, blockOptions.costToPlace)) {
+            PSL.msg(player, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
             return false;
         }
 
@@ -153,46 +154,47 @@ public class BlockHandler {
             ProtectionStones.getPluginLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
         }
 
-        if (createActualRegion(p, l, blockOptions)) { // region creation successful
+        if (createActualRegion(player, location, blockOptions)) { // region creation successful
 
             // take money
             if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(player, blockOptions.costToPlace);
                 if (!er.transactionSuccess()) {
-                    PSL.msg(p, er.errorMessage);
+                    PSL.msg(player, er.errorMessage);
                     return true;
                 }
-                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+                PSL.msg(player, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
             }
 
             return true;
-        } else { // region creation failed
-            return false;
         }
+
+        // region creation failed
+        return false;
     }
 
     // create the actual WG region for PS region
-    public static boolean createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static boolean createActualRegion(Player player, Location location, PSProtectBlock blockOptions) {
         // create region
-        double bx = l.getX(), bxo = blockOptions.xOffset;
-        double by = l.getY(), bxy = blockOptions.yOffset;
-        double bz = l.getZ(), bxz = blockOptions.zOffset;
+        double bx = location.getX(), bxo = blockOptions.xOffset;
+        double by = location.getY(), bxy = blockOptions.yOffset;
+        double bz = location.getZ(), bxz = blockOptions.zOffset;
 
-        RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
-        LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
+        RegionManager regionManager = WGUtils.getRegionManagerWithPlayer(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
         String id = WGUtils.createPSID(bx, by, bz);
 
         // if the region's id already exists, possibly placing block where a region is hidden
-        if (rm.hasRegion(id)) {
-            PSL.msg(p, PSL.REGION_ALREADY_IN_LOCATION_IS_HIDDEN.msg());
+        if (regionManager.hasRegion(id)) {
+            PSL.msg(player, PSL.REGION_ALREADY_IN_LOCATION_IS_HIDDEN.msg());
             return false;
         }
 
         // check for minimum distance between claims by using fake region
-        if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
-            if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx + bxo, by + bxy, bz + bxz)) {
-                PSL.msg(p, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
+        if (blockOptions.distanceBetweenClaims != -1 && !player.hasPermission(Permissions.SUPER_OWNER)) {
+            if (!isFarEnoughFromOtherClaims(blockOptions, player.getWorld(), localPlayer, bx + bxo, by + bxy, bz + bxz)) {
+                PSL.msg(player, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
                 return false;
             }
         }
@@ -202,14 +204,14 @@ public class BlockHandler {
         BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
 
         ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
-        region.getOwners().addPlayer(p.getUniqueId());
+        region.getOwners().addPlayer(player.getUniqueId());
         region.setPriority(blockOptions.priority);
-        rm.addRegion(region); // added to the region manager, be careful in implementing checks
+        regionManager.addRegion(region); // added to the region manager, be careful in implementing checks
 
         // check if new region overlaps more powerful region
-        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
-            rm.removeRegion(id);
-            PSL.msg(p, PSL.REGION_OVERLAP.msg());
+        if (!blockOptions.allowOverlapUnownedRegions && !player.hasPermission(Permissions.SUPER_OWNER) && WGUtils.overlapsStrongerRegion(player.getWorld(), region, localPlayer)) {
+            regionManager.removeRegion(id);
+            PSL.msg(player, PSL.REGION_OVERLAP.msg());
             return false;
         }
 
@@ -217,65 +219,66 @@ public class BlockHandler {
         HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
 
         // replace greeting and farewell messages with player name
-        FlagHandler.initDefaultFlagPlaceholders(flags, p);
+        FlagHandler.initDefaultFlagPlaceholders(flags, player);
 
         // set flags
         region.setFlags(flags);
-        FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
+        FlagHandler.initCustomFlagsForPS(region, location, blockOptions);
 
         // check for player's number of adjacent region groups
         if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
-            if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
-                HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
+            if (MiscUtil.getPermissionNumber(player, Permissions.ADJACENT, 1) >= 0 && !player.hasPermission(Permissions.ADMIN)) {
+                HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(player, regionManager);
 
-                int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
+                int permNum = MiscUtil.getPermissionNumber(player, Permissions.ADJACENT, 1);
                 if (adjGroups.size() > permNum && permNum != -1) {
-                    PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
-                    rm.removeRegion(id);
+                    PSL.msg(player, PSL.REGION_NOT_ADJACENT.msg());
+                    regionManager.removeRegion(id);
                     return false;
                 }
             }
         }
 
         // fire event and check if cancelled
-        PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
+        PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(player.getWorld(), region), player);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
-            rm.removeRegion(id);
+            regionManager.removeRegion(id);
             return false;
         }
 
-        PSL.msg(p, PSL.PROTECTED.msg());
+        PSL.msg(player, PSL.PROTECTED.msg());
 
         // hide block if auto hide is enabled
         if (blockOptions.autoHide) {
-            PSL.msg(p, PSL.REGION_HIDDEN.msg());
+            PSL.msg(player, PSL.REGION_HIDDEN.msg());
             // run on next tick so placing tile entities don't complain
-            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
+            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> location.getBlock().setType(Material.AIR));
         }
 
         if (blockOptions.startWithTaxAutopay) {
             // set tax auto-pay (even if taxing is not enabled)
-            region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
+            region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, player.getUniqueId().toString());
         }
 
         // show merge menu
-        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
-            PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-            if (r != null) playerMergeTask(p, r);
+        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && player.hasPermission(Permissions.MERGE)) {
+            PSRegion r = PSRegion.fromWGRegion(player.getWorld(), region);
+            if (r != null) playerMergeTask(player, r);
         }
 
         return true;
     }
 
     // merge behaviour after a region is created
-    private static void playerMergeTask(Player p, PSRegion r) {
+    private static void playerMergeTask(Player player, PSRegion psRegion) {
         boolean showGUI = true;
 
         // auto merge to nearest region if only one exists
-        if (r.getTypeOptions().autoMerge) {
+        if (psRegion.getTypeOptions().autoMerge) {
             PSRegion mergeTo = null;
-            for (PSRegion psr : r.getMergeableRegions(p)) {
+
+            for (PSRegion psr : psRegion.getMergeableRegions(player)) {
                 if (mergeTo == null) {
                     mergeTo = psr;
                     showGUI = false;
@@ -288,29 +291,35 @@ public class BlockHandler {
             // actually do auto merge
             if (!showGUI) {
                 PSRegion finalMergeTo = mergeTo;
+
                 Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                     try {
-                        WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
-                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
+                        WGMerge.mergeRealRegions(player.getWorld(), psRegion.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, psRegion));
+                        PSL.msg(player, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
                     } catch (WGMerge.RegionHoleException e) {
-                        PSL.msg(p, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI is true
-                    } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
+                        PSL.msg(player, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI is true
+                    } catch (WGMerge.RegionCannotMergeWhileRentedException ignored) {
                         // don't need to tell player that you can't merge
                     }
                 });
             }
         }
 
-        // show merge gui
-        if (showGUI) {
-            List<TextComponent> tc = ArgMerge.getGUI(p, r);
-            if (!tc.isEmpty()) { // if there are regions you can merge into
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                PSL.msg(p, PSL.MERGE_INTO.msg());
-                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
-                for (TextComponent t : tc) p.spigot().sendMessage(t);
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
-            }
+        if (!showGUI) {
+            return;
         }
+
+        TextComponent[] gui = ArgMerge.getGUI(player, psRegion).toArray(new TextComponent[0]);
+
+        if (gui.length == 0) {
+            return;
+        }
+
+        player.sendMessage(""); // send empty line
+        PSL.msg(player, PSL.MERGE_INTO.msg());
+        PSL.msg(player, PSL.MERGE_HEADER.msg().replace("%region%", psRegion.getId()));
+        player.spigot().sendMessage(gui);
+        player.sendMessage(""); // send empty line
     }
+
 }

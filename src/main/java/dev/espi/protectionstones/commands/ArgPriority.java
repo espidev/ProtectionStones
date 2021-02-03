@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,7 +42,7 @@ public class ArgPriority implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.priority");
+        return Collections.singletonList(Permissions.PRIORITY);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class ArgPriority implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
-        if (!p.hasPermission("protectionstones.priority")) {
+        if (!p.hasPermission(Permissions.PRIORITY)) {
             PSL.msg(p, PSL.NO_PERMISSION_PRIORITY.msg());
             return true;
         }

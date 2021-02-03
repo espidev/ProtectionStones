@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,7 +44,7 @@ public class ArgSetparent implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.setparent");
+        return Collections.singletonList(Permissions.SET_PARENT);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ArgSetparent implements PSCommandArg {
 
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
-        if (!s.hasPermission("protectionstones.setparent")) {
+        if (!s.hasPermission(Permissions.SET_PARENT)) {
             PSL.msg(s, PSL.NO_PERMISSION_SETPARENT.msg());
             return true;
         }
@@ -86,7 +87,7 @@ public class ArgSetparent implements PSCommandArg {
                 PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
                 return true;
             }
-            if (!p.hasPermission("protectionstones.setparent.others") && !parent.get(0).isOwner(p.getUniqueId())) {
+            if (!p.hasPermission(Permissions.SET_PARENT__OTHERS) && !parent.get(0).isOwner(p.getUniqueId())) {
                 PSL.msg(s, PSL.NO_PERMISSION_SETPARENT_OTHERS.msg());
                 return true;
             }

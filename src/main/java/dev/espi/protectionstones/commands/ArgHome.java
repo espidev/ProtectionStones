@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -47,7 +48,7 @@ public class ArgHome implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.home");
+        return Collections.singletonList(Permissions.HOME);
     }
 
     @Override
@@ -122,7 +123,7 @@ public class ArgHome implements PSCommandArg {
         Player p = (Player) s;
 
         // prelim checks
-        if (!p.hasPermission("protectionstones.home"))
+        if (!p.hasPermission(Permissions.HOME))
             return PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
 
         if (args.length != 2 && args.length != 1)

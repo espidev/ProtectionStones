@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.LimitUtil;
+import dev.espi.protectionstones.utils.Permissions;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ public class ArgAddRemove implements PSCommandArg {
 
     @Override
     public List<String> getPermissionsToExecute() {
-        return Arrays.asList("protectionstones.members", "protectionstones.owners");
+        return Arrays.asList(Permissions.MEMBERS, Permissions.OWNERS);
     }
 
     @Override
@@ -59,9 +60,9 @@ public class ArgAddRemove implements PSCommandArg {
         String operationType = args[0].toLowerCase(); // add, remove, addowner, removeowner
 
         // check permission
-        if ((operationType.equals("add") || operationType.equals("remove")) && !p.hasPermission("protectionstones.members")) {
+        if ((operationType.equals("add") || operationType.equals("remove")) && !p.hasPermission(Permissions.MEMBERS)) {
             return PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
-        } else if ((operationType.equals("addowner") || operationType.equals("removeowner")) && !p.hasPermission("protectionstones.owners")) {
+        } else if ((operationType.equals("addowner") || operationType.equals("removeowner")) && !p.hasPermission(Permissions.OWNERS)) {
             return PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
         }
 
