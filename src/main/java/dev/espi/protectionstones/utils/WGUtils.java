@@ -33,28 +33,35 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WGUtils {
 
     static final int MAX_BUILD_HEIGHT = 256;
+    public static final String REGION_NAME_FORMAT = "ps%dx%dy%dz";
+    /**
+     * Regex to match a region name, ex ps-256x76y8764z
+     */
+    private static final Pattern REGION_NAME_PATTERN = Pattern.compile("ps(?<x>-?\\d+)x(?<y>\\d{1,3})y(?<z>-?\\d+)z");
 
     public static FlagRegistry getFlagRegistry() {
         return WorldGuard.getInstance().getFlagRegistry();
     }
 
-    public static RegionManager getRegionManagerWithPlayer(Player p) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(p.getWorld()));
+    public static RegionManager getRegionManagerWithPlayer(Player player) {
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(player.getWorld()));
     }
 
     /**
      * Get a RegionManager from a world.
      *
-     * @param w the world
+     * @param world the world
      * @return the region manager, or null if it is not found
      */
 
-    public static RegionManager getRegionManagerWithWorld(World w) {
-        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
+    public static RegionManager getRegionManagerWithWorld(World world) {
+        return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(world));
     }
 
     /**
@@ -65,20 +72,31 @@ public class WGUtils {
      */
 
     public static HashMap<World, RegionManager> getAllRegionManagers() {
-        HashMap<World, RegionManager> m = new HashMap<>();
-        for (World w : Bukkit.getWorlds()) {
-            RegionManager rgm = getRegionManagerWithWorld(w);
-            if (rgm != null) m.put(w, rgm);
+        HashMap<World, RegionManager> regionManagers = new HashMap<>();
+
+        for (World world : Bukkit.getWorlds()) {
+            RegionManager regionManager = getRegionManagerWithWorld(world);
+
+            if (regionManager != null) {
+                regionManagers.put(world, regionManager);
+            }
         }
-        return m;
+
+        return regionManagers;
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z)
     public static PSLocation parsePSRegionToLocation(String regionName) {
-        int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
-        int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
-        int psz = Integer.parseInt(regionName.substring(regionName.indexOf("y") + 1, regionName.length() - 1));
-        return new PSLocation(psx, psy, psz);
+        //int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
+        //int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
+        //int psz = Integer.parseInt(regionName.substring(regionName.indexOf("y") + 1, regionName.length() - 1));
+        Matcher matcher = REGION_NAME_PATTERN.matcher(regionName);
+        return new PSLocation(
+                Integer.parseInt(matcher.group("x")),
+                Integer.parseInt(matcher.group("y")),
+                Integer.parseInt(matcher.group("z"))
+        );
+        //return new PSLocation(psx, psy, psz);
     }
 
     // whether region overlaps an unowned region that is more priority
@@ -164,41 +182,36 @@ public class WGUtils {
 
     // remember to call with offsets
     public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
-        if (yRadius == -1) {
-            return BlockVector3.at(bx - xRadius, 0, bz - zRadius);
-        } else {
-            return BlockVector3.at(bx - xRadius, by - yRadius, bz - zRadius);
-        }
+        return BlockVector3.at(bx - xRadius, yRadius == -1 ? 0 : by - yRadius, bz - zRadius);
     }
 
     // remember to call with offsets
     public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
-        if (yRadius == -1) {
-            return BlockVector3.at(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);
-        } else {
-            return BlockVector3.at(bx + xRadius, by + yRadius, bz + zRadius);
-        }
+        return BlockVector3.at(bx + xRadius, yRadius == -1 ? MAX_BUILD_HEIGHT : by + yRadius, bz + zRadius);
     }
 
     // create PS ids without making the numbers have scientific notation (addressed with long)
     public static String createPSID(double bx, double by, double bz) {
-        return "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
+        return String.format(REGION_NAME_FORMAT, (long) bx, (long) by, (long) bz);
+        //return "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
     }
 
-    public static String createPSID(Location l) {
-        return createPSID(l.getX(), l.getY(), l.getZ());
+    public static String createPSID(Location location) {
+        return String.format(REGION_NAME_FORMAT, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        //return createPSID(l.getX(), l.getY(), l.getZ());
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
         // Region is not valid
         if (region == null) return true;
 
-        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
+        return !p.hasPermission(Permissions.SUPER_OWNER) && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
     // get the overlapping sets of groups of regions a player owns
     public static HashMap<String, ArrayList<String>> getPlayerAdjacentRegionGroups(Player p, RegionManager rm) {
         PSPlayer psp = PSPlayer.fromPlayer(p);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(p);
 
         List<PSRegion> pRegions = psp.getPSRegions(p.getWorld(), false);
         HashMap<String, String> idToGroup = new HashMap<>();
@@ -219,7 +232,7 @@ public class WGUtils {
             // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(r.getId());
             for (ProtectedRegion pr : overlapping) {
-                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getId())) {
+                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(localPlayer) && !pr.getId().equals(r.getId())) {
 
                     if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
 
@@ -251,22 +264,25 @@ public class WGUtils {
                     }
                 }
             }
+
             if (adjacentGroup == null) {
                 idToGroup.put(r.getId(), r.getId());
                 groupToIDs.put(r.getId(), new ArrayList<>(Collections.singletonList(r.getId())));
             }
         }
+
         return groupToIDs;
     }
 
-    public static ProtectedCuboidRegion getDefaultProtectedRegion(PSProtectBlock b, PSLocation v) {
-        int bx = v.x, by = v.y, bz = v.z;
-        int bxo = b.xOffset, bxy = b.yOffset, bxz = b.zOffset;
+    public static ProtectedCuboidRegion getDefaultProtectedRegion(PSProtectBlock block, PSLocation psLocation) {
+        int bx = psLocation.x, by = psLocation.y, bz = psLocation.z;
+        int bxo = block.xOffset, bxy = block.yOffset, bxz = block.zOffset;
 
-        BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
-        BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
-
-        return new ProtectedCuboidRegion(createPSID(bx, by, bz), min, max);
+        return new ProtectedCuboidRegion(
+                createPSID(bx, by, bz),
+                getMinVector(bx + bxo, by + bxy, bz + bxz, block.xRadius, block.yRadius, block.zRadius),
+                getMaxVector(bx + bxo, by + bxy, bz + bxz, block.xRadius, block.yRadius, block.zRadius)
+        );
     }
 
     public static List<BlockVector2> getPointsFromDecomposedRegion(PSRegion r) {
@@ -300,6 +316,7 @@ public class WGUtils {
                     return false;
             }
         }
+
         return current.allowedMergingIntoTypes.contains(mergeInto.getTypeOptions().alias);
     }
 
