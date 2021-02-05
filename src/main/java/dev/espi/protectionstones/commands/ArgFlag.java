@@ -123,11 +123,11 @@ public class ArgFlag implements PSCommandArg {
                         if (fValue == StateFlag.State.DENY) {
                             allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                             allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
-                            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT.msg()).create()));
+                            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
                         } else if (fValue == StateFlag.State.ALLOW) {
                             deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                             deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
-                            allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT.msg()).create()));
+                            allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
                         } else {
                             allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
                             deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
