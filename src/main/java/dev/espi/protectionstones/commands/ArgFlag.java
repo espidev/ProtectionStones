@@ -110,23 +110,27 @@ public class ArgFlag implements PSCommandArg {
 
                 // add line based on flag type
                 if (f instanceof StateFlag) { // allow/deny
+                    boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();
+
                     TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
                             deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
 
                     // do not show hover for pvp if already set
-                    if (flag.equalsIgnoreCase("pvp") && fValue == StateFlag.State.DENY) {
-                        allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    } else if (flag.equalsIgnoreCase("pvp") && fValue == StateFlag.State.ALLOW) {
-                        deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
+                        if (fValue == StateFlag.State.DENY) {
+                            allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                        } else if (fValue == StateFlag.State.ALLOW) {
+                            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                        }
                     }
 
                     if (fValue == StateFlag.State.ALLOW) {
-                        if (!flag.equalsIgnoreCase("pvp")) // disable none/null ClickEvent for pvp
+                        if (!flag.equalsIgnoreCase("pvp") || !isGroupValueAll) // disable none/null ClickEvent for pvp
                             allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
                         deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
                     } else if (fValue == StateFlag.State.DENY) {
                         allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
-                        if (!flag.equalsIgnoreCase("pvp")) // disable none/null ClickEvent for pvp
+                        if (!flag.equalsIgnoreCase("pvp") || !isGroupValueAll) // disable none/null ClickEvent for pvp
                             deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
                     } else {
                         allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
