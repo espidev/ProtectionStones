@@ -59,6 +59,11 @@ allow_merging_holes = true
 # Whether when players join, by default they have protection block placement toggled off (equivalent to running /ps toggle)
 default_protection_block_placement_off = false
 
+# If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends
+# on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so
+# the check is unnecessary).
+allow_addowner_for_offline_players_without_lp = false
+
 [economy]
     # Set limits on the price for renting. Set to -1 to disable.
     max_rent_price = -1.0

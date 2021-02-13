@@ -110,6 +110,10 @@ public class ConfigUpgrades {
                 ProtectionStones.config.set("config_version", 13);
                 ProtectionStones.config.set("default_protection_block_placement_off", false);
                 ProtectionStones.config.setComment("default_protection_block_placement_off", " Whether when players join, by default they have protection block placement toggled off (equivalent to running /ps toggle)");
+                ProtectionStones.config.set("default_allow_addowner_for_offline_players_without_lp", false);
+                ProtectionStones.config.setComment("default_allow_addowner_for_offline_players_without_lp", " # If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
+                        " on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so\n" +
+                        " the check is unnecessary).");
                 break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;

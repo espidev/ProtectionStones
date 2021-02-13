@@ -81,6 +81,8 @@ class ConfigPlaceholders {
                 return getConf().allowMergingHoles + "";
             case "default_protection_block_placement_off":
                 return getConf().defaultProtectionBlockPlacementOff + "";
+            case "default_allow_addowner_for_offline_players_without_lp":
+                return getConf().allowAddownerForOfflinePlayersWithoutLp + "";
 
             case "config_economy_max_rent_price":
                 return String.format("%.2f", getConf().maxRentPrice);
