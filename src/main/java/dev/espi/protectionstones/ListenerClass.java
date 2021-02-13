@@ -208,7 +208,8 @@ public class ListenerClass implements Listener {
         Furnace f = (Furnace) e.getBlock().getState();
         if (f.getInventory().getSmelting() != null) {
             PSProtectBlock options = ProtectionStones.getBlockOptions(f.getInventory().getSmelting());
-            if (options != null && !options.allowSmeltItem) {
+            PSProtectBlock fuelOptions = ProtectionStones.getBlockOptions(f.getInventory().getFuel());
+            if ((options != null && !options.allowSmeltItem) || (fuelOptions != null && !fuelOptions.allowSmeltItem)) {
                 e.setCancelled(true);
             }
         }
@@ -305,6 +306,8 @@ public class ListenerClass implements Listener {
         e.setCancelled(true);
     }
 
+    // -=-=- prevent protection block piston effects -=-=-
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e) {
         pistonUtil(e.getBlocks(), e);
@@ -323,6 +326,8 @@ public class ListenerClass implements Listener {
             }
         }
     }
+
+    // -=-=- prevent protection blocks from exploding -=-=-
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent e) {
