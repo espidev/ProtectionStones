@@ -226,6 +226,10 @@ allow_placing_in_wild = true
     # Allow protect block item to be smelt in furnaces
     allow_smelt_item = false
 
+    # Allows the protection block to be used in crafting recipes
+    # You may want it set to false to prevent players decomposing its elements (ex. emerald ore -> emerald)
+    allow_use_in_crafting = false
+
 [player]
     # Whether or not to allow breaking the protection block with a shift-right click
     # Useful if the protection block is unbreakable (bedrock, command block), etc.

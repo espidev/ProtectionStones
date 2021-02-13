@@ -42,6 +42,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -195,9 +196,8 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFurnaceSmelt(FurnaceSmeltEvent e) {
         // prevent protect block item to be smelt
-        Furnace f = (Furnace) e.getBlock().getState();
-        PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource().getType().toString());
-        if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(e.getSource(), options.restrictObtaining)) {
+        PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource());
+        if (options != null && !options.allowSmeltItem) {
             e.setCancelled(true);
         }
     }
@@ -207,9 +207,21 @@ public class ListenerClass implements Listener {
         // prevent protect block item to be smelt
         Furnace f = (Furnace) e.getBlock().getState();
         if (f.getInventory().getSmelting() != null) {
-            PSProtectBlock options = ProtectionStones.getBlockOptions(f.getInventory().getSmelting().getType().toString());
-            if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(f.getInventory().getSmelting(), options.restrictObtaining)) {
+            PSProtectBlock options = ProtectionStones.getBlockOptions(f.getInventory().getSmelting());
+            if (options != null && !options.allowSmeltItem) {
                 e.setCancelled(true);
+            }
+        }
+    }
+
+    // -=-=-=- prevent crafting using protection blocks -=-=-=-
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPrepareItemCraft(PrepareItemCraftEvent e) {
+        for (ItemStack s : e.getInventory().getMatrix()) {
+            PSProtectBlock options = ProtectionStones.getBlockOptions(s);
+            if (options != null && !options.allowUseInCrafting) {
+                e.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
     }

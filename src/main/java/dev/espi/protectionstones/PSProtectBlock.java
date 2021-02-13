@@ -143,6 +143,8 @@ public class PSProtectBlock {
     public double costToPlace;
     @Path("behaviour.allow_smelt_item")
     public boolean allowSmeltItem;
+    @Path("behaviour.allow_use_in_crafting")
+    public boolean allowUseInCrafting;
 
     // player section
     @Path("player.allow_shift_right_break")

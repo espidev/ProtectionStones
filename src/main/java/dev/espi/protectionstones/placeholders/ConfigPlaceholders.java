@@ -214,6 +214,8 @@ class ConfigPlaceholders {
                 return String.format("%.2f", b.costToPlace);
             case "behaviour_allow_smelt_item":
                 return b.allowSmeltItem + "";
+            case "behaviour_allow_use_in_crafting":
+                return b.allowUseInCrafting + "";
 
             case "player_allow_shift_right_break":
                 return b.allowShiftRightBreak + "";
