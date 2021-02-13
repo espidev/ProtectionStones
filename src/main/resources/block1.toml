@@ -224,7 +224,7 @@ allow_placing_in_wild = true
     cost_to_place = 0.0
 
     # Allow protect block item to be smelt in furnaces
-    allow_smelt_item = true
+    allow_smelt_item = false
 
 [player]
     # Whether or not to allow breaking the protection block with a shift-right click
