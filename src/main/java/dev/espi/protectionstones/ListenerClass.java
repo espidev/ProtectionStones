@@ -190,15 +190,15 @@ public class ListenerClass implements Listener {
         }
     }
 
+    // -=-=-=- prevent smelting protection blocks -=-=-=-
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFurnaceSmelt(FurnaceSmeltEvent e) {
         // prevent protect block item to be smelt
         Furnace f = (Furnace) e.getBlock().getState();
         PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource().getType().toString());
         if (options != null && !options.allowSmeltItem && ProtectionStones.isProtectBlockItem(e.getSource(), options.restrictObtaining)) {
-            if (f.getCookTime() != 0) {
-                e.setCancelled(true);
-            }
+            e.setCancelled(true);
         }
     }
 
@@ -223,8 +223,6 @@ public class ListenerClass implements Listener {
         Block check = clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ());
         if (ProtectionStones.isProtectBlock(check)) {
             e.setCancelled(true);
-            // fix for dumb head texture changing
-            // Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> MiscUtil.setHeadType(ProtectionStones.getBlockOptions(check).type, check));
         }
     }
 
