@@ -266,9 +266,10 @@ public class ArgFlag implements PSCommandArg {
 
             // check if flag is allowed and its group is also allowed
             if (allowedFlags.keySet().contains(flagName) && allowedFlags.get(flagName).contains(flags.getOrDefault("-g", "all")) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
-                String value = "";
-                for (int i = 2; i < args.length; i++) value += args[i] + " ";
-                setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));
+                StringBuilder value = new StringBuilder();
+                for (int i = 2; i < args.length; i++) value.append(args[i]).append(" ");
+
+                setFlag(r, p, args[1], value.toString().trim(), flags.getOrDefault("-g", ""));
                 // reshow GUI
                 if (!gui.equals("")) {
                     Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
