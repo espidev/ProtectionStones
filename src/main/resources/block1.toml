@@ -76,6 +76,8 @@ allow_placing_in_wild = true
         "greeting-action &lEntering &b&l%player%'s &f&lprotected area",
         "farewell-action &lLeaving &b&l%player%'s &f&lprotected area",
         "creeper-explosion deny",
+        "wither-damage deny",
+        "ghast-fireball deny",
     ]
 
     # List all the flags that can be set by region owners.
@@ -91,6 +93,8 @@ allow_placing_in_wild = true
         "farewell-action",
         "mob-spawning",
         "creeper-explosion",
+        "wither-damage",
+        "ghast-fireball",
     ]
 
     # Which flags to hide from /ps info
