@@ -122,8 +122,7 @@ public class FlagHandler {
         region.setFlag(PS_BLOCK_MATERIAL, cpb.type);
     }
 
-    // Edit flags that require placeholders (variables)
-    public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
+    public static List<Flag<?>> getPlayerPlaceholderFlags() {
         List<Flag<?>> replaceFlags = new ArrayList<>();
         replaceFlags.add(WGUtils.getFlagRegistry().get("greeting"));
         replaceFlags.add(WGUtils.getFlagRegistry().get("greeting-title"));
@@ -131,8 +130,12 @@ public class FlagHandler {
         replaceFlags.add(WGUtils.getFlagRegistry().get("farewell"));
         replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-title"));
         replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-action"));
+        return replaceFlags;
+    }
 
-        for (Flag<?> f : replaceFlags) {
+    // Edit flags that require placeholders (variables)
+    public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
+        for (Flag<?> f : getPlayerPlaceholderFlags()) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
 

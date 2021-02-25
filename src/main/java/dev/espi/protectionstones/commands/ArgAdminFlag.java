@@ -17,9 +17,11 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -54,7 +56,17 @@ class ArgAdminFlag {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         for (ProtectedRegion r : rgm.getRegions().values()) {
             if (ProtectionStones.isPSRegion(r) && PSRegion.fromWGRegion(w, r) != null) {
-                ArgFlag.setFlag(PSRegion.fromWGRegion(w, r), p, flag, fValue.trim(), fGee);
+                String flagValue = fValue;
+
+                // apply %player% placeholder
+                if (FlagHandler.getPlayerPlaceholderFlags().contains(flag) && (!r.getOwners().getUniqueIds().isEmpty())) {
+                    String name = UUIDCache.getNameFromUUID(r.getOwners().getUniqueIds().stream().findFirst().get());
+                    if (name != null) {
+                        flagValue = flagValue.replace("%player%", name);
+                    }
+                }
+
+                ArgFlag.setFlag(PSRegion.fromWGRegion(w, r), p, flag, flagValue.trim(), fGee);
             }
         }
         return true;
