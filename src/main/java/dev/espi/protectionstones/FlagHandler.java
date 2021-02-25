@@ -34,6 +34,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FlagHandler {
     public static final List<String> FLAG_GROUPS = Arrays.asList("all", "members", "owners", "nonmembers", "nonowners");
@@ -122,20 +123,13 @@ public class FlagHandler {
         region.setFlag(PS_BLOCK_MATERIAL, cpb.type);
     }
 
-    public static List<Flag<?>> getPlayerPlaceholderFlags() {
-        List<Flag<?>> replaceFlags = new ArrayList<>();
-        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting"));
-        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting-title"));
-        replaceFlags.add(WGUtils.getFlagRegistry().get("greeting-action"));
-        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell"));
-        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-title"));
-        replaceFlags.add(WGUtils.getFlagRegistry().get("farewell-action"));
-        return replaceFlags;
+    public static List<String> getPlayerPlaceholderFlags() {
+        return Arrays.asList("greeting", "greeting-title", "greeting-action", "farewell", "farewell-title", "farewell-action");
     }
 
     // Edit flags that require placeholders (variables)
     public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
-        for (Flag<?> f : getPlayerPlaceholderFlags()) {
+        for (Flag<?> f : getPlayerPlaceholderFlags().stream().map(WGUtils.getFlagRegistry()::get).collect(Collectors.toList())) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
 
