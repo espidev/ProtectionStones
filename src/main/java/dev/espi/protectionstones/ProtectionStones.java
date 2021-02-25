@@ -198,11 +198,27 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getBlockOptions(Block block) {
+        if (block == null) return null;
         return getBlockOptions(BlockUtil.getProtectBlockType(block));
     }
 
     /**
-     * Gets the config options for the protection block type specified. It is recommended to use the block paramemter overloaded
+     * Get the protection block config options for the item specified.
+     *
+     * If the options has restrict-obtaining enabled, and the item does not contain the required NBT tag, null will
+     * be returned.
+     *
+     * @param item the item to get the block options of
+     * @return the config options for the protect item specified (null if not found)
+     */
+
+    public static PSProtectBlock getBlockOptions(ItemStack item) {
+        if (!isProtectBlockItem(item)) return null;
+        return getBlockOptions(BlockUtil.getProtectBlockType(item));
+    }
+
+    /**
+     * Gets the config options for the protection block type specified. It is recommended to use the block parameter overloaded
      * method instead if possible, since it deals better with heads.
      *
      * @param blockType the material type name (Bukkit) of the protect block to get the options for, or "PLAYER_HEAD name" for heads
@@ -299,7 +315,7 @@ public class ProtectionStones extends JavaPlugin {
 
         PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
         if (r != null) { // return id based query
-            return Collections.singletonList(r);
+            return new ArrayList<>(Collections.singletonList(r));
         } else { // return alias based query
             List<PSRegion> regions = new ArrayList<>();
             PSRegion.fromName(identifier).values().forEach(regions::addAll);
@@ -344,6 +360,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getProtectBlockFromAlias(String name) {
+        if (name == null) return null;
         for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
             if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) return cpb;
         }
@@ -351,9 +368,9 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Check if an item is a valid protection block, and if it was created by ProtectionStones. Be aware that some
-     * users of the plugin may have restrict-obtaining off, meaning that they ignore whether or not the item is created by
-     * protection stones (in this case have checkNBT false).
+     * Check if an item is a valid protection block, and if checkNBT is true, check if it was created by
+     * ProtectionStones. Be aware that blocks may have restrict-obtaining off, meaning that it is ignored whether or not
+     * the item is created by ProtectionStones (in this case have checkNBT false).
      *
      * @param item     the item to check
      * @param checkNBT whether or not to check if the plugin signed off on the item (restrict-obtaining)
@@ -361,6 +378,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
+        if (item == null) return false;
         // check basic item
         if (!ProtectionStones.isProtectBlockType(BlockUtil.getProtectBlockType(item))) return false;
         // check for player heads
@@ -384,6 +402,22 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         return tag; // whether or not the nbt tag was found
+    }
+
+    /**
+     * Check if an item is a valid protection block, and if the block type has restrict-obtaining on, check if it was
+     * created by ProtectionStones (custom NBT tag). Be aware that blocks may have restrict-obtaining
+     * off, meaning that it ignores whether or not the item is created by ProtectionStones.
+     *
+     * @param item     the item to check
+     * @return whether or not the item is a valid protection block item, and was created by protection stones
+     */
+
+    public static boolean isProtectBlockItem(ItemStack item) {
+        if (item == null) return false;
+        PSProtectBlock b = ProtectionStones.getBlockOptions(BlockUtil.getProtectBlockType(item));
+        if (b == null) return false;
+        return isProtectBlockItem(item, b.restrictObtaining);
     }
 
     /**

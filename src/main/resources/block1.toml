@@ -76,6 +76,8 @@ allow_placing_in_wild = true
         "greeting-action &lEntering &b&l%player%'s &f&lprotected area",
         "farewell-action &lLeaving &b&l%player%'s &f&lprotected area",
         "creeper-explosion deny",
+        "wither-damage deny",
+        "ghast-fireball deny",
     ]
 
     # List all the flags that can be set by region owners.
@@ -91,6 +93,8 @@ allow_placing_in_wild = true
         "farewell-action",
         "mob-spawning",
         "creeper-explosion",
+        "wither-damage",
+        "ghast-fireball",
     ]
 
     # Which flags to hide from /ps info
@@ -220,7 +224,11 @@ allow_placing_in_wild = true
     cost_to_place = 0.0
 
     # Allow protect block item to be smelt in furnaces
-    allow_smelt_item = true
+    allow_smelt_item = false
+
+    # Allows the protection block to be used in crafting recipes
+    # You may want it set to false to prevent players decomposing its elements (ex. emerald ore -> emerald)
+    allow_use_in_crafting = false
 
 [player]
     # Whether or not to allow breaking the protection block with a shift-right click

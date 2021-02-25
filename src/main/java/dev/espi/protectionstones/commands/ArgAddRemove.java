@@ -198,9 +198,14 @@ public class ArgAddRemove implements PSCommandArg {
     public boolean determinePlayerSurpassedLimit(Player commandSender, List<PSRegion> regionsToBeAddedTo, PSPlayer addedPlayer) {
 
         if (addedPlayer.getPlayer() == null && !ProtectionStones.getInstance().isLuckPermsSupportEnabled()) { // offline player
-            // we need luckperms to determine region limits for offline players, so if luckperms isn't detected, prevent the action
-            PSL.msg(commandSender, PSL.ADDREMOVE_PLAYER_NEEDS_TO_BE_ONLINE.msg());
-            return true;
+            if (ProtectionStones.getInstance().getConfigOptions().allowAddownerForOfflinePlayersWithoutLp) {
+                // bypass config option
+                return false;
+            } else {
+                // we need luckperms to determine region limits for offline players, so if luckperms isn't detected, prevent the action
+                PSL.msg(commandSender, PSL.ADDREMOVE_PLAYER_NEEDS_TO_BE_ONLINE.msg());
+                return true;
+            }
         }
 
         // find total region amounts after player is added to the regions, and their existing total

@@ -15,10 +15,7 @@
 
 package dev.espi.protectionstones.commands;
 
-import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSPlayer;
-import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtils;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -142,7 +139,8 @@ public class ArgHome implements PSCommandArg {
 
                 // remove regions not owned by the player
                 for (int i = 0; i < regions.size(); i++) {
-                    if (!regions.get(i).isOwner(p.getUniqueId()) || (regions.get(i).getTypeOptions() != null && regions.get(i).getTypeOptions().preventPsHome)) {
+                    PSProtectBlock typeOptions = regions.get(i).getTypeOptions();
+                    if (!regions.get(i).isOwner(p.getUniqueId()) || (typeOptions != null && typeOptions.preventPsHome)) {
                         regions.remove(i);
                         i--;
                     }

@@ -110,11 +110,14 @@ public class ArgFlag implements PSCommandArg {
 
                 // add line based on flag type
                 if (f instanceof StateFlag) { // allow/deny
+                    boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();
+
                     TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
                             deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
 
                     allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
                     deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+
                     if (fValue == StateFlag.State.ALLOW) {
                         allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
                         deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
@@ -124,6 +127,15 @@ public class ArgFlag implements PSCommandArg {
                     } else {
                         allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
                         deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
+                    }
+
+                    // HACK: Prevent pvp flag value from being changed to none/null, if it is set to a value with the group flag set to all
+                    if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
+                        if (fValue == StateFlag.State.DENY) {
+                            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
+                        } else if (fValue == StateFlag.State.ALLOW) {
+                            allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
+                        }
                     }
 
                     flagLine.addExtra(allow);
@@ -254,9 +266,10 @@ public class ArgFlag implements PSCommandArg {
 
             // check if flag is allowed and its group is also allowed
             if (allowedFlags.keySet().contains(flagName) && allowedFlags.get(flagName).contains(flags.getOrDefault("-g", "all")) && p.hasPermission("protectionstones.flags.edit." + flagName)) {
-                String value = "";
-                for (int i = 2; i < args.length; i++) value += args[i] + " ";
-                setFlag(r, p, args[1], value.trim(), flags.getOrDefault("-g", ""));
+                StringBuilder value = new StringBuilder();
+                for (int i = 2; i < args.length; i++) value.append(args[i]).append(" ");
+
+                setFlag(r, p, args[1], value.toString().trim(), flags.getOrDefault("-g", ""));
                 // reshow GUI
                 if (!gui.equals("")) {
                     Bukkit.dispatchCommand(p, ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + gui);
@@ -348,12 +361,13 @@ public class ArgFlag implements PSCommandArg {
                 region.setFlag(flag.getRegionGroupFlag(), null);
                 PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
 
-            } else if (value.equalsIgnoreCase("null")) { // null flag (remove)
+            } else if (value.equalsIgnoreCase("null") || value.equalsIgnoreCase("none")) { // null flag (remove)
 
                 // HACK: pvp flag should never be allowed to set null when the flag group is restricted to all, since
                 // the default is that nonmembers can be killed, but members cannot.
-                if (r.getTypeOptions().regionFlags.get(flag) != null && groupValue.toLowerCase().equals("all") && flagName.toLowerCase().equals("pvp")) {
-                    PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", flagName));
+                boolean isGroupValueAll = groupValue.equalsIgnoreCase("all") || groupValue.isEmpty();
+                if (r.getTypeOptions().regionFlags.get(flag) != null && isGroupValueAll && flagName.equalsIgnoreCase("pvp")) {
+                    PSL.msg(p, PSL.FLAG_PREVENT_EXPLOIT.msg());
                     return;
                 }
 

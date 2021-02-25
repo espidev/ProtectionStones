@@ -73,6 +73,8 @@ public class PSConfig {
     public Boolean allowMergingHoles;
     @Path("default_protection_block_placement_off")
     public Boolean defaultProtectionBlockPlacementOff;
+    @Path("allow_addowner_for_offline_players_without_lp")
+    public Boolean allowAddownerForOfflinePlayersWithoutLp;
 
     @Path("economy.max_rent_price")
     public Double maxRentPrice;

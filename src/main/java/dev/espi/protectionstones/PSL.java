@@ -127,6 +127,8 @@ public enum PSL {
     FLAG_HELP_DESC("flag.help_desc", "Use this command to set a flag in your protected region."),
     FLAG_SET("flag.flag_set", ChatColor.AQUA + "%flag%" + ChatColor.GRAY + " flag has been set."),
     FLAG_NOT_SET("flag.flag_not_set", ChatColor.AQUA + "%flag%" + ChatColor.GRAY + " flag has " + ChatColor.RED + "not" + ChatColor.GRAY + " been set. Check your values again."),
+    FLAG_PREVENT_EXPLOIT("flag.flag_prevent_exploit", ChatColor.RED + "This has been disabled to prevent exploits."),
+    FLAG_PREVENT_EXPLOIT_HOVER("flag.flag_prevent_exploit_hover", ChatColor.RED + "Disabled for security reasons."),
     FLAG_GUI_HEADER("flag.gui_header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Flags (click to change) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     FLAG_GUI_HOVER_SET("flag.gui_hover_set", ChatColor.AQUA + "Click to set."),
     FLAG_GUI_HOVER_SET_TEXT("flag.gui_hover_set_text", ChatColor.AQUA + "Click to change." + ChatColor.WHITE + "\nCurrent value:\n%value%"),

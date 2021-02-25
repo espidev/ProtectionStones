@@ -112,7 +112,9 @@ public class PSGroupRegion extends PSStandardRegion {
         List<PSMergedRegion> l = getMergedRegions();
         if (super.deleteRegion(deleteBlock, cause)) {
             for (PSMergedRegion r : l) {
-                if (!r.isHidden() && deleteBlock) r.getProtectBlock().setType(Material.AIR);
+                if (deleteBlock && !r.isHidden()) {
+                    r.getProtectBlock().setType(Material.AIR);
+                }
             }
             return true;
         } else {

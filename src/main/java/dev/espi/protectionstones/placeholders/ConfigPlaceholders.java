@@ -81,6 +81,8 @@ class ConfigPlaceholders {
                 return getConf().allowMergingHoles + "";
             case "default_protection_block_placement_off":
                 return getConf().defaultProtectionBlockPlacementOff + "";
+            case "default_allow_addowner_for_offline_players_without_lp":
+                return getConf().allowAddownerForOfflinePlayersWithoutLp + "";
 
             case "config_economy_max_rent_price":
                 return String.format("%.2f", getConf().maxRentPrice);
@@ -214,6 +216,8 @@ class ConfigPlaceholders {
                 return String.format("%.2f", b.costToPlace);
             case "behaviour_allow_smelt_item":
                 return b.allowSmeltItem + "";
+            case "behaviour_allow_use_in_crafting":
+                return b.allowUseInCrafting + "";
 
             case "player_allow_shift_right_break":
                 return b.allowShiftRightBreak + "";
