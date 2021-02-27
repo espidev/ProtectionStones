@@ -107,6 +107,8 @@ public enum PSL {
     REGION_HIDDEN("psregion.hidden", ChatColor.GRAY + "The protection block is now hidden."),
     MUST_BE_PLACED_IN_EXISTING_REGION("psregion.must_be_placed_in_existing_region", ChatColor.RED + "This must be placed inside of an existing region!"),
     REGION_ALREADY_IN_LOCATION_IS_HIDDEN("psregion.already_in_location_is_hidden", ChatColor.RED + "A region already exists in this location (is the protection block hidden?)"),
+    CANNOT_REMOVE_YOURSELF_LAST_OWNER("psregion.cannot_remove_yourself_last_owner", ChatColor.RED + "You cannot remove yourself as you are the last owner."),
+    CANNOT_REMOVE_YOURSELF_FROM_ALL_REGIONS("psregion.cannot_remove_yourself_all_regions", ChatColor.RED + "You cannot remove yourself from all of your regions at once, for safety reasons."),
 
     // ps toggle
     TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),

@@ -83,6 +83,13 @@ public class ArgAddRemove implements PSCommandArg {
 
             // obtain region list that player is being added to or removed from
             if (flags.containsKey("-a")) { // add or remove to all regions a player owns
+
+                // don't let players remove themself from all of their regions
+                if (operationType.equals("removeowner") && addPlayerUuid.equals(p.getUniqueId())) {
+                    PSL.msg(p, PSL.CANNOT_REMOVE_YOURSELF_FROM_ALL_REGIONS.msg());
+                    return;
+                }
+
                 regions = PSPlayer.fromPlayer(p).getPSRegions(p.getWorld(), false);
             } else { // add or remove to one region (the region currently in)
                 PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
@@ -93,7 +100,12 @@ public class ArgAddRemove implements PSCommandArg {
                 } else if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
                     PSL.msg(p, PSL.NO_ACCESS.msg());
                     return;
+                } else if (operationType.equals("removeowner") && addPlayerUuid.equals(p.getUniqueId()) && r.getOwners().size() == 1) {
+                    // don't let users remove themself if they are the last owner of the region
+                    PSL.msg(p, PSL.CANNOT_REMOVE_YOURSELF_LAST_OWNER.msg());
+                    return;
                 }
+
                 regions = Collections.singletonList(r);
             }
 
@@ -115,8 +127,9 @@ public class ArgAddRemove implements PSCommandArg {
                     } else {
                         PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", addPlayerName));
                     }
-                } else if ((operationType.equals("remove") && r.getWGRegion().getMembers().contains(addPlayerUuid))
-                        || (operationType.equals("removeowner") && r.getWGRegion().getOwners().contains(addPlayerUuid))) {
+                } else if ((operationType.equals("remove") && r.isMember(addPlayerUuid))
+                        || (operationType.equals("removeowner") && r.isOwner(addPlayerUuid))) {
+
                     if (flags.containsKey("-a")) {
                         PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
                                 .replace("%player%", addPlayerName)
