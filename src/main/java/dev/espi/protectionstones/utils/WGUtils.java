@@ -54,6 +54,7 @@ public class WGUtils {
      */
 
     public static RegionManager getRegionManagerWithWorld(World w) {
+        if (w == null) return null;
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
     }
 
