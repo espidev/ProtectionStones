@@ -164,6 +164,7 @@ allow_placing_in_wild = true
     # Specify the custom crafting recipe below
     # You must fill the item spots with names from here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
     # You can also use other protection stone items as ingredients in the recipe, in the format PROTECTION_STONES:alias
+    # Make sure that you set allow_use_in_crafting for that block to true, or else you can't use it in crafting
     # If you want air, you can just leave the spot as ""
     custom_recipe = [
         ["", "STONE", ""],
@@ -227,7 +228,7 @@ allow_placing_in_wild = true
     allow_smelt_item = false
 
     # Allows the protection block to be used in crafting recipes
-    # You may want it set to false to prevent players decomposing its elements (ex. emerald ore -> emerald)
+    # You may want it set to false to prevent players decomposing its elements
     allow_use_in_crafting = false
 
 [player]
