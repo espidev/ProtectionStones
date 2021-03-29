@@ -107,8 +107,12 @@ public class BlockHandler {
     // create a PS region (no checks for items)
     public static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // check permission
-        if (!p.hasPermission("protectionstones.create") || (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission))) {
+        if (!p.hasPermission("protectionstones.create")) {
             PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
+            return false;
+        }
+        if (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission)) {
+            PSL.msg(p, PSL.NO_PERMISSION_CREATE_SPECIFIC.msg());
             return false;
         }
 

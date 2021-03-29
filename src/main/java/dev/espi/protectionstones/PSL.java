@@ -46,6 +46,7 @@ public enum PSL {
 
     NO_PERMISSION_TOGGLE("no_permission_toggle", ChatColor.RED + "You don't have permission to use the toggle command."),
     NO_PERMISSION_CREATE("no_permission_create", ChatColor.RED + "You don't have permission to place a protection block."),
+    NO_PERMISSION_CREATE_SPECIFIC("no_permission_create_specific", ChatColor.RED + "You don't have permission to place this protection block type."),
     NO_PERMISSION_DESTROY("no_permission_destroy", ChatColor.RED + "You don't have permission to destroy a protection block."),
     NO_PERMISSION_MEMBERS("no_permission_members", ChatColor.RED + "You don't have permission to use member commands."),
     NO_PERMISSION_OWNERS("no_permission_owners", ChatColor.RED + "You don't have permission to use owner commands."),
