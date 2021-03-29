@@ -381,20 +381,22 @@ public class ListenerClass implements Listener {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(event.getTo().getWorld());
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
-        // check if player can teleport into region (no region with preventTeleportIn = true)
-        ApplicableRegionSet regions = rgm.getApplicableRegions(v);
-        if (regions.getRegions().isEmpty()) return;
-        boolean foundNoTeleport = false;
-        for (ProtectedRegion r : regions) {
-            String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
-            if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn)
-                foundNoTeleport = true;
-            if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
-        }
+        if (rgm != null) {
+            // check if player can teleport into region (no region with preventTeleportIn = true)
+            ApplicableRegionSet regions = rgm.getApplicableRegions(v);
+            if (regions.getRegions().isEmpty()) return;
+            boolean foundNoTeleport = false;
+            for (ProtectedRegion r : regions) {
+                String f = r.getFlag(FlagHandler.PS_BLOCK_MATERIAL);
+                if (f != null && ProtectionStones.getBlockOptions(f) != null && ProtectionStones.getBlockOptions(f).preventTeleportIn)
+                    foundNoTeleport = true;
+                if (r.getOwners().contains(wg.wrapPlayer(event.getPlayer()))) return;
+            }
 
-        if (foundNoTeleport) {
-            PSL.msg(event.getPlayer(), PSL.REGION_CANT_TELEPORT.msg());
-            event.setCancelled(true);
+            if (foundNoTeleport) {
+                PSL.msg(event.getPlayer(), PSL.REGION_CANT_TELEPORT.msg());
+                event.setCancelled(true);
+            }
         }
     }
 
