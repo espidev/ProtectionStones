@@ -23,11 +23,13 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
 import lombok.var;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 class PlayerPlaceholders {
@@ -37,12 +39,15 @@ class PlayerPlaceholders {
         PSPlayer psp = PSPlayer.fromPlayer(p);
 
         if (identifier.equals("currentplayer_global_region_limit")) {
+
             if (p.hasPermission("protectionstones.admin")) {
                 return "-1";
             } else {
                 return psp.getGlobalRegionLimits() + "";
             }
+
         } else if (identifier.startsWith("currentplayer_region_limit_")) {
+
             String alias = identifier.substring("currentplayer_region_limit_".length());
             List<Map.Entry<PSProtectBlock, Integer>> l = psp.getRegionLimits()
                     .entrySet()
@@ -59,7 +64,9 @@ class PlayerPlaceholders {
             } else {
                 return psp.getGlobalRegionLimits() + "";
             }
+
         } else if (identifier.startsWith("currentplayer_total_tax_owed")) {
+
             double amount = 0;
             for (PSRegion psr : psp.getTaxEligibleRegions()) {
                 for (var tp : psr.getTaxPaymentsDue()) {
@@ -67,14 +74,63 @@ class PlayerPlaceholders {
                 }
             }
             return String.format("%.2f", amount);
+
+        } else if (identifier.startsWith("currentplayer_num_of_accessible_regions_")) {
+
+            String world = identifier.substring("currentplayer_num_of_accessible_regions_".length());
+            World w = Bukkit.getWorld(world);
+            return w == null ? "Invalid world." : "" + psp.getPSRegions(w, true).size();
+
+        } else if (identifier.startsWith("currentplayer_num_of_accessible_regions")) {
+
+            return "" + Bukkit.getWorlds().stream().mapToInt(w -> psp.getPSRegions(w, true).size()).sum();
+
+        } else if (identifier.startsWith("currentplayer_num_of_owned_regions_")) {
+
+            String world = identifier.substring("currentplayer_num_of_owned_regions_".length());
+            World w = Bukkit.getWorld(world);
+            return w == null ? "Invalid world." : "" + psp.getPSRegions(w, false).size();
+
         } else if (identifier.startsWith("currentplayer_num_of_owned_regions")) {
-            List<PSRegion> regions = new ArrayList<>();
-            WGUtils.getAllRegionManagers().forEach((w, rgm) -> rgm.getRegions().values().forEach(r -> {
-                if (ProtectionStones.isPSRegion(r) && (r.getOwners().contains(psp.getUuid()))) {
-                    regions.add(PSRegion.fromWGRegion(w, r));
+
+            return "" + Bukkit.getWorlds().stream().mapToInt(w -> psp.getPSRegions(w, false).size()).sum();
+
+        } else if (identifier.startsWith("currentplayer_owned_regions_ids_")) {
+
+            String world = identifier.substring("currentplayer_owned_regions_ids_".length());
+            World w = Bukkit.getWorld(world);
+            if (w == null) {
+                return "Invalid world.";
+            } else {
+                StringBuilder sb = new StringBuilder();
+                List<PSRegion> regions = psp.getPSRegions(w, false);
+                for (int i = 0; i < regions.size(); i++) {
+                    sb.append(regions.get(i).getId());
+                    if (i < regions.size() - 1) {
+                        sb.append(", ");
+                    }
                 }
-            }));
-            return "" + regions.size();
+                return sb.toString();
+            }
+
+        } else if (identifier.startsWith("currentplayer_accessible_regions_ids_")) {
+
+            String world = identifier.substring("currentplayer_accessible_regions_ids_".length());
+            World w = Bukkit.getWorld(world);
+            if (w == null) {
+                return "Invalid world.";
+            } else {
+                StringBuilder sb = new StringBuilder();
+                List<PSRegion> regions = psp.getPSRegions(w, true);
+                for (int i = 0; i < regions.size(); i++) {
+                    sb.append(regions.get(i).getId());
+                    if (i < regions.size() - 1) {
+                        sb.append(", ");
+                    }
+                }
+                return sb.toString();
+            }
+
         }
         return "";
     }
