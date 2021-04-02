@@ -84,6 +84,9 @@ class ConfigPlaceholders {
             case "default_allow_addowner_for_offline_players_without_lp":
                 return getConf().allowAddownerForOfflinePlayersWithoutLp + "";
 
+            case "admin_cleanup_delete_regions_with_members_but_no_owners":
+                return getConf().cleanupDeleteRegionsWithMembersButNoOwners + "";
+
             case "config_economy_max_rent_price":
                 return String.format("%.2f", getConf().maxRentPrice);
             case "config_economy_min_rent_price":

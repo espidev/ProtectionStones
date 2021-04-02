@@ -76,6 +76,9 @@ public class PSConfig {
     @Path("allow_addowner_for_offline_players_without_lp")
     public Boolean allowAddownerForOfflinePlayersWithoutLp;
 
+    @Path("admin.cleanup_delete_regions_with_members_but_no_owners")
+    public Boolean cleanupDeleteRegionsWithMembersButNoOwners;
+
     @Path("economy.max_rent_price")
     public Double maxRentPrice;
     @Path("economy.min_rent_price")

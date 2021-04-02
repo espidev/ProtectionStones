@@ -121,7 +121,9 @@ class ArgAdminCleanup {
 
                 // remove region if there are no owners left
                 if (cleanupOperation.equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
-                    toDelete.add(r);
+                    if (ProtectionStones.getInstance().getConfigOptions().cleanupDeleteRegionsWithMembersButNoOwners || r.getMembers().size() == 0) {
+                        toDelete.add(r);
+                    }
                 }
             }
 

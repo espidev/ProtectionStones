@@ -115,6 +115,12 @@ public class ConfigUpgrades {
                         " on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so\n" +
                         " the check is unnecessary).");
                 break;
+            case 13:
+                ProtectionStones.config.set("config_version", 14);
+                ProtectionStones.config.set("admin.cleanup_delete_regions_with_members_but_no_owners", true);
+                ProtectionStones.config.setComment("admin.cleanup_delete_regions_with_members_but_no_owners", "     Whether /ps admin cleanup remove should delete regions that have members, but don't have owners (after inactive\n" +
+                        "     owners are removed).\n" +
+                        "     Regions that have no owners or members will be deleted regardless.");
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;
