@@ -101,7 +101,7 @@ public class ArgTp implements PSCommandArg {
 
             // run region search asynchronously to avoid blocking server thread
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                List<PSRegion> regions = PSPlayer.fromUUID(tpUuid).getPSRegions(p.getWorld(), false);
+                List<PSRegion> regions = PSPlayer.fromUUID(tpUuid).getPSRegionsCrossWorld(p.getWorld(), false);
 
                 // check if region was found
                 if (regions.isEmpty()) {
