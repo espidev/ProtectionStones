@@ -1,4 +1,4 @@
-# ProtectionStones
+## ProtectionStones
 [![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
 ![Open issues](https://img.shields.io/github/issues-raw/espidev/ProtectionStones)
 ![Closed issues](https://img.shields.io/github/issues-closed-raw/espidev/ProtectionStones)
@@ -17,25 +17,30 @@ This project was forked from (OUTDATED) https://github.com/vik1395/ProtectionSto
 
 The original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
 
-## Dependencies
+### Dependencies
 * ProtectionStones 2.8.1
   * WorldGuard 7.0+
   * WorldEdit 7.0+
   * Vault (Optional)
   * PlaceholderAPI (Optional)
   
-## Default Configuration
+### Default Configuration
 Find it in the src/main/resources folder. Also viewable [here](https://github.com/espidev/ProtectionStones/wiki/Configuration).
 
-## Commands
+### Commands
 Aliases and base command can be changed in the config.
 
 View the available commands on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Commands).
 
-## Permissions
+### Permissions
 View the available permissions on the wiki: [here](https://github.com/espidev/ProtectionStones/wiki/Permissions).
 
-## Placeholders
+### Placeholders
 View the placeholders available for PlaceholderAPI on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Placeholders).
+
+### Usage Statistics
+<img src="https://bstats.org/signatures/bukkit/protectionstones.svg">
+
+View full usage statistics [here](https://bstats.org/plugin/bukkit/ProtectionStones/4071).
 
 This plugin is licensed under the **GPLv3**, as is required by Bukkit plugins.
