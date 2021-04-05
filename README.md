@@ -38,6 +38,14 @@ View the available permissions on the wiki: [here](https://github.com/espidev/Pr
 ### Placeholders
 View the placeholders available for PlaceholderAPI on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Placeholders).
 
+### Developer API
+
+Access API information [here](https://github.com/espidev/ProtectionStones/wiki/API).
+
+JavaDocs: https://jdps.espi.dev
+
+Compiling ProtectionStones will also produce a jar with JavaDocs, which can be useful if you need to develop for an outdated version.
+
 ### Usage Statistics
 <img src="https://bstats.org/signatures/bukkit/protectionstones.svg">
 
