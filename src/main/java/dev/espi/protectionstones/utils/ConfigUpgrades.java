@@ -90,7 +90,7 @@ public class ConfigUpgrades {
                 ProtectionStones.config.setComment("economy.max_rent_period", " Set limits on the period between rent payments, in seconds (86400 seconds = 1 day). Set to -1 to disable.");
                 ProtectionStones.config.set("economy.tax_enabled", false);
                 ProtectionStones.config.set("economy.tax_message_on_join", true);
-                ProtectionStones.config.setComment("economy.tax_enabled", " Set taxes on regions. (THIS FEATURE IS STILL BEING DEVELOPED, ONLY USE FOR TESTING!)\n" +
+                ProtectionStones.config.setComment("economy.tax_enabled", " Set taxes on regions.\n" +
                         " Taxes are configured in each individual block config.\n" +
                         " Whether or not to enable the tax command.");
 
