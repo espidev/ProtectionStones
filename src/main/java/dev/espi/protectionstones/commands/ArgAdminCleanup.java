@@ -109,19 +109,12 @@ class ArgAdminCleanup {
                     continue;
                 }
 
-                // remove inactive players from being owner
-                List<UUID> owners = new ArrayList<>(r.getOwners()); // copy
-                for (UUID uuid : owners) {
-                    try {
-                        if (!activePlayers.contains(uuid)) {
-                            r.removeOwner(uuid);
-                        }
-                    } catch (NullPointerException ignored) {}
-                }
+                long numOfActiveOwners = r.getOwners().stream().filter(activePlayers::contains).count();
+                long numOfActiveMembers = r.getMembers().stream().filter(activePlayers::contains).count();
 
                 // remove region if there are no owners left
-                if (cleanupOperation.equalsIgnoreCase("remove") && r.getOwners().size() == 0) {
-                    if (ProtectionStones.getInstance().getConfigOptions().cleanupDeleteRegionsWithMembersButNoOwners || r.getMembers().size() == 0) {
+                if (cleanupOperation.equalsIgnoreCase("remove") && numOfActiveOwners == 0) {
+                    if (ProtectionStones.getInstance().getConfigOptions().cleanupDeleteRegionsWithMembersButNoOwners || numOfActiveMembers == 0) {
                         toDelete.add(r);
                     }
                 }

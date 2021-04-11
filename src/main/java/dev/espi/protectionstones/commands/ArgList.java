@@ -64,11 +64,11 @@ public class ArgList implements PSCommandArg {
         // run query async to reduce load
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) {
-                List<PSRegion> regions = psp.getPSRegions(psp.getPlayer().getWorld(), true);
+                List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), true);
                 display(s, regions, psp.getUuid());
             } else if (args.length == 2) {
                 UUID uuid = UUIDCache.getUUIDFromName(args[1]);
-                List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegions(psp.getPlayer().getWorld(), true);
+                List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegionsCrossWorld(psp.getPlayer().getWorld(), true);
                 display(s, regions, UUIDCache.getUUIDFromName(args[1]));
             } else {
                 PSL.msg(s, PSL.LIST_HELP.msg());

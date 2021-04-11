@@ -295,8 +295,6 @@ public class PSPlayer {
      * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
      * since the query can be slow.
      *
-     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
-     *
      * @param w           world to search for regions in
      * @param canBeMember whether or not to add regions where the player is a member, not owner
      * @return list of regions that the player owns (or is a part of if canBeMember is true)
@@ -306,28 +304,43 @@ public class PSPlayer {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) return new ArrayList<>();
 
-        Set<String> regionIdAdded = new HashSet<>();
-        List<PSRegion> regions = new ArrayList<>();
+        return rgm.getRegions().values().stream()
+                .filter(ProtectionStones::isPSRegion)
+                .filter(r -> r.getOwners().contains(uuid) || (canBeMember && r.getMembers().contains(uuid)))
+                .map(r -> PSRegion.fromWGRegion(w, r))
+                .collect(Collectors.toList());
+    }
 
-        // obtain worlds by id
-        rgm.getRegions().values().forEach(r -> {
-            if (ProtectionStones.isPSRegion(r) && (r.getOwners().contains(uuid) || (canBeMember && r.getMembers().contains(uuid)))) {
-                regions.add(PSRegion.fromWGRegion(w, r));
-                regionIdAdded.add(r.getId());
-            }
-        });
+    /**
+     * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
+     * since the query can be slow.
+     *
+     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
+     *
+     * @param w           world to search for regions in
+     * @param canBeMember whether or not to add regions where the player is a member, not owner
+     * @return list of regions that the player owns (or is a part of if canBeMember is true)
+     */
+
+    public List<PSRegion> getPSRegionsCrossWorld(World w, boolean canBeMember) {
+        List<PSRegion> regions = getPSRegions(w, canBeMember);
+        // set entry format: "worldName regionId"
+        Set<String> regionIdAdded = regions.stream().map(r -> w.getName() + " " + r.getId()).collect(Collectors.toSet());
 
         // obtain cross-world named worlds
         ProtectionStones.regionNameToID.forEach((rw, rs) -> {
             World world = Bukkit.getWorld(rw);
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
-            if (rm != null && world != null) {
+            if (rm != null) {
                 rs.values().forEach(rIds -> rIds.forEach(rId -> {
+
                     ProtectedRegion r = rm.getRegion(rId);
                     if (r != null && r.getOwners().contains(uuid) && ProtectionStones.isPSRegion(r)) {
                         // check if it has already been added
-                        if (!world.getName().equals(w.getName()) || !regionIdAdded.contains(r.getId())) {
+                        String setId = world.getName() + " " + r.getId();
+                        if (!world.getName().equals(w.getName()) || !regionIdAdded.contains(setId)) {
                             regions.add(PSRegion.fromWGRegion(world, r));
+                            regionIdAdded.add(setId);
                         }
                     }
                 }));
@@ -347,9 +360,9 @@ public class PSPlayer {
      */
 
     public List<PSRegion> getHomes(World w) {
-        return getPSRegions(w, false)
+        return getPSRegionsCrossWorld(w, false)
                 .stream()
-                .filter(r -> r.getTypeOptions() == null || (r.getTypeOptions() != null && !r.getTypeOptions().preventPsHome))
+                .filter(r -> r.getTypeOptions() != null && !r.getTypeOptions().preventPsHome)
                 .collect(Collectors.toList());
     }
 
