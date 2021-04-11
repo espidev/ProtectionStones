@@ -121,6 +121,7 @@ public class ConfigUpgrades {
                 ProtectionStones.config.setComment("admin.cleanup_delete_regions_with_members_but_no_owners", "     Whether /ps admin cleanup remove should delete regions that have members, but don't have owners (after inactive\n" +
                         "     owners are removed).\n" +
                         "     Regions that have no owners or members will be deleted regardless.");
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;
