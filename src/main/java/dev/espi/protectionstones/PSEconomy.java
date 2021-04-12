@@ -126,8 +126,6 @@ public class PSEconomy {
                 // update tax payments due
                 r.updateTaxPayments();
 
-                Bukkit.getLogger().info("Processing taxes for region " + r.getId() + " in world " + r.getWorld().getName());
-
                 // check if a player is set to auto-pay
                 if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) {
                     PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
