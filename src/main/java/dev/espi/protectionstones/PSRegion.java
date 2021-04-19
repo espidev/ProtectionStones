@@ -29,10 +29,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -736,5 +733,18 @@ public abstract class PSRegion {
      */
     public RegionManager getWGRegionManager() {
         return rgmanager;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PSRegion psRegion = (PSRegion) o;
+        return Objects.equals(getId(), psRegion.getId()) && Objects.equals(getWorld(), psRegion.getWorld());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getWorld());
     }
 }
