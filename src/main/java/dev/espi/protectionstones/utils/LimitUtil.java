@@ -40,6 +40,7 @@ public class LimitUtil {
 
             // add the blocks
             for (PSProtectBlock b : blocksAdded) {
+                ProtectionStones.getInstance().debug(String.format("Adding region type %s.", b.alias));
                 if (playerRegionCounts.containsKey(b)) {
                     playerRegionCounts.put(b, playerRegionCounts.get(b)+1);
                 } else {
@@ -49,13 +50,17 @@ public class LimitUtil {
 
             // check each limit
             for (PSProtectBlock type : playerRegionCounts.keySet()) {
-                if (regionLimits.containsKey(type) && (playerRegionCounts.get(type) > regionLimits.get(type))) {
-                    return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
+                if (regionLimits.containsKey(type)) {
+                    ProtectionStones.getInstance().debug(String.format("Of type %s: player will have %d regions - Player's limit is %d regions.", type.alias, playerRegionCounts.get(type), regionLimits.get(type)));
+                    if (playerRegionCounts.get(type) > regionLimits.get(type)) {
+                        return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
+                    }
                 }
                 total += playerRegionCounts.get(type);
             }
 
             // check if player has passed region limit
+            ProtectionStones.getInstance().debug(String.format("The player will have %d regions in total. Their limit is %d.", total, maxPS));
             if (total > maxPS && maxPS != -1) {
                 return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
             }
@@ -105,34 +110,37 @@ public class LimitUtil {
      * @return map of region types to the counts
      */
     private static HashMap<PSProtectBlock, Integer> getOwnedRegionTypeCounts(PSPlayer psp) {
+        if (ProtectionStones.getInstance().isDebug()) { // psp.getName may incur a performance penalty
+            ProtectionStones.getInstance().debug(String.format("Debug limits for: %s", psp.getName()));
+        }
+
         HashMap<PSProtectBlock, Integer> counts = new HashMap<>();
         HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
-        for (World w : m.keySet()) {
-            RegionManager rgm = m.get(w);
 
-            rgm.getRegions().values().stream()
-                    .filter(r -> ProtectionStones.isPSRegion(r))
-                    .filter(r -> r.getOwners().contains(psp.getUuid()))
-                    .map(r -> PSRegion.fromWGRegion(w, r))
-                    .forEach(r -> {
-                        if (r instanceof PSGroupRegion) {
-                            for (PSMergedRegion psmr : ((PSGroupRegion) r).getMergedRegions()) {
-                                if (psmr.getTypeOptions() == null) continue;
-                                if (!counts.containsKey(psmr.getTypeOptions())) {
-                                    counts.put(psmr.getTypeOptions(), 1);
-                                } else {
-                                    counts.put(psmr.getTypeOptions(), counts.get(psmr.getTypeOptions())+1);
-                                }
-                            }
+        for (World w : m.keySet()) {
+            psp.getPSRegions(w, false).forEach(r -> {
+                if (r instanceof PSGroupRegion) {
+                    ProtectionStones.getInstance().debug(String.format("Checking group region %s's (world %s) (type %s) regions:", r.getId(), w.getName(), r.getTypeOptions().alias));
+                    for (PSMergedRegion psmr : ((PSGroupRegion) r).getMergedRegions()) {
+                        if (psmr.getTypeOptions() == null) continue;
+                        if (!counts.containsKey(psmr.getTypeOptions())) {
+                            counts.put(psmr.getTypeOptions(), 1);
                         } else {
-                            if (r.getTypeOptions() == null) return;
-                            if (!counts.containsKey(r.getTypeOptions())) {
-                                counts.put(r.getTypeOptions(), 1);
-                            } else {
-                                counts.put(r.getTypeOptions(), counts.get(r.getTypeOptions())+1);
-                            }
+                            counts.put(psmr.getTypeOptions(), counts.get(psmr.getTypeOptions())+1);
                         }
-                    });
+
+                        ProtectionStones.getInstance().debug(String.format("Merged region %s (world %s) (type %s)", psmr.getId(), w.getName(), psmr.getTypeOptions().alias));
+                    }
+                } else {
+                    if (r.getTypeOptions() == null) return;
+                    if (!counts.containsKey(r.getTypeOptions())) {
+                        counts.put(r.getTypeOptions(), 1);
+                    } else {
+                        counts.put(r.getTypeOptions(), counts.get(r.getTypeOptions())+1);
+                    }
+                    ProtectionStones.getInstance().debug(String.format("Region %s (world %s) (type %s)", r.getId(), w.getName(), r.getTypeOptions().alias));
+                }
+            });
         }
         return counts;
     }

@@ -60,6 +60,8 @@ public class ProtectionStones extends JavaPlugin {
     // change this when the config version goes up
     public static final int CONFIG_VERSION = 14;
 
+    private boolean debug = false;
+
     public static File configLocation, blockDataFolder;
     public static CommentedFileConfig config;
 
@@ -127,6 +129,9 @@ public class ProtectionStones extends JavaPlugin {
         return vaultEconomy;
     }
 
+    /**
+     * @return the instance's {@link PSEconomy} instance
+     */
     public PSEconomy getPSEconomy() {
         return economy;
     }
@@ -137,6 +142,30 @@ public class ProtectionStones extends JavaPlugin {
 
     public LuckPerms getLuckPerms() {
         return luckPerms;
+    }
+
+    /**
+     * @param debug whether the plugin should be in debug mode
+     */
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    /**
+     * @return whether the plugin is in debug mode
+     */
+    public boolean isDebug() {
+        return debug;
+    }
+
+    /**
+     * Print a debug message (only prints if the plugin is in debug mode).
+     * @param msg the message to print
+     */
+    public void debug(String msg) {
+        if (debug) {
+            getLogger().info("[DEBUG] " + msg);
+        }
     }
 
     /**
@@ -427,7 +456,6 @@ public class ProtectionStones extends JavaPlugin {
      * @return the item with NBT and other metadata to signify that it was created by protection stones
      */
 
-    // Create protection stone item (for /ps get and /ps give, and unclaiming)
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
         ItemStack is = BlockUtil.getProtectBlockItemFromType(b.type);
 

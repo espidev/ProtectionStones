@@ -128,6 +128,14 @@ public class ArgAdmin implements PSCommandArg {
                 LegacyUpgrade.upgradeRegions();
                 s.sendMessage(ChatColor.YELLOW + "Done!");
                 break;
+            case "debug":
+                if (ProtectionStones.getInstance().isDebug()) {
+                    s.sendMessage(ChatColor.YELLOW + "Debug mode is now off.");
+                    ProtectionStones.getInstance().setDebug(false);
+                } else {
+                    s.sendMessage(ChatColor.YELLOW + "Debug mode is now on.");
+                    ProtectionStones.getInstance().setDebug(true);
+                }
         }
         return true;
     }
@@ -135,7 +143,7 @@ public class ArgAdmin implements PSCommandArg {
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         if (args.length == 2) {
-            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "forcemerge", "changeblock", "changeregiontype", "settaxautopayers");
+            List<String> arg = Arrays.asList("version", "hide", "unhide", "cleanup", "stats", "lastlogon", "lastlogons", "flag", "recreate", "fixregions", "debug", "forcemerge", "changeblock", "changeregiontype", "settaxautopayers");
             return StringUtil.copyPartialMatches(args[1], arg, new ArrayList<>());
         } else if (args.length >= 3 && args[1].equals("forcemerge")) {
             return ArgAdminForceMerge.tabComplete(sender, alias, args);

@@ -44,11 +44,12 @@ public class ArgAdminHelp {
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin lastlogons", "List all of the last logons of each player.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin stats [player (optional)]", "Show some statistics of the plugin.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin recreate", "Recreate all PS regions using radius set in config.");
+        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin debug", "Toggles debug mode.");
         send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin settaxautopayers", "Add a tax autopayer for every region on the server that does not have one.");
         send(p, ArgAdmin.getForceMergeHelp(), "Merge overlapping PS regions together if they have the same owners, members and flags.");
         send(p, ArgAdmin.getChangeBlockHelp(), "Change all of the PS blocks and regions in a world to a different block. Both blocks must be configured in config.");
         send(p, ArgAdmin.getChangeRegionTypeHelp(), "Change the internal type of all PS regions of a certain type. Useful for error correction.");
-        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin fixregions", "Use this command to correct errors for all of the PS regions in a world. Useful if you have issues with the plugin.");
+        send(p, ChatColor.AQUA + "> " + ChatColor.GRAY + bc + " admin fixregions", "Use this command to recalculate block types for PS regions in a world.");
 
         return true;
     }
