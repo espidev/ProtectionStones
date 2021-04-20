@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * Handler for ProtectionStones economy related tasks.
+ */
+
 public class PSEconomy {
     private List<PSRegion> rentedList = new CopyOnWriteArrayList<>();
     private static int rentRunner = -1, taxRunner = -1;

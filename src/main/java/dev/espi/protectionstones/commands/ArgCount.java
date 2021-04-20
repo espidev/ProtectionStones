@@ -15,14 +15,11 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSGroupRegion;
 import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -35,22 +32,15 @@ public class ArgCount implements PSCommandArg {
     // Only PS regions, not other regions
     static int[] countRegionsOfPlayer(UUID uuid, World w) {
         int[] count = {0, 0}; // total, including merged
-        try {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-            for (ProtectedRegion pr : rgm.getRegions().values()) {
-                if (ProtectionStones.isPSRegion(pr)) {
-                    PSRegion r = PSRegion.fromWGRegion(w, pr);
 
-                    if (r.isOwner(uuid)) {
-                        count[0]++;
-                        if (r instanceof PSGroupRegion) {
-                            count[1] += ((PSGroupRegion) r).getMergedRegions().size();
-                        }
-                    }
-                }
+        PSPlayer psp = PSPlayer.fromUUID(uuid);
+        psp.getPSRegions(w, false).forEach(r -> {
+            count[0]++;
+            if (r instanceof PSGroupRegion) {
+                count[1] += ((PSGroupRegion) r).getMergedRegions().size();
             }
-        } catch (Exception ignored) {
-        }
+        });
+
         return count;
     }
 

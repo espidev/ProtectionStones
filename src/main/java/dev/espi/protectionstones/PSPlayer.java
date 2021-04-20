@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
- * Wrapper for a Bukkit player so that it exposes ProtectionStones related methods.
+ * Wrapper for a Bukkit player that exposes ProtectionStones related methods.
  */
 
 public class PSPlayer {
@@ -115,7 +115,7 @@ public class PSPlayer {
 
     /**
      * Get the wrapped Bukkit offline player.
-     * Safer to use than getPlayer (this does not return a null)
+     * Safer to use than getPlayer (this does not return a null).
      * It may return an empty player if the object wraps a UUID that does not exist.
      *
      * @return the offline player
@@ -182,7 +182,7 @@ public class PSPlayer {
     }
 
     /**
-     * Pay another player a certain amount of money
+     * Pay another player a certain amount of money.
      * Vault must be enabled! Must be run on main thread!
      *
      * @param payee  the player to pay
