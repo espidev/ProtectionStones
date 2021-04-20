@@ -28,6 +28,7 @@ import java.util.List;
 
 public class LimitUtil {
 
+    // warning: group regions should be split into merged regions first
     public static String checkAddOwner(PSPlayer psp, List<PSProtectBlock> blocksAdded) {
         HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
         int maxPS = psp.getGlobalRegionLimits();
@@ -155,6 +156,7 @@ public class LimitUtil {
             int total = 0, bFound = 0;
             HashMap<PSProtectBlock, Integer> playerRegionCounts = getOwnedRegionTypeCounts(psp);
             for (PSProtectBlock type : playerRegionCounts.keySet()) {
+                ProtectionStones.getInstance().debug(String.format("Adding region type %s.", b.alias));
                 if (type.equals(b)) {
                     bFound = playerRegionCounts.get(type);
                 }
@@ -162,11 +164,13 @@ public class LimitUtil {
             }
 
             // check if player has passed region limit
+            ProtectionStones.getInstance().debug(String.format("The player will have %d regions in total. Their limit is %d.", total, maxPS));
             if (total >= maxPS && maxPS != -1) {
                 return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", ""+maxPS);
             }
 
             // check if player has passed per block limit
+            ProtectionStones.getInstance().debug(String.format("Of type %s: player will have %d regions - Player's limit is %d regions.", b.alias, bFound, regionLimits.get(b) == null ? -1 : regionLimits.get(b)));
             if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
                 return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg().replace("%limit%", ""+regionLimits.get(b));
             }

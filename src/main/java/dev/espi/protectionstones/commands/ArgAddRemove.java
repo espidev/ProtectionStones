@@ -28,6 +28,7 @@ import org.bukkit.util.StringUtil;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ArgAddRemove implements PSCommandArg {
 
@@ -223,6 +224,12 @@ public class ArgAddRemove implements PSCommandArg {
 
         // find total region amounts after player is added to the regions, and their existing total
         String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream()
+                .flatMap(r -> {
+                    if (r instanceof PSGroupRegion) {
+                        return ((PSGroupRegion) r).getMergedRegions().stream();
+                    }
+                    return Stream.of(r);
+                })
                 .map(PSRegion::getTypeOptions)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
