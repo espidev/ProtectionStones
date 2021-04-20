@@ -103,7 +103,7 @@ public class LegacyUpgrade {
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
             for (String regionName : rm.getRegions().keySet()) {
-                if (regionName.startsWith("ps")) {
+                if (regionName.startsWith("ps") && !ProtectionStones.isPSRegion(rm.getRegion(regionName))) {
                     try {
                         PSLocation psl = WGUtils.parsePSRegionToLocation(regionName);
                         ProtectedRegion r = rm.getRegion(regionName);
