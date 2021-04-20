@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a region that exists but is a group of merged {@link PSStandardRegion}s.
@@ -123,10 +124,9 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     /**
-     * Get the merged region who's ID is the same as the group region ID
+     * Get the merged region whose ID is the same as the group region ID.
      * @return the root region
      */
-
     public PSMergedRegion getRootRegion() {
         for (PSMergedRegion r : getMergedRegions()) {
             if (r.getId().equals(getId())) return r;
@@ -173,11 +173,21 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     /**
-     * Get the PSMergedRegion objects of the regions that were merged into this region.
+     * Get the list of {@link PSMergedRegion} objects of the regions that were merged into this region.
      * @return the list of regions merged into this region
      */
-
     public List<PSMergedRegion> getMergedRegions() {
+        return getMergedRegionsUnsafe().stream()
+                .filter(r -> r.getTypeOptions() != null)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get the list of {@link PSMergedRegion} objects of the regions that were merged into this region.
+     * Note: This is unsafe as it includes {@link PSMergedRegion}s that are of types not configured in the config.
+     * @return the list of regions merged into this region
+     */
+    public List<PSMergedRegion> getMergedRegionsUnsafe() {
         List<PSMergedRegion> l = new ArrayList<>();
         for (String line : getWGRegion().getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES)) {
             String[] spl = line.split(" ");
