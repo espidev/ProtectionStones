@@ -27,7 +27,7 @@
     <scm>
       <connection>scm:git:git://github.com/espidev/ProtectionStones.git</connection>
       <developerConnection>scm:git:ssh://github.com:espidev/ProtectionStones.git</developerConnection>
-      <url>http://github.com/espidev/ProtectionStones/tree/master</url>
+      <url>https://github.com/espidev/ProtectionStones/tree/master</url>
     </scm>
 
     <profiles>
@@ -173,7 +173,7 @@
         <!-- WorldGuard, WorldEdit -->
         <repository>
             <id>sk89q-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
+            <url>https://maven.sk89q.com/repo/</url>
         </repository>
         <!-- bStats -->
         <repository>
@@ -183,7 +183,7 @@
         <!-- Placeholder API -->
         <repository>
             <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
     </repositories>
 
