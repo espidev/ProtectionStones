@@ -4,6 +4,8 @@
 ![Open issues](https://img.shields.io/github/issues-raw/espidev/ProtectionStones)
 ![Closed issues](https://img.shields.io/github/issues-closed-raw/espidev/ProtectionStones)
 
+[Spigot](https://www.spigotmc.org/resources/protectionstones-updated-for-1-13-1-16-wg7.61797/) | [Permissions](https://github.com/espidev/ProtectionStones/wiki/Permissions) | [Commands](https://github.com/espidev/ProtectionStones/wiki/Commands) | [Configuration](https://github.com/espidev/ProtectionStones/wiki/Configuration) | [Placeholders](https://github.com/espidev/ProtectionStones/wiki/Placeholders) | [Translations](https://github.com/espidev/ProtectionStones/wiki/Translations) | [API Information](https://github.com/espidev/ProtectionStones/wiki/API) | [Javadocs](https://jdps.espi.dev/) | [Dev Builds](https://ci.espi.dev/job/ProtectionStones/)
+
 Get support for the plugin on the M.O.S.S. Discord! https://discord.gg/TQXWtf8
 
 ProtectionStones is a grief prevention and land claiming plugin.
@@ -12,11 +14,7 @@ This plugin uses a specified type of minecraft block/blocks as a protection bloc
 
 View the Spigot page (with FAQ and install instructions) [here](https://www.spigotmc.org/resources/protectionstones-updated-for-1-13-1-16-wg7.61797/).
 
-This plugin is loosely based off of the original ProtectionStones plugin by AxelDios.
-
-This project is a rewrite of (OUTDATED) https://github.com/vik1395/ProtectionStones-Minecraft.
-
-That project was a rewrite of the original ProtectionStones plugin (OUTDATED): http://dev.bukkit.org/bukkit-plugins/protectionstones/
+Check the [wiki](https://github.com/espidev/ProtectionStones/wiki) for plugin reference information.
 
 ### Dependencies
 * ProtectionStones 2.8.3
@@ -25,31 +23,17 @@ That project was a rewrite of the original ProtectionStones plugin (OUTDATED): h
   * Vault (Optional)
   * PlaceholderAPI (Optional)
   * LuckPerms (Optional)
-  
-### Default Configuration
-Find it in the src/main/resources folder. Also viewable [here](https://github.com/espidev/ProtectionStones/wiki/Configuration).
 
-### Commands
-Command aliases and the base command (/ps) can be changed in the config.
+### Building
+Make sure you have the Java 8 JDK installed, as well as Maven.
 
-View the available commands on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Commands).
+```
+git clone https://github.com/espidev/ProtectionStones.git
+cd ProtectionStones
+mvn clean install
+```
 
-### Permissions
-View the available permissions on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Permissions).
-
-### Placeholders
-View the placeholders available for PlaceholderAPI on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Placeholders).
-
-### Translations
-View user contributed translations on the wiki [here](https://github.com/espidev/ProtectionStones/wiki/Translations).
-
-### Developer API
-
-Access API information [here](https://github.com/espidev/ProtectionStones/wiki/API).
-
-JavaDocs: https://jdps.espi.dev
-
-Compiling ProtectionStones will also produce a jar with JavaDocs, which can be useful if you need to develop for an outdated version.
+Compiling ProtectionStones will also produce a jar with JavaDocs, which can be useful if you need documentation for an older version.
 
 ### Usage Statistics
 <img src="https://bstats.org/signatures/bukkit/protectionstones.svg">
