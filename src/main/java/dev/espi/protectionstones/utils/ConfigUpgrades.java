@@ -122,6 +122,20 @@ public class ConfigUpgrades {
                         "     owners are removed).\n" +
                         "     Regions that have no owners or members will be deleted regardless.");
                 break;
+            case 14:
+                ProtectionStones.config.set("config_version", 15);
+
+                // fix incorrect value set
+                if (ProtectionStones.config.get("allow_addowner_for_offline_players_without_lp") == null) {
+                    Object value = ProtectionStones.config.get("default_allow_addowner_for_offline_players_without_lp");
+                    ProtectionStones.config.removeComment("default_allow_addowner_for_offline_players_without_lp");
+                    ProtectionStones.config.remove("default_allow_addowner_for_offline_players_without_lp");
+                    ProtectionStones.config.set("allow_addowner_for_offline_players_without_lp", value == null ? false : (boolean) value);
+                    ProtectionStones.config.setComment("default_allow_addowner_for_offline_players_without_lp", " # If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
+                            " on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so\n" +
+                            " the check is unnecessary).");
+                }
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;
