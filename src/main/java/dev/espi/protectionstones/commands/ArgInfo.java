@@ -75,17 +75,26 @@ public class ArgInfo implements PSCommandArg {
                 return PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
-            if (r.getName() == null) {
-                PSL.msg(p, PSL.INFO_REGION.msg() + r.getId() + ", " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
-            } else {
-                PSL.msg(p, PSL.INFO_REGION.msg() + r.getName() + " (" + r.getId() + "), " + PSL.INFO_PRIORITY.msg() + r.getWGRegion().getPriority());
-            }
 
+            // region: %region%, priority: %priority%
+            StringBuilder sb = new StringBuilder();
+
+            if (r.getName() == null) {
+                sb.append(PSL.INFO_REGION2.msg().replace("%region%", r.getId()));
+            } else {
+                sb.append(PSL.INFO_REGION2.msg().replace("%region%", r.getName() + " (" + r.getId() + "), "));
+            }
+            if (!PSL.INFO_PRIORITY2.msg().equals("")) {
+                sb.append(", ").append(PSL.INFO_PRIORITY2.msg().replace("%priority%", "" + r.getWGRegion().getPriority()));
+            }
+            PSL.msg(p, sb.toString());
+
+            // type: %type%
             if (r instanceof PSGroupRegion) {
-                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias + " " + PSL.INFO_MAY_BE_MERGED.msg());
+                PSL.msg(p, PSL.INFO_TYPE2.msg().replace("%type%", r.getTypeOptions().alias + " " + PSL.INFO_MAY_BE_MERGED.msg()));
                 displayMerged(p, (PSGroupRegion) r);
             } else {
-                PSL.msg(p, PSL.INFO_TYPE.msg() + r.getTypeOptions().alias);
+                PSL.msg(p, PSL.INFO_TYPE2.msg().replace("%type%", r.getTypeOptions().alias));
             }
 
             displayEconomy(p, r);
@@ -95,15 +104,15 @@ public class ArgInfo implements PSCommandArg {
 
             if (r.getParent() != null) {
                 if (r.getName() != null) {
-                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getName() + " (" + r.getParent().getId() + ")");
+                    PSL.msg(p, PSL.INFO_PARENT2.msg().replace("%parentregion%", r.getParent().getName() + " (" + r.getParent().getId() + ")"));
                 } else {
-                    PSL.msg(p, PSL.INFO_PARENT.msg() + r.getParent().getId());
+                    PSL.msg(p, PSL.INFO_PARENT2.msg().replace("%parentregion%", r.getParent().getId()));
                 }
             }
 
             BlockVector3 min = r.getWGRegion().getMinimumPoint();
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
-            PSL.msg(p, PSL.INFO_BOUNDS.msg() + "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
+            PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"));
 
         } else if (args.length == 2) { // get specific information on current region
 
@@ -145,88 +154,91 @@ public class ArgInfo implements PSCommandArg {
         for (PSMergedRegion pr : r.getMergedRegions()) {
             msg.append(pr.getId() + " (" + pr.getTypeOptions().alias + "), ");
         }
-        PSL.msg(p, PSL.INFO_MERGED.msg() + msg);
+        PSL.msg(p, PSL.INFO_MERGED2.msg().replace("%merged%", msg));
     }
 
     private static void displayEconomy(Player p, PSRegion r) {
         if (r.forSale()) {
             PSL.msg(p, PSL.INFO_AVAILABLE_FOR_SALE.msg());
-            PSL.msg(p, PSL.INFO_SELLER.msg() + UUIDCache.getNameFromUUID(r.getLandlord()));
-            PSL.msg(p, PSL.INFO_PRICE.msg() + String.format("%.2f", r.getPrice()));
+            PSL.msg(p, PSL.INFO_SELLER2.msg().replace("%seller%", UUIDCache.getNameFromUUID(r.getLandlord())));
+            PSL.msg(p, PSL.INFO_PRICE2.msg().replace("%price%", String.format("%.2f", r.getPrice())));
         }
         if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
             PSL.msg(p, PSL.INFO_AVAILABLE_FOR_RENT.msg());
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, PSL.INFO_TENANT.msg() + UUIDCache.getNameFromUUID(r.getTenant()));
+            PSL.msg(p, PSL.INFO_TENANT2.msg().replace("%tenant%", UUIDCache.getNameFromUUID(r.getTenant())));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
-            PSL.msg(p, PSL.INFO_LANDLORD.msg() + UUIDCache.getNameFromUUID(r.getLandlord()));
-            PSL.msg(p, PSL.INFO_RENT.msg() + String.format("%.2f", r.getPrice()));
+            PSL.msg(p, PSL.INFO_LANDLORD2.msg().replace("%landlord%", UUIDCache.getNameFromUUID(r.getLandlord())));
+            PSL.msg(p, PSL.INFO_RENT2.msg().replace("%rent%", String.format("%.2f", r.getPrice())));
         }
     }
 
     private static void displayFlags(Player p, PSRegion r) {
         ProtectedRegion region = r.getWGRegion();
+        PSProtectBlock typeOptions = r.getTypeOptions();
 
         StringBuilder flagDisp = new StringBuilder();
         String flagValue;
+        // loop through all flags
         for (Flag<?> flag : WGUtils.getFlagRegistry().getAll()) {
-            if (region.getFlag(flag) != null && !r.getTypeOptions().hiddenFlagsFromInfo.contains(flag.getName())) {
+            if (region.getFlag(flag) != null && !typeOptions.hiddenFlagsFromInfo.contains(flag.getName())) {
                 flagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
 
                 if (region.getFlag(groupFlag) != null) {
-                    flagDisp.append(flag.getName()).append(": -g ").append(region.getFlag(groupFlag)).append(" ").append(flagValue).append(", " + ChatColor.GRAY);
+                    flagDisp.append(String.format("%s: -g %s %s, ", flag.getName(), region.getFlag(groupFlag), flagValue));
                 } else {
-                    flagDisp.append(flag.getName()).append(": ").append(flagValue).append(", " + ChatColor.GRAY);
+                    flagDisp.append(String.format("%s: %s, ", flag.getName(), flagValue));
                 }
+                flagDisp.append(ChatColor.GRAY);
             }
         }
 
         if (flagDisp.length() > 2) {
             flagDisp = new StringBuilder(flagDisp.substring(0, flagDisp.length() - 2) + ".");
-            PSL.msg(p, PSL.INFO_FLAGS.msg() + flagDisp);
+            PSL.msg(p, PSL.INFO_FLAGS2.msg().replace("%flags%", flagDisp));
         } else {
-            PSL.msg(p, PSL.INFO_FLAGS.msg() + "(none)");
+            PSL.msg(p, PSL.INFO_FLAGS2.msg().replace("%flags%", PSL.INFO_NO_FLAGS.msg()));
         }
     }
 
     private static void displayOwners(Player p, ProtectedRegion region) {
         DefaultDomain owners = region.getOwners();
-        StringBuilder send = new StringBuilder(PSL.INFO_OWNERS.msg());
+        StringBuilder msg = new StringBuilder();
         if (owners.size() == 0) {
-            send.append(PSL.INFO_NO_OWNERS.msg());
-            PSL.msg(p, send.toString());
+            msg.append(PSL.INFO_NO_OWNERS.msg());
         } else {
             for (UUID uuid : owners.getUniqueIds()) {
                 String name = UUIDCache.getNameFromUUID(uuid);
                 if (name == null) name = Bukkit.getOfflinePlayer(uuid).getName();
-                send.append(name).append(", ");
+                msg.append(name).append(", ");
             }
             for (String name : owners.getPlayers()) { // legacy purposes
-                send.append(name).append(", ");
+                msg.append(name).append(", ");
             }
-            PSL.msg(p, send.substring(0, send.length() - 2));
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2));
         }
+        PSL.msg(p, PSL.INFO_OWNERS2.msg().replace("%owners%", msg.toString()));
     }
 
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
-        StringBuilder send = new StringBuilder(PSL.INFO_MEMBERS.msg());
+        StringBuilder msg = new StringBuilder();
         if (members.size() == 0) {
-            send.append(PSL.INFO_NO_MEMBERS.msg());
-            PSL.msg(p, send.toString());
+            msg.append(PSL.INFO_NO_MEMBERS.msg());
         } else {
             for (UUID uuid : members.getUniqueIds()) {
                 String name = UUIDCache.getNameFromUUID(uuid);
                 if (name == null) name = uuid.toString();
-                send.append(name).append(", ");
+                msg.append(name).append(", ");
             }
             for (String name : members.getPlayers()) { // legacy purposes
-                send.append(name).append(", ");
+                msg.append(name).append(", ");
             }
-            PSL.msg(p, send.substring(0, send.length() - 2));
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2));
         }
+        PSL.msg(p, PSL.INFO_MEMBERS2.msg().replace("%members%", msg.toString()));
     }
 }
