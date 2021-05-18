@@ -266,14 +266,7 @@ public class ListenerClass implements Listener {
             event.setCancelled(true);
         }
     }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPhysicsEvent(BlockPhysicsEvent e) {
-        if (ProtectionStones.isProtectBlock(e.getBlock()) || ProtectionStones.isProtectBlock(e.getSourceBlock())) {
-            e.setCancelled(true);
-        }
-    }
-
+    
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
         if (ProtectionStones.isProtectBlock(e.getBlock())) {
