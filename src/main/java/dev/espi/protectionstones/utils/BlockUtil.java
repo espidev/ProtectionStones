@@ -43,22 +43,32 @@ public class BlockUtil {
         }
     }
 
+    // used for preventing unnecessary calls to .getOwningPlayer() which could cause server freezes
+    private static boolean isOwnedSkullTypeConfigured() {
+        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
+            if (b.type.startsWith("PLAYER_HEAD:")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String getProtectBlockType(ItemStack i) {
         if (i.getType() == Material.PLAYER_HEAD || i.getType() == Material.LEGACY_SKULL_ITEM) {
             SkullMeta sm = (SkullMeta) i.getItemMeta();
 
             // PLAYER_HEAD
-            if (!sm.hasOwner()) {
+            if (!sm.hasOwner() || !isOwnedSkullTypeConfigured()) {
                 return Material.PLAYER_HEAD.toString();
             }
 
             // PLAYER_HEAD:base64
-            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + sm.getOwningPlayer().getUniqueId().toString()) != null) {
-                return Material.PLAYER_HEAD.toString() + ":" + sm.getOwningPlayer().getUniqueId().toString();
+            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + sm.getOwningPlayer().getUniqueId()) != null) {
+                return Material.PLAYER_HEAD + ":" + sm.getOwningPlayer().getUniqueId();
             }
 
             // PLAYER_HEAD:name
-            return Material.PLAYER_HEAD.toString() + ":" + sm.getOwningPlayer().getName(); // return name if it doesn't exist
+            return Material.PLAYER_HEAD + ":" + sm.getOwningPlayer().getName(); // return name if it doesn't exist
         }
         return i.getType().toString();
     }
@@ -67,16 +77,15 @@ public class BlockUtil {
         if (block.getType() == Material.PLAYER_HEAD || block.getType() == Material.PLAYER_WALL_HEAD) {
 
             Skull s = (Skull) block.getState();
-            if (s.hasOwner()) {
+            if (s.hasOwner() && isOwnedSkullTypeConfigured()) {
                 OfflinePlayer op = s.getOwningPlayer();
-                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + op.getUniqueId().toString()) != null) {
+                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + op.getUniqueId()) != null) {
                     // PLAYER_HEAD:base64
-                    return Material.PLAYER_HEAD.toString() + ":" + op.getUniqueId().toString();
+                    return Material.PLAYER_HEAD + ":" + op.getUniqueId();
                 } else {
                     // PLAYER_HEAD:name
-                    return Material.PLAYER_HEAD.toString() + ":" + op.getName(); // return name if doesn't exist
+                    return Material.PLAYER_HEAD + ":" + op.getName(); // return name if doesn't exist
                 }
-
             } else { // PLAYER_HEAD
                 return Material.PLAYER_HEAD.toString();
             }
