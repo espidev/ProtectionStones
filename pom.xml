@@ -252,12 +252,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.7</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!--<dependency> LOCAL DEPENDENCIES-->
         <!--<groupId>com.sk89q.worldedit</groupId>-->

@@ -20,14 +20,14 @@ import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.val;
-import lombok.var;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -106,7 +106,7 @@ public class PSEconomy {
     public void loadRentList() {
         rentedList = new ArrayList<>();
 
-        var managers = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> managers = WGUtils.getAllRegionManagers();
 
         for (World w : managers.keySet()) {
             RegionManager rgm = managers.get(w);
@@ -133,7 +133,7 @@ public class PSEconomy {
                 // check if a player is set to auto-pay
                 if (!r.getTaxPaymentsDue().isEmpty() && r.getTaxAutopayer() != null) {
                     PSPlayer psp = PSPlayer.fromUUID(r.getTaxAutopayer());
-                    val res = r.payTax(psp, psp.getBalance());
+                    EconomyResponse res = r.payTax(psp, psp.getBalance());
 
                     if (psp.getPlayer() != null && res.amount != 0) {
                         PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()

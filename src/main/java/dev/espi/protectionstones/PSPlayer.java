@@ -19,7 +19,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import lombok.NonNull;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
@@ -33,6 +32,8 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wrapper for a Bukkit player that exposes ProtectionStones related methods.
@@ -60,8 +61,8 @@ public class PSPlayer {
      * @return the PSPlayer object
      */
 
-    public static PSPlayer fromUUID(@NonNull UUID uuid) {
-        return new PSPlayer(uuid);
+    public static PSPlayer fromUUID(UUID uuid) {
+        return new PSPlayer(checkNotNull(uuid));
     }
 
     /**
@@ -71,12 +72,12 @@ public class PSPlayer {
      * @return the PSPlayer object
      */
 
-    public static PSPlayer fromPlayer(@NonNull Player p) {
-        return new PSPlayer(p);
+    public static PSPlayer fromPlayer(Player p) {
+        return new PSPlayer(checkNotNull(p));
     }
 
-    public static PSPlayer fromPlayer(@NonNull OfflinePlayer p) {
-        if (p instanceof Player) {
+    public static PSPlayer fromPlayer(OfflinePlayer p) {
+        if (checkNotNull(p) instanceof Player) {
             return new PSPlayer((Player) p);
         } else {
             return new PSPlayer(p.getUniqueId());

@@ -20,16 +20,12 @@ package dev.espi.protectionstones.placeholders;
 import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.ProtectionStones;
-import dev.espi.protectionstones.utils.WGUtils;
-import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 class PlayerPlaceholders {
@@ -69,7 +65,7 @@ class PlayerPlaceholders {
 
             double amount = 0;
             for (PSRegion psr : psp.getTaxEligibleRegions()) {
-                for (var tp : psr.getTaxPaymentsDue()) {
+                for (PSRegion.TaxPayment tp : psr.getTaxPaymentsDue()) {
                     amount += tp.getAmount();
                 }
             }
