@@ -336,6 +336,8 @@ public enum PSL {
     LIST_HEADER("list.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " %player%'s Regions " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     LIST_OWNER("list.owner", ChatColor.GRAY + "Owner of:"),
     LIST_MEMBER("list.member", ChatColor.GRAY + "Member of:"),
+    LIST_NO_REGIONS("list.no_regions", ChatColor.GRAY + "You currently do not own and are not a member of any regions."),
+    LIST_NO_REGIONS_PLAYER("list.no_regions_player", ChatColor.AQUA + "%player% " + ChatColor.GRAY + "does not own and is not a member of any regions."),
 
     // ps name
     NAME_HELP("name.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps name [name|none]"),

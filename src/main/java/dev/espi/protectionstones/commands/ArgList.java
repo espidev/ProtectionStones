@@ -65,11 +65,11 @@ public class ArgList implements PSCommandArg {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             if (args.length == 1) {
                 List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), true);
-                display(s, regions, psp.getUuid());
+                display(s, regions, psp.getUuid(), true);
             } else if (args.length == 2) {
                 UUID uuid = UUIDCache.getUUIDFromName(args[1]);
                 List<PSRegion> regions = PSPlayer.fromUUID(uuid).getPSRegionsCrossWorld(psp.getPlayer().getWorld(), true);
-                display(s, regions, UUIDCache.getUUIDFromName(args[1]));
+                display(s, regions, uuid, false);
             } else {
                 PSL.msg(s, PSL.LIST_HELP.msg());
             }
@@ -82,7 +82,7 @@ public class ArgList implements PSCommandArg {
         return null;
     }
 
-    private void display(CommandSender s, List<PSRegion> regions, UUID pUUID) {
+    private void display(CommandSender s, List<PSRegion> regions, UUID pUUID, boolean isCurrentPlayer) {
         List<String> ownerOf = new ArrayList<>(), memberOf = new ArrayList<>();
         for (PSRegion r : regions) {
             if (r.isOwner(pUUID)) {
@@ -99,6 +99,15 @@ public class ArgList implements PSCommandArg {
                     memberOf.add(ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getId() + ")");
                 }
             }
+        }
+
+        if (ownerOf.isEmpty() && memberOf.isEmpty()) {
+            if (isCurrentPlayer) {
+                PSL.msg(s, PSL.LIST_NO_REGIONS.msg());
+            } else {
+                PSL.msg(s, PSL.LIST_NO_REGIONS_PLAYER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
+            }
+            return;
         }
 
         PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
