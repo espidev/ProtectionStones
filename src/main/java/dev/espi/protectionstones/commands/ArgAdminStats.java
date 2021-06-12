@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,8 +34,8 @@ class ArgAdminStats {
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
 
         int size = 0;
-        for (World w : Bukkit.getWorlds()) {
-            size += WGUtils.getRegionManagerWithWorld(w).size();
+        for (RegionManager rgm : WGUtils.getAllRegionManagers().values()) {
+            size += rgm.getRegions().values().stream().filter(ProtectionStones::isPSRegion).count();
         }
 
         if (args.length > 2) {
