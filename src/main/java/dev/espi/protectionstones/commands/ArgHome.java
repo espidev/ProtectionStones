@@ -71,8 +71,11 @@ public class ArgHome implements PSCommandArg {
                 List<PSRegion> regions = psp.getHomes(p.getWorld());
                 List<String> regionNames = new ArrayList<>();
                 for (PSRegion r : regions) {
-                    if (r.getName() != null) regionNames.add(r.getName());
-                    regionNames.add(r.getId());
+                    if (r.getName() != null) {
+                        regionNames.add(r.getName());
+                    } else {
+                        regionNames.add(r.getId());
+                    }
                 }
                 // cache home regions
                 tabCache.put(p.getUniqueId(), regionNames);
