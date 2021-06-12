@@ -141,6 +141,11 @@ public class PSMergedRegion extends PSRegion {
     }
 
     @Override
+    public void setHome(double blockX, double blockY, double blockZ, float yaw, float pitch) {
+        mergedGroup.setHome(blockX, blockY, blockZ, yaw, pitch);
+    }
+
+    @Override
     public boolean forSale() {
         return mergedGroup.forSale();
     }

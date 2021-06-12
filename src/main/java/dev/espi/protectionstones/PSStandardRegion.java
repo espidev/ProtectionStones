@@ -93,12 +93,19 @@ public class PSStandardRegion extends PSRegion {
         String oPos = wgregion.getFlag(FlagHandler.PS_HOME);
         if (oPos == null) return null;
         String[] pos = oPos.split(" ");
-        return new Location(world, Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]));
+        double x = Double.parseDouble(pos[0]), y = Double.parseDouble(pos[1]), z = Double.parseDouble(pos[2]);
+        float yaw = pos.length >= 4 ? Float.parseFloat(pos[3]) : 0, pitch = pos.length >= 4 ? Float.parseFloat(pos[4]) : 0;
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     @Override
     public void setHome(double blockX, double blockY, double blockZ) {
         wgregion.setFlag(FlagHandler.PS_HOME, blockX + " " + blockY + " " + blockZ);
+    }
+
+    @Override
+    public void setHome(double blockX, double blockY, double blockZ, float yaw, float pitch) {
+        wgregion.setFlag(FlagHandler.PS_HOME, blockX + " " + blockY + " " + blockZ + " " + yaw + " " + pitch);
     }
 
     @Override

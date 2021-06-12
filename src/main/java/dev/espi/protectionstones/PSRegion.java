@@ -243,6 +243,16 @@ public abstract class PSRegion {
      */
     public abstract void setHome(double blockX, double blockY, double blockZ);
 
+    /**
+     * Set the home of the region (internally changes the flag).
+     * @param blockX block x location
+     * @param blockY block y location
+     * @param blockZ block z location
+     * @param yaw location yaw
+     * @param pitch location pitch
+     */
+    public abstract void setHome(double blockX, double blockY, double blockZ, float yaw, float pitch);
+
     // -=-=-=-=- Selling, Buying, Renting -=-=-=-=-
 
     public enum RentStage {

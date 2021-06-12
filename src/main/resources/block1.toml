@@ -99,6 +99,7 @@ allow_placing_in_wild = true
 
     # Which flags to hide from /ps info
     hidden_flags_from_info = [
+        "ps-name",
         "ps-merged-regions",
         "ps-merged-regions-types",
         "ps-block-material",

@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.utils.WGUtils;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -57,22 +58,18 @@ public class ArgSethome implements PSCommandArg {
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        if (!p.hasPermission("protectionstones.sethome")) {
-            PSL.msg(p, PSL.NO_PERMISSION_SETHOME.msg());
-            return true;
-        }
-        if (r == null) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
-            return true;
-        }
-        if (WGUtils.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false)) {
-            PSL.msg(p, PSL.NO_ACCESS.msg());
-            return true;
-        }
+        if (!p.hasPermission("protectionstones.sethome"))
+            return PSL.msg(p, PSL.NO_PERMISSION_SETHOME.msg());
 
-        r.setHome(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
-        PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getId()));
-        return true;
+        if (r == null)
+            return PSL.msg(p, PSL.NOT_IN_REGION.msg());
+
+        if (WGUtils.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false))
+            return PSL.msg(p, PSL.NO_ACCESS.msg());
+
+        Location l = p.getLocation();
+        r.setHome(l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch());
+        return PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getName() != null ? String.format("%s (%s)", r.getName(), r.getId()) : r.getId()));
     }
 
     @Override
