@@ -111,7 +111,7 @@ public class ArgTp implements PSCommandArg {
                 } else if (regionNumber > regions.size()) {
                     PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
                             .replace("%player%", tpName)
-                            .replace("%num%", "" + regionNumber));
+                            .replace("%num%", "" + regions.size()));
                     return;
                 }
 
