@@ -55,6 +55,8 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgSetparent());
         ProtectionStones.getInstance().addCommandArgument(new ArgTax());
         ProtectionStones.getInstance().addCommandArgument(new ArgToggle());
+        ProtectionStones.getInstance().addCommandArgument(new ArgToggle.ArgToggleOn());
+        ProtectionStones.getInstance().addCommandArgument(new ArgToggle.ArgToggleOff());
         ProtectionStones.getInstance().addCommandArgument(new ArgTp());
         ProtectionStones.getInstance().addCommandArgument(new ArgUnclaim());
         ProtectionStones.getInstance().addCommandArgument(new ArgView());

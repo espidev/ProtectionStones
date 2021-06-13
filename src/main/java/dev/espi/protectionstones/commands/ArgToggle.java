@@ -27,6 +27,76 @@ import java.util.List;
 
 public class ArgToggle implements PSCommandArg {
 
+    // /ps on
+    public static class ArgToggleOn implements PSCommandArg {
+        @Override
+        public List<String> getNames() {
+            return Collections.singletonList("on");
+        }
+        @Override
+        public boolean allowNonPlayersToExecute() {
+            return false;
+        }
+        @Override
+        public List<String> getPermissionsToExecute() {
+            return Collections.singletonList("protectionstones.toggle");
+        }
+        @Override
+        public HashMap<String, Boolean> getRegisteredFlags() {
+            return null;
+        }
+        @Override
+        public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
+            Player p = (Player) s;
+            if (p.hasPermission("protectionstones.toggle")) {
+                ProtectionStones.toggleList.add(p.getUniqueId());
+                p.sendMessage(PSL.TOGGLE_ON.msg());
+            } else {
+                p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
+            }
+            return true;
+        }
+        @Override
+        public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+            return null;
+        }
+    }
+
+    // /ps off
+    public static class ArgToggleOff implements PSCommandArg {
+        @Override
+        public List<String> getNames() {
+            return Collections.singletonList("off");
+        }
+        @Override
+        public boolean allowNonPlayersToExecute() {
+            return false;
+        }
+        @Override
+        public List<String> getPermissionsToExecute() {
+            return Collections.singletonList("protectionstones.toggle");
+        }
+        @Override
+        public HashMap<String, Boolean> getRegisteredFlags() {
+            return null;
+        }
+        @Override
+        public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
+            Player p = (Player) s;
+            if (p.hasPermission("protectionstones.toggle")) {
+                ProtectionStones.toggleList.remove(p.getUniqueId());
+                p.sendMessage(PSL.TOGGLE_OFF.msg());
+            } else {
+                p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
+            }
+            return true;
+        }
+        @Override
+        public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+            return null;
+        }
+    }
+
     @Override
     public List<String> getNames() {
         return Collections.singletonList("toggle");
