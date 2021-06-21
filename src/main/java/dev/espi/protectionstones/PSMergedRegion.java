@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Represents an instance of a PS region that has been merged into another region. There is no actual WG region that
  * this contains, and instead takes properties from its parent region (see {@link PSGroupRegion}).
@@ -49,9 +51,9 @@ public class PSMergedRegion extends PSRegion {
     private String id, type;
 
     PSMergedRegion(String id, PSGroupRegion mergedGroup, RegionManager rgmanager, World world) {
-        super(rgmanager, world);
-        this.id = id;
-        this.mergedGroup = mergedGroup;
+        super(rgmanager, world); // null checks are in super constructor
+        this.id = checkNotNull(id);
+        this.mergedGroup = checkNotNull(mergedGroup);
 
         // get type
         // stored instead of fetched on the fly because unmerge algorithm removes the flag causing getType to return null
@@ -79,15 +81,10 @@ public class PSMergedRegion extends PSRegion {
         if (rgm == null) return null;
 
         for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
-            Set<String> types = pr.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES);
-            if (types != null && types.contains(psID)) {
-                for (String s : types) {
-                    String[] spl = s.split(" ");
-                    String id = spl[0], type = spl[1];
-                    if (id.equals(psID)) {
-                        return new PSMergedRegion(psID, new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
-                    }
-                }
+            // if the region has the merged region
+            Set<String> mergedIds = pr.getFlag(FlagHandler.PS_MERGED_REGIONS);
+            if (mergedIds != null && mergedIds.contains(psID)) {
+                return new PSMergedRegion(psID, new PSGroupRegion(pr, rgm, l.getWorld()), rgm, l.getWorld());
             }
         }
 
