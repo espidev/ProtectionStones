@@ -112,7 +112,7 @@ public enum PSL {
     CANNOT_REMOVE_YOURSELF_FROM_ALL_REGIONS("psregion.cannot_remove_yourself_all_regions", ChatColor.RED + "You cannot remove yourself from all of your regions at once, for safety reasons."),
 
     // ps toggle
-    TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle"),
+    TOGGLE_HELP("toggle.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps toggle|on|off"),
     TOGGLE_HELP_DESC("toggle.help_desc", "Use this command to turn on or off placement of protection blocks."),
     TOGGLE_ON("toggle.toggle_on", ChatColor.AQUA + "Protection block placement turned on."),
     TOGGLE_OFF("toggle.toggle_off", ChatColor.AQUA + "Protection block placement turned off."),
