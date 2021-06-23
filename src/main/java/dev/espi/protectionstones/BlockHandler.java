@@ -224,7 +224,12 @@ public class BlockHandler {
         FlagHandler.initDefaultFlagPlaceholders(flags, p);
 
         // set flags
-        region.setFlags(flags);
+        try {
+            region.setFlags(flags);
+        } catch (Exception e) {
+            ProtectionStones.getPluginLogger().severe(String.format("Region flags have failed to initialize for: %s (%s)", blockOptions.alias, blockOptions.type));
+            throw e;
+        }
         FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
 
         // check for player's number of adjacent region groups

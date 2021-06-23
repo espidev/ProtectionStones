@@ -169,6 +169,7 @@ public class FlagHandler {
         // initialize default flags
         b.regionFlags = new HashMap<>();
 
+        // loop through default flags
         for (String flagraw : b.flags) {
             String[] split = flagraw.split(" ");
             String settings = "", // flag settings (after flag name)
@@ -197,16 +198,28 @@ public class FlagHandler {
                     isEmpty = true;
                 }
 
-                // apply flag
+                // determine worldguard flag object
                 Flag<?> flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
                 FlagContext fc = FlagContext.create().setInput(settings).build();
 
+                // warn if flag setting has already been set
+                if (b.regionFlags.containsKey(flag)) {
+                    ProtectionStones.getPluginLogger().warning(String.format("Duplicate default flags found (only one flag setting can be applied for each flag)! Overwriting the previous value set for %s with \"%s\" ...", flagName, flagraw));
+                }
+
+                // apply flag
                 if (isEmpty) { // empty flag
                     b.regionFlags.put(flag, "");
                 } else if (!group.equals("")) { // group flag
 
+                    RegionGroup rGroup = flag.getRegionGroupFlag().detectValue(group);
+                    if (rGroup == null) {
+                        ProtectionStones.getPluginLogger().severe(String.format("Error parsing flag \"%s\", the group value is invalid!", flagraw));
+                        continue;
+                    }
+
                     b.regionFlags.put(flag, flag.parseInput(fc)); // add flag
-                    b.regionFlags.put(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(group)); // apply group
+                    b.regionFlags.put(flag.getRegionGroupFlag(), rGroup); // apply group
 
                 } else { // normal flag
                     b.regionFlags.put(flag, flag.parseInput(fc));
