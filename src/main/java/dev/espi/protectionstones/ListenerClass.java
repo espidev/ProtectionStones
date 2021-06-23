@@ -94,6 +94,7 @@ public class ListenerClass implements Listener {
     }
 
     // helper method for breaking protection blocks
+    // IMPLEMENTATION NOTES: r may be not configured
     private boolean playerBreakProtection(Player p, PSRegion r) {
         PSProtectBlock blockOptions = r.getTypeOptions();
 
@@ -149,7 +150,8 @@ public class ListenerClass implements Listener {
 
             PSProtectBlock ppb = ProtectionStones.getBlockOptions(e.getClickedBlock());
             if (ppb.allowShiftRightBreak && e.getPlayer().isSneaking()) {
-                if (playerBreakProtection(e.getPlayer(), PSRegion.fromLocation(e.getClickedBlock().getLocation()))) { // successful
+                PSRegion r = PSRegion.fromLocation(e.getClickedBlock().getLocation());
+                if (r != null && playerBreakProtection(e.getPlayer(), r)) { // successful
                     e.getClickedBlock().setType(Material.AIR);
                 }
             }
@@ -183,7 +185,7 @@ public class ListenerClass implements Listener {
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
         // break protection
-        if (playerBreakProtection(p, r)) { // successful
+        if (r != null && playerBreakProtection(p, r)) { // successful
             e.setDropItems(false);
             e.setExpToDrop(0);
         } else { // unsuccessful
