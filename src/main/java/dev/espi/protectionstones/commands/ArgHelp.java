@@ -110,6 +110,11 @@ public class ArgHelp implements PSCommandArg {
 
         List<TextComponent> entries = new ArrayList<>();
         for (HelpEntry he : helpMenu) {
+            // ignore blank lines
+            if (he.msg.getText().equals("")) {
+                continue;
+            }
+            // check player permissions
             for (String perm : he.permission) {
                 if (p.hasPermission(perm)) {
                     entries.add(he.msg);
