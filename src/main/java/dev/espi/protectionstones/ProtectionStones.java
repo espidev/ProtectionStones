@@ -514,7 +514,8 @@ public class ProtectionStones extends JavaPlugin {
                 }
                 commandMap.register(getInstance().configOptions.base_command, psc); // register command
 
-            } catch (Exception e) {
+            } catch (Exception | NoSuchMethodError e) {
+                ProtectionStones.getPluginLogger().severe("Unable to load plugin commands!");
                 e.printStackTrace();
             }
 
