@@ -19,7 +19,10 @@ permissions:
     description: Allow players to unclaim their region using /ps unclaim.
     default: op
   protectionstones.view:
-    description: Allows players the use of /ps view.
+    description: Allows players the use of /ps view in their own regions.
+    default: op
+  protectionstones.view.others:
+    description: Allows players the use of /ps view in regions they are not a part of.
     default: op
   protectionstones.info:
     description: Allows players the use of /ps info.
