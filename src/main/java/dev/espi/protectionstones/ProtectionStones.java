@@ -540,7 +540,8 @@ public class ProtectionStones extends JavaPlugin {
         blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
         // metrics (bStats)
-        new Metrics(this);
+        // https://bstats.org/plugin/bukkit/ProtectionStones/4071
+        new Metrics(this, 4071);
 
         // load command arguments
         PSCommand.addDefaultArguments();

@@ -337,7 +337,7 @@ public class WGMerge {
         }
 
         // create new merged region
-        ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, 0, WGUtils.MAX_BUILD_HEIGHT);
+        ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, WGUtils.MIN_BUILD_HEIGHT, WGUtils.MAX_BUILD_HEIGHT);
 
         r.copyFrom(root.getWGRegion());
         // only make it a merged region if there is more than one contained region

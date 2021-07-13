@@ -112,7 +112,12 @@ public class ArgInfo implements PSCommandArg {
 
             BlockVector3 min = r.getWGRegion().getMinimumPoint();
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
-            PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"));
+            // only show x,z if it's at block limit
+            if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
+                PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockZ() + ")"));
+            } else {
+                PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"));
+            }
 
         } else if (args.length == 2) { // get specific information on current region
 

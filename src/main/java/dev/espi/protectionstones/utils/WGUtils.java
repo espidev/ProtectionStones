@@ -36,7 +36,10 @@ import java.util.*;
 
 public class WGUtils {
 
-    static final int MAX_BUILD_HEIGHT = 256;
+    // Integer.MAX_VALUE/MIN_VALUE causes strange issues with WG not detecting players in regions,
+    // so we use the 16 bit limit, which is more than enough.
+    public static final int MAX_BUILD_HEIGHT = Short.MAX_VALUE;
+    public static final int MIN_BUILD_HEIGHT = Short.MIN_VALUE;
 
     public static FlagRegistry getFlagRegistry() {
         return WorldGuard.getInstance().getFlagRegistry();
@@ -166,7 +169,7 @@ public class WGUtils {
     // remember to call with offsets
     public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
         if (yRadius == -1) {
-            return BlockVector3.at(bx - xRadius, 0, bz - zRadius);
+            return BlockVector3.at(bx - xRadius, MIN_BUILD_HEIGHT, bz - zRadius);
         } else {
             return BlockVector3.at(bx - xRadius, by - yRadius, bz - zRadius);
         }

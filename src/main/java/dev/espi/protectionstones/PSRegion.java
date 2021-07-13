@@ -34,7 +34,7 @@ import java.util.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Represents an instance of a protectionstones protected region.
+ * Represents an instance of a ProtectionStones protected region.
  */
 
 public abstract class PSRegion {
