@@ -206,7 +206,7 @@ visibility:
   hide_help_desc: Use this command to hide or unhide your protection block.
   unhide_help: '&b> &7/ps unhide'
   unhide_help_desc: Use this command to hide or unhide your protection block.
-  already_not_hidden: '&7The protection stone doesn''t appear hidden...'
+  already_not_hidden: '&7The protection stone doesn''t appear hidden…'
   already_hidden: '&7The protection stone appears to already be hidden...'
 info:
   help: '&b> &7/ps info members|owners|flags'
