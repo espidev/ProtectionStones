@@ -15,13 +15,17 @@
 
 package dev.espi.protectionstones;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Objects;
 
 public enum PSL {
     // messages.yml
@@ -48,12 +52,12 @@ public enum PSL {
     NO_PERMISSION_CREATE("no_permission_create", ChatColor.RED + "You don't have permission to place a protection block."),
     NO_PERMISSION_CREATE_SPECIFIC("no_permission_create_specific", ChatColor.RED + "You don't have permission to place this protection block type."),
     NO_PERMISSION_DESTROY("no_permission_destroy", ChatColor.RED + "You don't have permission to destroy a protection block."),
-    NO_PERMISSION_MEMBERS("no_permission_members", ChatColor.RED + "You don't have permission to use member commands."),
-    NO_PERMISSION_OWNERS("no_permission_owners", ChatColor.RED + "You don't have permission to use owner commands."),
+    NO_PERMISSION_MEMBERS("no_permission_members", "&cYou don't have permission to use member commands."),
+    NO_PERMISSION_OWNERS("no_permission_owners", "&cYou don't have permission to use owner commands."),
     NO_PERMISSION_ADMIN("no_permission_admin", ChatColor.RED + "You do not have permission to use that command."),
     NO_PERMISSION_COUNT("no_permission_count", ChatColor.RED + "You do not have permission to use that command."),
     NO_PERMISSION_COUNT_OTHERS("no_permission_count_others", ChatColor.RED + "You do not have permission to use that command."),
-    NO_PERMISSION_FLAGS("no_permission_flags", ChatColor.RED + "You do not have permission to use flag commands."),
+    NO_PERMISSION_FLAGS("no_permission_flags", "&cYou do not have permission to use flag commands."),
     NO_PERMISSION_PER_FLAG("no_permission_per_flag", ChatColor.RED + "You do not have permission to use that flag."),
     NO_PERMISSION_RENT("no_permission_rent", ChatColor.RED + "You do not have permission for renting."),
     NO_PERMISSION_TAX("no_permission_tax", ChatColor.RED + "You do not have permission to use the tax command."),
@@ -214,24 +218,26 @@ public enum PSL {
     INFO_HELP("info.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps info members|owners|flags"),
     INFO_HELP_DESC("info.help_desc", "Use this command inside a ps region to see more information about it."),
     INFO_HEADER("info.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Info " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
-    INFO_TYPE2("info.type2", ChatColor.BLUE + "Type: " + ChatColor.GRAY + "%type%"),
+    INFO_TYPE2("info.type2", "&9Type: &7%type%", "%type%"),
     INFO_MAY_BE_MERGED("info.may_be_merged", "(may be merged with other types)"),
     INFO_MERGED2("info.merged2", ChatColor.BLUE + "Merged regions: " + ChatColor.GRAY + "%merged%"),
-    INFO_MEMBERS2("info.members2", ChatColor.BLUE + "Members: " + ChatColor.GRAY + "%members%"),
+    INFO_MEMBERS2("info.members2", "&9Members: &7%members%", "%members%"),
     INFO_NO_MEMBERS("info.no_members", ChatColor.RED + "(no members)"),
-    INFO_OWNERS2("info.owners2", ChatColor.BLUE + "Owners: " + ChatColor.GRAY + "%owners%"),
+    INFO_OWNERS2("info.owners2", "&9Owners: &7%owners%", "%owners%"),
     INFO_NO_OWNERS("info.no_owners", ChatColor.RED + "(no owners)"),
-    INFO_FLAGS2("info.flags2", ChatColor.BLUE + "Flags: " + ChatColor.GRAY + "%flags%"),
+    INFO_FLAGS2("info.flags2", "&9Flags: &7%flags%", "%flags%"),
     INFO_NO_FLAGS("info.no_flags", "(none)"),
-    INFO_REGION2("info.region2", ChatColor.BLUE + "Region: " + ChatColor.AQUA + "%region%"),
-    INFO_PRIORITY2("info.priority2", ChatColor.BLUE + "Priority: " + ChatColor.AQUA + "%priority%"),
-    INFO_PARENT2("info.parent2", ChatColor.BLUE + "Parent: " + ChatColor.AQUA + "%parentregion%"),
-    INFO_BOUNDS2("info.bounds2", ChatColor.BLUE + "Bounds: " + ChatColor.AQUA + "%bounds%"),
-    INFO_SELLER2("info.seller2", ChatColor.BLUE + "Seller: " + ChatColor.GRAY + "%seller%"),
-    INFO_PRICE2("info.price2", ChatColor.BLUE + "Price: " + ChatColor.GRAY + "%price%"),
-    INFO_TENANT2("info.tenant2", ChatColor.BLUE + "Tenant: " + ChatColor.GRAY + "%tenant%"),
-    INFO_LANDLORD2("info.landlord2", ChatColor.BLUE + "Landlord: " + ChatColor.GRAY + "%landlord%"),
-    INFO_RENT2("info.rent2", ChatColor.BLUE + "Rent: " + ChatColor.GRAY + "%rent%"),
+    INFO_REGION2("info.region2", "&9Region: &b%region%", "%region%"),
+    INFO_PRIORITY2("info.priority2", "&9Priority: &b%priority%", "%priority%"),
+    INFO_PARENT2("info.parent2", "&9Parent: &b%parentregion%", "%parentregion%"),
+    INFO_BOUNDS2("info.bounds2", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
+            "%minx%", "%miny%", "%minz%", "%maxx%", "%maxy%", "%maxz%"
+    ),
+    INFO_SELLER2("info.seller2", "&9Seller: &7%seller%", "%seller%"),
+    INFO_PRICE2("info.price2", "&9Price: &7%price%", "%price%"),
+    INFO_TENANT2("info.tenant2", "&9Tenant: &7%tenant%", "%tenant%"),
+    INFO_LANDLORD2("info.landlord2", "&9Landlord: &7%landlord%", "%landlord%"),
+    INFO_RENT2("info.rent2", "&9Rent: &7%rent%", "%rent%"),
     INFO_AVAILABLE_FOR_SALE("info.available_for_sale", ChatColor.AQUA + "Region available for sale!"),
     INFO_AVAILABLE_FOR_RENT("info.available_for_rent", ChatColor.AQUA + "Region available for rent!"),
 
@@ -368,20 +374,71 @@ public enum PSL {
 
     ;
 
-    private final String key;
-    private String msg;
+    private final String path;
+    private final String defaultMessage;
 
-    private static File conf = new File(ProtectionStones.getInstance().getDataFolder(), "messages.yml");
-    private static HashMap<String, String> keyToMsg = new HashMap<>();
+    private final String[] placeholders;
+    private final int placeholdersCount;
+    private String message;
+    private boolean isEmpty;
 
-    PSL(String path, String start) {
-        this.key = path;
-        this.msg = start;
+    private static final File conf = new File(ProtectionStones.getInstance().getDataFolder(), "messages.yml");
+
+    PSL(String path, String defaultMessage, String... placeholders) {
+        this.path = path;
+        this.defaultMessage = defaultMessage;
+
+        this.placeholders = placeholders;
+        this.placeholdersCount = placeholders.length;
+        this.message = defaultMessage;
+        this.isEmpty = message.isEmpty();
     }
 
     public String msg() {
-        String msgG = keyToMsg.get(key);
-        return ChatColor.translateAlternateColorCodes('&', (msgG == null) ? msg : msgG);
+        return message;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
+
+    @Nullable
+    public String format(final Object... args) {
+        if (isEmpty) {
+            return null;
+        }
+
+        if (this.placeholdersCount == 0) {
+            return this.message;
+        }
+
+        if (this.placeholdersCount != args.length) {
+            throw new IllegalArgumentException("Expected " + this.placeholdersCount + " arguments but got " + args.length);
+        }
+
+        return StringUtils.replaceEach(
+                this.message,
+                this.placeholders,
+                Arrays.stream(args).filter(Objects::nonNull).map(Object::toString).toArray(String[]::new)
+        );
+    }
+
+    public boolean send(@NotNull final CommandSender receiver, @NotNull final Object... args) {
+        final String msg = this.format(args);
+
+        if (msg != null) {
+            receiver.sendMessage(msg);
+        }
+
+        return true;
+    }
+
+    public void append(@NotNull final StringBuilder builder, @NotNull final Object... args) {
+        final String msg = this.format(args);
+
+        if (msg != null) {
+            builder.append(msg);
+        }
     }
 
     // Sends a message to a commandsender if the string is not empty
@@ -398,8 +455,6 @@ public enum PSL {
     }
 
     public static void loadConfig() {
-        keyToMsg.clear();
-
         YamlConfiguration yml = new YamlConfiguration();
 
         if (!conf.exists()) {
@@ -413,17 +468,18 @@ public enum PSL {
         try {
             yml.load(conf); // can throw error
             for (PSL psl : PSL.values()) {
-                if (yml.getString(psl.key) == null) {
-                    yml.set(psl.key, psl.msg.replace('§', '&'));
+                if (yml.getString(psl.path) == null) {
+                    yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
                 } else {
 
                     // psl conversions
-                    if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more protected regions.")) {
-                        yml.set(psl.key, psl.msg.replace('§', '&'));
-                    } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.key).equals("&cYou can not create any more regions of this type.")) {
-                        yml.set(psl.key, psl.msg.replace('§', '&'));
+                    if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more protected regions.")) {
+                        yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
+                    } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more regions of this type.")) {
+                        yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
                     } else { // use custom setting
-                        keyToMsg.put(psl.key, yml.getString(psl.key));
+                        psl.message = ChatColor.translateAlternateColorCodes('&', yml.getString(psl.path));
+                        psl.isEmpty = psl.message.isEmpty();
                     }
                 }
             }
@@ -434,9 +490,6 @@ public enum PSL {
             }
         } catch (Exception e) { // prevent bad messages.yml file from resetting the file
             e.printStackTrace();
-            for (PSL psl : PSL.values()) {
-                keyToMsg.put(psl.key, psl.msg);
-            }
         }
     }
 
