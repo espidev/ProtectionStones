@@ -59,10 +59,10 @@ public class ArgInfo implements PSCommandArg {
         PSRegion r = PSRegion.fromLocationGroupUnsafe(p.getLocation());
 
         if (r == null)
-            return PSL.msg(p, PSL.NOT_IN_REGION.msg());
+            return PSL.NOT_IN_REGION.send(p);
 
         if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
-            return PSL.msg(p, PSL.NO_ACCESS.msg());
+            return PSL.NO_ACCESS.send(p);
 
         if (r.getTypeOptions() == null) {
             PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
@@ -72,7 +72,7 @@ public class ArgInfo implements PSCommandArg {
 
         if (args.length == 1) { // info of current region player is in
             if (!p.hasPermission("protectionstones.info"))
-                return PSL.msg(p, PSL.NO_PERMISSION_INFO.msg());
+                return PSL.NO_PERMISSION_INFO.send(p);
 
             PSL.msg(p, PSL.INFO_HEADER.msg());
 
@@ -80,21 +80,22 @@ public class ArgInfo implements PSCommandArg {
             StringBuilder sb = new StringBuilder();
 
             if (r.getName() == null) {
-                sb.append(PSL.INFO_REGION2.msg().replace("%region%", r.getId()));
+                PSL.INFO_REGION2.append(sb, r.getId());
             } else {
-                sb.append(PSL.INFO_REGION2.msg().replace("%region%", r.getName() + " (" + r.getId() + "), "));
+                PSL.INFO_REGION2.append(sb, r.getName() + " (" + r.getId() + "), ");
             }
-            if (!PSL.INFO_PRIORITY2.msg().equals("")) {
-                sb.append(", ").append(PSL.INFO_PRIORITY2.msg().replace("%priority%", "" + r.getWGRegion().getPriority()));
+
+            if (!PSL.INFO_PRIORITY2.isEmpty()) {
+                sb.append(", ").append(PSL.INFO_PRIORITY2.format(r.getWGRegion().getPriority()));
             }
             PSL.msg(p, sb.toString());
 
             // type: %type%
             if (r instanceof PSGroupRegion) {
-                PSL.msg(p, PSL.INFO_TYPE2.msg().replace("%type%", r.getTypeOptions().alias + " " + PSL.INFO_MAY_BE_MERGED.msg()));
+                PSL.INFO_TYPE2.send(p, r.getTypeOptions().alias + " " + PSL.INFO_MAY_BE_MERGED.msg());
                 displayMerged(p, (PSGroupRegion) r);
             } else {
-                PSL.msg(p, PSL.INFO_TYPE2.msg().replace("%type%", r.getTypeOptions().alias));
+                PSL.INFO_TYPE2.send(p, r.getTypeOptions().alias);
             }
 
             displayEconomy(p, r);
@@ -104,9 +105,9 @@ public class ArgInfo implements PSCommandArg {
 
             if (r.getParent() != null) {
                 if (r.getName() != null) {
-                    PSL.msg(p, PSL.INFO_PARENT2.msg().replace("%parentregion%", r.getParent().getName() + " (" + r.getParent().getId() + ")"));
+                    PSL.INFO_PARENT2.send(p, r.getParent().getName() + " (" + r.getParent().getId() + ")");
                 } else {
-                    PSL.msg(p, PSL.INFO_PARENT2.msg().replace("%parentregion%", r.getParent().getId()));
+                    PSL.INFO_PARENT2.send(p, r.getParent().getId());
                 }
             }
 
@@ -114,9 +115,15 @@ public class ArgInfo implements PSCommandArg {
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             // only show x,z if it's at block limit
             if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
-                PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockZ() + ")"));
+                PSL.INFO_BOUNDS2.send(p,
+                        min.getBlockX(), p.getWorld().getMinHeight(), min.getBlockZ(),
+                        max.getBlockX(), p.getWorld().getMaxHeight(), max.getBlockZ()
+                );
             } else {
-                PSL.msg(p, PSL.INFO_BOUNDS2.msg().replace("%bounds%", "(" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ") -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")"));
+                PSL.INFO_BOUNDS2.send(p,
+                        min.getBlockX(), min.getBlockY(), min.getBlockZ(),
+                        max.getBlockX(), max.getBlockY(), max.getBlockZ()
+                );
             }
 
         } else if (args.length == 2) { // get specific information on current region
@@ -124,27 +131,27 @@ public class ArgInfo implements PSCommandArg {
             switch (args[1].toLowerCase()) {
                 case "members":
                     if (!p.hasPermission("protectionstones.members"))
-                        return PSL.msg(p, PSL.NO_PERMISSION_MEMBERS.msg());
+                        return PSL.NO_PERMISSION_MEMBERS.send(p);
 
                     displayMembers(p, r.getWGRegion());
                     break;
                 case "owners":
                     if (!p.hasPermission("protectionstones.owners"))
-                        return PSL.msg(p, PSL.NO_PERMISSION_OWNERS.msg());
+                        return PSL.NO_PERMISSION_OWNERS.send(p);
 
                     displayOwners(p, r.getWGRegion());
                     break;
                 case "flags":
                     if (!p.hasPermission("protectionstones.flags"))
-                        return PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
+                        return PSL.NO_PERMISSION_FLAGS.send(p);
                         displayFlags(p, r);
                     break;
                 default:
-                    PSL.msg(p, PSL.INFO_HELP.msg());
+                    PSL.INFO_HELP.send(p);
                     break;
             }
         } else {
-            PSL.msg(p, PSL.INFO_HELP.msg());
+            PSL.INFO_HELP.send(p);
         }
         return true;
     }
@@ -157,26 +164,26 @@ public class ArgInfo implements PSCommandArg {
     private static void displayMerged(Player p, PSGroupRegion r) {
         StringBuilder msg = new StringBuilder();
         for (PSMergedRegion pr : r.getMergedRegions()) {
-            msg.append(pr.getId() + " (" + pr.getTypeOptions().alias + "), ");
+            msg.append(pr.getId()).append(" (").append(pr.getTypeOptions().alias).append("), ");
         }
-        PSL.msg(p, PSL.INFO_MERGED2.msg().replace("%merged%", msg));
+        PSL.INFO_MERGED2.send(p, msg);
     }
 
     private static void displayEconomy(Player p, PSRegion r) {
         if (r.forSale()) {
-            PSL.msg(p, PSL.INFO_AVAILABLE_FOR_SALE.msg());
-            PSL.msg(p, PSL.INFO_SELLER2.msg().replace("%seller%", UUIDCache.getNameFromUUID(r.getLandlord())));
-            PSL.msg(p, PSL.INFO_PRICE2.msg().replace("%price%", String.format("%.2f", r.getPrice())));
+            PSL.INFO_AVAILABLE_FOR_SALE.send(p);
+            PSL.INFO_SELLER2.send(p, UUIDCache.getNameFromUUID(r.getLandlord()));
+            PSL.INFO_PRICE2.send(p, String.format("%.2f", r.getPrice()));
         }
         if (r.getRentStage() == PSRegion.RentStage.LOOKING_FOR_TENANT) {
-            PSL.msg(p, PSL.INFO_AVAILABLE_FOR_RENT.msg());
+            PSL.INFO_AVAILABLE_FOR_SALE.send(p);
         }
         if (r.getRentStage() == PSRegion.RentStage.RENTING) {
-            PSL.msg(p, PSL.INFO_TENANT2.msg().replace("%tenant%", UUIDCache.getNameFromUUID(r.getTenant())));
+            PSL.INFO_TENANT2.send(p, UUIDCache.getNameFromUUID(r.getTenant()));
         }
         if (r.getRentStage() != PSRegion.RentStage.NOT_RENTING) {
-            PSL.msg(p, PSL.INFO_LANDLORD2.msg().replace("%landlord%", UUIDCache.getNameFromUUID(r.getLandlord())));
-            PSL.msg(p, PSL.INFO_RENT2.msg().replace("%rent%", String.format("%.2f", r.getPrice())));
+            PSL.INFO_LANDLORD2.send(p, UUIDCache.getNameFromUUID(r.getLandlord()));
+            PSL.INFO_RENT2.send(p, String.format("%.2f", r.getPrice()));
         }
     }
 
@@ -203,9 +210,9 @@ public class ArgInfo implements PSCommandArg {
 
         if (flagDisp.length() > 2) {
             flagDisp = new StringBuilder(flagDisp.substring(0, flagDisp.length() - 2) + ".");
-            PSL.msg(p, PSL.INFO_FLAGS2.msg().replace("%flags%", flagDisp));
+            PSL.INFO_FLAGS2.send(p, flagDisp);
         } else {
-            PSL.msg(p, PSL.INFO_FLAGS2.msg().replace("%flags%", PSL.INFO_NO_FLAGS.msg()));
+            PSL.INFO_FLAGS2.send(p, PSL.INFO_NO_FLAGS.msg());
         }
     }
 
@@ -213,7 +220,7 @@ public class ArgInfo implements PSCommandArg {
         DefaultDomain owners = region.getOwners();
         StringBuilder msg = new StringBuilder();
         if (owners.size() == 0) {
-            msg.append(PSL.INFO_NO_OWNERS.msg());
+            PSL.INFO_NO_OWNERS.append(msg);
         } else {
             for (UUID uuid : owners.getUniqueIds()) {
                 String name = UUIDCache.getNameFromUUID(uuid);
@@ -225,14 +232,14 @@ public class ArgInfo implements PSCommandArg {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2));
         }
-        PSL.msg(p, PSL.INFO_OWNERS2.msg().replace("%owners%", msg.toString()));
+        PSL.INFO_OWNERS2.send(p, msg);
     }
 
     private static void displayMembers(Player p, ProtectedRegion region) {
         DefaultDomain members = region.getMembers();
         StringBuilder msg = new StringBuilder();
         if (members.size() == 0) {
-            msg.append(PSL.INFO_NO_MEMBERS.msg());
+            PSL.INFO_NO_MEMBERS.append(msg);
         } else {
             for (UUID uuid : members.getUniqueIds()) {
                 String name = UUIDCache.getNameFromUUID(uuid);
@@ -244,6 +251,6 @@ public class ArgInfo implements PSCommandArg {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2));
         }
-        PSL.msg(p, PSL.INFO_MEMBERS2.msg().replace("%members%", msg.toString()));
+        PSL.INFO_MEMBERS2.send(p, msg);
     }
 }
