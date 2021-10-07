@@ -115,12 +115,12 @@ public class ArgInfo implements PSCommandArg {
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             // only show x,z if it's at block limit
             if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
-                PSL.INFO_BOUNDS2.send(p,
+                PSL.INFO_BOUNDS3.send(p,
                         min.getBlockX(), p.getWorld().getMinHeight(), min.getBlockZ(),
                         max.getBlockX(), p.getWorld().getMaxHeight(), max.getBlockZ()
                 );
             } else {
-                PSL.INFO_BOUNDS2.send(p,
+                PSL.INFO_BOUNDS3.send(p,
                         min.getBlockX(), min.getBlockY(), min.getBlockZ(),
                         max.getBlockX(), max.getBlockY(), max.getBlockZ()
                 );

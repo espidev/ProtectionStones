@@ -230,7 +230,7 @@ public enum PSL {
     INFO_REGION2("info.region2", "&9Region: &b%region%", "%region%"),
     INFO_PRIORITY2("info.priority2", "&9Priority: &b%priority%", "%priority%"),
     INFO_PARENT2("info.parent2", "&9Parent: &b%parentregion%", "%parentregion%"),
-    INFO_BOUNDS2("info.bounds2", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
+    INFO_BOUNDS3("info.bounds3", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
             "%minx%", "%miny%", "%minz%", "%maxx%", "%maxy%", "%maxz%"
     ),
     INFO_SELLER2("info.seller2", "&9Seller: &7%seller%", "%seller%"),
