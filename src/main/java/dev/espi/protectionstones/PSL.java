@@ -16,6 +16,7 @@
 package dev.espi.protectionstones;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public enum PSL {
     // messages.yml
@@ -469,16 +472,15 @@ public enum PSL {
             yml.load(conf); // can throw error
             for (PSL psl : PSL.values()) {
                 if (yml.getString(psl.path) == null) {
-                    yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
+                    yml.set(psl.path, applyInGameColours(psl.defaultMessage));
                 } else {
-
-                    // psl conversions
+                    // psl upgrade conversions
                     if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more protected regions.")) {
-                        yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
+                        yml.set(psl.path, applyInGameColours(psl.defaultMessage));
                     } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more regions of this type.")) {
-                        yml.set(psl.path, psl.defaultMessage.replace('§', '&'));
+                        yml.set(psl.path, applyInGameColours(psl.defaultMessage));
                     } else { // use custom setting
-                        psl.message = ChatColor.translateAlternateColorCodes('&', yml.getString(psl.path));
+                        psl.message = applyInGameColours(yml.getString(psl.path));
                         psl.isEmpty = psl.message.isEmpty();
                     }
                 }
@@ -493,4 +495,24 @@ public enum PSL {
         }
     }
 
+    // match all %#123abc#% format for hex
+    private static final Pattern hexPatternLong = Pattern.compile("(?<!\\\\\\\\)(%#[a-fA-F0-9]{8}%)"),
+            hexPatternShort = Pattern.compile("(?<!\\\\\\\\)(%#[a-fA-F0-9]{6}%)");
+
+    private static String applyInGameColours(String msg) {
+
+        Matcher matcher = hexPatternLong.matcher(msg);
+        while (matcher.find()) {
+            String color = msg.substring(matcher.start() + 1, matcher.end() - 1);
+            msg = msg.replace(msg.substring(matcher.start(), matcher.end()), "" + net.md_5.bungee.api.ChatColor.of(color));
+        }
+
+        matcher = hexPatternShort.matcher(msg);
+        while (matcher.find()) {
+            String color = msg.substring(matcher.start() + 1, matcher.end() - 1);
+            msg = msg.replace(msg.substring(matcher.start(), matcher.end()), "" + net.md_5.bungee.api.ChatColor.of(color));
+        }
+
+        return msg.replace('&', '§');
+    }
 }
