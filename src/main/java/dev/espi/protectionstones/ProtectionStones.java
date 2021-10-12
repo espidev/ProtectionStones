@@ -26,6 +26,7 @@ import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
+import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
@@ -644,8 +645,11 @@ public class ProtectionStones extends JavaPlugin {
         getLogger().info("Checking if PS regions have been updated to UUIDs...");
 
         // update to UUIDs
-        if (!configOptions.uuidupdated)
+        if (configOptions.uuidupdated == null || !configOptions.uuidupdated)
             LegacyUpgrade.convertToUUID();
+
+        if (configOptions.regionNegativeMinMaxUpdated == null || !configOptions.regionNegativeMinMaxUpdated)
+            LegacyUpgrade.upgradeRegionsWithNegativeYValues();
 
         getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
     }

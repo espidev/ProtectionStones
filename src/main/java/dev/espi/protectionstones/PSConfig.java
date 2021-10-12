@@ -20,7 +20,8 @@ import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import dev.espi.protectionstones.utils.BlockUtil;
-import dev.espi.protectionstones.utils.ConfigUpgrades;
+import dev.espi.protectionstones.utils.upgrade.ConfigUpgrades;
+import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +52,8 @@ public class PSConfig {
     public int configVersion;
     @Path("uuidupdated")
     public Boolean uuidupdated;
+    @Path("region_negative_min_max_updated")
+    public Boolean regionNegativeMinMaxUpdated;
     @Path("placing_cooldown")
     public Integer placingCooldown;
     @Path("allow_duplicate_region_names")

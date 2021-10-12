@@ -16,7 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import dev.espi.protectionstones.LegacyUpgrade;
+import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;

@@ -13,12 +13,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.espi.protectionstones;
+package dev.espi.protectionstones.utils.upgrade;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,6 +38,51 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class LegacyUpgrade {
+
+    // upgrade to 1.17, upgrade regions with 0->256 to SHORT_MIN->SHORT_MAX
+    public static void upgradeRegionsWithNegativeYValues() {
+        ProtectionStones.getInstance().getLogger().info("Upgrading region y-values for 1.17...");
+        for (RegionManager rgm : WGUtils.getAllRegionManagers().values()) {
+            List<ProtectedRegion> newRegions = new ArrayList<>();
+
+            // loop through each region
+            for (var region : rgm.getRegions().values()) {
+                int minY = region.getMinimumPoint().getBlockY(), maxY = region.getMaximumPoint().getBlockY();
+                Bukkit.getLogger().info("REGION: " + region.getId() + " " + ProtectionStones.isPSRegion(region) + " " + minY + " " + maxY); // TODO
+                if (ProtectionStones.isPSRegion(region) && minY == 0 && maxY == 256) {
+                    // clone region, and recreate with new min/max points
+                    ProtectedRegion toAdd = null;
+                    if (region instanceof ProtectedPolygonalRegion) { // convert merged region
+                        toAdd = new ProtectedPolygonalRegion(region.getId(), region.getPoints(), WGUtils.MIN_BUILD_HEIGHT, WGUtils.MAX_BUILD_HEIGHT);
+                    } else if (region instanceof ProtectedCuboidRegion) { // convert standard region
+                        BlockVector3 minVec = BlockVector3.at(region.getMinimumPoint().getX(), WGUtils.MIN_BUILD_HEIGHT, region.getMinimumPoint().getZ()),
+                                     maxVec = BlockVector3.at(region.getMaximumPoint().getX(), WGUtils.MAX_BUILD_HEIGHT, region.getMaximumPoint().getZ());
+                        toAdd = new ProtectedCuboidRegion(region.getId(), minVec, maxVec);
+                    }
+
+                    if (toAdd != null) {
+                        ProtectionStones.getInstance().getLogger().info("Updated region " + region.getId());
+                        toAdd.copyFrom(region); // copy region settings
+                        newRegions.add(toAdd);
+                    }
+
+                } else {
+                    newRegions.add(region);
+                }
+            }
+
+            rgm.setRegions(newRegions);
+            try {
+                rgm.save();
+            } catch (StorageException e) {
+                e.printStackTrace();
+            }
+        }
+        // update config to mark that uuid upgrade has been done
+        ProtectionStones.config.set("region_negative_min_max_updated", true);
+        ProtectionStones.config.save();
+        ProtectionStones.getInstance().getLogger().info("Finished!");
+    }
 
     // for one day when we switch to proper base64 generation (no hashcode, use nameuuidfrombytes)
     // problem is, currently I don't know how to convert all items to use this uuid
@@ -142,7 +192,7 @@ public class LegacyUpgrade {
     }
 
     // convert regions to use UUIDs instead of player names
-    static void convertToUUID() {
+    public static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
@@ -185,7 +235,7 @@ public class LegacyUpgrade {
     }
 
     // upgrade from config < v2.0.0
-    static void upgradeFromV1V2() {
+    public static void upgradeFromV1V2() {
         Bukkit.getLogger().info(ChatColor.AQUA + "Upgrading configs from v1.x to v2.0+...");
 
         try {

@@ -13,7 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.espi.protectionstones.utils;
+package dev.espi.protectionstones.utils.upgrade;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import dev.espi.protectionstones.ProtectionStones;
@@ -111,7 +111,7 @@ public class ConfigUpgrades {
                 ProtectionStones.config.set("default_protection_block_placement_off", false);
                 ProtectionStones.config.setComment("default_protection_block_placement_off", " Whether when players join, by default they have protection block placement toggled off (equivalent to running /ps toggle)");
                 ProtectionStones.config.set("default_allow_addowner_for_offline_players_without_lp", false);
-                ProtectionStones.config.setComment("default_allow_addowner_for_offline_players_without_lp", " # If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
+                ProtectionStones.config.setComment("default_allow_addowner_for_offline_players_without_lp", " If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
                         " on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so\n" +
                         " the check is unnecessary).");
                 break;
@@ -131,7 +131,7 @@ public class ConfigUpgrades {
                     ProtectionStones.config.removeComment("default_allow_addowner_for_offline_players_without_lp");
                     ProtectionStones.config.remove("default_allow_addowner_for_offline_players_without_lp");
                     ProtectionStones.config.set("allow_addowner_for_offline_players_without_lp", value == null ? false : (boolean) value);
-                    ProtectionStones.config.setComment("default_allow_addowner_for_offline_players_without_lp", " # If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
+                    ProtectionStones.config.setComment("allow_addowner_for_offline_players_without_lp", " If you do not have LuckPerms, ProtectionStones is unable to determine the limits of offline players (since it depends\n" +
                             " on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so\n" +
                             " the check is unnecessary).");
                 }
