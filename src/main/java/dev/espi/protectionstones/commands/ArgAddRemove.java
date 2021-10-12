@@ -15,12 +15,15 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -128,6 +131,10 @@ public class ArgAddRemove implements PSCommandArg {
                     } else {
                         PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", addPlayerName));
                     }
+
+                    // add to WorldGuard profile cache
+                    Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(addPlayerUuid, addPlayerName));
+
                 } else if ((operationType.equals("remove") && r.isMember(addPlayerUuid))
                         || (operationType.equals("removeowner") && r.isOwner(addPlayerUuid))) {
 

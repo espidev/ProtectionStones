@@ -622,23 +622,12 @@ public class ProtectionStones extends JavaPlugin {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                     UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
-
-                    if (op.getName() != null)
-                        UUIDCache.storeWGProfile(op.getUniqueId(), op.getName());
                 }
             });
         } else { // sync load
-            List<Profile> profiles = new ArrayList<>();
             for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
                 UUIDCache.storeUUIDNamePair(op.getUniqueId(), op.getName());
-                if (op.getName() != null) profiles.add(new Profile(op.getUniqueId(), op.getName()));
             }
-
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                for (Profile p : profiles) {
-                    WorldGuard.getInstance().getProfileCache().put(p);
-                }
-            });
         }
 
         // check if UUIDs have been upgraded already
