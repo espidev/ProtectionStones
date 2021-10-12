@@ -56,6 +56,8 @@ class ConfigPlaceholders {
                 return getConf().configVersion + "";
             case "config_uuidupdated":
                 return getConf().uuidupdated + "";
+            case "config_region_negative_min_max_updated":
+                return getConf().regionNegativeMinMaxUpdated + "";
             case "config_placing_cooldown":
                 return getConf().placingCooldown + "";
             case "config_async_load_uuid_cache":
@@ -81,8 +83,10 @@ class ConfigPlaceholders {
                 return getConf().allowMergingHoles + "";
             case "default_protection_block_placement_off":
                 return getConf().defaultProtectionBlockPlacementOff + "";
-            case "default_allow_addowner_for_offline_players_without_lp":
+            case "allow_addowner_for_offline_players_without_lp":
                 return getConf().allowAddownerForOfflinePlayersWithoutLp + "";
+            case "allow_home_teleport_for_members":
+                return getConf().allowHomeTeleportForMembers + "";
 
             case "admin_cleanup_delete_regions_with_members_but_no_owners":
                 return getConf().cleanupDeleteRegionsWithMembersButNoOwners + "";

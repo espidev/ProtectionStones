@@ -361,7 +361,7 @@ public class PSPlayer {
      */
 
     public List<PSRegion> getHomes(World w) {
-        return getPSRegionsCrossWorld(w, false)
+        return getPSRegionsCrossWorld(w, ProtectionStones.getInstance().getConfigOptions().allowHomeTeleportForMembers)
                 .stream()
                 .filter(r -> r.getTypeOptions() != null && !r.getTypeOptions().preventPsHome)
                 .collect(Collectors.toList());

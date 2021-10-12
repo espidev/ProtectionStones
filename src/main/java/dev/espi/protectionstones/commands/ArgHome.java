@@ -139,13 +139,18 @@ public class ArgHome implements PSCommandArg {
                 // get regions from the query
                 List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
 
-                // remove regions not owned by the player
+                // remove regions that the player is not a member or owner of
                 for (int i = 0; i < regions.size(); i++) {
                     PSProtectBlock typeOptions = regions.get(i).getTypeOptions();
-                    if (!regions.get(i).isOwner(p.getUniqueId()) || (typeOptions != null && typeOptions.preventPsHome)) {
-                        regions.remove(i);
-                        i--;
+
+                    if (typeOptions != null && typeOptions.preventPsHome) continue;
+                    if (regions.get(i).isOwner(p.getUniqueId())) continue;
+                    if (regions.get(i).isMember(p.getUniqueId()) && ProtectionStones.getInstance().getConfigOptions().allowHomeTeleportForMembers) {
+                        continue;
                     }
+
+                    regions.remove(i);
+                    i--;
                 }
 
                 if (regions.isEmpty()) {

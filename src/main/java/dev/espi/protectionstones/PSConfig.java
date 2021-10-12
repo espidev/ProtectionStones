@@ -78,6 +78,8 @@ public class PSConfig {
     public Boolean defaultProtectionBlockPlacementOff;
     @Path("allow_addowner_for_offline_players_without_lp")
     public Boolean allowAddownerForOfflinePlayersWithoutLp;
+    @Path("allow_home_teleport_for_members")
+    public Boolean allowHomeTeleportForMembers;
 
     @Path("admin.cleanup_delete_regions_with_members_but_no_owners")
     public Boolean cleanupDeleteRegionsWithMembersButNoOwners;

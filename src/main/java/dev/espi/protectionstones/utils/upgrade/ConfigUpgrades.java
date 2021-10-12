@@ -136,6 +136,11 @@ public class ConfigUpgrades {
                             " the check is unnecessary).");
                 }
                 break;
+            case 15:
+                ProtectionStones.config.set("config_version", 16);
+                ProtectionStones.config.set("allow_home_teleport_for_members", true);
+                ProtectionStones.config.setComment("allow_home_teleport_for_members", " Whether or not members of a region can /ps home to the region.");
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

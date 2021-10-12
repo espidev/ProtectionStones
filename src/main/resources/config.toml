@@ -1,5 +1,5 @@
 # Please do not change the config version unless you know what you are doing!
-config_version = 15
+config_version = 16
 uuidupdated = true
 region_negative_min_max_updated = true
 
@@ -64,6 +64,9 @@ default_protection_block_placement_off = false
 # on permissions), and so it requires players to be online. Set this to true if your server does not need limits (and so
 # the check is unnecessary).
 allow_addowner_for_offline_players_without_lp = false
+
+# Whether or not members of a region can /ps home to the region.
+allow_home_teleport_for_members = true
 
 [admin]
     # Whether /ps admin cleanup remove should delete regions that have members, but don't have owners (after inactive
