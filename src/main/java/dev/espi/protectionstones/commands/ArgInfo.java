@@ -82,7 +82,7 @@ public class ArgInfo implements PSCommandArg {
             if (r.getName() == null) {
                 PSL.INFO_REGION2.append(sb, r.getId());
             } else {
-                PSL.INFO_REGION2.append(sb, r.getName() + " (" + r.getId() + "), ");
+                PSL.INFO_REGION2.append(sb, r.getName() + " (" + r.getId() + ")");
             }
 
             if (!PSL.INFO_PRIORITY2.isEmpty()) {
@@ -115,12 +115,12 @@ public class ArgInfo implements PSCommandArg {
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             // only show x,z if it's at block limit
             if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
-                PSL.INFO_BOUNDS3.send(p,
-                        min.getBlockX(), p.getWorld().getMinHeight(), min.getBlockZ(),
-                        max.getBlockX(), p.getWorld().getMaxHeight(), max.getBlockZ()
+                PSL.INFO_BOUNDS_XZ.send(p,
+                        min.getBlockX(), min.getBlockZ(),
+                        max.getBlockX(), max.getBlockZ()
                 );
             } else {
-                PSL.INFO_BOUNDS3.send(p,
+                PSL.INFO_BOUNDS_XYZ.send(p,
                         min.getBlockX(), min.getBlockY(), min.getBlockZ(),
                         max.getBlockX(), max.getBlockY(), max.getBlockZ()
                 );

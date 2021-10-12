@@ -223,7 +223,7 @@ public enum PSL {
     INFO_HEADER("info.header", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Info " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
     INFO_TYPE2("info.type2", "&9Type: &7%type%", "%type%"),
     INFO_MAY_BE_MERGED("info.may_be_merged", "(may be merged with other types)"),
-    INFO_MERGED2("info.merged2", ChatColor.BLUE + "Merged regions: " + ChatColor.GRAY + "%merged%"),
+    INFO_MERGED2("info.merged2", ChatColor.BLUE + "Merged regions: " + ChatColor.GRAY + "%merged%", "%merged%"),
     INFO_MEMBERS2("info.members2", "&9Members: &7%members%", "%members%"),
     INFO_NO_MEMBERS("info.no_members", ChatColor.RED + "(no members)"),
     INFO_OWNERS2("info.owners2", "&9Owners: &7%owners%", "%owners%"),
@@ -233,8 +233,11 @@ public enum PSL {
     INFO_REGION2("info.region2", "&9Region: &b%region%", "%region%"),
     INFO_PRIORITY2("info.priority2", "&9Priority: &b%priority%", "%priority%"),
     INFO_PARENT2("info.parent2", "&9Parent: &b%parentregion%", "%parentregion%"),
-    INFO_BOUNDS3("info.bounds3", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
+    INFO_BOUNDS_XYZ("info.bounds_xyz", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
             "%minx%", "%miny%", "%minz%", "%maxx%", "%maxy%", "%maxz%"
+    ),
+    INFO_BOUNDS_XZ("info.bounds_xz", "&9Bounds: &b(%minx%,%minz%) -> (%maxx%,%maxz%)",
+            "%minx%", "%minz%", "%maxx%", "%maxz%"
     ),
     INFO_SELLER2("info.seller2", "&9Seller: &7%seller%", "%seller%"),
     INFO_PRICE2("info.price2", "&9Price: &7%price%", "%price%"),
@@ -471,19 +474,22 @@ public enum PSL {
         try {
             yml.load(conf); // can throw error
             for (PSL psl : PSL.values()) {
-                if (yml.getString(psl.path) == null) {
-                    yml.set(psl.path, applyInGameColours(psl.defaultMessage));
+
+                // fix message if need be
+                if (yml.getString(psl.path) == null) { // if msg not found in config
+                    yml.set(psl.path, psl.defaultMessage);
                 } else {
                     // psl upgrade conversions
                     if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more protected regions.")) {
-                        yml.set(psl.path, applyInGameColours(psl.defaultMessage));
+                        yml.set(psl.path, psl.defaultMessage);
                     } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more regions of this type.")) {
-                        yml.set(psl.path, applyInGameColours(psl.defaultMessage));
-                    } else { // use custom setting
-                        psl.message = applyInGameColours(yml.getString(psl.path));
-                        psl.isEmpty = psl.message.isEmpty();
+                        yml.set(psl.path, psl.defaultMessage);
                     }
                 }
+
+                // load message
+                psl.message = applyInGameColours(yml.getString(psl.path));
+                psl.isEmpty = psl.message.isEmpty();
             }
             try {
                 yml.save(conf);
