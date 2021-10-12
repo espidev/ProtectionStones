@@ -23,9 +23,12 @@ import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ArgList implements PSCommandArg {
     @Override
@@ -79,6 +82,14 @@ public class ArgList implements PSCommandArg {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        if (!sender.hasPermission("protectionstones.list") || !sender.hasPermission("protectionstones.list.others")) {
+            return null;
+        }
+        if (args.length == 2) {
+            // autocomplete with online player list
+            return StringUtil.copyPartialMatches(args[1], Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), new ArrayList<>());
+        }
+
         return null;
     }
 

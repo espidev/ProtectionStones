@@ -60,8 +60,7 @@ public class ArgHome implements PSCommandArg {
     // tab completion
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        if (!(sender instanceof Player)) return null;
-        Player p = (Player) sender;
+        if (!(sender instanceof Player p)) return null;
         PSPlayer psp = PSPlayer.fromPlayer(p);
 
         if (args.length == 2) {
