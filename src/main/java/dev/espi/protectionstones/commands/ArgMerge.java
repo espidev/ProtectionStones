@@ -116,7 +116,8 @@ public class ArgMerge implements PSCommandArg {
                 return PSL.msg(p, PSL.NO_ACCESS.msg());
 
             // check if region is actually overlapping the region
-            if (!root.getIntersectingRegions(Collections.singletonList(region)).contains(region))
+            var overlappingRegionIds = WGUtils.findOverlapOrAdjacentRegions(root, rm, p.getWorld()).stream().map(ProtectedRegion::getId).collect(Collectors.toList());
+            if (!overlappingRegionIds.contains(region.getId()))
                 return PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
 
             // check if merging is allowed in config

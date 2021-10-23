@@ -48,7 +48,6 @@ public class LegacyUpgrade {
             // loop through each region
             for (var region : rgm.getRegions().values()) {
                 int minY = region.getMinimumPoint().getBlockY(), maxY = region.getMaximumPoint().getBlockY();
-                Bukkit.getLogger().info("REGION: " + region.getId() + " " + ProtectionStones.isPSRegion(region) + " " + minY + " " + maxY); // TODO
                 if (ProtectionStones.isPSRegion(region) && minY == 0 && maxY == 256) {
                     // clone region, and recreate with new min/max points
                     ProtectedRegion toAdd = null;

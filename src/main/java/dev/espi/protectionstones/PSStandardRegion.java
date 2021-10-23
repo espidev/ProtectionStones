@@ -477,11 +477,9 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public List<PSRegion> getMergeableRegions(Player p) {
-        return getWGRegionManager()
-                .getApplicableRegions(getWGRegion())
-                .getRegions()
+        return WGUtils.findOverlapOrAdjacentRegions(getWGRegion(), getWGRegionManager(), getWorld())
                 .stream()
-                .map(r -> PSRegion.fromWGRegion(p.getWorld(), r))
+                .map(r -> PSRegion.fromWGRegion(getWorld(), r))
                 .filter(r -> r != null && r.getTypeOptions() != null && !r.getId().equals(getId()))
                 .filter(r -> r.getTypeOptions().allowMerging)
                 .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))

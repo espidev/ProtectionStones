@@ -47,10 +47,10 @@ public class WGMerge {
     // more to come in RegionTraverse
 
     // build groups of overlapping regions in idToGroup and groupToIDs
-    public static void findOverlappingRegionGroups(List<ProtectedRegion> regions, HashMap<String, String> idToGroup, HashMap<String, ArrayList<String>> groupToIDs) {
+    public static void findOverlappingRegionGroups(World w, List<ProtectedRegion> regions, HashMap<String, String> idToGroup, HashMap<String, ArrayList<String>> groupToIDs) {
         for (ProtectedRegion iter : regions) {
-            List<ProtectedRegion> overlapping = iter.getIntersectingRegions(regions);
-            // algorithm to find adjacent regions (oooh boy)
+            Set<ProtectedRegion> overlapping = WGUtils.findOverlapOrAdjacentRegions(iter, regions, w);
+            // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(iter.getId());
             for (ProtectedRegion pr : overlapping) {
 
@@ -133,7 +133,7 @@ public class WGMerge {
                 }
 
                 // build set of groups of overlapping regions
-                findOverlappingRegionGroups(toCheck, idToGroup, groupToIDs);
+                findOverlappingRegionGroups(w, toCheck, idToGroup, groupToIDs);
 
                 // check how many groups there are and relabel the original root to be the head ID
                 boolean foundOriginal = false;
@@ -275,7 +275,7 @@ public class WGMerge {
         return nRegion;
     }
 
-    // returns a merged region; root and merge must be overlapping
+    // returns a merged region; root and merge must be overlapping or adjacent
     // merge parameter must all be decomposed regions (down to cuboids, no polygon)
     private static ProtectedRegion mergeRegions(String newID, PSRegion root, List<PSRegion> merge) throws RegionHoleException {
         HashSet<BlockVector2> points = new HashSet<>();

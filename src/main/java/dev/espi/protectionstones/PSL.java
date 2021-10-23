@@ -236,7 +236,7 @@ public enum PSL {
     INFO_BOUNDS_XYZ("info.bounds_xyz", "&9Bounds: &b(%minx%,%miny%,%minz%) -> (%maxx%,%maxy%,%maxz%)",
             "%minx%", "%miny%", "%minz%", "%maxx%", "%maxy%", "%maxz%"
     ),
-    INFO_BOUNDS_XZ("info.bounds_xz", "&9Bounds: &b(%minx%,%minz%) -> (%maxx%,%maxz%)",
+    INFO_BOUNDS_XZ("info.bounds_xz", "&9Bounds: &b(%minx%, %minz%) -> (%maxx%, %maxz%)",
             "%minx%", "%minz%", "%maxx%", "%maxz%"
     ),
     INFO_SELLER2("info.seller2", "&9Seller: &7%seller%", "%seller%"),

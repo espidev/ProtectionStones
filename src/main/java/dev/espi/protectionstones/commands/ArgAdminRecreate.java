@@ -58,7 +58,7 @@ class ArgAdminRecreate {
                     BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
 
                     ProtectedRegion nr = new ProtectedCuboidRegion(r.getId(), min, max);
-                    WGUtils.copyRegionValues(r, nr);
+                    nr.copyFrom(r); // copy region data over
                     toAdd.add(nr);
                 }
             }
