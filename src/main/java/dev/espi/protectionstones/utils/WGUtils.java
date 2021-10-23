@@ -137,7 +137,7 @@ public class WGUtils {
 
         if (r instanceof ProtectedCuboidRegion) {
             BlockVector3 minPoint = r.getMinimumPoint(), maxPoint = r.getMaximumPoint();
-            int minX = minPoint.getX(), maxX = maxPoint.getX(), minY = minPoint.getY(),
+            long minX = minPoint.getX(), maxX = maxPoint.getX(), minY = minPoint.getY(),
                 maxY = maxPoint.getY(), minZ = minPoint.getZ(), maxZ = maxPoint.getZ();
 
             toReturn = Arrays.asList(
@@ -241,22 +241,26 @@ public class WGUtils {
         return currentPSID;
     }
 
-    // remember to call with offsets
     public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
-        if (yRadius == -1) {
-            return BlockVector3.at(bx - xRadius, MIN_BUILD_HEIGHT, bz - zRadius);
-        } else {
-            return BlockVector3.at(bx - xRadius, by - yRadius, bz - zRadius);
-        }
+        return BlockVector3.at(bx - xRadius, (yRadius == -1) ? MIN_BUILD_HEIGHT : by - yRadius, bz - zRadius);
     }
 
-    // remember to call with offsets
     public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
-        if (yRadius == -1) {
-            return BlockVector3.at(bx + xRadius, MAX_BUILD_HEIGHT, bz + zRadius);
-        } else {
-            return BlockVector3.at(bx + xRadius, by + yRadius, bz + zRadius);
-        }
+        return BlockVector3.at(bx + xRadius, (yRadius == -1) ? MAX_BUILD_HEIGHT : by + yRadius, bz + zRadius);
+    }
+
+    public static BlockVector3 getMinChunkVector(double bx, double by, double bz, long chunkRadius, long yRadius) {
+        --chunkRadius; // this becomes chunk offset from centre chunk, not radius
+        long chunkX = (long) Math.floor(bx / 16);
+        long chunkZ = (long) Math.floor(bz / 16);
+        return BlockVector3.at((chunkX - chunkRadius) * 16, (yRadius == -1) ? MIN_BUILD_HEIGHT : by - yRadius, (chunkZ - chunkRadius) * 16);
+    }
+
+    public static BlockVector3 getMaxChunkVector(double bx, double by, double bz, long chunkRadius, long yRadius) {
+        --chunkRadius; // this becomes chunk offset from centre chunk, not radius
+        long chunkX = (long) Math.floor(bx / 16);
+        long chunkZ = (long) Math.floor(bz / 16);
+        return BlockVector3.at((chunkX + chunkRadius) * 16 + 15, (yRadius == -1) ? MAX_BUILD_HEIGHT : by - yRadius, (chunkZ + chunkRadius) * 16 + 15);
     }
 
     // create PS ids without making the numbers have scientific notation (addressed with long)
@@ -269,9 +273,7 @@ public class WGUtils {
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        // Region is not valid
         if (region == null) return true;
-
         return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
     }
 
@@ -330,8 +332,14 @@ public class WGUtils {
     }
 
     public static ProtectedCuboidRegion getDefaultProtectedRegion(PSProtectBlock b, PSLocation v) {
-        BlockVector3 min = WGUtils.getMinVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
-        BlockVector3 max = WGUtils.getMaxVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+        BlockVector3 min, max;
+        if (b.chunkRadius > 0) {
+            min = getMinChunkVector(v.x, v.y, v.z, b.chunkRadius, b.yRadius);
+            max = getMaxChunkVector(v.x, v.y, v.z, b.chunkRadius, b.yRadius);
+        } else {
+            min = getMinVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+            max = getMaxVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+        }
         return new ProtectedCuboidRegion(createPSID(v.x, v.y, v.z), min, max);
     }
 

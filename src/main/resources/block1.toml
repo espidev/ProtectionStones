@@ -56,7 +56,7 @@ allow_placing_in_wild = true
     # Enables "chunk snapping mode", where the region boundaries will be determined by the chunk the block is in, and
     # the chunk_radius (how many chunks away from the center chunk).
     # Set to -1 to disable, and any number larger than or equal to 1 to enable.
-    # Note: If enabled, x_radius, z_radius, x_offset, and z_offset will be ignored!
+    # Note: If enabled, x_radius and z_radius will be ignored!
     chunk_radius = -1
 
     # How many blocks to offset the default location of /ps home from the protection block
