@@ -79,10 +79,10 @@ public class WGUtils {
     }
 
     // Turn WG region name into a location (ex. ps138x35y358z)
-    public static PSLocation parsePSRegionToLocation(String regionName) {
-        int psx = Integer.parseInt(regionName.substring(2, regionName.indexOf("x")));
-        int psy = Integer.parseInt(regionName.substring(regionName.indexOf("x") + 1, regionName.indexOf("y")));
-        int psz = Integer.parseInt(regionName.substring(regionName.indexOf("y") + 1, regionName.length() - 1));
+    public static PSLocation parsePSRegionToLocation(String regionId) {
+        int psx = Integer.parseInt(regionId.substring(2, regionId.indexOf("x")));
+        int psy = Integer.parseInt(regionId.substring(regionId.indexOf("x") + 1, regionId.indexOf("y")));
+        int psz = Integer.parseInt(regionId.substring(regionId.indexOf("y") + 1, regionId.length() - 1));
         return new PSLocation(psx, psy, psz);
     }
 
@@ -284,16 +284,7 @@ public class WGUtils {
         HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
 
         for (PSRegion r : pRegions) {
-            // create fake region to test overlap (to check for adjacent since borders will need to be 1 block larger)
-            double fbx = r.getProtectBlock().getLocation().getX(),
-                    fby = r.getProtectBlock().getLocation().getY(),
-                    fbz = r.getProtectBlock().getLocation().getZ();
-
-            BlockVector3 minT = WGUtils.getMinVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
-            BlockVector3 maxT = WGUtils.getMaxVector(fbx, fby, fbz, r.getTypeOptions().xRadius + 1, r.getTypeOptions().yRadius + 1, r.getTypeOptions().zRadius + 1);
-
-            ProtectedRegion td = new ProtectedCuboidRegion("regionOverlapTest", true, minT, maxT);
-            ApplicableRegionSet overlapping = rm.getApplicableRegions(td);
+            Set<ProtectedRegion> overlapping = findOverlapOrAdjacentRegions(r.getWGRegion(), r.getWGRegionManager(), r.getWorld());
 
             // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(r.getId());
@@ -339,13 +330,9 @@ public class WGUtils {
     }
 
     public static ProtectedCuboidRegion getDefaultProtectedRegion(PSProtectBlock b, PSLocation v) {
-        int bx = v.x, by = v.y, bz = v.z;
-        int bxo = b.xOffset, bxy = b.yOffset, bxz = b.zOffset;
-
-        BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
-        BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, b.xRadius, b.yRadius, b.zRadius);
-
-        return new ProtectedCuboidRegion(createPSID(bx, by, bz), min, max);
+        BlockVector3 min = WGUtils.getMinVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+        BlockVector3 max = WGUtils.getMaxVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+        return new ProtectedCuboidRegion(createPSID(v.x, v.y, v.z), min, max);
     }
 
     public static List<BlockVector2> getPointsFromDecomposedRegion(PSRegion r) {

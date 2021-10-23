@@ -105,7 +105,7 @@ class PlayerPlaceholders {
 
             World w = Bukkit.getWorld(identifier.substring("currentplayer_owned_regions_names_".length()));
             return w == null ? "Invalid world." : getRegionsString(psp.getPSRegions(w, false), true);
-        
+
         } else if (identifier.startsWith("currentplayer_accessible_regions_names_")) {
 
             World w = Bukkit.getWorld(identifier.substring("currentplayer_accessible_regions_names_".length()));

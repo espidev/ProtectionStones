@@ -53,12 +53,11 @@ allow_placing_in_wild = true
     y_radius = -1
     z_radius = 64
 
-    # Offset the protection block
-    # If you would like to make the protection block not be at the center of new regions, you can offset it here
-    # ex. x_offset = 64, y_offset = 0, z_offset = 64 would make it at the corner of a created region
-    x_offset = 0
-    y_offset = 0
-    z_offset = 0
+    # Enables "chunk snapping mode", where the region boundaries will be determined by the chunk the block is in, and
+    # the chunk_radius (how many chunks away from the center chunk).
+    # Set to -1 to disable, and any number larger than or equal to 1 to enable.
+    # Note: If enabled, x_radius, z_radius, x_offset, and z_offset will be ignored!
+    chunk_radius = -1
 
     # How many blocks to offset the default location of /ps home from the protection block
     home_x_offset = 0.0

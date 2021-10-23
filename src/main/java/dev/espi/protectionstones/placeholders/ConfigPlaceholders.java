@@ -137,12 +137,8 @@ class ConfigPlaceholders {
                 return b.yRadius + "";
             case "region_z_radius":
                 return b.zRadius + "";
-            case "region_x_offset":
-                return b.xOffset + "";
-            case "region_y_offset":
-                return b.yOffset + "";
-            case "region_z_offset":
-                return b.zOffset + "";
+            case "region_chunk_radius":
+                return b.chunkRadius + "";
             case "region_home_x_offset":
                 return b.homeXOffset + "";
             case "region_home_y_offset":

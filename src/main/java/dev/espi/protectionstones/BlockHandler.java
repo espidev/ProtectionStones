@@ -178,9 +178,7 @@ public class BlockHandler {
     // create the actual WG region for PS region
     public static boolean createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // create region
-        double bx = l.getX(), bxo = blockOptions.xOffset;
-        double by = l.getY(), bxy = blockOptions.yOffset;
-        double bz = l.getZ(), bxz = blockOptions.zOffset;
+        double bx = l.getX(), by = l.getY(), bz = l.getZ();
 
         RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
         LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
@@ -195,17 +193,14 @@ public class BlockHandler {
 
         // check for minimum distance between claims by using fake region
         if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
-            if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx + bxo, by + bxy, bz + bxz)) {
+            if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx, by, bz)) {
                 PSL.msg(p, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
                 return false;
             }
         }
 
         // create actual region
-        BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
-        BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
-
-        ProtectedRegion region = new ProtectedCuboidRegion(id, min, max);
+        ProtectedRegion region = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(id));
         region.getOwners().addPlayer(p.getUniqueId());
         region.setPriority(blockOptions.priority);
         rm.addRegion(region); // added to the region manager, be careful in implementing checks

@@ -51,13 +51,7 @@ class ArgAdminRecreate {
                         continue;
                     }
 
-                    double bx = wr.getProtectBlock().getLocation().getX(), bxo = blockOptions.xOffset;
-                    double by = wr.getProtectBlock().getLocation().getY(), bxy = blockOptions.yOffset;
-                    double bz = wr.getProtectBlock().getLocation().getZ(), bxz = blockOptions.zOffset;
-                    BlockVector3 min = WGUtils.getMinVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
-                    BlockVector3 max = WGUtils.getMaxVector(bx + bxo, by + bxy, bz + bxz, blockOptions.xRadius, blockOptions.yRadius, blockOptions.zRadius);
-
-                    ProtectedRegion nr = new ProtectedCuboidRegion(r.getId(), min, max);
+                    ProtectedRegion nr = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(wr.getId()));
                     nr.copyFrom(r); // copy region data over
                     toAdd.add(nr);
                 }
