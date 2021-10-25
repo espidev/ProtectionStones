@@ -260,7 +260,7 @@ public class WGUtils {
         --chunkRadius; // this becomes chunk offset from centre chunk, not radius
         long chunkX = (long) Math.floor(bx / 16);
         long chunkZ = (long) Math.floor(bz / 16);
-        return BlockVector3.at((chunkX + chunkRadius) * 16 + 15, (yRadius == -1) ? MAX_BUILD_HEIGHT : by - yRadius, (chunkZ + chunkRadius) * 16 + 15);
+        return BlockVector3.at((chunkX + chunkRadius) * 16 + 15, (yRadius == -1) ? MAX_BUILD_HEIGHT : by + yRadius, (chunkZ + chunkRadius) * 16 + 15);
     }
 
     // create PS ids without making the numbers have scientific notation (addressed with long)
