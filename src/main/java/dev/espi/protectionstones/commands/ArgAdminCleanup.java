@@ -27,19 +27,29 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 
 class ArgAdminCleanup {
 
-    // /ps admin cleanup
+    private static File previewFile;
+    private static FileWriter previewFileOutputStream;
+
+    // /ps admin cleanup [remove/preview]
     static boolean argumentAdminCleanup(CommandSender p, String[] preParseArgs) {
-        if (preParseArgs.length < 3 || (!preParseArgs[2].equalsIgnoreCase("remove") && !preParseArgs[2].equalsIgnoreCase("disown"))) {
+        if (preParseArgs.length < 3 || !Arrays.asList("remove", "preview").contains(preParseArgs[2].toLowerCase())) {
             PSL.msg(p, ArgAdmin.getCleanupHelp());
             return true;
         }
 
-        String cleanupOperation = preParseArgs[2]; // [remove|disown]
+        String cleanupOperation = preParseArgs[2].toLowerCase(); // [remove|preview]
 
         World w;
         String alias = null;
@@ -56,7 +66,6 @@ class ArgAdminCleanup {
         }
 
         // the args array should consist of: [days, world (optional)]
-
         if (args.size() > 1 && Bukkit.getWorld(args.get(1)) != null) {
             w = Bukkit.getWorld(args.get(1));
         } else {
@@ -68,8 +77,21 @@ class ArgAdminCleanup {
             }
         }
 
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        // create preview file
+        if (cleanupOperation.equals("preview")) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H-m-s");
+            previewFile = new File(ProtectionStones.getInstance().getDataFolder().getAbsolutePath() + "/" + LocalDateTime.now().format(formatter) + " cleanup preview.txt");
+            try {
+                previewFile.createNewFile();
+                previewFileOutputStream = new FileWriter(previewFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                p.sendMessage(ChatColor.RED + "Internal error, please check the console logs.");
+                return true;
+            }
+        }
 
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
         // async cleanup task
@@ -113,7 +135,7 @@ class ArgAdminCleanup {
                 long numOfActiveMembers = r.getMembers().stream().filter(activePlayers::contains).count();
 
                 // remove region if there are no owners left
-                if (cleanupOperation.equalsIgnoreCase("remove") && numOfActiveOwners == 0) {
+                if (numOfActiveOwners == 0) {
                     if (ProtectionStones.getInstance().getConfigOptions().cleanupDeleteRegionsWithMembersButNoOwners || numOfActiveMembers == 0) {
                         toDelete.add(r);
                     }
@@ -131,9 +153,20 @@ class ArgAdminCleanup {
         if (deleteRegionsIterator.hasNext()) {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () ->
                     processRegion(deleteRegionsIterator, p, isRemoveOperation), 1);
-        } else {
+        } else { // finished region iteration
             PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
-                    .replace("%arg%", isRemoveOperation ? "remove" : "disown"));
+                    .replace("%arg%", isRemoveOperation ? "remove" : "preview"));
+
+            // flush and close preview file
+            if (!isRemoveOperation) {
+                try {
+                    p.sendMessage(ChatColor.YELLOW + "Dumped the list regions that can be deleted in " + previewFile.getName() + " (in the plugin folder).");
+                    previewFileOutputStream.flush();
+                    previewFileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -142,10 +175,24 @@ class ArgAdminCleanup {
     // (lag from loading chunks to remove protection blocks)
     static private void processRegion(Iterator<PSRegion> deleteRegionsIterator, CommandSender p, boolean isRemoveOperation) {
         PSRegion r = deleteRegionsIterator.next();
-        p.sendMessage(ChatColor.YELLOW + "Removed region " + r.getId() + " due to inactive owners.");
 
-        // must be sync
-        r.deleteRegion(true);
+        if (isRemoveOperation) { // delete
+
+            p.sendMessage(ChatColor.YELLOW + "Removed region " + r.getId() + " due to inactive owners.");
+
+            // must be sync
+            r.deleteRegion(true);
+        } else { // preview
+
+            p.sendMessage(ChatColor.YELLOW + "Found region " + r.getId() + " that can be deleted.");
+
+            // adds region id to preview file
+            try {
+                previewFileOutputStream.write(r.getId() + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         // go to next region
         regionLoop(deleteRegionsIterator, p, isRemoveOperation);

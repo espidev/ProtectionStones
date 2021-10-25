@@ -35,7 +35,7 @@ public class ArgAdmin implements PSCommandArg {
     // has to be a method, because the base command config option is not available until the plugin is loaded
     public static String getCleanupHelp() {
         return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin cleanup [remove|disown] [-t typealias (optional)] [days] [world (optional)]";
+                " admin cleanup [remove|preview] [-t typealias (optional)] [days] [world (optional)]";
     }
 
     public static String getFlagHelp() {
