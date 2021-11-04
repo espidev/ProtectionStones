@@ -86,13 +86,6 @@ public class WGUtils {
         return new PSLocation(psx, psy, psz);
     }
 
-    // TODO: BUG
-    // We have a major issue with detecting adjacent regions when the other regions are PSGroupRegion (the one adjacent
-    // to the current one), which is likely a WorldGuard bug?
-    //
-    // If you create an adjacent region south or east of the region, it seems that it doesn't detect the adjacent edge
-    // overlap, you need to increase the edge by one more block (2 blocks from region edge).
-
     /**
      * Find regions that are overlapping or adjacent to the region given.
      * @param r
@@ -101,12 +94,28 @@ public class WGUtils {
      * @return the list of regions
      */
     public static Set<ProtectedRegion> findOverlapOrAdjacentRegions(ProtectedRegion r, RegionManager rgm, World w) {
-        Set<ProtectedRegion> overlappingRegions =  rgm.getApplicableRegions(r).getRegions();
+        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(rgm.getApplicableRegions(r).getRegions()); // we need to ensure addAll is implemented
 
         // find adjacent regions (not overlapping, but bordering)
         for (var edgeRegion : getTransientEdgeRegions(w, r)) {
             overlappingRegions.addAll(rgm.getApplicableRegions(edgeRegion).getRegions());
         }
+
+        // HACK: WORKAROUND FOR BUG
+        // We have a major issue with detecting adjacent regions when the other regions are PSGroupRegion (the one adjacent
+        // to the current one), which is likely a WorldGuard bug?
+        //
+        // If you create an adjacent region south or east of the region, it seems that it doesn't detect the adjacent edge
+        // overlap, you need to increase the edge by one more block for the north and west (2 blocks from region edge).
+        for (var edgeRegion : getTransientEdgeRegionsHelper(w, r, true)) {
+            for (var region : rgm.getApplicableRegions(edgeRegion).getRegions()) {
+                PSRegion psr = PSRegion.fromWGRegion(w, region);
+                if (psr instanceof PSGroupRegion) {
+                    overlappingRegions.add(region);
+                }
+            }
+        }
+
         return overlappingRegions;
     }
 
@@ -118,12 +127,28 @@ public class WGUtils {
      * @return the list of regions
      */
     public static Set<ProtectedRegion> findOverlapOrAdjacentRegions(ProtectedRegion r, List<ProtectedRegion> regionsToCheck, World w) {
-        Set<ProtectedRegion> overlappingRegions = new HashSet<>(r.getIntersectingRegions(regionsToCheck));
+        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(r.getIntersectingRegions(regionsToCheck)); // we need to ensure addAll is implemented
 
         // find adjacent regions (not overlapping, but bordering)
         for (var edgeRegion : getTransientEdgeRegions(w, r)) {
             overlappingRegions.addAll(edgeRegion.getIntersectingRegions(regionsToCheck));
         }
+
+        // HACK: WORKAROUND FOR BUG
+        // We have a major issue with detecting adjacent regions when the other regions are PSGroupRegion (the one adjacent
+        // to the current one), which is likely a WorldGuard bug?
+        //
+        // If you create an adjacent region south or east of the region, it seems that it doesn't detect the adjacent edge
+        // overlap, you need to increase the edge by one more block for the north and west (2 blocks from region edge).
+        for (var edgeRegion : getTransientEdgeRegionsHelper(w, r, true)) {
+            for (var region : edgeRegion.getIntersectingRegions(regionsToCheck)) {
+                PSRegion psr = PSRegion.fromWGRegion(w, region);
+                if (psr instanceof PSGroupRegion) {
+                    overlappingRegions.add(region);
+                }
+            }
+        }
+
         return overlappingRegions;
     }
 
@@ -133,18 +158,31 @@ public class WGUtils {
      * @return the list of regions
      */
     public static List<ProtectedRegion> getTransientEdgeRegions(World w, ProtectedRegion r) {
-        List<ProtectedRegion> toReturn = new ArrayList<>();
+        return getTransientEdgeRegionsHelper(w, r, false);
+    }
+
+    private static List<ProtectedRegion> getTransientEdgeRegionsHelper(World w, ProtectedRegion r, boolean oneBlockAdjustHack) {
+        ArrayList<ProtectedRegion> toReturn = new ArrayList<>();
 
         if (r instanceof ProtectedCuboidRegion) {
             BlockVector3 minPoint = r.getMinimumPoint(), maxPoint = r.getMaximumPoint();
             long minX = minPoint.getX(), maxX = maxPoint.getX(), minY = minPoint.getY(),
-                maxY = maxPoint.getY(), minZ = minPoint.getZ(), maxZ = maxPoint.getZ();
+                    maxY = maxPoint.getY(), minZ = minPoint.getZ(), maxZ = maxPoint.getZ();
 
-            toReturn = Arrays.asList(
-                new ProtectedCuboidRegion(r.getId() + "-edge-0", true, BlockVector3.at(minX, minY - 1, minZ), BlockVector3.at(maxX, maxY + 1, maxZ)),
-                new ProtectedCuboidRegion(r.getId() + "-edge-1", true, BlockVector3.at(minX - 1, minY, minZ), BlockVector3.at(maxX + 1, maxY, maxZ)),
-                new ProtectedCuboidRegion(r.getId() + "-edge-2", true, BlockVector3.at(minX, minY, minZ - 1), BlockVector3.at(maxX, maxY, maxZ + 1))
+            toReturn = new ArrayList<>(
+                Arrays.asList(
+                    new ProtectedCuboidRegion(r.getId() + "-edge-0", true, BlockVector3.at(minX, minY - 1, minZ), BlockVector3.at(maxX, maxY + 1, maxZ)),
+                    new ProtectedCuboidRegion(r.getId() + "-edge-1", true, BlockVector3.at(minX - 1, minY, minZ), BlockVector3.at(maxX + 1, maxY, maxZ)),
+                    new ProtectedCuboidRegion(r.getId() + "-edge-2", true, BlockVector3.at(minX, minY, minZ - 1), BlockVector3.at(maxX, maxY, maxZ + 1))
+                )
             );
+
+            if (oneBlockAdjustHack) {
+                // one block extra in the north
+                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-3", true, BlockVector3.at(minX, minY, minZ - 2), BlockVector3.at(maxX, maxY, maxZ)));
+                // one block extra in the west
+                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-4", true, BlockVector3.at(minX - 2, minY, minZ), BlockVector3.at(maxX, maxY, maxZ)));
+            }
 
         } else if (r instanceof ProtectedPolygonalRegion) {
 
@@ -152,7 +190,7 @@ public class WGUtils {
                 PSGroupRegion psr = (PSGroupRegion) PSRegion.fromWGRegion(w, r);
                 for (PSMergedRegion psmr : psr.getMergedRegions()) {
                     var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtils.parsePSRegionToLocation(psmr.getId()));
-                    toReturn.addAll(getTransientEdgeRegions(w, testRegion));
+                    toReturn.addAll(getTransientEdgeRegionsHelper(w, testRegion, oneBlockAdjustHack));
                 }
             }
         }
