@@ -53,8 +53,10 @@ allow_placing_in_wild = true
     y_radius = -1
     z_radius = 64
 
-    # Enables "chunk snapping mode", where the region boundaries will be determined by the chunk the block is in, and
-    # the chunk_radius (how many chunks away from the center chunk).
+    # Enables "chunk snapping mode", where the region boundaries will be determined by the chunk the block is in, and the
+    # chunk_radius (how many chunks away from the center chunk).
+    # Allows players to not have to worry about the exact placement of their block, and removes the issue of messy overlapping
+    # regions (as they all conform to chunk boundaries).
     # Set to -1 to disable, and any number larger than or equal to 1 to enable.
     # Note: If enabled, x_radius and z_radius will be ignored!
     chunk_radius = -1
