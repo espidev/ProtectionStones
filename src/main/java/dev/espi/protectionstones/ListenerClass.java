@@ -39,6 +39,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
@@ -334,34 +335,56 @@ public class ListenerClass implements Listener {
         explodeUtil(e.blockList(), e.getLocation().getWorld());
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        // events like ender dragon block break, wither running into block break, etc.
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            if (!blockExplodeUtil(e.getBlock().getWorld(), e.getBlock())) {
+                // if block shouldn't be exploded, cancel the event
+                e.setCancelled(true);
+            }
+        }
+    }
+
     private void explodeUtil(List<Block> blockList, World w) {
         // loop through exploded blocks
         for (int i = 0; i < blockList.size(); i++) {
             Block b = blockList.get(i);
 
             if (ProtectionStones.isProtectBlock(b)) {
-                String id = WGUtils.createPSID(b.getLocation());
-
-                PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
-
-                // remove protection block from exploded list if prevent_explode is enabled
+                // always remove protection block from exploded list
                 blockList.remove(i);
                 i--;
+            }
 
-                // if allow explode
-                if (!blockOptions.preventExplode) {
-                    b.setType(Material.AIR); // manually set to air
-                    // manually add drop
-                    if (!blockOptions.noDrop) {
-                        b.getWorld().dropItem(b.getLocation(), blockOptions.createItem());
-                    }
-                    // remove region from worldguard if destroy_region_when_explode is enabled
-                    if (blockOptions.destroyRegionWhenExplode) {
-                        ProtectionStones.removePSRegion(w, id);
-                    }
-                }
+            blockExplodeUtil(w, b);
+        }
+    }
+
+    // returns whether the block is exploded
+    private boolean blockExplodeUtil(World w, Block b) {
+        if (ProtectionStones.isProtectBlock(b)) {
+            String id = WGUtils.createPSID(b.getLocation());
+            PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
+
+            // if prevent explode
+            if (blockOptions.preventExplode) {
+                return false;
+            }
+
+            // manually set to air if exploded so there is no natural item drop
+            b.setType(Material.AIR);
+
+            // manually add drop
+            if (!blockOptions.noDrop) {
+                b.getWorld().dropItem(b.getLocation(), blockOptions.createItem());
+            }
+            // remove region from worldguard if destroy_region_when_explode is enabled
+            if (blockOptions.destroyRegionWhenExplode) {
+                ProtectionStones.removePSRegion(w, id);
             }
         }
+        return true;
     }
 
     // check player teleporting into region behaviour
