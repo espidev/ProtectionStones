@@ -49,7 +49,7 @@ public class ArgToggle implements PSCommandArg {
         public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
             Player p = (Player) s;
             if (p.hasPermission("protectionstones.toggle")) {
-                ProtectionStones.toggleList.add(p.getUniqueId());
+                ProtectionStones.toggleList.remove(p.getUniqueId());
                 p.sendMessage(PSL.TOGGLE_ON.msg());
             } else {
                 p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
@@ -84,7 +84,7 @@ public class ArgToggle implements PSCommandArg {
         public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
             Player p = (Player) s;
             if (p.hasPermission("protectionstones.toggle")) {
-                ProtectionStones.toggleList.remove(p.getUniqueId());
+                ProtectionStones.toggleList.add(p.getUniqueId());
                 p.sendMessage(PSL.TOGGLE_OFF.msg());
             } else {
                 p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
