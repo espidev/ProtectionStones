@@ -6,7 +6,7 @@
 
 [Spigot](https://www.spigotmc.org/resources/protectionstones-updated-for-1-13-1-16-wg7.61797/) | [Permissions](https://github.com/espidev/ProtectionStones/wiki/Permissions) | [Commands](https://github.com/espidev/ProtectionStones/wiki/Commands) | [Configuration](https://github.com/espidev/ProtectionStones/wiki/Configuration) | [Placeholders](https://github.com/espidev/ProtectionStones/wiki/Placeholders) | [Translations](https://github.com/espidev/ProtectionStones/wiki/Translations) | [API Information](https://github.com/espidev/ProtectionStones/wiki/API) | [Javadocs](https://jdps.espi.dev/) | [Dev Builds](https://ci.espi.dev/job/ProtectionStones/)
 
-Get support for the plugin on the M.O.S.S. Discord! https://discord.gg/TQXWtf8
+Get support for the plugin on the M.O.S.S. Discord! https://discord.gg/cqM96tcJRx
 
 ProtectionStones is a grief prevention and land claiming plugin.
 
