@@ -195,7 +195,7 @@ allow_placing_in_wild = true
     tenant_rent_role = "member"
 
     # Should the landlords of rented out regions still be an owner while it is rented out?
-    landlord_still_owner = true
+    landlord_still_owner = false
 
 [behaviour]
     # Hide protection stone right away when placed?

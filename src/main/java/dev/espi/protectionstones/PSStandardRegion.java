@@ -228,8 +228,8 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void removeRenting() {
-        removeMember(getTenant());
-        removeOwner(getTenant());
+        getWGRegion().getOwners().removeAll();
+        getWGRegion().getMembers().removeAll();
         addOwner(getLandlord());
 
         setLandlord(null);
