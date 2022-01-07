@@ -164,7 +164,16 @@ public class WGUtils {
     private static List<ProtectedRegion> getTransientEdgeRegionsHelper(World w, ProtectedRegion r, boolean oneBlockAdjustHack) {
         ArrayList<ProtectedRegion> toReturn = new ArrayList<>();
 
-        if (r instanceof ProtectedCuboidRegion) {
+        PSRegion psr = PSRegion.fromWGRegion(w, r);
+
+        // note that PSGroupRegion is a subclass of PSStandardRegion, so we need PSGroupRegion check first
+        if (r instanceof ProtectedPolygonalRegion && psr instanceof PSGroupRegion) {
+            PSGroupRegion psgr = (PSGroupRegion) PSRegion.fromWGRegion(w, r);
+            for (PSMergedRegion psmr : psgr.getMergedRegions()) {
+                var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtils.parsePSRegionToLocation(psmr.getId()));
+                toReturn.addAll(getTransientEdgeRegionsHelper(w, testRegion, oneBlockAdjustHack));
+            }
+        } else if (r instanceof ProtectedCuboidRegion || (psr instanceof PSStandardRegion)) {
             BlockVector3 minPoint = r.getMinimumPoint(), maxPoint = r.getMaximumPoint();
             long minX = minPoint.getX(), maxX = maxPoint.getX(), minY = minPoint.getY(),
                     maxY = maxPoint.getY(), minZ = minPoint.getZ(), maxZ = maxPoint.getZ();
@@ -182,16 +191,6 @@ public class WGUtils {
                 toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-3", true, BlockVector3.at(minX, minY, minZ - 2), BlockVector3.at(maxX, maxY, maxZ)));
                 // one block extra in the west
                 toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-4", true, BlockVector3.at(minX - 2, minY, minZ), BlockVector3.at(maxX, maxY, maxZ)));
-            }
-
-        } else if (r instanceof ProtectedPolygonalRegion) {
-
-            if (ProtectionStones.isPSRegion(r)) {
-                PSGroupRegion psr = (PSGroupRegion) PSRegion.fromWGRegion(w, r);
-                for (PSMergedRegion psmr : psr.getMergedRegions()) {
-                    var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtils.parsePSRegionToLocation(psmr.getId()));
-                    toReturn.addAll(getTransientEdgeRegionsHelper(w, testRegion, oneBlockAdjustHack));
-                }
             }
         }
 
