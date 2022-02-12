@@ -94,26 +94,36 @@ public class ListenerClass implements Listener {
         BlockHandler.createPSRegion(e);
     }
 
+    // returns the error message, or "" if the player has permission to break the region
+    // TODO: refactor and move this to PSRegion, so that /ps unclaim can use the same checks
+    private String checkPermissionToBreakProtection(Player p, PSRegion r) {
+        // check for destroy permission
+        if (!p.hasPermission("protectionstones.destroy")) {
+            return PSL.NO_PERMISSION_DESTROY.msg();
+        }
+
+        // check if player is owner of region
+        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+            return PSL.NO_REGION_PERMISSION.msg();
+        }
+
+        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
+        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+            return PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg();
+        }
+
+        return "";
+    }
+
     // helper method for breaking protection blocks
     // IMPLEMENTATION NOTES: r may be not configured
     private boolean playerBreakProtection(Player p, PSRegion r) {
         PSProtectBlock blockOptions = r.getTypeOptions();
 
-        // check for destroy permission
-        if (!p.hasPermission("protectionstones.destroy")) {
-            PSL.msg(p, PSL.NO_PERMISSION_DESTROY.msg());
-            return false;
-        }
-
-        // check if player is owner of region
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
-            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
-            return false;
-        }
-
-        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
-        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
-            PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
+        // check if player has permission to break the protection
+        String error = checkPermissionToBreakProtection(p, r);
+        if (!error.isEmpty()) {
+            PSL.msg(p, error);
             return false;
         }
 
@@ -156,6 +166,22 @@ public class ListenerClass implements Listener {
                     e.getClickedBlock().setType(Material.AIR);
                 }
             }
+        }
+    }
+
+    // this will be the first event handler called in the chain
+    // thus we should cancel the event here if possible (so other plugins don't start acting upon it)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBlockBreakLowPriority(BlockBreakEvent e) {
+        Player p = e.getPlayer();
+        Block pb = e.getBlock();
+
+        // check if player has permission to break the protection
+        PSRegion r = PSRegion.fromLocation(pb.getLocation());
+        String error = checkPermissionToBreakProtection(p, r);
+        if (r != null && !error.isEmpty()) {
+            PSL.msg(p, error);
+            e.setCancelled(true);
         }
     }
 
