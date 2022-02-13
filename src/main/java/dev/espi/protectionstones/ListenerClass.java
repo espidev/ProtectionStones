@@ -178,10 +178,12 @@ public class ListenerClass implements Listener {
 
         // check if player has permission to break the protection
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
-        String error = checkPermissionToBreakProtection(p, r);
-        if (r != null && !error.isEmpty()) {
-            PSL.msg(p, error);
-            e.setCancelled(true);
+        if (r != null) {
+            String error = checkPermissionToBreakProtection(p, r);
+            if (!error.isEmpty()) {
+                PSL.msg(p, error);
+                e.setCancelled(true);
+            }
         }
     }
 
