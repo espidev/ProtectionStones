@@ -176,6 +176,8 @@ public class ListenerClass implements Listener {
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
+        if (!ProtectionStones.isProtectBlock(pb)) return;
+
         // check if player has permission to break the protection
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
         if (r != null) {
