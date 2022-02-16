@@ -17,6 +17,7 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -35,6 +36,7 @@ import org.bukkit.block.Furnace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,6 +56,23 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class ListenerClass implements Listener {
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlaceEvent(PlaceBlockEvent event)
+    {
+        if(ProtectionStones.getInstance().getConfigOptions().byPassWGPassthrough) {
+            var cause = event.getCause().getRootCause();
+            if (cause instanceof Player) {
+                if (event.getBlocks().size() >= 1) {
+                    var block = event.getBlocks().get(0);
+                    if (!ProtectionStones.isProtectBlockType(block)) return;
+                    event.setResult(Event.Result.ALLOW);
+                }
+            }
+        }
+    }
+
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -89,7 +108,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);
     }

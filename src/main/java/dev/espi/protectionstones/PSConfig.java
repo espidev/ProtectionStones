@@ -81,6 +81,9 @@ public class PSConfig {
     @Path("allow_home_teleport_for_members")
     public Boolean allowHomeTeleportForMembers;
 
+    @Path("bypass_wg_passthrough")
+    public Boolean byPassWGPassthrough;
+
     @Path("admin.cleanup_delete_regions_with_members_but_no_owners")
     public Boolean cleanupDeleteRegionsWithMembersButNoOwners;
 
