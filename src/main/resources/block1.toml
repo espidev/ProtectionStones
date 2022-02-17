@@ -40,6 +40,9 @@ prevent_block_place_in_restricted_world = true
 # If set to false, the protection block can only be placed in existing regions.
 allow_placing_in_wild = true
 
+# Whether or not to allow the block to bypass the worldguard passthrough flag.
+placing_bypasses_wg_passthrough = true
+
 [region]
     # Minimum distance between claims (that aren't owned by the same owner), measured from the protection block to the edge of another region
     # You will probably have to change this between blocks, since the region sizes will be different

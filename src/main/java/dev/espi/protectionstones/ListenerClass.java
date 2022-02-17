@@ -61,18 +61,17 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlaceEvent(PlaceBlockEvent event)
     {
-        if(ProtectionStones.getInstance().getConfigOptions().byPassWGPassthrough) {
-            var cause = event.getCause().getRootCause();
-            if (cause instanceof Player) {
-                if (event.getBlocks().size() >= 1) {
-                    var block = event.getBlocks().get(0);
-                    if (!ProtectionStones.isProtectBlockType(block)) return;
+        var cause = event.getCause().getRootCause();
+        if (cause instanceof Player) {
+            if (event.getBlocks().size() >= 1) {
+                var block = event.getBlocks().get(0);
+                if (!ProtectionStones.isProtectBlockType(block)) return;
+                if(ProtectionStones.getBlockOptions(block).placingByPassWGPassthrough) {
                     event.setResult(Event.Result.ALLOW);
                 }
             }
         }
     }
-
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -108,7 +107,7 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);
     }

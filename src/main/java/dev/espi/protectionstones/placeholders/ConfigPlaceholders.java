@@ -87,8 +87,6 @@ class ConfigPlaceholders {
                 return getConf().allowAddownerForOfflinePlayersWithoutLp + "";
             case "allow_home_teleport_for_members":
                 return getConf().allowHomeTeleportForMembers + "";
-            case "bypass_wg_passthrough":
-                return getConf().byPassWGPassthrough + "";
             case "admin_cleanup_delete_regions_with_members_but_no_owners":
                 return getConf().cleanupDeleteRegionsWithMembersButNoOwners + "";
 
