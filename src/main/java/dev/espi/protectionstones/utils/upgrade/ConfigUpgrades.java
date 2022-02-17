@@ -139,7 +139,6 @@ public class ConfigUpgrades {
             case 15:
                 ProtectionStones.config.set("config_version", 16);
                 ProtectionStones.config.set("allow_home_teleport_for_members", true);
-                ProtectionStones.config.set("bypass_wg_passthrough", true);
                 ProtectionStones.config.setComment("allow_home_teleport_for_members", " Whether or not members of a region can /ps home to the region.");
                 break;
             case ProtectionStones.CONFIG_VERSION:
