@@ -49,6 +49,8 @@ public class PSProtectBlock {
     public boolean preventBlockPlaceInRestrictedWorld;
     @Path("allow_placing_in_wild")
     public boolean allowPlacingInWild;
+    @Path("placing_bypasses_wg_passthrough")
+    public Boolean placingByPassWGPassthrough;
 
     // region section
     @Path("region.distance_between_claims")
