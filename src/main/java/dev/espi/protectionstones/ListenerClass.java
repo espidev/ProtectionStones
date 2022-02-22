@@ -93,7 +93,7 @@ public class ListenerClass implements Listener {
 
     // specifically add WG passthrough bypass here, so other plugins can see the result
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onBlockPlaceEvent(PlaceBlockEvent event) {
+    public void onBlockPlaceLowPriority(PlaceBlockEvent event) {
         var cause = event.getCause().getRootCause();
         if (cause instanceof Player && event.getBlocks().size() >= 1) {
             var block = event.getBlocks().get(0);
