@@ -57,22 +57,6 @@ import java.util.List;
 
 public class ListenerClass implements Listener {
 
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onBlockPlaceEvent(PlaceBlockEvent event)
-    {
-        var cause = event.getCause().getRootCause();
-        if (cause instanceof Player) {
-            if (event.getBlocks().size() >= 1) {
-                var block = event.getBlocks().get(0);
-                if (!ProtectionStones.isProtectBlockType(block)) return;
-                if(ProtectionStones.getBlockOptions(block).placingByPassWGPassthrough) {
-                    event.setResult(Event.Result.ALLOW);
-                }
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
@@ -107,6 +91,20 @@ public class ListenerClass implements Listener {
         }
     }
 
+    // specifically add WG passthrough bypass here, so other plugins can see the result
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlaceEvent(PlaceBlockEvent event) {
+        var cause = event.getCause().getRootCause();
+        if (cause instanceof Player && event.getBlocks().size() >= 1) {
+            var block = event.getBlocks().get(0);
+            var options = ProtectionStones.getBlockOptions(block);
+            if (options != null && options.placingBypassesWGPassthrough) {
+                event.setResult(Event.Result.ALLOW);
+            }
+        }
+    }
+
+    // we only create the region after other plugins' event handlers have run
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         BlockHandler.createPSRegion(e);

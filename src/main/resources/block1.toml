@@ -40,7 +40,8 @@ prevent_block_place_in_restricted_world = true
 # If set to false, the protection block can only be placed in existing regions.
 allow_placing_in_wild = true
 
-# Whether or not to allow the block to bypass the worldguard passthrough flag.
+# Whether or not to allow the block to bypass the WorldGuard passthrough flag.
+# This allows the protection block to be placed even if WorldGuard prevents block placing in the wild.
 placing_bypasses_wg_passthrough = true
 
 [region]

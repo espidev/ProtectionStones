@@ -50,7 +50,7 @@ public class PSProtectBlock {
     @Path("allow_placing_in_wild")
     public boolean allowPlacingInWild;
     @Path("placing_bypasses_wg_passthrough")
-    public Boolean placingByPassWGPassthrough;
+    public Boolean placingBypassesWGPassthrough;
 
     // region section
     @Path("region.distance_between_claims")

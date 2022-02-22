@@ -127,6 +127,10 @@ class ConfigPlaceholders {
                 return MiscUtil.concatWithoutLast(b.worlds, " ");
             case "prevent_block_place_in_restricted_world":
                 return b.preventBlockPlaceInRestrictedWorld + "";
+            case "allow_placing_in_wild":
+                return b.allowPlacingInWild + "";
+            case "placing_bypasses_wg_passthrough":
+                return b.placingBypassesWGPassthrough + "";
 
             case "region_distance_between_claims":
                 return b.distanceBetweenClaims + "";
