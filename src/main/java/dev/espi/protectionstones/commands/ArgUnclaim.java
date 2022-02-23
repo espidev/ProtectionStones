@@ -16,6 +16,12 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.TextGUI;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -55,6 +61,29 @@ public class ArgUnclaim implements PSCommandArg {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
+        //Check if /ps unclaim list|PsID
+        if(args.length >= 2 ){
+            PSPlayer psp = PSPlayer.fromPlayer(p);
+            //Get the list of regions that a player owns
+            List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), false);
+            if(args[1].equalsIgnoreCase("list")) {
+                displayPSRegions(s,regions,args.length == 2 ? 0 : tryParseInt(args[2])-1);
+            }else{
+                for(PSRegion ps : regions){
+                    if(ps.getId().equalsIgnoreCase(args[1])){
+                        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
+                        if (ps.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+                            PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
+                            return false;
+                        }
+                        return unclaimBlock(ps,p);
+                    }
+                }
+                PSL.msg(p,PSL.REGION_DOES_NOT_EXIST.msg());
+            }
+            return false;
+        }
+
         if (r == null) {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
@@ -70,7 +99,39 @@ public class ArgUnclaim implements PSCommandArg {
             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
             return false;
         }
+        return unclaimBlock(r, p);
+    }
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        return null;
+    }
+    private int tryParseInt(String arg){
+        int i = 1;
+        try{
+            i = Integer.parseInt(arg);
+        }catch(NumberFormatException ignore){
+            //ignore
+        }
+        return i;
+    }
+    private void displayPSRegions(CommandSender s,List<PSRegion> regions,int page){
+        List<TextComponent> entries = new ArrayList<>();
+        for (PSRegion rs : regions) {
+            String msg;
+            if (rs.getName() == null) {
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + rs.getId();
+            } else {
+                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + rs.getName() + " (" + rs.getId() + ")";
+            }
+            TextComponent tc = new TextComponent(ChatColor.AQUA + " [-] " + msg);
+            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to delete "+rs.getId()).create()));
+            tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ps unclaim " + rs.getId()));
+            entries.add(tc);
+        }
+        TextGUI.displayGUI(s,PSL.UNCLAIM_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim list %page%",page,17,entries,true);
+    }
 
+    private boolean unclaimBlock(PSRegion r,Player p){
         PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
@@ -97,7 +158,6 @@ public class ArgUnclaim implements PSCommandArg {
                 }
             }
         }
-
         // remove region
         // check if removing the region and firing region remove event blocked it
         if (!r.deleteRegion(true, p)) {
@@ -110,10 +170,5 @@ public class ArgUnclaim implements PSCommandArg {
         PSL.msg(p, PSL.NO_LONGER_PROTECTED.msg());
 
         return true;
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
-        return null;
     }
 }

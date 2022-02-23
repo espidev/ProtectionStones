@@ -285,6 +285,7 @@ public enum PSL {
     // ps unclaim
     UNCLAIM_HELP("unclaim.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps unclaim"),
     UNCLAIM_HELP_DESC("unclaim.help_desc", "Use this command to pickup a placed protection stone and remove the region."),
+    UNCLAIM_HEADER("unclaim.header",ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " Unclaim (click to unclaim) " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "====="),
 
     // ps view
     VIEW_HELP("view.help", ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps view"),
