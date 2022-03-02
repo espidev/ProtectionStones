@@ -26,7 +26,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class ArgUnclaim implements PSCommandArg {
 
@@ -62,24 +65,24 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
         //Check if /ps unclaim list|PsID
-        if(args.length >= 2 ){
+        if (args.length >= 2) {
             PSPlayer psp = PSPlayer.fromPlayer(p);
             //Get the list of regions that a player owns
             List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), false);
-            if(args[1].equalsIgnoreCase("list")) {
-                displayPSRegions(s,regions,args.length == 2 ? 0 : tryParseInt(args[2])-1);
-            }else{
-                for(PSRegion ps : regions){
-                    if(ps.getId().equalsIgnoreCase(args[1])){
+            if (args[1].equalsIgnoreCase("list")) {
+                displayPSRegions(s, regions, args.length == 2 ? 0 : tryParseInt(args[2]) - 1);
+            } else {
+                for (PSRegion ps : regions) {
+                    if (ps.getId().equalsIgnoreCase(args[1])) {
                         // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
                         if (ps.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
                             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
                             return false;
                         }
-                        return unclaimBlock(ps,p);
+                        return unclaimBlock(ps, p);
                     }
                 }
-                PSL.msg(p,PSL.REGION_DOES_NOT_EXIST.msg());
+                PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
             }
             return false;
         }
@@ -101,20 +104,23 @@ public class ArgUnclaim implements PSCommandArg {
         }
         return unclaimBlock(r, p);
     }
+
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
         return null;
     }
-    private int tryParseInt(String arg){
+
+    private int tryParseInt(String arg) {
         int i = 1;
-        try{
+        try {
             i = Integer.parseInt(arg);
-        }catch(NumberFormatException ignore){
+        } catch (NumberFormatException ignore) {
             //ignore
         }
         return i;
     }
-    private void displayPSRegions(CommandSender s,List<PSRegion> regions,int page){
+
+    private void displayPSRegions(CommandSender s, List<PSRegion> regions, int page) {
         List<TextComponent> entries = new ArrayList<>();
         for (PSRegion rs : regions) {
             String msg;
@@ -124,14 +130,14 @@ public class ArgUnclaim implements PSCommandArg {
                 msg = ChatColor.GRAY + "> " + ChatColor.AQUA + rs.getName() + " (" + rs.getId() + ")";
             }
             TextComponent tc = new TextComponent(ChatColor.AQUA + " [-] " + msg);
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to delete "+rs.getId()).create()));
-            tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/ps unclaim " + rs.getId()));
+            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to delete " + rs.getId()).create()));
+            tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim " + rs.getId()));
             entries.add(tc);
         }
-        TextGUI.displayGUI(s,PSL.UNCLAIM_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim list %page%",page,17,entries,true);
+        TextGUI.displayGUI(s, PSL.UNCLAIM_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim list %page%", page, 17, entries, true);
     }
 
-    private boolean unclaimBlock(PSRegion r,Player p){
+    private boolean unclaimBlock(PSRegion r, Player p) {
         PSProtectBlock cpb = r.getTypeOptions();
         if (cpb != null && !cpb.noDrop) {
             // return protection stone
