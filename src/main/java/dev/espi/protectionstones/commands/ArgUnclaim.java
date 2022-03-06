@@ -66,6 +66,10 @@ public class ArgUnclaim implements PSCommandArg {
         }
         //Check if /ps unclaim list|PsID
         if (args.length >= 2) {
+            if (!p.hasPermission("protectionstones.unclaim.remote")) {
+                PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM_REMOTE.msg());
+                return true;
+            }
             PSPlayer psp = PSPlayer.fromPlayer(p);
             //Get the list of regions that a player owns
             List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), false);

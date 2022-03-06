@@ -73,6 +73,7 @@ public enum PSL {
     NO_PERMISSION_TP("no_permission_tp", ChatColor.RED + "You do not have permission to teleport to other players' protection blocks."),
     NO_PERMISSION_HOME("no_permission_home", ChatColor.RED + "You do not have permission to teleport to your protection blocks."),
     NO_PERMISSION_UNCLAIM("no_permission_unclaim", ChatColor.RED + "You do not have permission to use the unclaim command."),
+    NO_PERMISSION_UNCLAIM_REMOTE("no_permission_unclaim_remote", ChatColor.RED + "You do not have permission to use the unclaim remote command."),
     NO_PERMISSION_VIEW("no_permission_view", ChatColor.RED + "You do not have permission to use the view command."),
     NO_PERMISSION_GIVE("no_permission_give", ChatColor.RED + "You do not have permission to use the give command."),
     NO_PERMISSION_GET("no_permission_get", ChatColor.RED + "You do not have permission to use the get command."),
