@@ -58,55 +58,62 @@ public class ArgUnclaim implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
-        PSRegion r = PSRegion.fromLocationGroupUnsafe(p.getLocation()); // allow unclaiming unconfigured regions
+
 
         if (!p.hasPermission("protectionstones.unclaim")) {
             PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM.msg());
             return true;
         }
-        //Check if /ps unclaim list|PsID
-        if (args.length >= 2) {
+
+        if (args.length >= 2) { // /ps unclaim list|id (unclaim remote region)
+
             if (!p.hasPermission("protectionstones.unclaim.remote")) {
                 PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM_REMOTE.msg());
                 return true;
             }
+
             PSPlayer psp = PSPlayer.fromPlayer(p);
-            //Get the list of regions that a player owns
+
+            // list of regions that the player owns
             List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), false);
+
             if (args[1].equalsIgnoreCase("list")) {
                 displayPSRegions(s, regions, args.length == 2 ? 0 : tryParseInt(args[2]) - 1);
             } else {
-                for (PSRegion ps : regions) {
-                    if (ps.getId().equalsIgnoreCase(args[1])) {
+                for (PSRegion psr : regions) {
+                    if (psr.getId().equalsIgnoreCase(args[1])) {
                         // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
-                        if (ps.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+                        if (psr.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
                             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
                             return false;
                         }
-                        return unclaimBlock(ps, p);
+                        return unclaimBlock(psr, p);
                     }
                 }
                 PSL.msg(p, PSL.REGION_DOES_NOT_EXIST.msg());
             }
-            return false;
-        }
 
-        if (r == null) {
-            PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
-        }
+        } else { // /ps unclaim (no arguments, unclaim current region)
+            PSRegion r = PSRegion.fromLocationGroupUnsafe(p.getLocation()); // allow unclaiming unconfigured regions
 
-        if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
-            PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
-            return true;
-        }
+            if (r == null) {
+                PSL.msg(p, PSL.NOT_IN_REGION.msg());
+                return true;
+            }
 
-        // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
-        if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
-            PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
-            return false;
+            if (!r.isOwner(p.getUniqueId()) && !p.hasPermission("protectionstones.superowner")) {
+                PSL.msg(p, PSL.NO_REGION_PERMISSION.msg());
+                return true;
+            }
+
+            // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
+            if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
+                PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
+                return true;
+            }
+            return unclaimBlock(r, p);
         }
-        return unclaimBlock(r, p);
     }
 
     @Override
@@ -134,7 +141,7 @@ public class ArgUnclaim implements PSCommandArg {
                 msg = ChatColor.GRAY + "> " + ChatColor.AQUA + rs.getName() + " (" + rs.getId() + ")";
             }
             TextComponent tc = new TextComponent(ChatColor.AQUA + " [-] " + msg);
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to delete " + rs.getId()).create()));
+            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unclaim " + rs.getId()).create()));
             tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim " + rs.getId()));
             entries.add(tc);
         }
