@@ -15,14 +15,20 @@
 
 package dev.espi.protectionstones.utils;
 
+import dev.espi.protectionstones.ProtectionStones;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.Node;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class MiscUtil {
@@ -97,6 +103,27 @@ public class MiscUtil {
         if (minutes != 0) s += minutes + "m";
         if (seconds != 0) s += seconds + "s";
         return s;
+    }
+
+    public static List<String> getLuckPermsUserPermissions(UUID uniqueId) throws ExecutionException, InterruptedException {
+        UserManager userManager = ProtectionStones.getInstance().getLuckPerms().getUserManager();
+        User user = userManager.loadUser(uniqueId).get();
+
+        List<String> permissions = new ArrayList<>();
+
+        // add permissions set on the user
+        permissions.addAll(user.getNodes().stream().filter(Node::getValue).map(Node::getKey).collect(Collectors.toList()));
+
+        // add permissions set on the groups
+        permissions.addAll(user.getInheritedGroups(user.getQueryOptions())
+                .stream()
+                .flatMap(g -> g.getNodes()
+                        .stream()
+                        .filter(Node::getValue)
+                        .map(Node::getKey))
+                .collect(Collectors.toList()));
+
+        return permissions;
     }
 
 }

@@ -148,18 +148,10 @@ public class ArgAddRemove implements PSCommandArg {
                 }
 
                 switch (operationType) {
-                    case "add":
-                        r.addMember(addPlayerUuid);
-                        break;
-                    case "remove":
-                        r.removeMember(addPlayerUuid);
-                        break;
-                    case "addowner":
-                        r.addOwner(addPlayerUuid);
-                        break;
-                    case "removeowner":
-                        r.removeOwner(addPlayerUuid);
-                        break;
+                    case "add" -> r.addMember(addPlayerUuid);
+                    case "remove" -> r.removeMember(addPlayerUuid);
+                    case "addowner" -> r.addOwner(addPlayerUuid);
+                    case "removeowner" -> r.removeOwner(addPlayerUuid);
                 }
             }
         });
