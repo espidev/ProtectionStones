@@ -33,6 +33,9 @@ public class LimitUtil {
         HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
         int maxPS = psp.getGlobalRegionLimits();
 
+        ProtectionStones.getInstance().debug(String.format("Player's global limit is %d.", maxPS));
+        ProtectionStones.getInstance().debug(String.format("Player has limits on %d region types.", regionLimits.size()));
+
         if (maxPS != -1 || !regionLimits.isEmpty()) { // only check if limit was found
 
             // count player's protection blocks
