@@ -132,7 +132,7 @@ public class ListenerClass implements Listener {
     }
 
     // helper method for breaking protection blocks
-    // IMPLEMENTATION NOTES: r may be not configured
+    // IMPLEMENTATION NOTES: r may be of a non-configured type
     private boolean playerBreakProtection(Player p, PSRegion r) {
         PSProtectBlock blockOptions = r.getTypeOptions();
 

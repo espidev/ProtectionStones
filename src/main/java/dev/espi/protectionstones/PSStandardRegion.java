@@ -17,6 +17,7 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
@@ -500,11 +501,13 @@ public class PSStandardRegion extends PSRegion {
             return false;
         }
 
+        // set the physical block to air
         if (deleteBlock && !this.isHidden()) {
             this.getProtectBlock().setType(Material.AIR);
         }
 
-        if (getName() != null) { // remove name from cache
+        // remove name from cache
+        if (getName() != null) {
             HashMap<String, ArrayList<String>> rIds = ProtectionStones.regionNameToID.get(getWorld().getUID());
             if (rIds != null && rIds.containsKey(getName())) {
                 if (rIds.get(getName()).size() == 1) {
@@ -514,7 +517,11 @@ public class PSStandardRegion extends PSRegion {
                 }
             }
         }
-        rgmanager.removeRegion(wgregion.getId());
+
+        // remove region from WorldGuard
+        // specify UNSET_PARENT_IN_CHILDREN removal strategy so that region children don't get deleted
+        rgmanager.removeRegion(wgregion.getId(), RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
+
         return true;
     }
 

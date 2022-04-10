@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
@@ -58,7 +59,7 @@ class ArgAdminRecreate {
             }
 
             for (ProtectedRegion r : toAdd) {
-                rgm.removeRegion(r.getId());
+                rgm.removeRegion(r.getId(), RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
                 rgm.addRegion(r);
             }
         }
