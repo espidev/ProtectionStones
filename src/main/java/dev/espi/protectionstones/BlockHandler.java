@@ -71,6 +71,9 @@ public class BlockHandler {
         // if the radius test region overlaps an unowned region
         if (rgm.overlapsUnownedRegion(td, lp)) {
             for (ProtectedRegion rg : rgm.getApplicableRegions(td)) {
+                // skip if the user is already an owner
+                if (rg.isOwner(lp)) continue;
+
                 if (ProtectionStones.isPSRegion(rg) && rg.getFlag(Flags.PASSTHROUGH) != StateFlag.State.ALLOW) {
                     // if it is a PS region, and "passthrough allow" is not set, then it is not far enough
                     return false;
