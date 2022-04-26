@@ -23,6 +23,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -60,12 +61,17 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+
+        // update UUID cache
         UUIDCache.removeUUID(p.getUniqueId());
         UUIDCache.removeName(p.getName());
         UUIDCache.storeUUIDNamePair(p.getUniqueId(), p.getName());
 
         // allow worldguard to resolve all UUIDs to names
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(p.getUniqueId(), p.getName()));
+
+        // add recipes to player's recipe book
+        p.discoverRecipes(RecipeUtil.getRecipeKeys());
 
         PSPlayer psp = PSPlayer.fromPlayer(p);
 

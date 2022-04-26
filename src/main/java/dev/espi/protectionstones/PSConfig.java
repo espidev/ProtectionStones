@@ -20,16 +20,11 @@ import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import dev.espi.protectionstones.utils.BlockUtil;
+import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.upgrade.ConfigUpgrades;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.apache.commons.io.IOUtils;
-import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapedRecipe;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -231,86 +226,7 @@ public class PSConfig {
             tempFile.delete();
 
             // setup crafting recipes for all blocks
-            setupRecipes();
-        }
-
-    }
-
-    static void removePSRecipes() {
-        // remove previous protectionstones recipes (/ps reload)
-        Iterator<Recipe> iter = Bukkit.getServer().recipeIterator();
-        while (iter.hasNext()) {
-            try {
-                Recipe r = iter.next();
-                if (r instanceof ShapedRecipe && (((ShapedRecipe) r).getKey().getNamespace().equalsIgnoreCase("protectionstones"))) {
-                    iter.remove();
-                }
-            } catch (Exception ignored) {
-            }
+            RecipeUtil.setupPSRecipes();
         }
     }
-
-    private static void setupRecipes() {
-        for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            // add custom recipes to Bukkit
-            if (b.allowCraftWithCustomRecipe) {
-                setupRecipe(b);
-            }
-        }
-    }
-
-    private static void setupRecipe(PSProtectBlock b) {
-        // create item
-        ItemStack item = b.createItem();
-        item.setAmount(b.recipeAmount);
-
-        // create recipe
-        // key must adhere to [a-z0-9/._-]
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(ProtectionStones.getInstance(), b.type.replaceAll("[+/=:]", "")), item);
-        HashMap<String, Character> items = new HashMap<>();
-        List<String> recipeLine = new ArrayList<>();
-        char id = 'a';
-        for (int i = 0; i < b.customRecipe.size(); i++) {
-            recipeLine.add("");
-            for (String mat : b.customRecipe.get(i)) {
-                if (mat.equals("")) {
-                    recipeLine.set(i, recipeLine.get(i) + " ");
-                } else {
-                    if (items.get(mat) == null) {
-                        items.put(mat, id++);
-                    }
-                    recipeLine.set(i, recipeLine.get(i) + items.get(mat));
-                }
-            }
-        }
-
-        // recipe
-        recipe.shape(recipeLine.toArray(new String[0]));
-        for (String mat : items.keySet()) {
-            if (Material.matchMaterial(mat) != null) { // general material type
-
-                recipe.setIngredient(items.get(mat), Material.matchMaterial(mat));
-
-            } else if (mat.startsWith("PROTECTION_STONES:")) { // ProtectionStones block
-
-                // format PROTECTION_STONES:alias
-                String alias = mat.substring(mat.indexOf(":") + 1);
-                PSProtectBlock use = ProtectionStones.getProtectBlockFromAlias(alias);
-                if (use != null && use.createItem() != null) {
-                    recipe.setIngredient(items.get(mat), new RecipeChoice.ExactChoice(use.createItem()));
-                } else {
-                    ProtectionStones.getPluginLogger().warning("Unable to resolve material " + mat + " for the crafting recipe for " + b.alias + ".");
-                }
-
-            } else {
-                ProtectionStones.getPluginLogger().warning("Unable to find material " + mat + " for the crafting recipe for " + b.alias + ".");
-            }
-        }
-        try {
-            Bukkit.addRecipe(recipe);
-        } catch (IllegalStateException e) {
-            ProtectionStones.getPluginLogger().warning("Reloading custom recipes does not work right now, you have to restart the server for updated recipes.");
-        }
-    }
-
 }

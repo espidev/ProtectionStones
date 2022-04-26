@@ -18,14 +18,13 @@ package dev.espi.protectionstones;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
+import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -75,6 +74,7 @@ public class ProtectionStones extends JavaPlugin {
     private PSConfig configOptions;
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
 
+
     // ps alias to id cache
     // <world-name, <alias, [ids]>>
     static HashMap<UUID, HashMap<String, ArrayList<String>>> regionNameToID = new HashMap<>();
@@ -89,6 +89,7 @@ public class ProtectionStones extends JavaPlugin {
 
     private boolean placeholderAPISupportEnabled = false;
 
+    // ps toggle/on/off list
     public static Set<UUID> toggleList = new HashSet<>();
 
     /* ~~~~~~~~~~ Instance methods ~~~~~~~~~~~~ */
@@ -487,7 +488,7 @@ public class ProtectionStones extends JavaPlugin {
     // called on first start, and /ps reload
     public static void loadConfig(boolean isReload) {
         // remove old ps crafting recipes
-        PSConfig.removePSRecipes();
+        RecipeUtil.removePSRecipes();
 
         // init config
         PSConfig.initConfig();
