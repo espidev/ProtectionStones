@@ -20,6 +20,7 @@ package dev.espi.protectionstones.placeholders;
 import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -110,6 +111,10 @@ class PlayerPlaceholders {
 
             World w = Bukkit.getWorld(identifier.substring("currentplayer_accessible_regions_names_".length()));
             return w == null ? "Invalid world." : getRegionsString(psp.getPSRegions(w, true), true);
+
+        } else if (identifier.startsWith("currentplayer_protection_placing_enabled")) {
+
+            return ProtectionStones.toggleList.contains(p.getUniqueId()) + "";
 
         }
         return "";
