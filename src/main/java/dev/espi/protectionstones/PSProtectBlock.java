@@ -95,6 +95,8 @@ public class PSProtectBlock {
     public String displayName;
     @Path("block_data.lore")
     public List<String> lore;
+    @Path("block_data.enchanted_effect")
+    public boolean enchantedEffect;
     @Path("block_data.price")
     @SpecDoubleInRange(min = 0.0, max = Double.MAX_VALUE)
     public double price;

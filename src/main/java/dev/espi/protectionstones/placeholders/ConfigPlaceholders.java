@@ -172,6 +172,8 @@ class ConfigPlaceholders {
                     sb.append(b.lore.get(i)).append("\n");
                 }
                 return sb.toString();
+            case "block_data_enchanted_effect":
+                return b.enchantedEffect + "";
             case "block_data_price":
                 return String.format("%.2f", b.price);
             case "block_data_allow_craft_with_custom_recipe":

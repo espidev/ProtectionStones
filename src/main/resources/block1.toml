@@ -159,6 +159,9 @@ placing_bypasses_wg_passthrough = true
         "&6(⌐■_■)ノ♪ Nobody's going to touch my stuff!",
     ]
 
+    # Whether the item should have an "glow/enchant" effect look when in a player's inventory.
+    enchanted_effect = false
+
     # Add price when using /ps get
     # Must have compatible economy plugin (requires Vault, ie. Essentials)
     # Must be a decimal (ex. not 10, but 10.0)

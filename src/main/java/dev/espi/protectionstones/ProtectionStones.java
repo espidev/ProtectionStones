@@ -33,7 +33,9 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandMap;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -461,6 +463,11 @@ public class ProtectionStones extends JavaPlugin {
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
         ItemStack is = BlockUtil.getProtectBlockItemFromType(b.type);
 
+        // add enchant effect if enabled
+        if (b.enchantedEffect) {
+            is.addUnsafeEnchantment(Enchantment.LURE, 1);
+        }
+
         ItemMeta im = is.getItemMeta();
 
         // add skull metadata, must be before others since it resets item metadata
@@ -476,6 +483,11 @@ public class ProtectionStones extends JavaPlugin {
         List<String> lore = new ArrayList<>();
         for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
         im.setLore(lore);
+
+        // hide enchant name (cannot call addUnsafeEnchantment here)
+        if (b.enchantedEffect) {
+            im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
 
         // add identifier for protection stone created items
         im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.BYTE, (byte) 1);
