@@ -18,7 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -64,7 +64,7 @@ public class ArgSethome implements PSCommandArg {
         if (r == null)
             return PSL.msg(p, PSL.NOT_IN_REGION.msg());
 
-        if (WGUtils.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false))
+        if (WGUtil.hasNoAccess(r.getWGRegion(), p, wg.wrapPlayer(p), false))
             return PSL.msg(p, PSL.NO_ACCESS.msg());
 
         Location l = p.getLocation();

@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class ChatUtils {
+public class ChatUtil {
     public static void displayDuplicateRegionAliases(Player p, List<PSRegion> r) {
         StringBuilder rep = new StringBuilder(r.get(0).getId() + " (" + r.get(0).getWorld().getName() + ")");
 

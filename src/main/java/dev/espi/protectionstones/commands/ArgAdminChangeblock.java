@@ -18,7 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -60,7 +60,7 @@ class ArgAdminChangeblock {
         if (w == null) {
             return PSL.msg(p, PSL.INVALID_WORLD.msg());
         }
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
         if (rgm == null) {
             return PSL.msg(p, ChatColor.GRAY + "The world does not have WorldGuard configured!");
         }

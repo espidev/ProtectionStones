@@ -27,7 +27,7 @@ import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
@@ -282,9 +282,9 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isProtectBlock(Block b) {
         if (!isProtectBlockType(b)) return false;
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(b.getWorld());
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(b.getWorld());
         if (rgm == null) return false;
-        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSMergedRegion.getMergedRegion(b.getLocation()) != null;
+        return rgm.getRegion(WGUtil.createPSID(b.getLocation())) != null || PSMergedRegion.getMergedRegion(b.getLocation()) != null;
     }
 
     /**
@@ -317,7 +317,7 @@ public class ProtectionStones extends JavaPlugin {
 
     public static boolean isPSNameAlreadyUsed(String name) {
         for (UUID worldUid : regionNameToID.keySet()) {
-            RegionManager rgm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(worldUid));
+            RegionManager rgm = WGUtil.getRegionManagerWithWorld(Bukkit.getWorld(worldUid));
 
             List<String> l = regionNameToID.get(worldUid).get(name);
             if (l == null) continue;
@@ -341,7 +341,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static List<PSRegion> getPSRegions(World w, String identifier) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
         if (rgm == null) return new ArrayList<>();
 
         PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
@@ -364,7 +364,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID) {
-        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtil.getRegionManagerWithWorld(w).getRegion(psID)));
         return r != null && r.deleteRegion(false);
     }
 
@@ -379,7 +379,7 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID, Player cause) {
-        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtil.getRegionManagerWithWorld(w).getRegion(psID)));
         return r != null && r.deleteRegion(false, cause);
     }
 
@@ -600,7 +600,7 @@ public class ProtectionStones extends JavaPlugin {
         // build up region cache
         getLogger().info("Building region cache...");
 
-        HashMap<World, RegionManager> regionManagers = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> regionManagers = WGUtil.getAllRegionManagers();
         for (World w : regionManagers.keySet()) {
             RegionManager rgm = regionManagers.get(w);
             HashMap<String, ArrayList<String>> m = new HashMap<>();

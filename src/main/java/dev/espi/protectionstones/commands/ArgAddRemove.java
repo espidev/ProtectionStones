@@ -15,21 +15,17 @@
 
 package dev.espi.protectionstones.commands;
 
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.util.profile.Profile;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,7 +97,7 @@ public class ArgAddRemove implements PSCommandArg {
                 if (r == null) {
                     PSL.msg(p, PSL.NOT_IN_REGION.msg());
                     return;
-                } else if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
+                } else if (WGUtil.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
                     PSL.msg(p, PSL.NO_ACCESS.msg());
                     return;
                 } else if (operationType.equals("removeowner") && addPlayerUuid.equals(p.getUniqueId()) && r.getOwners().size() == 1) {

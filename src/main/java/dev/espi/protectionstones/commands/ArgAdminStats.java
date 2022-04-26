@@ -18,7 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import dev.espi.protectionstones.ProtectionStones;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -34,7 +34,7 @@ class ArgAdminStats {
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
 
         int size = 0;
-        for (RegionManager rgm : WGUtils.getAllRegionManagers().values()) {
+        for (RegionManager rgm : WGUtil.getAllRegionManagers().values()) {
             size += rgm.getRegions().values().stream().filter(ProtectionStones::isPSRegion).count();
         }
 
@@ -42,7 +42,7 @@ class ArgAdminStats {
             String playerName = args[2];
             OfflinePlayer op = Bukkit.getOfflinePlayer(playerName);
             int count = 0;
-            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+            HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
             for (RegionManager rgm : m.values()) {
                 count += rgm.getRegionCountOfPlayer(wg.wrapOfflinePlayer(op));
             }

@@ -35,7 +35,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class WGUtils {
+public class WGUtil {
 
     // Integer.MAX_VALUE/MIN_VALUE causes strange issues with WG not detecting players in regions,
     // so we use the 16 bit limit, which is more than enough.
@@ -170,7 +170,7 @@ public class WGUtils {
         if (r instanceof ProtectedPolygonalRegion && psr instanceof PSGroupRegion) {
             PSGroupRegion psgr = (PSGroupRegion) PSRegion.fromWGRegion(w, r);
             for (PSMergedRegion psmr : psgr.getMergedRegions()) {
-                var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtils.parsePSRegionToLocation(psmr.getId()));
+                var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtil.parsePSRegionToLocation(psmr.getId()));
                 toReturn.addAll(getTransientEdgeRegionsHelper(w, testRegion, oneBlockAdjustHack));
             }
         } else if (r instanceof ProtectedCuboidRegion || (psr instanceof PSStandardRegion)) {
@@ -199,7 +199,7 @@ public class WGUtils {
 
     // whether region overlaps an unowned region that is more priority
     public static boolean overlapsStrongerRegion(World w, ProtectedRegion r, LocalPlayer lp) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
 
         ApplicableRegionSet rp = rgm.getApplicableRegions(r);
 
@@ -254,7 +254,7 @@ public class WGUtils {
     public static String matchLocationToPSID(Location l) {
         BlockVector3 v = BlockVector3.at(l.getX(), l.getY(), l.getZ());
         String currentPSID = "";
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(l.getWorld());
         List<String> idList = rgm.getApplicableRegionsIDs(v);
         if (idList.size() == 1) { // if the location is only in one region
             if (ProtectionStones.isPSRegionFormat(rgm.getRegion(idList.get(0)))) {
@@ -265,7 +265,7 @@ public class WGUtils {
             double distanceToPS = -1, tempToPS;
             for (String currentID : idList) {
                 if (ProtectionStones.isPSRegionFormat(rgm.getRegion(currentID))) {
-                    PSLocation psl = WGUtils.parsePSRegionToLocation(currentID);
+                    PSLocation psl = WGUtil.parsePSRegionToLocation(currentID);
                     Location psLocation = new Location(l.getWorld(), psl.x, psl.y, psl.z);
                     tempToPS = l.distance(psLocation);
                     if (distanceToPS == -1 || tempToPS < distanceToPS) {

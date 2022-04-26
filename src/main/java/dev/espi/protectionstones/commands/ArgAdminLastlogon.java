@@ -16,15 +16,22 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
-import dev.espi.protectionstones.utils.PlayerComparator;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 class ArgAdminLastlogon {
     // /ps admin lastlogon
+
+    static class PlayerComparator implements Comparator<OfflinePlayer> {
+        @Override
+        public int compare(OfflinePlayer o1, OfflinePlayer o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
     static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
         if (args.length < 3) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());

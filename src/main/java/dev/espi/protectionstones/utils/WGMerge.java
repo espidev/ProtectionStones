@@ -50,7 +50,7 @@ public class WGMerge {
     // build groups of overlapping regions in idToGroup and groupToIDs
     public static void findOverlappingRegionGroups(World w, List<ProtectedRegion> regions, HashMap<String, String> idToGroup, HashMap<String, ArrayList<String>> groupToIDs) {
         for (ProtectedRegion iter : regions) {
-            Set<ProtectedRegion> overlapping = WGUtils.findOverlapOrAdjacentRegions(iter, regions, w);
+            Set<ProtectedRegion> overlapping = WGUtil.findOverlapOrAdjacentRegions(iter, regions, w);
             // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(iter.getId());
             for (ProtectedRegion pr : overlapping) {
@@ -105,7 +105,7 @@ public class WGMerge {
                 String[] spl = r.getFlag(FlagHandler.PS_MERGED_REGIONS_TYPES).iterator().next().split(" ");
                 String id = spl[0], type = spl[1];
 
-                ProtectedRegion nRegion = WGUtils.getDefaultProtectedRegion(ProtectionStones.getBlockOptions(type), WGUtils.parsePSRegionToLocation(id));
+                ProtectedRegion nRegion = WGUtil.getDefaultProtectedRegion(ProtectionStones.getBlockOptions(type), WGUtil.parsePSRegionToLocation(id));
                 nRegion.copyFrom(r);
                 nRegion.setFlag(FlagHandler.PS_BLOCK_MATERIAL, type);
                 nRegion.setFlag(FlagHandler.PS_MERGED_REGIONS, null);
@@ -130,7 +130,7 @@ public class WGMerge {
                 // add decomposed regions
                 for (PSMergedRegion ps : psr.getMergedRegions()) {
                     mergedRegions.put(ps.getId(), ps);
-                    toCheck.add(WGUtils.getDefaultProtectedRegion(ps.getTypeOptions(), WGUtils.parsePSRegionToLocation(ps.getId())));
+                    toCheck.add(WGUtil.getDefaultProtectedRegion(ps.getTypeOptions(), WGUtil.parsePSRegionToLocation(ps.getId())));
                 }
 
                 // build set of groups of overlapping regions
@@ -284,7 +284,7 @@ public class WGMerge {
 
         // decompose regions down to their points
         for (PSRegion r : merge) {
-            points.addAll(WGUtils.getPointsFromDecomposedRegion(r));
+            points.addAll(WGUtil.getPointsFromDecomposedRegion(r));
             regions.add(r.getWGRegion());
         }
 
@@ -338,7 +338,7 @@ public class WGMerge {
         }
 
         // create new merged region
-        ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, WGUtils.MIN_BUILD_HEIGHT, WGUtils.MAX_BUILD_HEIGHT);
+        ProtectedRegion r = new ProtectedPolygonalRegion(newID, vertex, WGUtil.MIN_BUILD_HEIGHT, WGUtil.MAX_BUILD_HEIGHT);
 
         r.copyFrom(root.getWGRegion());
         // only make it a merged region if there is more than one contained region

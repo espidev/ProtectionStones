@@ -22,7 +22,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -49,11 +49,11 @@ class ArgAdminFlag {
             for (int i = 4; i < args.length; i++) value += args[i] + " ";
         }
 
-        if (WGUtils.getFlagRegistry().get(flag) == null)
+        if (WGUtil.getFlagRegistry().get(flag) == null)
             return PSL.msg(p, PSL.FLAG_NOT_SET.msg());
 
         final String fValue = value, fGee = gee;
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
         for (ProtectedRegion r : rgm.getRegions().values()) {
             if (ProtectionStones.isPSRegion(r) && PSRegion.fromWGRegion(w, r) != null) {
                 String flagValue = fValue;

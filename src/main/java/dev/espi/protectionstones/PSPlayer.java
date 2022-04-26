@@ -18,11 +18,7 @@ package dev.espi.protectionstones;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
-import dev.espi.protectionstones.utils.WGUtils;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.query.QueryOptions;
+import dev.espi.protectionstones.utils.WGUtil;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -274,7 +270,7 @@ public class PSPlayer {
      * @return the regions that the player owes tax money to
      */
     public List<PSRegion> getTaxEligibleRegions() {
-        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
         List<PSRegion> ret = new ArrayList<>();
 
         for (World w : m.keySet()) {
@@ -300,7 +296,7 @@ public class PSPlayer {
      */
 
     public List<PSRegion> getPSRegions(World w, boolean canBeMember) {
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
         if (rgm == null) return new ArrayList<>();
 
         return rgm.getRegions().values().stream()
@@ -329,7 +325,7 @@ public class PSPlayer {
         // obtain cross-world named worlds
         ProtectionStones.regionNameToID.forEach((rw, rs) -> {
             World world = Bukkit.getWorld(rw);
-            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
+            RegionManager rm = WGUtil.getRegionManagerWithWorld(world);
             if (rm != null) {
                 rs.values().forEach(rIds -> rIds.forEach(rId -> {
 

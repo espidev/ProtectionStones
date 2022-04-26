@@ -16,7 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -158,7 +158,7 @@ public class ArgHome implements PSCommandArg {
                     return;
                 }
                 if (regions.size() > 1) {
-                    ChatUtils.displayDuplicateRegionAliases(p, regions);
+                    ChatUtil.displayDuplicateRegionAliases(p, regions);
                     return;
                 }
 

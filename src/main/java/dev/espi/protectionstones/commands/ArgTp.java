@@ -16,7 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.ChatUtils;
+import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -75,7 +75,7 @@ public class ArgTp implements PSCommandArg {
                     return;
                 }
                 if (regions.size() > 1) {
-                    ChatUtils.displayDuplicateRegionAliases(p, regions);
+                    ChatUtil.displayDuplicateRegionAliases(p, regions);
                     return;
                 }
                 teleportPlayer(p, regions.get(0));

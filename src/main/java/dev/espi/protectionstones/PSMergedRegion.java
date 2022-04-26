@@ -17,13 +17,12 @@ package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -76,8 +75,8 @@ public class PSMergedRegion extends PSRegion {
      * @return the {@link PSMergedRegion} of the source block location, or null if not applicable
      */
     public static PSMergedRegion getMergedRegion(Location l) {
-        String psID = WGUtils.createPSID(l);
-        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        String psID = WGUtil.createPSID(l);
+        RegionManager rgm = WGUtil.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
         for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
@@ -284,7 +283,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public Block getProtectBlock() {
-        PSLocation psl = WGUtils.parsePSRegionToLocation(id);
+        PSLocation psl = WGUtil.parsePSRegionToLocation(id);
         return world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
@@ -365,7 +364,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public List<BlockVector2> getPoints() {
-        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id)).getPoints();
+        return WGUtil.getDefaultProtectedRegion(getTypeOptions(), WGUtil.parsePSRegionToLocation(id)).getPoints();
     }
 
     @Override
@@ -402,6 +401,6 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public ProtectedRegion getWGRegion() {
-        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id));
+        return WGUtil.getDefaultProtectedRegion(getTypeOptions(), WGUtil.parsePSRegionToLocation(id));
     }
 }

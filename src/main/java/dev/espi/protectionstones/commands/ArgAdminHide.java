@@ -20,7 +20,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -33,7 +33,7 @@ class ArgAdminHide {
         RegionManager mgr;
         World w;
         if (p instanceof Player) {
-            mgr = WGUtils.getRegionManagerWithPlayer((Player) p);
+            mgr = WGUtil.getRegionManagerWithPlayer((Player) p);
             w = ((Player) p).getWorld();
         } else {
             if (args.length != 3) {
@@ -45,7 +45,7 @@ class ArgAdminHide {
                 return true;
             }
             w = Bukkit.getWorld(args[2]);
-            mgr = WGUtils.getRegionManagerWithWorld(w);
+            mgr = WGUtil.getRegionManagerWithWorld(w);
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

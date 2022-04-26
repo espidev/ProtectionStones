@@ -19,7 +19,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -74,7 +74,7 @@ public class PSEconomy {
     }
 
     private void updateTaxes() {
-        WGUtils.getAllRegionManagers()
+        WGUtil.getAllRegionManagers()
                 .forEach((w, rgm) -> {
                     for (ProtectedRegion r : rgm.getRegions().values()) {
                         if (ProtectionStones.isPSRegion(r)) {
@@ -106,7 +106,7 @@ public class PSEconomy {
     public void loadRentList() {
         rentedList = new ArrayList<>();
 
-        HashMap<World, RegionManager> managers = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> managers = WGUtil.getAllRegionManagers();
 
         for (World w : managers.keySet()) {
             RegionManager rgm = managers.get(w);

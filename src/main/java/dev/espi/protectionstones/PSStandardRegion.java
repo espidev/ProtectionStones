@@ -22,7 +22,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -385,7 +385,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public Block getProtectBlock() {
-        PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
+        PSLocation psl = WGUtil.parsePSRegionToLocation(wgregion.getId());
         return world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
@@ -478,13 +478,13 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public List<PSRegion> getMergeableRegions(Player p) {
-        return WGUtils.findOverlapOrAdjacentRegions(getWGRegion(), getWGRegionManager(), getWorld())
+        return WGUtil.findOverlapOrAdjacentRegions(getWGRegion(), getWGRegionManager(), getWorld())
                 .stream()
                 .map(r -> PSRegion.fromWGRegion(getWorld(), r))
                 .filter(r -> r != null && r.getTypeOptions() != null && !r.getId().equals(getId()))
                 .filter(r -> r.getTypeOptions().allowMerging)
                 .filter(r -> r.isOwner(p.getUniqueId()) || p.hasPermission("protectionstones.admin"))
-                .filter(r -> WGUtils.canMergeRegionTypes(getTypeOptions(), r))
+                .filter(r -> WGUtil.canMergeRegionTypes(getTypeOptions(), r))
                 .collect(Collectors.toList());
     }
 

@@ -23,7 +23,7 @@ import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.WGUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -61,7 +61,7 @@ public class ArgInfo implements PSCommandArg {
         if (r == null)
             return PSL.NOT_IN_REGION.send(p);
 
-        if (!p.hasPermission("protectionstones.info.others") && WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
+        if (!p.hasPermission("protectionstones.info.others") && WGUtil.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), true))
             return PSL.NO_ACCESS.send(p);
 
         if (r.getTypeOptions() == null) {
@@ -114,7 +114,7 @@ public class ArgInfo implements PSCommandArg {
             BlockVector3 min = r.getWGRegion().getMinimumPoint();
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             // only show x,z if it's at block limit
-            if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
+            if (min.getBlockY() == WGUtil.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtil.MAX_BUILD_HEIGHT) {
                 PSL.INFO_BOUNDS_XZ.send(p,
                         min.getBlockX(), min.getBlockZ(),
                         max.getBlockX(), max.getBlockZ()
@@ -194,7 +194,7 @@ public class ArgInfo implements PSCommandArg {
         StringBuilder flagDisp = new StringBuilder();
         String flagValue;
         // loop through all flags
-        for (Flag<?> flag : WGUtils.getFlagRegistry().getAll()) {
+        for (Flag<?> flag : WGUtil.getFlagRegistry().getAll()) {
             if (region.getFlag(flag) != null && !typeOptions.hiddenFlagsFromInfo.contains(flag.getName())) {
                 flagValue = region.getFlag(flag).toString();
                 RegionGroupFlag groupFlag = flag.getRegionGroupFlag();

@@ -19,7 +19,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -91,7 +90,7 @@ public class LimitUtil {
             int total = 0;
 
             // find total number of rented regions
-            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+            HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
             for (World w : m.keySet()) {
                 RegionManager rgm = m.get(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
@@ -119,7 +118,7 @@ public class LimitUtil {
         }
 
         HashMap<PSProtectBlock, Integer> counts = new HashMap<>();
-        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
+        HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
 
         for (World w : m.keySet()) {
             psp.getPSRegions(w, false).forEach(r -> {
