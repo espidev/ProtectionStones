@@ -15,8 +15,8 @@
 
     <licenses>
       <license>
-        <name>The Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <name>GPLv3</name>
+        <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
       </license>
     </licenses>
 
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.4</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <configuration>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
