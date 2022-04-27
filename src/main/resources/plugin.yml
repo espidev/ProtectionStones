@@ -19,7 +19,7 @@ permissions:
     description: Allow players to unclaim their region using /ps unclaim.
     default: op
   protectionstones.unclaim.remote:
-    description: Allow players to unclaim their region remotely using /ps unclaim list|PsID.
+    description: Allow players to unclaim their region remotely using /ps unclaim [list|region-id].
     default: op
   protectionstones.view:
     description: Allows players the use of /ps view in their own regions.

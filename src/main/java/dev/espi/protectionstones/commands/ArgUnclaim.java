@@ -65,7 +65,7 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
-        if (args.length >= 2) { // /ps unclaim list|id (unclaim remote region)
+        if (args.length >= 2) { // /ps unclaim [list|region-id] (unclaim remote region)
 
             if (!p.hasPermission("protectionstones.unclaim.remote")) {
                 PSL.msg(p, PSL.NO_PERMISSION_UNCLAIM_REMOTE.msg());
