@@ -24,7 +24,7 @@ import com.sk89q.worldguard.session.SessionManager;
 import com.sk89q.worldguard.session.handler.ExitFlag;
 import dev.espi.protectionstones.flags.FarewellFlagHandler;
 import dev.espi.protectionstones.flags.GreetingFlagHandler;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,7 +64,7 @@ public class FlagHandler {
 
     // called on initial start
     static void registerFlags() {
-        FlagRegistry registry = WGUtil.getFlagRegistry();
+        FlagRegistry registry = WGUtils.getFlagRegistry();
         try {
             registry.register(PS_HOME);
             registry.register(PS_BLOCK_MATERIAL);
@@ -105,7 +105,7 @@ public class FlagHandler {
     // adds flag permissions for ALL registered WorldGuard flags
     // by default, all players have access to it
     static void initializePermissions() {
-        for (Flag<?> flag : WGUtil.getFlagRegistry().getAll()) {
+        for (Flag<?> flag : WGUtils.getFlagRegistry().getAll()) {
             Bukkit.getPluginManager().addPermission(new Permission("protectionstones.flags.edit." + flag.getName(),
                     "Given to all players by default. Remove if you do not want the player to have the ability to edit this flag with /ps flag.",
                     PermissionDefault.TRUE));
@@ -128,7 +128,7 @@ public class FlagHandler {
 
     // Edit flags that require placeholders (variables)
     public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
-        for (Flag<?> f : getPlayerPlaceholderFlags().stream().map(WGUtil.getFlagRegistry()::get).collect(Collectors.toList())) {
+        for (Flag<?> f : getPlayerPlaceholderFlags().stream().map(WGUtils.getFlagRegistry()::get).collect(Collectors.toList())) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
 
@@ -199,7 +199,7 @@ public class FlagHandler {
                 }
 
                 // determine worldguard flag object
-                Flag<?> flag = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), flagName);
+                Flag<?> flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
                 FlagContext fc = FlagContext.create().setInput(settings).build();
 
                 // warn if flag setting has already been set

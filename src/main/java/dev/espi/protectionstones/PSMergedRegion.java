@@ -22,7 +22,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -75,8 +75,8 @@ public class PSMergedRegion extends PSRegion {
      * @return the {@link PSMergedRegion} of the source block location, or null if not applicable
      */
     public static PSMergedRegion getMergedRegion(Location l) {
-        String psID = WGUtil.createPSID(l);
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(l.getWorld());
+        String psID = WGUtils.createPSID(l);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
         for (ProtectedRegion pr : rgm.getApplicableRegions(BlockVector3.at(l.getX(), l.getY(), l.getZ()))) {
@@ -283,7 +283,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public Block getProtectBlock() {
-        PSLocation psl = WGUtil.parsePSRegionToLocation(id);
+        PSLocation psl = WGUtils.parsePSRegionToLocation(id);
         return world.getBlockAt(psl.x, psl.y, psl.z);
     }
 
@@ -364,7 +364,7 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public List<BlockVector2> getPoints() {
-        return WGUtil.getDefaultProtectedRegion(getTypeOptions(), WGUtil.parsePSRegionToLocation(id)).getPoints();
+        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id)).getPoints();
     }
 
     @Override
@@ -401,6 +401,6 @@ public class PSMergedRegion extends PSRegion {
 
     @Override
     public ProtectedRegion getWGRegion() {
-        return WGUtil.getDefaultProtectedRegion(getTypeOptions(), WGUtil.parsePSRegionToLocation(id));
+        return WGUtils.getDefaultProtectedRegion(getTypeOptions(), WGUtils.parsePSRegionToLocation(id));
     }
 }

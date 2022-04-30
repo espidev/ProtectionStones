@@ -23,7 +23,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -41,7 +41,7 @@ public class LegacyUpgrade {
     // upgrade to 1.17, upgrade regions with 0->256 to SHORT_MIN->SHORT_MAX
     public static void upgradeRegionsWithNegativeYValues() {
         ProtectionStones.getInstance().getLogger().info("Upgrading region y-values for 1.17...");
-        for (RegionManager rgm : WGUtil.getAllRegionManagers().values()) {
+        for (RegionManager rgm : WGUtils.getAllRegionManagers().values()) {
             List<ProtectedRegion> newRegions = new ArrayList<>();
 
             // loop through each region
@@ -51,10 +51,10 @@ public class LegacyUpgrade {
                     // clone region, and recreate with new min/max points
                     ProtectedRegion toAdd = null;
                     if (region instanceof ProtectedPolygonalRegion) { // convert merged region
-                        toAdd = new ProtectedPolygonalRegion(region.getId(), region.getPoints(), WGUtil.MIN_BUILD_HEIGHT, WGUtil.MAX_BUILD_HEIGHT);
+                        toAdd = new ProtectedPolygonalRegion(region.getId(), region.getPoints(), WGUtils.MIN_BUILD_HEIGHT, WGUtils.MAX_BUILD_HEIGHT);
                     } else if (region instanceof ProtectedCuboidRegion) { // convert standard region
-                        BlockVector3 minVec = BlockVector3.at(region.getMinimumPoint().getX(), WGUtil.MIN_BUILD_HEIGHT, region.getMinimumPoint().getZ()),
-                                     maxVec = BlockVector3.at(region.getMaximumPoint().getX(), WGUtil.MAX_BUILD_HEIGHT, region.getMaximumPoint().getZ());
+                        BlockVector3 minVec = BlockVector3.at(region.getMinimumPoint().getX(), WGUtils.MIN_BUILD_HEIGHT, region.getMinimumPoint().getZ()),
+                                     maxVec = BlockVector3.at(region.getMaximumPoint().getX(), WGUtils.MAX_BUILD_HEIGHT, region.getMaximumPoint().getZ());
                         toAdd = new ProtectedCuboidRegion(region.getId(), minVec, maxVec);
                     }
 
@@ -96,7 +96,7 @@ public class LegacyUpgrade {
         }
 
         for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WGUtil.getRegionManagerWithWorld(world);
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
             for (ProtectedRegion r : rm.getRegions().values()) {
                 if (ProtectionStones.isPSRegion(r)) {
                     PSRegion psr = PSRegion.fromWGRegion(world, r);
@@ -149,11 +149,11 @@ public class LegacyUpgrade {
             hideFile = YamlConfiguration.loadConfiguration(new File(ProtectionStones.getInstance().getDataFolder() + "/hiddenpstones.yml"));
         }
         for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WGUtil.getRegionManagerWithWorld(world);
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
             for (String regionName : rm.getRegions().keySet()) {
                 if (regionName.startsWith("ps") && !ProtectionStones.isPSRegion(rm.getRegion(regionName))) {
                     try {
-                        PSLocation psl = WGUtil.parsePSRegionToLocation(regionName);
+                        PSLocation psl = WGUtils.parsePSRegionToLocation(regionName);
                         ProtectedRegion r = rm.getRegion(regionName);
 
                         // get material of ps
@@ -193,7 +193,7 @@ public class LegacyUpgrade {
     public static void convertToUUID() {
         Bukkit.getLogger().info("Updating PS regions to UUIDs...");
         for (World world : Bukkit.getWorlds()) {
-            RegionManager rm = WGUtil.getRegionManagerWithWorld(world);
+            RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
 
             // iterate over regions in world
             for (String regionName : rm.getRegions().keySet()) {

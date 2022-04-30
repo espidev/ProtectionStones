@@ -19,7 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -88,7 +88,7 @@ public class ArgFlag implements PSCommandArg {
                 String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
 
                 // match flag
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), flag);
+                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flag);
                 if (f == null) continue;
                 Object fValue = r.getWGRegion().getFlag(f);
 
@@ -237,7 +237,7 @@ public class ArgFlag implements PSCommandArg {
             PSL.msg(p, PSL.NOT_IN_REGION.msg());
             return true;
         }
-        if (WGUtil.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
+        if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
             PSL.msg(p, PSL.NO_ACCESS.msg());
             return true;
         }
@@ -309,7 +309,7 @@ public class ArgFlag implements PSCommandArg {
             } else if (args.length == 3) { // flag options
                 keywords.addAll(Arrays.asList("null", "default"));
 
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), args[1]);
+                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[1]);
                 if (f instanceof StateFlag) {
                     keywords.addAll(Arrays.asList("allow", "deny"));
                 } else if (f instanceof BooleanFlag) {
@@ -328,7 +328,7 @@ public class ArgFlag implements PSCommandArg {
             } else if (args.length == 5 && args[1].equals("-g")) { // -g option flag arg
                 keywords.addAll(Arrays.asList("null", "default"));
 
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), args[3]);
+                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), args[3]);
                 if (f instanceof StateFlag) {
                     keywords.addAll(Arrays.asList("allow", "deny"));
                 } else if (f instanceof BooleanFlag) {
@@ -347,7 +347,7 @@ public class ArgFlag implements PSCommandArg {
         String[] flagSplit = flagName.split(":");
         if (flagSplit.length == 2) flagName = flagSplit[1];
 
-        Flag flag = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), flagName);
+        Flag flag = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagName);
         ProtectedRegion region = r.getWGRegion();
 
         try {

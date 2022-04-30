@@ -23,7 +23,7 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ class RegionPlaceholders {
             List<PSRegion> r;
             if (p == null) {
                 r = new ArrayList<>();
-                WGUtil.getAllRegionManagers().forEach((w, rgm) -> r.addAll(ProtectionStones.getPSRegions(w, regionIdentifier)));
+                WGUtils.getAllRegionManagers().forEach((w, rgm) -> r.addAll(ProtectionStones.getPSRegions(w, regionIdentifier)));
             } else {
                 r = ProtectionStones.getPSRegions(p.getWorld(), regionIdentifier);
             }
@@ -113,7 +113,7 @@ class RegionPlaceholders {
         } else if (identifier.startsWith("flags_")) {
             String[] spl = identifier.split("_");
             if (spl.length > 1) {
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtil.getFlagRegistry(), spl[1]);
+                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), spl[1]);
                 if (r.getWGRegion().getFlag(f) != null) {
                     return r.getWGRegion().getFlag(f).toString();
                 }

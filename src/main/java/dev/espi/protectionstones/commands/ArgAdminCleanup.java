@@ -20,7 +20,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -86,7 +86,7 @@ class ArgAdminCleanup {
             }
         }
 
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         Map<String, ProtectedRegion> regions = rgm.getRegions();
 
         // async cleanup task

@@ -24,7 +24,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -94,7 +94,7 @@ public class ArgAdminForceMerge {
             }
         }
 
-        RegionManager rm = WGUtil.getRegionManagerWithWorld(Bukkit.getWorld(world));
+        RegionManager rm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(world));
 
         HashMap<String, String> idToGroup = new HashMap<>();
         HashMap<String, List<PSRegion>> groupToMembers = new HashMap<>();

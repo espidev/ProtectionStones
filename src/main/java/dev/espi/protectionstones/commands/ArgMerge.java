@@ -21,7 +21,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -105,7 +105,7 @@ public class ArgMerge implements PSCommandArg {
             }
 
         } else if (args.length == 3) { // /ps merge [region] [root]
-            RegionManager rm = WGUtil.getRegionManagerWithPlayer(p);
+            RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
             ProtectedRegion region = rm.getRegion(args[1]), root = rm.getRegion(args[2]);
             LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
 
@@ -116,7 +116,7 @@ public class ArgMerge implements PSCommandArg {
                 return PSL.msg(p, PSL.NO_ACCESS.msg());
 
             // check if region is actually overlapping the region
-            var overlappingRegionIds = WGUtil.findOverlapOrAdjacentRegions(root, rm, p.getWorld()).stream().map(ProtectedRegion::getId).collect(Collectors.toList());
+            var overlappingRegionIds = WGUtils.findOverlapOrAdjacentRegions(root, rm, p.getWorld()).stream().map(ProtectedRegion::getId).collect(Collectors.toList());
             if (!overlappingRegionIds.contains(region.getId()))
                 return PSL.msg(p, PSL.REGION_NOT_OVERLAPPING.msg());
 
@@ -126,7 +126,7 @@ public class ArgMerge implements PSCommandArg {
                 return PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
 
             // check if the region types allow for it
-            if (!WGUtil.canMergeRegionTypes(aRegion.getTypeOptions(), aRoot))
+            if (!WGUtils.canMergeRegionTypes(aRegion.getTypeOptions(), aRoot))
                 return PSL.msg(p, PSL.MERGE_NOT_ALLOWED.msg());
 
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {

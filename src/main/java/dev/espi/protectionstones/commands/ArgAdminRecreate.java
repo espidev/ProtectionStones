@@ -19,7 +19,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -33,7 +33,7 @@ class ArgAdminRecreate {
     static boolean argumentAdminRecreate(CommandSender s, String[] args) {
         s.sendMessage(ChatColor.YELLOW + "Recreating...");
 
-        HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
+        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
         for (World w : m.keySet()) {
             RegionManager rgm = m.get(w);
 
@@ -50,7 +50,7 @@ class ArgAdminRecreate {
                         continue;
                     }
 
-                    ProtectedRegion nr = WGUtil.getDefaultProtectedRegion(blockOptions, WGUtil.parsePSRegionToLocation(wr.getId()));
+                    ProtectedRegion nr = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(wr.getId()));
                     nr.copyFrom(r); // copy region data over
                     toAdd.add(nr);
                 }

@@ -29,7 +29,7 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
@@ -61,12 +61,12 @@ public class BlockHandler {
     }
 
     private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World w, LocalPlayer lp, double bx, double by, double bz) {
-        BlockVector3 min = WGUtil.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
-        BlockVector3 max = WGUtil.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
+        BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
+        BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
         ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), true, min, max);
         td.setPriority(blockOptions.priority);
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
 
         // if the radius test region overlaps an unowned region
         if (rgm.overlapsUnownedRegion(td, lp)) {
@@ -111,7 +111,7 @@ public class BlockHandler {
         }
 
         // check if it is in a WorldGuard region
-        RegionManager rgm = WGUtil.getRegionManagerWithPlayer(p);
+        RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
         if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(BlockVector3.at(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ())).size() == 0) {
             PSL.msg(p, PSL.MUST_BE_PLACED_IN_EXISTING_REGION.msg());
             e.setCancelled(true);
@@ -200,10 +200,10 @@ public class BlockHandler {
         // create region
         double bx = l.getX(), by = l.getY(), bz = l.getZ();
 
-        RegionManager rm = WGUtil.getRegionManagerWithPlayer(p);
+        RegionManager rm = WGUtils.getRegionManagerWithPlayer(p);
         LocalPlayer lp = WorldGuardPlugin.inst().wrapPlayer(p);
 
-        String id = WGUtil.createPSID(bx, by, bz);
+        String id = WGUtils.createPSID(bx, by, bz);
 
         // if the region's id already exists, possibly placing block where a region is hidden
         if (rm.hasRegion(id)) {
@@ -220,13 +220,13 @@ public class BlockHandler {
         }
 
         // create actual region
-        ProtectedRegion region = WGUtil.getDefaultProtectedRegion(blockOptions, WGUtil.parsePSRegionToLocation(id));
+        ProtectedRegion region = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(id));
         region.getOwners().addPlayer(p.getUniqueId());
         region.setPriority(blockOptions.priority);
         rm.addRegion(region); // added to the region manager, be careful in implementing checks
 
         // check if new region overlaps more powerful region
-        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtil.overlapsStrongerRegion(p.getWorld(), region, lp)) {
+        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
             rm.removeRegion(id);
             PSL.msg(p, PSL.REGION_OVERLAP.msg());
             return false;
@@ -250,7 +250,7 @@ public class BlockHandler {
         // check for player's number of adjacent region groups
         if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
             if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
-                HashMap<String, ArrayList<String>> adjGroups = WGUtil.getPlayerAdjacentRegionGroups(p, rm);
+                HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
 
                 int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
                 if (adjGroups.size() > permNum && permNum != -1) {

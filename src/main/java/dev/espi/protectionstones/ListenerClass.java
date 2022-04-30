@@ -25,7 +25,7 @@ import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -339,11 +339,11 @@ public class ListenerClass implements Listener {
         BlockState bs = e.getBlockState();
         if (!ProtectionStones.isProtectBlockType(bs.getType().toString())) return;
 
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(bs.getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(bs.getWorld());
         if (rgm == null) return;
 
         // check if the block is a source block
-        ProtectedRegion br = rgm.getRegion(WGUtil.createPSID(bs.getLocation()));
+        ProtectedRegion br = rgm.getRegion(WGUtils.createPSID(bs.getLocation()));
         if (!ProtectionStones.isPSRegion(br) && PSMergedRegion.getMergedRegion(bs.getLocation()) == null) return;
 
         PSRegion r = PSRegion.fromLocation(bs.getLocation());
@@ -416,7 +416,7 @@ public class ListenerClass implements Listener {
     // returns whether the block is exploded
     private boolean blockExplodeUtil(World w, Block b) {
         if (ProtectionStones.isProtectBlock(b)) {
-            String id = WGUtil.createPSID(b.getLocation());
+            String id = WGUtils.createPSID(b.getLocation());
             PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
 
             // if prevent explode
@@ -448,7 +448,7 @@ public class ListenerClass implements Listener {
         if (event.getPlayer().hasPermission("protectionstones.tp.bypassprevent")) return;
 
         WorldGuardPlugin wg = WorldGuardPlugin.inst();
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(event.getTo().getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(event.getTo().getWorld());
         BlockVector3 v = BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ());
 
         if (rgm != null) {

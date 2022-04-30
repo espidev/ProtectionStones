@@ -90,7 +90,7 @@ public class LimitUtil {
             int total = 0;
 
             // find total number of rented regions
-            HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
+            HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
             for (World w : m.keySet()) {
                 RegionManager rgm = m.get(w);
                 for (ProtectedRegion r : rgm.getRegions().values()) {
@@ -118,7 +118,7 @@ public class LimitUtil {
         }
 
         HashMap<PSProtectBlock, Integer> counts = new HashMap<>();
-        HashMap<World, RegionManager> m = WGUtil.getAllRegionManagers();
+        HashMap<World, RegionManager> m = WGUtils.getAllRegionManagers();
 
         for (World w : m.keySet()) {
             psp.getPSRegions(w, false).forEach(r -> {

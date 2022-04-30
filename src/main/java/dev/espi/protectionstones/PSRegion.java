@@ -19,7 +19,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.BlockUtil;
-import dev.espi.protectionstones.utils.WGUtil;
+import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -70,7 +70,7 @@ public abstract class PSRegion {
      */
     public static PSRegion fromLocationUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(l.getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
         // check exact location first for merged region block
@@ -102,11 +102,11 @@ public abstract class PSRegion {
      */
     public static PSRegion fromLocationGroupUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(l.getWorld());
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
         if (rgm == null) return null;
 
         // check if location is in a region
-        String psID = WGUtil.matchLocationToPSID(l);
+        String psID = WGUtils.matchLocationToPSID(l);
         ProtectedRegion r = rgm.getRegion(psID);
 
         if (r == null) {
@@ -129,9 +129,9 @@ public abstract class PSRegion {
     public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
         if (!ProtectionStones.isPSRegionFormat(r)) return null;
         if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
-            return new PSGroupRegion(r, WGUtil.getRegionManagerWithWorld(checkNotNull(w)), w);
+            return new PSGroupRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
         } else {
-            return new PSStandardRegion(r, WGUtil.getRegionManagerWithWorld(checkNotNull(w)), w);
+            return new PSStandardRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
         }
     }
 
@@ -144,7 +144,7 @@ public abstract class PSRegion {
      */
 
     public static List<PSRegion> fromName(World w, String name) {
-        RegionManager rgm = WGUtil.getRegionManagerWithWorld(w);
+        RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) return new ArrayList<>();
 
         List<PSRegion> l = new ArrayList<>();
