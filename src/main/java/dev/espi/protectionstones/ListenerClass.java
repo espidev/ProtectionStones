@@ -389,6 +389,8 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        if (!ProtectionStones.isProtectBlock(e.getBlock())) return;
+
         var region = PSRegion.fromLocation(e.getBlock().getLocation());
         // events like ender dragon block break, wither running into block break, etc.
         if (region != null && region.getTypeOptions() != null) {
