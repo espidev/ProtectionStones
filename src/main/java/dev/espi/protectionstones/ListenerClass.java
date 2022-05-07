@@ -36,6 +36,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -391,15 +392,10 @@ public class ListenerClass implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent e) {
         if (!ProtectionStones.isProtectBlock(e.getBlock())) return;
 
-        var region = PSRegion.fromLocation(e.getBlock().getLocation());
         // events like ender dragon block break, wither running into block break, etc.
-        if (region != null && region.getTypeOptions() != null) {
-            if (!blockExplodeUtil(e.getBlock().getWorld(), e.getBlock())) {
-                // if block shouldn't be exploded, cancel the event
-                e.setCancelled(true);
-            } else if (region.getTypeOptions().destroyRegionWhenExplode) {
-                region.deleteRegion(true);
-            }
+        if (!blockExplodeUtil(e.getBlock().getWorld(), e.getBlock())) {
+            // if block shouldn't be exploded, cancel the event
+            e.setCancelled(true);
         }
     }
 
