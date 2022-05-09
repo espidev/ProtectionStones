@@ -45,14 +45,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.FurnaceBurnEvent;
-import org.bukkit.event.inventory.FurnaceSmeltEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.GrindstoneInventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -282,6 +281,20 @@ public class ListenerClass implements Listener {
             }
         }
     }
+
+
+    // -=-=-=- disable grindstone inventory to prevent infinite exp exploit with enchanted_effect option  -=-=-=-
+    // see https://github.com/espidev/ProtectionStones/issues/324
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onInventoryClickEvent(InventoryClickEvent e) {
+        if (e.getInventory().getType() == InventoryType.GRINDSTONE) {
+            if (ProtectionStones.isProtectBlockItem(e.getCurrentItem())) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
 
     // -=-=-=- block changes to protection block related events -=-=-=-
 
