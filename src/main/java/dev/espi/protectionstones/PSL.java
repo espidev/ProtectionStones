@@ -465,6 +465,7 @@ public enum PSL {
     public static void loadConfig() {
         YamlConfiguration yml = new YamlConfiguration();
 
+        // check if messages.yml exists
         if (!conf.exists()) {
             try {
                 conf.createNewFile();
@@ -473,20 +474,17 @@ public enum PSL {
             }
         }
 
+        // load config
         try {
             yml.load(conf); // can throw error
             for (PSL psl : PSL.values()) {
 
                 // fix message if need be
                 if (yml.getString(psl.path) == null) { // if msg not found in config
-                    yml.set(psl.path, psl.defaultMessage);
+                    yml.set(psl.path, applyConfigColours(psl.defaultMessage));
                 } else {
-                    // psl upgrade conversions
-                    if (psl == PSL.REACHED_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more protected regions.")) {
-                        yml.set(psl.path, psl.defaultMessage);
-                    } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && yml.getString(psl.path).equals("&cYou can not create any more regions of this type.")) {
-                        yml.set(psl.path, psl.defaultMessage);
-                    }
+                    // perform message upgrades
+                    messageUpgrades(psl, yml);
                 }
 
                 // load message
@@ -500,6 +498,21 @@ public enum PSL {
             }
         } catch (Exception e) { // prevent bad messages.yml file from resetting the file
             e.printStackTrace();
+        }
+    }
+
+    // message upgrades over time
+    private static void messageUpgrades(PSL psl, YamlConfiguration yml) {
+        String value = yml.getString(psl.path);
+        assert(value != null);
+
+        // psl upgrade conversions
+        if (psl == PSL.REACHED_REGION_LIMIT && value.equals("&cYou can not create any more protected regions.")) {
+            yml.set(psl.path, psl.defaultMessage);
+        } else if (psl == PSL.REACHED_PER_BLOCK_REGION_LIMIT && value.equals("&cYou can not create any more regions of this type.")) {
+            yml.set(psl.path, psl.defaultMessage);
+        } else if (value.contains("§")) {
+            yml.set(psl.path, applyConfigColours(value));
         }
     }
 
@@ -522,5 +535,9 @@ public enum PSL {
         }
 
         return msg.replace('&', '§');
+    }
+
+    private static String applyConfigColours(String msg) {
+        return msg.replace('§', '&');
     }
 }
