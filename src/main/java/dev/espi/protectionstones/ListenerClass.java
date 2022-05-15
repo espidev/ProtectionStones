@@ -15,12 +15,17 @@
 
 package dev.espi.protectionstones;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.event.block.PlaceBlockEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.RecipeUtil;
@@ -101,11 +106,27 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlaceLowPriority(PlaceBlockEvent event) {
         var cause = event.getCause().getRootCause();
-        if (cause instanceof Player && event.getBlocks().size() >= 1) {
+
+        if (cause instanceof Player player && event.getBlocks().size() >= 1) {
             var block = event.getBlocks().get(0);
             var options = ProtectionStones.getBlockOptions(block);
+
             if (options != null && options.placingBypassesWGPassthrough) {
-                event.setResult(Event.Result.ALLOW);
+                // check if any regions here have the passthrough flag
+                // we can't query unfortunately, since null flags seem to equate to ALLOW, when we want it to be DENY
+                ApplicableRegionSet set = WGUtils.getRegionManagerWithWorld(event.getWorld()).getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation()));
+
+                // loop through regions, if any region does not have passthrough = deny, then don't allow
+                for (var region : set.getRegions()) {
+                    if (region.getFlag(Flags.PASSTHROUGH) == null || region.getFlag(Flags.PASSTHROUGH) == StateFlag.State.DENY) {
+                        return;
+                    }
+                }
+
+                // if there was at least one region with passthrough = allow, then allow passthrough of protection block
+                if (!set.getRegions().isEmpty()) {
+                    event.setResult(Event.Result.ALLOW);
+                }
             }
         }
     }
