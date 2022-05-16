@@ -273,7 +273,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setTaxPaymentsDue(List<TaxPayment> taxPayments) {
-        wgregion.setFlag(FlagHandler.PS_TAX_PAYMENTS_DUE, taxPayments.stream().map(TaxPayment::toFlagEntry).collect(Collectors.toSet()));
+        WGUtils.setFlagIfNeeded(wgregion, FlagHandler.PS_TAX_PAYMENTS_DUE, taxPayments.stream().map(TaxPayment::toFlagEntry).collect(Collectors.toSet()));
     }
 
     @Override
@@ -297,7 +297,8 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setRegionLastTaxPaymentAddedEntries(List<LastRegionTaxPaymentEntry> entries) {
-        wgregion.setFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, entries.stream().map(LastRegionTaxPaymentEntry::toFlagEntry).collect(Collectors.toSet()));
+        Set<String> set = entries.stream().map(LastRegionTaxPaymentEntry::toFlagEntry).collect(Collectors.toSet());
+        WGUtils.setFlagIfNeeded(wgregion, FlagHandler.PS_TAX_LAST_PAYMENT_ADDED, set);
     }
 
     @Override
@@ -307,7 +308,7 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public void setTaxAutopayer(UUID player) {
-        wgregion.setFlag(FlagHandler.PS_TAX_AUTOPAYER, player == null ? null : player.toString());
+        WGUtils.setFlagIfNeeded(wgregion, FlagHandler.PS_TAX_AUTOPAYER, player == null ? null : player.toString());
     }
 
     @Override
