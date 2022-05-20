@@ -413,4 +413,51 @@ public class WGUtils {
         }
         return current.allowedMergingIntoTypes.contains(mergeInto.getTypeOptions().alias);
     }
+
+    // set a flag on a region, only saving it to db if it is actually a new value
+    // prevents unnecessary messages in the console from saves
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<String>> void setFlagIfNeeded(ProtectedRegion region, T flag, String value) {
+        String curValue = region.getFlag(flag);
+        if ((curValue == null && value == null) || (curValue != null && !curValue.equals(value))) {
+            region.setFlag(flag, value);
+        }
+    }
+
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<Set<V>>, V> void setFlagIfNeeded(ProtectedRegion region, T flag, Set<V> value) {
+        Set<V> curValue = region.getFlag(flag);
+        if (!checkCollectionEquality(curValue, value)) {
+            region.setFlag(flag, value);
+        }
+    }
+
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<List<V>>, V> void setFlagIfNeeded(ProtectedRegion region, T flag, List<V> value) {
+        List<V> curValue = region.getFlag(flag);
+        if (!checkCollectionEquality(curValue, value)) {
+            region.setFlag(flag, value);
+        }
+    }
+
+    private static <V> boolean checkCollectionEquality(Collection<V> col1, Collection<V> col2) {
+        // check if any are null
+        if (col1 == null || col2 == null) {
+            return col1 == col2;
+        }
+
+        // check length
+        if (col1.size() != col2.size()) {
+            return false;
+        }
+
+        var iterator1 = col1.iterator();
+        var iterator2 = col2.iterator();
+
+        // check individual values if they are exactly the same
+        while (iterator1.hasNext()) {
+            if (!iterator1.next().equals(iterator2.next())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
