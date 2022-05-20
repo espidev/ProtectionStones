@@ -138,11 +138,11 @@ public class ArgRent implements PSCommandArg {
 
                     try {
                         Duration d = MiscUtil.parseRentPeriod(period);
-                        if (ProtectionStones.getInstance().getConfigOptions().minRentPeriod != -1 && d.getSeconds() < ProtectionStones.getInstance().getConfigOptions().minRentPrice) {
-                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+d.getSeconds()));
+                        if (ProtectionStones.getInstance().getConfigOptions().minRentPeriod != -1 && d.getSeconds() < ProtectionStones.getInstance().getConfigOptions().minRentPeriod) {
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPeriod));
                         }
-                        if (ProtectionStones.getInstance().getConfigOptions().maxRentPeriod != -1 && d.getSeconds() > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) {
-                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+d.getSeconds()));
+                        if (ProtectionStones.getInstance().getConfigOptions().maxRentPeriod != -1 && d.getSeconds() > ProtectionStones.getInstance().getConfigOptions().maxRentPeriod) {
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPeriod));
                         }
                     } catch (NumberFormatException e) {
                         return PSL.msg(p, PSL.RENT_PERIOD_INVALID.msg());
