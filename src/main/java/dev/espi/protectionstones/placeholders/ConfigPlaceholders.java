@@ -188,6 +188,8 @@ class ConfigPlaceholders {
                 return sb.toString();
             case "block_data_recipe_amount":
                 return b.recipeAmount + "";
+            case "block_data_custom_model_data":
+                return b.customModelData + "";
 
             case "economy_tax_amount":
                 return String.format("%.2f", b.taxAmount);

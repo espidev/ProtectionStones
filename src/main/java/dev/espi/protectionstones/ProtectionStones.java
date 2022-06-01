@@ -476,6 +476,11 @@ public class ProtectionStones extends JavaPlugin {
             im = is.getItemMeta();
         }
 
+        // set custom model data
+        if (b.customModelData != -1) {
+            im.setCustomModelData(b.customModelData);
+        }
+
         // add display name and lore
         if (!b.displayName.equals("")) {
             im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));

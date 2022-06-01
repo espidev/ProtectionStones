@@ -183,6 +183,9 @@ placing_bypasses_wg_passthrough = true
     # Amount of the protection item to give when crafted
     recipe_amount = 1
 
+    # The custom model data of the block item, useful for resource packs. Set to -1 to disable.
+    custom_model_data = -1
+
 [economy]
     # Taxes must be enabled in config.toml first (tax_enabled)
     # The amount to tax the region per tax cycle.

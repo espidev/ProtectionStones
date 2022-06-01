@@ -107,6 +107,8 @@ public class PSProtectBlock {
     @Path("block_data.recipe_amount")
     @SpecIntInRange(min = 0, max = 64)
     public int recipeAmount;
+    @Path("block_data.custom_model_data")
+    public int customModelData;
 
     // economy section
     @Path("economy.tax_amount")
