@@ -172,8 +172,12 @@ public class ArgTp implements PSCommandArg {
                         }
                         // increment seconds
                         waitCounter.put(uuid, waitCounter.get(uuid) + 1);
+
+                        ProtectionStones.getInstance().debug(String.format("Checking player movement. Player location: (%.2f, %.2f, %.2f), actual location: (%.2f, %.2f, %.2f)", pl.getLocation().getX(), pl.getLocation().getY(), pl.getLocation().getZ(), l.getX(), l.getY(), l.getZ()));
+
                         // if the player moved cancel it
                         if (!inThreshold(l.getX(), pl.getLocation().getX()) || !inThreshold(l.getY(), pl.getLocation().getY()) || !inThreshold(l.getZ(), pl.getLocation().getZ())) {
+                            ProtectionStones.getInstance().debug(String.format("Not in threshold. X check: %s, Y check: %s, Z check: %s", inThreshold(l.getX(), pl.getLocation().getX()), inThreshold(l.getY(), pl.getLocation().getY()), inThreshold(l.getZ(), pl.getLocation().getZ())));
                             PSL.msg(pl, PSL.TP_CANCELLED_MOVED.msg());
                             removeUUIDTimer(uuid);
                         } else if (waitCounter.get(uuid) == r.getTypeOptions().tpWaitingSeconds * 4) { // * 4 since this loops 4 times a second
