@@ -365,6 +365,13 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockForm(BlockFormEvent e) {
+        if (ProtectionStones.isProtectBlock(e.getBlock())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDropItem(BlockDropItemEvent e) {
         // unfortunately, the below fix does not really work because Spigot only triggers for the source block, despite
         // what the documentation says: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/block/BlockDropItemEvent.html
