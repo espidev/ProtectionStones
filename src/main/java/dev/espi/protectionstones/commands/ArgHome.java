@@ -91,12 +91,9 @@ public class ArgHome implements PSCommandArg {
 
     private static final int GUI_SIZE = 17;
 
-    private void openHomeGUI(Player p, int page) {
-        PSPlayer psp = PSPlayer.fromPlayer(p);
-        List<PSRegion> regions = psp.getHomes(p.getWorld());
-
+    private void openHomeGUI(PSPlayer psp, List<PSRegion> homes, int page) {
         List<TextComponent> entries = new ArrayList<>();
-        for (PSRegion r : regions) {
+        for (PSRegion r : homes) {
             String msg;
             if (r.getName() == null) {
                 msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getId();
@@ -113,10 +110,10 @@ public class ArgHome implements PSCommandArg {
             entries.add(tc);
         }
 
-        TextGUI.displayGUI(p, PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries, true);
+        TextGUI.displayGUI(psp.getPlayer(), PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries, true);
 
         if (page * GUI_SIZE + GUI_SIZE < entries.size())
-            PSL.msg(p, PSL.HOME_NEXT.msg().replace("%page%", page + 2 + ""));
+            PSL.msg(psp, PSL.HOME_NEXT.msg().replace("%page%", page + 2 + ""));
     }
 
     @Override
@@ -131,27 +128,20 @@ public class ArgHome implements PSCommandArg {
             return PSL.msg(p, PSL.HOME_HELP.msg());
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            if (args.length == 1) { // /ps home GUI
+            if (args.length == 1) { // just "/ps home"
 
-                openHomeGUI(p, (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p"))-1));
+                PSPlayer psp = PSPlayer.fromPlayer(p);
+                List<PSRegion> regions = psp.getHomes(p.getWorld());
+                if (regions.size() == 1) { // teleport to home if there is only one home
+                    ArgTp.teleportPlayer(p, regions.get(0));
+                } else { // otherwise, open the GUI
+                    openHomeGUI(psp, regions, (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
+                }
 
             } else {// /ps home [id]
                 // get regions from the query
-                List<PSRegion> regions = ProtectionStones.getPSRegions(p.getWorld(), args[1]);
-
-                // remove regions that the player is not a member or owner of
-                for (int i = 0; i < regions.size(); i++) {
-                    PSProtectBlock typeOptions = regions.get(i).getTypeOptions();
-
-                    if (typeOptions != null && typeOptions.preventPsHome) continue;
-                    if (regions.get(i).isOwner(p.getUniqueId())) continue;
-                    if (regions.get(i).isMember(p.getUniqueId()) && ProtectionStones.getInstance().getConfigOptions().allowHomeTeleportForMembers) {
-                        continue;
-                    }
-
-                    regions.remove(i);
-                    i--;
-                }
+                PSPlayer psp = PSPlayer.fromPlayer(p);
+                List<PSRegion> regions = psp.getHomes(p.getWorld());
 
                 if (regions.isEmpty()) {
                     PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
