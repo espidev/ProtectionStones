@@ -30,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ArgHome implements PSCommandArg {
 
@@ -128,25 +129,30 @@ public class ArgHome implements PSCommandArg {
             return PSL.msg(p, PSL.HOME_HELP.msg());
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-            if (args.length == 1) { // just "/ps home"
-
-                PSPlayer psp = PSPlayer.fromPlayer(p);
+            PSPlayer psp = PSPlayer.fromPlayer(p);
+            if (args.length == 1) {
+                // just "/ps home"
                 List<PSRegion> regions = psp.getHomes(p.getWorld());
                 if (regions.size() == 1) { // teleport to home if there is only one home
                     ArgTp.teleportPlayer(p, regions.get(0));
                 } else { // otherwise, open the GUI
                     openHomeGUI(psp, regions, (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
                 }
-
             } else {// /ps home [id]
                 // get regions from the query
-                PSPlayer psp = PSPlayer.fromPlayer(p);
-                List<PSRegion> regions = psp.getHomes(p.getWorld());
+                String query = args[1];
+                List<PSRegion> regions = psp.getHomes(p.getWorld())
+                        .stream()
+                        .filter(region -> region.getId().equals(query)
+                                || (region.getName() != null && region.getName().equals(query)))
+                        .collect(Collectors.toList());
 
                 if (regions.isEmpty()) {
                     PSL.msg(s, PSL.REGION_DOES_NOT_EXIST.msg());
                     return;
                 }
+
+                // if there is more than one name in the query
                 if (regions.size() > 1) {
                     ChatUtil.displayDuplicateRegionAliases(p, regions);
                     return;
