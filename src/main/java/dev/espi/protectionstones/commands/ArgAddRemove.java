@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.event.AddRemoveEvent;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -118,6 +119,11 @@ public class ArgAddRemove implements PSCommandArg {
 
             // apply operation to regions
             for (PSRegion r : regions) {
+                AddRemoveEvent event = new AddRemoveEvent(r, operationType, p, addPlayerName, addPlayerUuid);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) { // if event was cancelled, prevent execution
+                    continue;
+                }
 
                 if (operationType.equals("add") || operationType.equals("addowner")) {
                     if (flags.containsKey("-a")) {
