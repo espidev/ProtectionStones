@@ -262,5 +262,10 @@
             <artifactId>commons-io</artifactId>
             <version>2.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.papermc</groupId>
+            <artifactId>paperlib</artifactId>
+            <version>1.0.8-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

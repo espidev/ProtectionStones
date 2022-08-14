@@ -272,6 +272,7 @@ public enum PSL {
     TPING("tp.tping", ChatColor.GREEN + "Teleporting..."),
     TP_ERROR_NAME("tp.error_name", ChatColor.RED + "Error in teleporting to protected region! (parsing WG region name error)"),
     TP_ERROR_TP("tp.error_tp", ChatColor.RED + "Error in finding the region to teleport to!"),
+    TP_ERROR_ASYNC("tp.error_async", ChatColor.RED + "Something went wrong!"),
     TP_IN_SECONDS("tp.in_seconds", ChatColor.GRAY + "Teleporting in " + ChatColor.AQUA + "%seconds%" + ChatColor.GRAY + " seconds."),
     TP_CANCELLED_MOVED("tp.cancelled_moved", ChatColor.RED + "Teleport cancelled. You moved!"),
 

@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -137,17 +138,25 @@ public class ArgTp implements PSCommandArg {
         // teleport player
         if (r.getTypeOptions().tpWaitingSeconds == 0 || p.hasPermission("protectionstones.tp.bypasswait")) {
             // no teleport delay
-            PSL.msg(p, PSL.TPING.msg());
-            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> p.teleport(r.getHome())); // run on main thread, not async
+            PaperLib.teleportAsync(p, r.getHome()).thenAccept(result -> {
+                if (result) {
+                    PSL.msg(p, PSL.TPING.msg());
+                } else {
+                    PSL.msg(p, PSL.TP_ERROR_ASYNC.msg());
+                }
+            });
         } else if (!r.getTypeOptions().noMovingWhenTeleportWaiting) {
             // teleport delay, but doesn't care about moving
             p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
-
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
-                PSL.msg(p, PSL.TPING.msg());
-                p.teleport(r.getHome());
-            }, 20 * r.getTypeOptions().tpWaitingSeconds);
-
+                PaperLib.teleportAsync(p, r.getHome()).thenAccept(result -> {
+                    if (result) {
+                        PSL.msg(p, PSL.TPING.msg());
+                    } else {
+                        PSL.msg(p, PSL.TP_ERROR_ASYNC.msg());
+                    }
+                });
+            }, 20L * r.getTypeOptions().tpWaitingSeconds);
         } else {// delay and not allowed to move
             PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
             Location l = p.getLocation().clone();
@@ -182,9 +191,14 @@ public class ArgTp implements PSCommandArg {
                             removeUUIDTimer(uuid);
                         } else if (waitCounter.get(uuid) == r.getTypeOptions().tpWaitingSeconds * 4) { // * 4 since this loops 4 times a second
                             // if the timer has passed, teleport and cancel
-                            PSL.msg(pl, PSL.TPING.msg());
-                            pl.teleport(r.getHome());
                             removeUUIDTimer(uuid);
+                            PaperLib.teleportAsync(p, r.getHome()).thenAccept(result -> {
+                                if (result) {
+                                    PSL.msg(pl, PSL.TPING.msg());
+                                } else {
+                                    PSL.msg(p, PSL.TP_ERROR_ASYNC.msg());
+                                }
+                            });
                         }
                     }, 5, 5) // loop 4 times a second
             );
