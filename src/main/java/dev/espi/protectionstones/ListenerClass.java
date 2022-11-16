@@ -109,24 +109,26 @@ public class ListenerClass implements Listener {
 
         if (cause instanceof Player player && event.getBlocks().size() >= 1) {
             var block = event.getBlocks().get(0);
-            var options = ProtectionStones.getBlockOptions(block);
+            if (!ProtectionStones.isProtectBlockItem(player.getInventory().getItemInHand())) {
+                return;
+            }
+
+            var options = ProtectionStones.getBlockOptions(player.getInventory().getItemInHand());
 
             if (options != null && options.placingBypassesWGPassthrough) {
                 // check if any regions here have the passthrough flag
                 // we can't query unfortunately, since null flags seem to equate to ALLOW, when we want it to be DENY
                 ApplicableRegionSet set = WGUtils.getRegionManagerWithWorld(event.getWorld()).getApplicableRegions(BukkitAdapter.asBlockVector(block.getLocation()));
 
-                // loop through regions, if any region does not have passthrough = deny, then don't allow
+                // loop through regions, if any region does not have a passthrough value set, then don't allow
                 for (var region : set.getRegions()) {
-                    if (region.getFlag(Flags.PASSTHROUGH) == null || region.getFlag(Flags.PASSTHROUGH) == StateFlag.State.DENY) {
+                    if (region.getFlag(Flags.PASSTHROUGH) == null) {
                         return;
                     }
                 }
 
-                // if there was at least one region with passthrough = allow, then allow passthrough of protection block
-                if (!set.getRegions().isEmpty()) {
-                    event.setResult(Event.Result.ALLOW);
-                }
+                // if every region with an explicit passthrough value, then allow passthrough of protection block
+                event.setResult(Event.Result.ALLOW);
             }
         }
     }
