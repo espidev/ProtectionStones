@@ -244,43 +244,45 @@ public class BlockHandler {
                 }
             }
 
-            // fire event and check if cancelled
-            PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                rm.removeRegion(id);
-                return;
-            }
-
-            PSL.msg(p, PSL.PROTECTED.msg());
-
-            // hide block if auto hide is enabled
-            if (blockOptions.autoHide) {
-                PSL.msg(p, PSL.REGION_HIDDEN.msg());
-                // run on next tick so placing tile entities don't complain
-                Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
-            }
-
-            if (blockOptions.startWithTaxAutopay) {
-                // set tax auto-pay (even if taxing is not enabled)
-                region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
-            }
-
-            // show merge menu
-            if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
-                PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-                if (r != null) playerMergeTask(p, r);
-            }
-
-            // take money
-            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
-                if (!er.transactionSuccess()) {
-                    PSL.msg(p, er.errorMessage);
+            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> {
+                // fire event and check if cancelled (needs to run sync)
+                PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
+                Bukkit.getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    rm.removeRegion(id);
                     return;
                 }
-                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
-            }
+
+                PSL.msg(p, PSL.PROTECTED.msg());
+
+                // hide block if auto hide is enabled
+                if (blockOptions.autoHide) {
+                    PSL.msg(p, PSL.REGION_HIDDEN.msg());
+                    // run on next tick so placing tile entities don't complain
+                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
+                }
+
+                if (blockOptions.startWithTaxAutopay) {
+                    // set tax auto-pay (even if taxing is not enabled)
+                    region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
+                }
+
+                // show merge menu
+                if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
+                    PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
+                    if (r != null) playerMergeTask(p, r);
+                }
+
+                // take money
+                if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+                    EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                    if (!er.transactionSuccess()) {
+                        PSL.msg(p, er.errorMessage);
+                        return;
+                    }
+                    PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+                }
+            });
         });
     }
 
