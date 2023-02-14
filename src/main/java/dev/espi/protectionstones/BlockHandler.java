@@ -118,22 +118,20 @@ public class BlockHandler {
             return;
         }
 
-        // create region, and cancel if it fails
-        if (!createPSRegion(p, b.getLocation(), blockOptions)) {
-            e.setCancelled(true);
-        }
+        // create region
+        createPSRegion(p, b.getLocation(), blockOptions);
     }
 
     // create a PS region (no checks for items)
-    public static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static void createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // check permission
         if (!p.hasPermission("protectionstones.create")) {
             PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
-            return false;
+            return;
         }
         if (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission)) {
             PSL.msg(p, PSL.NO_PERMISSION_CREATE_SPECIFIC.msg());
-            return false;
+            return;
         }
 
         // check cooldown
@@ -141,13 +139,13 @@ public class BlockHandler {
             String time = checkCooldown(p);
             if (time != null) {
                 PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", time));
-                return false;
+                return;
             }
         }
 
         // check if player reached region limit
         if (!LimitUtil.check(p, blockOptions)) {
-            return false;
+            return;
         }
 
         // non-admin checks
@@ -158,10 +156,8 @@ public class BlockHandler {
             if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
                 if (blockOptions.preventBlockPlaceInRestrictedWorld) {
                     PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
-                    return false;
-                } else {
-                    return true;
                 }
+                return;
             }
 
         } // end of non-admin checks
@@ -169,7 +165,7 @@ public class BlockHandler {
         // check if player has enough money
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
             PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
-            return false;
+            return;
         }
 
         // debug message
@@ -177,26 +173,11 @@ public class BlockHandler {
             ProtectionStones.getPluginLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
         }
 
-        if (createActualRegion(p, l, blockOptions)) { // region creation successful
-
-            // take money
-            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
-                if (!er.transactionSuccess()) {
-                    PSL.msg(p, er.errorMessage);
-                    return true;
-                }
-                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
-            }
-
-            return true;
-        } else { // region creation failed
-            return false;
-        }
+        createActualRegion(p, l, blockOptions);
     }
 
     // create the actual WG region for PS region
-    public static boolean createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
+    public static void createActualRegion(Player p, Location l, PSProtectBlock blockOptions) {
         // create region
         double bx = l.getX(), by = l.getY(), bz = l.getZ();
 
@@ -208,88 +189,99 @@ public class BlockHandler {
         // if the region's id already exists, possibly placing block where a region is hidden
         if (rm.hasRegion(id)) {
             PSL.msg(p, PSL.REGION_ALREADY_IN_LOCATION_IS_HIDDEN.msg());
-            return false;
+            return;
         }
 
         // check for minimum distance between claims by using fake region
         if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
             if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx, by, bz)) {
                 PSL.msg(p, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
-                return false;
+                return;
             }
         }
 
-        // create actual region
-        ProtectedRegion region = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(id));
-        region.getOwners().addPlayer(p.getUniqueId());
-        region.setPriority(blockOptions.priority);
-        rm.addRegion(region); // added to the region manager, be careful in implementing checks
+        // run async so that RegionManager does not block the main thread
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            // create actual region
+            ProtectedRegion region = WGUtils.getDefaultProtectedRegion(blockOptions, WGUtils.parsePSRegionToLocation(id));
+            region.getOwners().addPlayer(p.getUniqueId());
+            region.setPriority(blockOptions.priority);
+            rm.addRegion(region); // added to the region manager, be careful in implementing checks
 
-        // check if new region overlaps more powerful region
-        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
-            rm.removeRegion(id);
-            PSL.msg(p, PSL.REGION_OVERLAP.msg());
-            return false;
-        }
+            // check if new region overlaps more powerful region
+            if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
+                rm.removeRegion(id);
+                PSL.msg(p, PSL.REGION_OVERLAP.msg());
+                return;
+            }
 
-        // add corresponding flags to new region by cloning blockOptions default flags
-        HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
+            // add corresponding flags to new region by cloning blockOptions default flags
+            HashMap<Flag<?>, Object> flags = new HashMap<>(blockOptions.regionFlags);
 
-        // replace greeting and farewell messages with player name
-        FlagHandler.initDefaultFlagPlaceholders(flags, p);
+            // replace greeting and farewell messages with player name
+            FlagHandler.initDefaultFlagPlaceholders(flags, p);
 
-        // set flags
-        try {
-            region.setFlags(flags);
-        } catch (Exception e) {
-            ProtectionStones.getPluginLogger().severe(String.format("Region flags have failed to initialize for: %s (%s)", blockOptions.alias, blockOptions.type));
-            throw e;
-        }
-        FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
+            // set flags
+            try {
+                region.setFlags(flags);
+            } catch (Exception e) {
+                ProtectionStones.getPluginLogger().severe(String.format("Region flags have failed to initialize for: %s (%s)", blockOptions.alias, blockOptions.type));
+                throw e;
+            }
+            FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
 
-        // check for player's number of adjacent region groups
-        if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
-            if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
-                HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
+            // check for player's number of adjacent region groups
+            if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
+                if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
+                    HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
 
-                int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
-                if (adjGroups.size() > permNum && permNum != -1) {
-                    PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
-                    rm.removeRegion(id);
-                    return false;
+                    int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
+                    if (adjGroups.size() > permNum && permNum != -1) {
+                        PSL.msg(p, PSL.REGION_NOT_ADJACENT.msg());
+                        rm.removeRegion(id);
+                        return;
+                    }
                 }
             }
-        }
 
-        // fire event and check if cancelled
-        PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            rm.removeRegion(id);
-            return false;
-        }
+            // fire event and check if cancelled
+            PSCreateEvent event = new PSCreateEvent(PSRegion.fromWGRegion(p.getWorld(), region), p);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                rm.removeRegion(id);
+                return;
+            }
 
-        PSL.msg(p, PSL.PROTECTED.msg());
+            PSL.msg(p, PSL.PROTECTED.msg());
 
-        // hide block if auto hide is enabled
-        if (blockOptions.autoHide) {
-            PSL.msg(p, PSL.REGION_HIDDEN.msg());
-            // run on next tick so placing tile entities don't complain
-            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
-        }
+            // hide block if auto hide is enabled
+            if (blockOptions.autoHide) {
+                PSL.msg(p, PSL.REGION_HIDDEN.msg());
+                // run on next tick so placing tile entities don't complain
+                Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> l.getBlock().setType(Material.AIR));
+            }
 
-        if (blockOptions.startWithTaxAutopay) {
-            // set tax auto-pay (even if taxing is not enabled)
-            region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
-        }
+            if (blockOptions.startWithTaxAutopay) {
+                // set tax auto-pay (even if taxing is not enabled)
+                region.setFlag(FlagHandler.PS_TAX_AUTOPAYER, p.getUniqueId().toString());
+            }
 
-        // show merge menu
-        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
-            PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-            if (r != null) playerMergeTask(p, r);
-        }
+            // show merge menu
+            if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
+                PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
+                if (r != null) playerMergeTask(p, r);
+            }
 
-        return true;
+            // take money
+            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                if (!er.transactionSuccess()) {
+                    PSL.msg(p, er.errorMessage);
+                    return;
+                }
+                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+            }
+        });
     }
 
     // merge behaviour after a region is created
