@@ -72,7 +72,7 @@ public class MiscUtil {
         for (String permission : permissions) {
             if (permission.startsWith(perm)) {
                 String value = permission.substring(perm.length());
-                if (StringUtils.isNumeric(value)) {
+                if (MiscUtil.isValidInteger(value)) {
                     n = Math.max(n, Integer.parseInt(value));
                 }
             }
@@ -126,4 +126,17 @@ public class MiscUtil {
         return permissions;
     }
 
+    public static boolean isValidInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+
+        try {
+            // this apparently throws NumberFormatException if it is beyond the integer limit, so we catch that
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+        } catch (NullPointerException e) {}
+        return false;
+    }
 }

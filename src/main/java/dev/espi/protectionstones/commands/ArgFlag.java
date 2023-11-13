@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.*;
 import org.apache.commons.lang.StringUtils;
@@ -66,18 +67,24 @@ public class ArgFlag implements PSCommandArg {
 
     // flag gui that has ability to use pages
     private boolean openFlagGUI(Player p, PSRegion r, int page) {
+        List<String> allowedFlags = new ArrayList<>(r.getTypeOptions().allowedFlags.keySet());
+
+        // ensure the page is valid and in range
+        if (page < 0 || (page * GUI_SIZE) > allowedFlags.size()) {
+            PSL.msg(p, PSL.PAGE_DOES_NOT_EXIST.msg());
+            return true;
+        }
+
         // add blank space if gui not long enough
-        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (Math.min(r.getTypeOptions().allowedFlags.size(), GUI_SIZE * page + GUI_SIZE) - GUI_SIZE * page); i++) {
+        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (Math.min(allowedFlags.size(), GUI_SIZE * page + GUI_SIZE) - GUI_SIZE * page); i++) {
             PSL.msg(p, ChatColor.WHITE + "");
         }
 
         PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
 
-        List<String> allowedFlags = new ArrayList<>(r.getTypeOptions().allowedFlags.keySet());
-
         // send actual flags
         for (int i = GUI_SIZE * page; i < Math.min(allowedFlags.size(), GUI_SIZE * page + GUI_SIZE); i++) {
-            if (i >= r.getTypeOptions().allowedFlags.size()) {
+            if (i >= allowedFlags.size()) {
                 PSL.msg(p, ChatColor.WHITE + "");
             } else {
                 String flag = allowedFlags.get(i);
@@ -244,9 +251,15 @@ public class ArgFlag implements PSCommandArg {
 
         // /ps flag GUI
         if (args.length == 1) return openFlagGUI(p, r, 0);
+        
         // go to GUI page
-        if (args.length == 2 && StringUtils.isNumeric(args[1])) {
-            return openFlagGUI(p, r, Integer.parseInt(args[1]));
+        if (args.length == 2) {
+            if (MiscUtil.isValidInteger(args[1])) {
+                return openFlagGUI(p, r, Integer.parseInt(args[1]));
+            }
+
+            PSL.msg(p, PSL.FLAG_HELP.msg());
+            return true;
         }
 
         if (args.length < 3) {

@@ -30,6 +30,11 @@ public class TextGUI {
     // page starts at zero, but displays start at one
     // pageCommand will be replacing %page%
     public static void displayGUI(CommandSender s, String header, String pageCommand, int currentPage, int guiSize, List<TextComponent> lines, boolean sendBlankLines) {
+        int currentLine = currentPage * guiSize;
+        if (currentPage < 0 || currentLine > lines.size()) {
+            return;
+        }
+
         PSL.msg(s, header);
 
         for (int i = currentPage*guiSize; i < Math.min((currentPage+1) * guiSize, lines.size()); i++) {

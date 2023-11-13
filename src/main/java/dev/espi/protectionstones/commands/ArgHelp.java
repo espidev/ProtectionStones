@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -104,7 +105,7 @@ public class ArgHelp implements PSCommandArg {
     @Override
     public boolean executeArgument(CommandSender p, String[] args, HashMap<String, String> flags) {
         int page = 0;
-        if (args.length > 1 && StringUtils.isNumeric(args[1])) {
+        if (args.length > 1 && MiscUtil.isValidInteger(args[1])) {
             page = Integer.parseInt(args[1]) - 1;
         }
 
@@ -125,7 +126,9 @@ public class ArgHelp implements PSCommandArg {
 
         TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries, false);
 
-        if (page * GUI_SIZE + GUI_SIZE < entries.size()) PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
+        if (page >= 0 && page * GUI_SIZE + GUI_SIZE < entries.size()) {
+            PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
+        }
 
         return true;
     }

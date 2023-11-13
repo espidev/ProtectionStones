@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import dev.espi.protectionstones.utils.UUIDCache;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -105,7 +106,7 @@ public class ArgTax implements PSCommandArg {
     public boolean taxInfo(String[] args, HashMap<String, String> flags, PSPlayer p) {
         if (args.length == 2) { // /ps tax info
             Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
-                int pageNum = (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p"))-1);
+                int pageNum = (flags.get("-p") == null || !MiscUtil.isValidInteger(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p"))-1);
 
                 List<TextComponent> entries = new ArrayList<>();
                 for (PSRegion r : p.getTaxEligibleRegions()) {

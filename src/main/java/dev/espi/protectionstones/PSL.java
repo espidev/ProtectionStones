@@ -44,6 +44,7 @@ public enum PSL {
     MUST_BE_PLAYER("must_be_player", ChatColor.RED + "You must be a player to execute this command."),
     GO_BACK_PAGE("go_back_page", "Go back a page."),
     GO_NEXT_PAGE("go_next_page", "Go to next page."),
+    PAGE_DOES_NOT_EXIST("page_does_not_exist", ChatColor.RED + "Page does not exist."),
 
     HELP("help", ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET + " PS Help " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "=====\n" + ChatColor.AQUA + "> " + ChatColor.GRAY + "/ps help"),
     HELP_NEXT("help_next", ChatColor.GRAY + "Do /ps help %page% to go to the next page!"),

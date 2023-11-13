@@ -17,6 +17,7 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtil;
+import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -136,7 +137,7 @@ public class ArgHome implements PSCommandArg {
                 if (regions.size() == 1) { // teleport to home if there is only one home
                     ArgTp.teleportPlayer(p, regions.get(0));
                 } else { // otherwise, open the GUI
-                    openHomeGUI(psp, regions, (flags.get("-p") == null || !StringUtils.isNumeric(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
+                    openHomeGUI(psp, regions, (flags.get("-p") == null || !MiscUtil.isValidInteger(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
                 }
             } else {// /ps home [id]
                 // get regions from the query
