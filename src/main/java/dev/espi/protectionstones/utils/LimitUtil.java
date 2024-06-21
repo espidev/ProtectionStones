@@ -19,11 +19,14 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class LimitUtil {
 
@@ -178,6 +181,38 @@ public class LimitUtil {
             }
         }
         return "";
+    }
+
+    /**
+     * Getting number variable on end of perm
+     * @param player Bukkit player
+     * @param searchingPerm permission without number variable on end like "protectionstones.owners-limit."
+     * @param varPos position of variable in permission
+     * @param defaultValue default return value if perm not exist
+     * @return perm int variable
+     */
+    public static int getPermissionIntVariable(Player player, String searchingPerm, int varPos, int defaultValue) {
+        //admin check
+        if (player.hasPermission("protectionstones.admin") || player.isOp()) {
+            return 9999;
+        }
+        //getting perm to check
+        Optional<PermissionAttachmentInfo> perm = player.getEffectivePermissions().stream()
+                .filter(p -> p.getPermission().startsWith(searchingPerm)).findFirst();
+        if (perm.isEmpty()) {
+            return defaultValue;
+        }
+        //getting var perm
+        String[] split = perm.get().getPermission().split("\\.");
+        if (split.length < varPos + 1) {
+            return defaultValue;
+        }
+        String limitString = split[varPos];
+
+        if (NumberUtils.isNumber(limitString)) {
+            return Integer.parseInt(limitString);
+        }
+        return defaultValue;
     }
 
 }
