@@ -184,7 +184,7 @@ public class LimitUtil {
     }
 
     /**
-     * Getting number variable on end of perm
+     * Getting number variable from permission
      * @param player Bukkit player
      * @param searchingPerm permission without number variable on end like "protectionstones.owners-limit."
      * @param varPos position of variable in permission
