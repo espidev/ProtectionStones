@@ -260,6 +260,16 @@ public class ListenerClass implements Listener {
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
+        // todo: fix block break event fired twice
+        // Call PSRemoveEvent
+        PSRemoveEvent event = new PSRemoveEvent(r , p);
+        Bukkit.getPluginManager().callEvent(event);
+        // don't give ps block to player if the event is cancelled
+        if (event.isCancelled()) {
+            e.setCancelled(true);
+            return;
+        }
+
         // break protection
         if (r != null && playerBreakProtection(p, r)) { // successful
             e.setDropItems(false);
