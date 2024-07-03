@@ -1,6 +1,5 @@
 package dev.espi.protectionstones.event;
 
-import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSRegion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -16,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Event that is called when a protection stones block is removed
  */
-public class PSBreakEvent extends Event implements Cancellable {
+public class PSBreakProtectBlockEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -24,7 +23,7 @@ public class PSBreakEvent extends Event implements Cancellable {
     private Player player;
     private boolean isCancelled = false;
 
-    public PSBreakEvent(PSRegion psr, Player player) {
+    public PSBreakProtectBlockEvent(PSRegion psr, Player player) {
         this.region = checkNotNull(psr);
         this.player = player;
     }
