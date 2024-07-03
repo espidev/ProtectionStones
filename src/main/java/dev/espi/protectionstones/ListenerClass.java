@@ -173,6 +173,12 @@ public class ListenerClass implements Listener {
             return false;
         }
 
+        // Call PSBreakEvent
+        PSBreakEvent event = new PSBreakEvent(r , p);
+        Bukkit.getPluginManager().callEvent(event);
+        // don't give ps block to player if the event is cancelled
+        if (event.isCancelled()) return false;
+
         // return protection stone if no drop option is off
         if (blockOptions != null && !blockOptions.noDrop) {
             if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
@@ -260,15 +266,6 @@ public class ListenerClass implements Listener {
         }
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
-
-        // Call PSBreakEvent
-        PSBreakEvent event = new PSBreakEvent(r , p);
-        Bukkit.getPluginManager().callEvent(event);
-        // don't give ps block to player if the event is cancelled
-        if (event.isCancelled()) {
-            e.setCancelled(true);
-            return;
-        }
 
         // break protection
         if (r != null && playerBreakProtection(p, r)) { // successful
