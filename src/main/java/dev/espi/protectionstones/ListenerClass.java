@@ -26,6 +26,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import dev.espi.protectionstones.event.PSBreakEvent;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.RecipeUtil;
@@ -260,9 +261,8 @@ public class ListenerClass implements Listener {
 
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
 
-        // todo: fix block break event fired twice
-        // Call PSRemoveEvent
-        PSRemoveEvent event = new PSRemoveEvent(r , p);
+        // Call PSBreakEvent
+        PSBreakEvent event = new PSBreakEvent(r , p);
         Bukkit.getPluginManager().callEvent(event);
         // don't give ps block to player if the event is cancelled
         if (event.isCancelled()) {
