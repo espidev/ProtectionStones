@@ -126,7 +126,7 @@ public class BlockUtil {
     }
 
     public static PlayerProfile getProfile(String uuid, String base64) {
-        String name = uuid.substring(0, 16);
+        String name = uuid.substring(0, MAX_USERNAME_LENGTH);
         PlayerProfile profile = Bukkit.getServer().createPlayerProfile(UUID.fromString(uuid), name);
         PlayerTextures textures = profile.getTextures();
 
@@ -161,16 +161,30 @@ public class BlockUtil {
 
     public static ItemStack setHeadType(String psType, ItemStack item) {
         String name = psType.split(":")[1];
-        if (name.length() > MAX_USERNAME_LENGTH) { // base 64 head
+        if (name.length() > MAX_USERNAME_LENGTH) { // base64 or UUID head
             String uuid = name;
 
-            // decode base64 to URL
             String base64 = uuidToBase64Head.get(name);
-            PlayerProfile profile = getProfile(uuid, base64);
+            boolean isBase64UUID;
+            try {
+                isBase64UUID = UUID.fromString(base64).toString().equals(base64);
+            } catch (IllegalArgumentException e) {
+                isBase64UUID = false;
+            }
 
-            SkullMeta meta = (SkullMeta) item.getItemMeta();
-            meta.setOwnerProfile(profile);
-            item.setItemMeta(meta);
+            if (isBase64UUID) {
+                // use UUID directly
+                UUID uuidObj = UUID.fromString(base64);
+                SkullMeta sm = (SkullMeta) item.getItemMeta();
+                sm.setOwningPlayer(Bukkit.getOfflinePlayer(uuidObj));
+                item.setItemMeta(sm);
+            } else {
+                // decode base64 to URL
+                PlayerProfile profile = getProfile(uuid, base64);
+                SkullMeta meta = (SkullMeta) item.getItemMeta();
+                meta.setOwnerProfile(profile);
+                item.setItemMeta(meta);
+            }
 
             return item;
         } else { // normal name head
