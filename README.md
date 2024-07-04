@@ -17,16 +17,16 @@ View the Spigot page (with FAQ and install instructions) [here](https://www.spig
 Check the [wiki](https://github.com/espidev/ProtectionStones/wiki) for plugin reference information.
 
 ### Dependencies
-* ProtectionStones 2.10.4
-  * Spigot 1.17+
-  * WorldGuard 7.0.6+
+* ProtectionStones 2.10.5
+  * Spigot 1.20.6+
+  * WorldGuard 7.0.9+
   * WorldEdit 7.2.6+
   * Vault (Optional)
   * PlaceholderAPI (Optional)
   * LuckPerms (Optional)
 
 ### Building
-Make sure you have the Java 16 JDK installed, as well as Maven.
+Make sure you have the Java 21 JDK installed, as well as Maven.
 
 ```
 git clone https://github.com/espidev/ProtectionStones.git
