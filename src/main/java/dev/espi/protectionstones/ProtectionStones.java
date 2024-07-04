@@ -465,7 +465,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // add enchant effect if enabled
         if (b.enchantedEffect) {
-            is.addUnsafeEnchantment(Enchantment.LURE, 0);
+            is.addUnsafeEnchantment(Enchantment.LURE, 1);
         }
 
         ItemMeta im = is.getItemMeta();
