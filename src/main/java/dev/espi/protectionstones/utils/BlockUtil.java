@@ -27,9 +27,17 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.Base64;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class BlockUtil {
     static final int MAX_USERNAME_LENGTH = 16;
@@ -117,19 +125,54 @@ public class BlockUtil {
         }
     }
 
+    public static PlayerProfile getProfile(String uuid, String base64) {
+        String name = uuid.substring(0, 16);
+        PlayerProfile profile = Bukkit.getServer().createPlayerProfile(UUID.fromString(uuid), name);
+        PlayerTextures textures = profile.getTextures();
+
+        // decode base64 to URL
+        byte[] decodedBytes = Base64.getDecoder().decode(base64);
+        String decodedString = new String(decodedBytes);
+
+        // read decoded string as JSON object
+        // sample: {"textures":{"SKIN":{"url":"http://textures.minecraft.net/texture/..."}}}
+        String url = "";
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject object = (JSONObject) parser.parse(decodedString);
+            JSONObject jsonTextures = (JSONObject) object.get("textures");
+            JSONObject jsonSkin = (JSONObject) jsonTextures.get("SKIN");
+            url = (String) jsonSkin.get("url");
+        } catch (ParseException exception) {
+            throw new RuntimeException("Invalid JSON retrieved from base64 " + decodedString, exception);
+        }
+
+        URL urlObject;
+        try {
+            urlObject = new URL(url);
+        } catch (MalformedURLException exception) {
+            throw new RuntimeException("Invalid decoded URL from head data: " + url, exception);
+        }
+
+        textures.setSkin(urlObject);
+        profile.setTextures(textures);
+        return profile;
+    }
+
     public static ItemStack setHeadType(String psType, ItemStack item) {
         String name = psType.split(":")[1];
         if (name.length() > MAX_USERNAME_LENGTH) { // base 64 head
             String uuid = name;
 
-            // if 1.16 or above, use new uuid format
-            if (Integer.parseInt(MiscUtil.getVersionString().split("\\.")[1]) >= 16 || !MiscUtil.getVersionString().split("\\.")[0].equals("1")) {
-                uuid = MiscUtil.getUniqueIdIntArray(UUID.fromString(uuid));
-            } else { // quotes are needed for pre 1.16 uuids
-                uuid = "\"" + uuid + "\"";
-            }
+            // decode base64 to URL
+            String base64 = uuidToBase64Head.get(name);
+            PlayerProfile profile = getProfile(uuid, base64);
 
-            return Bukkit.getUnsafe().modifyItemStack(item, "{SkullOwner:{Name:\"" + name + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + uuidToBase64Head.get(name) + "\"}]}}}");
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            meta.setOwnerProfile(profile);
+            item.setItemMeta(meta);
+
+            return item;
         } else { // normal name head
             SkullMeta sm = (SkullMeta) item.getItemMeta();
             sm.setOwningPlayer(Bukkit.getOfflinePlayer(name));
@@ -138,40 +181,13 @@ public class BlockUtil {
         }
     }
 
-    // Note: this code is really weird
     private static void blockWithBase64(Block block, String uuid) {
-        String base64 = uuidToBase64Head.get(uuid), args;
+        String base64 = uuidToBase64Head.get(uuid);
+        PlayerProfile profile = getProfile(uuid, base64);
 
-        // if 1.16 or above, use new uuid format
-        if (Integer.parseInt(MiscUtil.getVersionString().split("\\.")[1]) >= 16 || !MiscUtil.getVersionString().split("\\.")[0].equals("1")) {
-            uuid = MiscUtil.getUniqueIdIntArray(UUID.fromString(uuid));
-            args = String.format(
-                    "%d %d %d %s",
-                    block.getX(),
-                    block.getY(),
-                    block.getZ(),
-                    "{SkullOwner:{Name:\"" + uuid + "\",Id:" + uuid + ",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
-            );
-        } else { // tag was different pre 1.16
-            args = String.format(
-                    "%d %d %d %s",
-                    block.getX(),
-                    block.getY(),
-                    block.getZ(),
-                    "{Owner:{Name:\"" + uuid + "\",Id:\"" + uuid + "\",Properties:{textures:[{Value:\"" + base64 + "\"}]}}}"
-            );
-        }
-
-        // fake entity to run command at its location
-        Entity e = block.getWorld().spawn(new Location(block.getWorld(), 0, 0, 0), ArmorStand.class, ent -> {
-            ent.setCustomName("mrpig");
-            ent.setInvulnerable(true);
-            ent.setVisible(false);
-        });
-
-        // run data command to change block using the pig's world
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute at @e[type=armor_stand,nbt={CustomName:'{\"extra\":[{\"text\":\"" + e.getName() + "\"}],\"text\":\"\"}'}] run data merge block " + args);
-        e.remove();
+        Skull skull = (Skull) block.getState();
+        skull.setOwnerProfile(profile);
+        skull.update(false);
     }
 
     public static boolean isBase64PSHead(String type) {
