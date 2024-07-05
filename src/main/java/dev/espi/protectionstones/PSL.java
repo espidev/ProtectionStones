@@ -516,21 +516,14 @@ public enum PSL {
         }
     }
 
-    // match all %#123abc#% format for hex
-    private static final Pattern hexPatternLong = Pattern.compile("(?<!\\\\\\\\)(%#[a-fA-F0-9]{8}%)"),
-            hexPatternShort = Pattern.compile("(?<!\\\\\\\\)(%#[a-fA-F0-9]{6}%)");
+    // match all &#123abc format for hex
+    private static final Pattern hexPattern = Pattern.compile("(?<!\\\\\\\\)(&#[a-fA-F0-9]{6})");
 
     private static String applyInGameColours(String msg) {
 
-        Matcher matcher = hexPatternLong.matcher(msg);
+        Matcher matcher = hexPattern.matcher(msg);
         while (matcher.find()) {
-            String color = msg.substring(matcher.start() + 1, matcher.end() - 1);
-            msg = msg.replace(msg.substring(matcher.start(), matcher.end()), "" + net.md_5.bungee.api.ChatColor.of(color));
-        }
-
-        matcher = hexPatternShort.matcher(msg);
-        while (matcher.find()) {
-            String color = msg.substring(matcher.start() + 1, matcher.end() - 1);
+            String color = msg.substring(matcher.start() + 1, matcher.end());
             msg = msg.replace(msg.substring(matcher.start(), matcher.end()), "" + net.md_5.bungee.api.ChatColor.of(color));
         }
 
