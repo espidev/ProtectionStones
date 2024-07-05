@@ -1,6 +1,6 @@
 # Home
 
-### Welcome to the ProtectionStones wiki!
+### Welcome to the ProtectionStones documentation!
 
 Click the items on the sidebar to see documentation for using the plugin.
 
