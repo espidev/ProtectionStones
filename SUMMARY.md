@@ -1,3 +1,9 @@
 # Table of contents
 
-* [Initial page](README.md)
+* [Home](README.md)
+* [API](api.md)
+* [Commands](commands.md)
+* [Configuration](configuration.md)
+* [Permissions](permissions.md)
+* [Placeholders](placeholders.md)
+* [Translations](translations.md)
