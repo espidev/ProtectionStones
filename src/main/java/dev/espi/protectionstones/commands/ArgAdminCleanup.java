@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 class ArgAdminCleanup {
 
@@ -99,6 +101,20 @@ class ArgAdminCleanup {
                     .replace("%days%", "" + days));
 
             HashSet<UUID> activePlayers = new HashSet<>();
+
+            // loop over all luckperms players and add to list if they have bypass permission
+            if (ProtectionStones.getInstance().isLuckPermsSupportEnabled()) {
+                try {
+                    activePlayers.addAll(ProtectionStones.getInstance().getLuckPerms()
+                            .getUserManager()
+                            .searchAll(node ->
+                                    node instanceof PermissionNode &&
+                                    ((PermissionNode) node).getPermission().equalsIgnoreCase("protectionstones.cleanup.bypass")
+                            ).get().keySet());
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
 
             // loop over offline players and add to list if they haven't joined recently
             for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
