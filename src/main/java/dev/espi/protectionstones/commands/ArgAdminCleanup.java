@@ -21,6 +21,7 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.luckperms.api.node.matcher.NodeMatcher;
 import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -41,12 +42,12 @@ class ArgAdminCleanup {
 
     // /ps admin cleanup [remove/preview]
     static boolean argumentAdminCleanup(CommandSender p, String[] preParseArgs) {
-        if (preParseArgs.length < 3 || !Arrays.asList("remove", "preview").contains(preParseArgs[2].toLowerCase())) {
+        if (preParseArgs.length < 3 || !Arrays.asList("remove", "preview", "count").contains(preParseArgs[2].toLowerCase())) {
             PSL.msg(p, ArgAdmin.getCleanupHelp());
             return true;
         }
 
-        String cleanupOperation = preParseArgs[2].toLowerCase(); // [remove|preview]
+        String cleanupOperation = preParseArgs[2].toLowerCase(); // [remove|preview|count]
 
         World w;
         String alias = null;
@@ -102,22 +103,24 @@ class ArgAdminCleanup {
 
             HashSet<UUID> activePlayers = new HashSet<>();
 
+            int bypassCount = 0;
+
             // loop over all luckperms players and add to list if they have bypass permission
             if (ProtectionStones.getInstance().isLuckPermsSupportEnabled()) {
                 try {
                     activePlayers.addAll(ProtectionStones.getInstance().getLuckPerms()
                             .getUserManager()
-                            .searchAll(node ->
-                                    node instanceof PermissionNode &&
-                                    ((PermissionNode) node).getPermission().equalsIgnoreCase("protectionstones.cleanup.bypass")
-                            ).get().keySet());
+                            .searchAll(NodeMatcher.key("protectionstones.cleanup.bypass")).thenApply(Map::keySet).get());
+
+                    bypassCount = activePlayers.size();
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
 
-            // loop over offline players and add to list if they haven't joined recently
-            for (OfflinePlayer op : Bukkit.getServer().getOfflinePlayers()) {
+            // loop over offline players and add to list if they haven't joined recently}
+            final OfflinePlayer[] players = Bukkit.getServer().getOfflinePlayers();
+            for (OfflinePlayer op : players) {
                 long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
                 try {
                     // a player is active if they have joined within the days
@@ -151,6 +154,20 @@ class ArgAdminCleanup {
                         toDelete.add(r);
                     }
                 }
+            }
+
+            if (cleanupOperation.equalsIgnoreCase("count")) {
+                p.sendMessage(ChatColor.GOLD + "PLAYERS");
+                p.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "Bypass: " + ChatColor.WHITE + bypassCount);
+                p.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "Active: " + ChatColor.WHITE + (activePlayers.size() - bypassCount));
+                p.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "Inactive: " + ChatColor.WHITE + (players.length - activePlayers.size()));
+                p.sendMessage(ChatColor.GOLD + "|_" + ChatColor.YELLOW + "Total: " + ChatColor.WHITE + players.length);
+                p.sendMessage(" ");
+                p.sendMessage(ChatColor.GOLD + "REGIONS");
+                p.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "Active: " + ChatColor.WHITE + (regions.size() - toDelete.size()));
+                p.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "Inactive: " + ChatColor.WHITE + toDelete.size());
+                p.sendMessage(ChatColor.GOLD + "|_" + ChatColor.YELLOW + "Total: " + ChatColor.WHITE + regions.size());
+                return;
             }
 
             // start recursive iteration to delete a region each tick
