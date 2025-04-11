@@ -1,7 +1,7 @@
 # Table of contents
 
-* [🏠 Home](README.md)
-* [🧩 API](api.md)
+* [Home](README.md)
+* [API](api.md)
 * [Commands](commands.md)
 * [Configuration](configuration.md)
 * [Permissions](permissions.md)
