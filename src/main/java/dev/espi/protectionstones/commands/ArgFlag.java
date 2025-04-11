@@ -138,14 +138,6 @@ public class ArgFlag implements PSCommandArg {
                         deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
                     }
 
-                    // HACK: Prevent pvp flag value from being changed to none/null, if it is set to a value with the group flag set to all
-                    if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
-                        if (fValue == StateFlag.State.DENY) {
-                            deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
-                        } else if (fValue == StateFlag.State.ALLOW) {
-                            allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create()));
-                        }
-                    }
 
                     flagLine.addExtra(allow);
                     flagLine.addExtra(" ");
@@ -193,15 +185,27 @@ public class ArgFlag implements PSCommandArg {
 
                 // set hover and click task for flag group
                 BaseComponent[] hover;
-                if (fValue == null) {
+                // HACK: Prevent pvp flag value from being changed to none/null
+                // Special handling for "pvp" flag with "all" group, disabling interaction.
+                if (flag.equalsIgnoreCase("pvp") && groupfValue.equalsIgnoreCase("all")) {
+                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
+                    // Remove click action to fully disable changing this group.
+                    groupChange.setClickEvent(null);
+                } else if (fValue == null) {
                     hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create();
                 } else {
                     hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
                 }
-                if (!nextGroup.equals(groupfValue)) { // only display hover message if the group is not the same
+
+                // Always set hover if the flag is pvp and group is "all"
+                if (flag.equalsIgnoreCase("pvp") && groupfValue.equalsIgnoreCase("all")) {
+                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
                     groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                    groupChange.setClickEvent(null); // Disable click event explicitly
+                } else if (!nextGroup.equals(groupfValue)) {
+                    groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                    groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
                 }
-                groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
 
                 flagLine.addExtra(groupChange);
                 // send message

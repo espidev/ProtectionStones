@@ -1,7 +1,7 @@
 name: ProtectionStones
 version: ${version}
 description: ${description}
-authors: [EspiDev]
+authors: [EspiDev, Jerzean]
 
 depend: [WorldGuard, WorldEdit]
 softdepend: [Vault, PlaceholderAPI, LuckPerms]
