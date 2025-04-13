@@ -17,7 +17,7 @@ View the Spigot page (with FAQ and install instructions) [here](https://www.spig
 Check the [wiki](https://github.com/espidev/ProtectionStones/wiki) for plugin reference information.
 
 ### Dependencies
-* ProtectionStones 2.10.5
+* ProtectionStones 2.10.6
   * Spigot 1.20.6+
   * WorldGuard 7.0.9+
   * WorldEdit 7.2.6+

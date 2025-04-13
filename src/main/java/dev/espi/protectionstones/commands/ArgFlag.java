@@ -118,8 +118,8 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 // add line based on flag type
+                boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();;
                 if (f instanceof StateFlag) { // allow/deny
-                    boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();
 
                     TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
                             deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
@@ -187,7 +187,7 @@ public class ArgFlag implements PSCommandArg {
                 BaseComponent[] hover;
                 // HACK: Prevent pvp flag value from being changed to none/null
                 // Special handling for "pvp" flag with "all" group, disabling interaction.
-                if (flag.equalsIgnoreCase("pvp") && groupfValue.equalsIgnoreCase("all")) {
+                if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
                     hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
                     // Remove click action to fully disable changing this group.
                     groupChange.setClickEvent(null);
