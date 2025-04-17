@@ -36,7 +36,7 @@ public class ArgAdminHelp {
         // Create the hover event from the info text, add click event after
         BaseComponent[] hoverComponents = TextComponent.fromLegacyText(info);
         mainText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents));
-        //toggle for running on mouse click, currently disabled
+        //toggle for running on mouse click
         if (run) {
             mainText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ChatColor.stripColor(clickCommand)));
         } else {
@@ -56,6 +56,7 @@ public class ArgAdminHelp {
                 ChatColor.RESET + " PS Admin Help " +
                 ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "===============\n");
 
+        // The run parameter is currently unused by all messages
         send(p,
                 tx + " admin version",
                 "Show the version number of the plugin.\n\n" + bc + " admin version",
@@ -157,7 +158,6 @@ public class ArgAdminHelp {
                 "Use this command to recalculate block types for PS regions in a world.\n\n" + bc + " admin fixregions",
                 bc + " admin fixregions",
                 false);
-        //add footer since it was missing
         p.sendMessage(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=============================================");
 
         return true;
