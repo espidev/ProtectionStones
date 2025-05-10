@@ -53,6 +53,7 @@ placing_bypasses_wg_passthrough = true
     # Protection radius of block (radius of 64 -> 129 x 129 region)
     # Set y_radius to -1 if you want it to protect for all y levels.
     # y_radius must be -1 if you are allowing the region to be merged ("allow_merging" option)
+    y_init = false
     x_radius = 64
     y_radius = -1
     z_radius = 64

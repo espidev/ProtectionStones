@@ -58,6 +58,8 @@ public class PSProtectBlock {
     @Path("region.x_radius")
     @SpecIntInRange(min = 0, max = Integer.MAX_VALUE)
     public int xRadius;
+    @Path("region.y_init")
+    public boolean y_init;
     @Path("region.y_radius")
     @SpecIntInRange(min = -1, max = Integer.MAX_VALUE)
     public int yRadius;
