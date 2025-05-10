@@ -278,8 +278,9 @@ public class WGUtils {
         return currentPSID;
     }
 
-    public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
-        return BlockVector3.at(bx - xRadius, (yRadius == -1) ? MIN_BUILD_HEIGHT : by - yRadius, bz - zRadius);
+    public static BlockVector3 getMinVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius, boolean yInit) {
+        double yValue = (yRadius == -1) ? MIN_BUILD_HEIGHT : (yInit ? by : by - yRadius);
+        return BlockVector3.at(bx - xRadius, yValue, bz - zRadius);
     }
 
     public static BlockVector3 getMaxVector(double bx, double by, double bz, long xRadius, long yRadius, long zRadius) {
@@ -374,7 +375,7 @@ public class WGUtils {
             min = getMinChunkVector(v.x, v.y, v.z, b.chunkRadius, b.yRadius);
             max = getMaxChunkVector(v.x, v.y, v.z, b.chunkRadius, b.yRadius);
         } else {
-            min = getMinVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
+            min = getMinVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius, b.y_init);
             max = getMaxVector(v.x, v.y, v.z, b.xRadius, b.yRadius, b.zRadius);
         }
         return new ProtectedCuboidRegion(createPSID(v.x, v.y, v.z), min, max);
