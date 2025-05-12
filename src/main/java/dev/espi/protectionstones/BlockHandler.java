@@ -28,8 +28,10 @@ import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
+import dev.espi.protectionstones.utils.OptimizationManager;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.utils.DatabaseManager;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
@@ -126,72 +128,79 @@ public class BlockHandler {
 
     // create a PS region (no checks for items)
     public static boolean createPSRegion(Player p, Location l, PSProtectBlock blockOptions) {
-        // check permission
-        if (!p.hasPermission("protectionstones.create")) {
-            PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
-            return false;
-        }
-        if (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission)) {
-            PSL.msg(p, PSL.NO_PERMISSION_CREATE_SPECIFIC.msg());
-            return false;
-        }
-
-        // check cooldown
-        if (ProtectionStones.getInstance().getConfigOptions().placingCooldown != -1) {
-            String time = checkCooldown(p);
-            if (time != null) {
-                PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", time));
+        // Track player operation for optimization
+        OptimizationManager.trackOperation(p);
+        
+        try {
+            // check permission
+            if (!p.hasPermission("protectionstones.create")) {
+                PSL.msg(p, PSL.NO_PERMISSION_CREATE.msg());
                 return false;
             }
-        }
+            if (!blockOptions.permission.equals("") && !p.hasPermission(blockOptions.permission)) {
+                PSL.msg(p, PSL.NO_PERMISSION_CREATE_SPECIFIC.msg());
+                return false;
+            }
 
-        // check if player reached region limit
-        if (!LimitUtil.check(p, blockOptions)) {
-            return false;
-        }
-
-        // non-admin checks
-        if (!p.hasPermission("protectionstones.admin")) {
-            // check if in world blacklist or not in world whitelist
-            boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
-
-            if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
-                if (blockOptions.preventBlockPlaceInRestrictedWorld) {
-                    PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
+            // check cooldown
+            if (ProtectionStones.getInstance().getConfigOptions().placingCooldown != -1) {
+                String time = checkCooldown(p);
+                if (time != null) {
+                    PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", time));
                     return false;
-                } else {
-                    return true;
                 }
             }
 
-        } // end of non-admin checks
-
-        // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
-            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
-            return false;
-        }
-
-        // debug message
-        if (!ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-            ProtectionStones.getPluginLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
-        }
-
-        if (createActualRegion(p, l, blockOptions)) { // region creation successful
-
-            // take money
-            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
-                if (!er.transactionSuccess()) {
-                    PSL.msg(p, er.errorMessage);
-                    return true;
-                }
-                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+            // check if player reached region limit
+            if (!LimitUtil.check(p, blockOptions)) {
+                return false;
             }
 
-            return true;
-        } else { // region creation failed
-            return false;
+            // non-admin checks
+            if (!p.hasPermission("protectionstones.admin")) {
+                // check if in world blacklist or not in world whitelist
+                boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
+
+                if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
+                    if (blockOptions.preventBlockPlaceInRestrictedWorld) {
+                        PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+
+            } // end of non-admin checks
+
+            // check if player has enough money
+            if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
+                PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+                return false;
+            }
+
+            // debug message
+            if (!ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+                ProtectionStones.getPluginLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
+            }
+
+            if (createActualRegion(p, l, blockOptions)) { // region creation successful
+
+                // take money
+                if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
+                    EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                    if (!er.transactionSuccess()) {
+                        PSL.msg(p, er.errorMessage);
+                        return true;
+                    }
+                    PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+                }
+
+                return true;
+            } else { // region creation failed
+                return false;
+            }
+        } finally {
+            OptimizationManager.untrackOperation(p);
         }
     }
 
@@ -268,6 +277,16 @@ public class BlockHandler {
             rm.removeRegion(id);
             return false;
         }
+
+        // Store block data in database
+        boolean isHidden = blockOptions.autoHide;
+        DatabaseManager.saveBlockAsync(l, blockOptions.type, isHidden, id);
+        
+        // Cache block data for faster lookup
+        OptimizationManager.cacheBlock(l, blockOptions.type);
+        
+        // Store region data in database
+        DatabaseManager.saveRegionAsync(id, p.getWorld().getName(), null, p.getUniqueId(), 0, 0);
 
         PSL.msg(p, PSL.PROTECTED.msg());
 

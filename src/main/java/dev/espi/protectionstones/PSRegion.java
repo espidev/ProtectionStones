@@ -46,6 +46,49 @@ public abstract class PSRegion {
         this.world = checkNotNull(world);
     }
 
+    /**
+     * Syncs the current region data to the database for persistence
+     */
+    public void syncToDB() {
+        // Save region data to database asynchronously
+        dev.espi.protectionstones.utils.DatabaseManager.saveRegionAsync(
+                getId(),
+                getWorld().getName(),
+                getName(),
+                getOwners().size() > 0 ? getOwners().get(0) : null,
+                getTaxPaymentsDue().isEmpty() ? 0 : System.currentTimeMillis(),
+                getRentLastPaid() != null ? getRentLastPaid() : 0
+        );
+    }
+
+    /**
+     * Removes the region data from the database
+     */
+    public void removeFromDB() {
+        // Remove region data from database asynchronously
+        dev.espi.protectionstones.utils.DatabaseManager.deleteRegionAsync(getId());
+        
+        // Get block location and remove from blocks table
+        PSLocation loc = WGUtils.parsePSRegionToLocation(getId());
+        if (loc != null) {
+            dev.espi.protectionstones.utils.DatabaseManager.deleteBlockAsync(getWorld().getName(), loc.x, loc.y, loc.z);
+        }
+        
+        // Clear from cache
+        dev.espi.protectionstones.utils.OptimizationManager.clearRegionCache(getId());
+        if (loc != null) {
+            Location location = new Location(getWorld(), loc.x, loc.y, loc.z);
+            dev.espi.protectionstones.utils.OptimizationManager.clearBlockCache(location);
+        }
+    }
+    
+    /**
+     * Update region data in the database after any changes
+     */
+    public void updateDB() {
+        syncToDB();
+    }
+
     // ~~~~~~~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~~
 
     /**
