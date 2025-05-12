@@ -16,10 +16,15 @@
 package dev.espi.protectionstones;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.RemovalStrategy;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionType;
+import dev.espi.protectionstones.event.PSBreakProtectBlockEvent;
 import dev.espi.protectionstones.event.PSRemoveEvent;
+import dev.espi.protectionstones.utils.BlockUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
 import dev.espi.protectionstones.utils.WGUtils;
@@ -496,33 +501,38 @@ public class PSStandardRegion extends PSRegion {
 
     @Override
     public boolean deleteRegion(boolean deleteBlock, Player cause) {
-        PSRemoveEvent event = new PSRemoveEvent(this, cause);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) { // if event was cancelled, prevent execution
-            return false;
+        PSLocation psl = WGUtils.parsePSRegionToLocation(wgregion.getId());
+        if (psl == null) return false;
+        Block blockToDelete = world.getBlockAt(psl.x, psl.y, psl.z);
+
+        // check if block is actually there (if block not hidden)
+        if (!isHidden() && blockToDelete.getType() == Material.AIR) return false;
+
+        Block psBlock = getProtectBlock();
+        String type = getType();
+        PSProtectBlock cpb = getTypeOptions();
+
+        // this should never occur except in testing or corrupt regions, but adding catch just in case
+        if (cpb == null) return false;
+
+        // fire event
+        if (cause != null) {
+            PSBreakProtectBlockEvent event = new PSBreakProtectBlockEvent(this, cause);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) return false;
         }
 
-        // set the physical block to air
-        if (deleteBlock && !this.isHidden()) {
-            this.getProtectBlock().setType(Material.AIR);
+        // delete the block (turn to air)
+        if (deleteBlock && psBlock != null) {
+            psBlock.setType(Material.AIR);
         }
 
-        // remove name from cache
-        if (getName() != null) {
-            HashMap<String, ArrayList<String>> rIds = ProtectionStones.regionNameToID.get(getWorld().getUID());
-            if (rIds != null && rIds.containsKey(getName())) {
-                if (rIds.get(getName()).size() == 1) {
-                    rIds.remove(getName());
-                } else {
-                    rIds.get(getName()).remove(getId());
-                }
-            }
-        }
+        // delete region
+        getWGRegionManager().removeRegion(wgregion.getId(), RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
 
-        // remove region from WorldGuard
-        // specify UNSET_PARENT_IN_CHILDREN removal strategy so that region children don't get deleted
-        rgmanager.removeRegion(wgregion.getId(), RemovalStrategy.UNSET_PARENT_IN_CHILDREN);
-
+        // remove region data from database
+        removeFromDB();
+        
         return true;
     }
 

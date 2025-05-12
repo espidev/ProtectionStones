@@ -18,15 +18,20 @@ package dev.espi.protectionstones;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgHelp;
 import dev.espi.protectionstones.commands.PSCommandArg;
 import dev.espi.protectionstones.placeholders.PSPlaceholderExpansion;
 import dev.espi.protectionstones.utils.BlockUtil;
+import dev.espi.protectionstones.utils.DatabaseManager;
+import dev.espi.protectionstones.utils.OptimizationManager;
 import dev.espi.protectionstones.utils.RecipeUtil;
-import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.UUIDCache;
+import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
@@ -549,12 +554,13 @@ public class ProtectionStones extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        plugin = this;
+        
         FlagHandler.registerHandlers(); // register custom WG flag handlers
 
         TomlFormat.instance();
         Config.setInsertionOrderPreserved(true); // make sure that config upgrades aren't a complete mess
 
-        plugin = this;
         configLocation = new File(this.getDataFolder() + "/config.toml");
         blockDataFolder = new File(this.getDataFolder() + "/blocks");
 
@@ -610,14 +616,59 @@ public class ProtectionStones extends JavaPlugin {
 
         // load configuration
         loadConfig(false);
+        
+        // Initialize DatabaseManager
+        DatabaseManager.initialize();
+        
+        // Initialize UUIDCache from database
+        UUIDCache.initialize();
+        
+        // Initialize optimization manager
+        OptimizationManager.initialize();
+
+        // Apply server optimizations
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
+            ProtectionStones.getInstance().getLogger().info("Applying server performance optimizations...");
+            
+            // Optimize region lookup operations by using our cache system
+            getLogger().info("WorldGuard region lookup optimization applied through OptimizationManager.");
+            
+            // Reduce task frequency of heavy tasks
+            final int TICK_MINUTES = 20 * 60;
+            Bukkit.getScheduler().runTaskTimerAsynchronously(getInstance(), () -> {
+                getInstance().debug("Running optimization task - clearing region caches");
+                OptimizationManager.clearAllRegionCaches();
+                OptimizationManager.clearAllBlockCaches();
+            }, TICK_MINUTES * 5, TICK_MINUTES * 30); // Run every 30 minutes
+        }
 
         // register protectionstones.flags.edit.[flag] permission
         FlagHandler.initializePermissions();
 
+        // setup economy system
+        economy = new PSEconomy();
+
+        // Automatically save region manager changes
+        HashMap<World, RegionManager> regionManagers = WGUtils.getAllRegionManagers();
+        plugin.debug("Setting up auto save for worlds: " + regionManagers.keySet().toString());
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            // asynchronously save regions to not lock up server
+            HashMap<World, RegionManager> rms = WGUtils.getAllRegionManagers();
+            for (RegionManager rm : rms.values()) {
+                try {
+                    rm.saveChanges();
+                    plugin.debug("Saved region");
+                } catch (StorageException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 300 * 20L, 300 * 20L); // Save every 5 minutes (300 seconds)
+
         // build up region cache
         getLogger().info("Building region cache...");
 
-        HashMap<World, RegionManager> regionManagers = WGUtils.getAllRegionManagers();
+        // setup name -> id cache
+        regionNameToID = new HashMap<>();
         for (World w : regionManagers.keySet()) {
             RegionManager rgm = regionManagers.get(w);
             HashMap<String, ArrayList<String>> m = new HashMap<>();
@@ -659,6 +710,17 @@ public class ProtectionStones extends JavaPlugin {
             LegacyUpgrade.upgradeRegionsWithNegativeYValues();
 
         getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
+    }
+
+    @Override
+    public void onDisable() {
+        // stop economy cycles
+        if (economy != null) {
+            economy.stop();
+        }
+        
+        // Close database connection
+        DatabaseManager.shutdown();
     }
 
 }
