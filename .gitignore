@@ -7,3 +7,4 @@
 /.project
 /dependency-reduced-pom.xml
 /*.iml
+.vscode/settings.json
