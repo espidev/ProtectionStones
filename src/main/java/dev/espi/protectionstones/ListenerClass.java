@@ -53,7 +53,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 import java.util.List;
 
@@ -220,6 +223,7 @@ public class ListenerClass implements Listener {
     // thus we should cancel the event here if possible (so other plugins don't start acting upon it)
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockBreakLowPriority(BlockBreakEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onBlockBreakLowPriority");
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
@@ -228,6 +232,9 @@ public class ListenerClass implements Listener {
         // check if player has permission to break the protection
         PSRegion r = PSRegion.fromLocation(pb.getLocation());
         if (r != null) {
+            ProtectionStones.getInstance().debug("Player:"+ p.getName()+", Holding:"+ p.getPlayer().getInventory().getItemInMainHand().getType().name()+", Enchants:" +p.getPlayer().getInventory().getItemInMainHand().getEnchantments());
+
+
             String error = checkPermissionToBreakProtection(p, r);
             if (!error.isEmpty()) {
                 PSL.msg(p, error);
@@ -238,6 +245,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onBlockBreak");
         Player p = e.getPlayer();
         Block pb = e.getBlock();
 
@@ -275,6 +283,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFurnaceSmelt(FurnaceSmeltEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onFurnaceSmelt");
         // prevent protect block item to be smelt
         PSProtectBlock options = ProtectionStones.getBlockOptions(e.getSource());
         if (options != null && !options.allowSmeltItem) {
@@ -284,6 +293,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFurnaceBurnItem(FurnaceBurnEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onFurnaceBurnItem");
         // prevent protect block item to be smelt
         Furnace f = (Furnace) e.getBlock().getState();
         if (f.getInventory().getSmelting() != null) {
@@ -299,10 +309,47 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPrepareItemCraft(PrepareItemCraftEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onPrepareItemCraft");
         for (ItemStack s : e.getInventory().getMatrix()) {
             PSProtectBlock options = ProtectionStones.getBlockOptions(s);
             if (options != null && !options.allowUseInCrafting) {
                 e.getInventory().setResult(new ItemStack(Material.AIR));
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onCrafterCraft(CrafterCraftEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onCrafterCraft");
+
+        CraftingRecipe recipe = e.getRecipe();
+        if (recipe == null) return;
+
+        // Shaped recipes (grid-based)
+        if (recipe instanceof ShapedRecipe shaped) {
+            for (ItemStack ingredient : shaped.getIngredientMap().values()) {
+                if (ingredient != null) {
+                    PSProtectBlock options = ProtectionStones.getBlockOptions(ingredient);
+                    if (options != null && !options.allowUseInCrafting) {
+                        e.setResult(new ItemStack(Material.AIR));
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Shapeless recipes (unordered list)
+        if (recipe instanceof ShapelessRecipe shapeless) {
+            for (ItemStack ingredient : shapeless.getIngredientList()) {
+                if (ingredient != null) {
+                    PSProtectBlock options = ProtectionStones.getBlockOptions(ingredient);
+                    if (options != null && !options.allowUseInCrafting) {
+                        e.setResult(new ItemStack(Material.AIR));
+                        e.setCancelled(true);
+                        return;
+                    }
+                }
             }
         }
     }
@@ -313,6 +360,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInventoryClickEvent(InventoryClickEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onInventoryClickEvent");
         if (e.getInventory().getType() == InventoryType.GRINDSTONE) {
             if (ProtectionStones.isProtectBlockItem(e.getCurrentItem())) {
                 e.setCancelled(true);
@@ -325,6 +373,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBucketFill(PlayerBucketEmptyEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onPlayerBucketFill");
         Block clicked = e.getBlockClicked();
         BlockFace bf = e.getBlockFace();
         Block check = clicked.getWorld().getBlockAt(clicked.getX() + e.getBlockFace().getModX(), clicked.getY() + bf.getModY(), clicked.getZ() + e.getBlockFace().getModZ());
@@ -335,6 +384,7 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onBlockIgnite");
         if (ProtectionStones.isProtectBlock(e.getBlock())) {
             e.setCancelled(true);
         }
@@ -425,16 +475,19 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onBlockExplode");
         explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onEntityExplode");
         explodeUtil(e.blockList(), e.getLocation().getWorld());
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        ProtectionStones.getInstance().debug("ListenerClass.java, onEntityChangeBlock");
         if (!ProtectionStones.isProtectBlock(e.getBlock())) return;
 
         // events like ender dragon block break, wither running into block break, etc.
