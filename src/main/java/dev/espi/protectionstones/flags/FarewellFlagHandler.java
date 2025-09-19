@@ -74,7 +74,7 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
     protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
         Player p = Bukkit.getPlayer(localPlayer.getUniqueId());
         if (p != null && lastValue != null) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+            PSL.action(p, lastValue);
         }
         return true;
     }
