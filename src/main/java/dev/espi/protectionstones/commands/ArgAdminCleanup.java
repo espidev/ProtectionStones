@@ -94,9 +94,10 @@ class ArgAdminCleanup {
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             int days = (args.size() > 0) ? Integer.parseInt(args.get(0)) : 30; // 30 days is default if days aren't specified
 
-            PSL.msg(p, PSL.ADMIN_CLEANUP_HEADER.msg()
-                    .replace("%arg%", cleanupOperation)
-                    .replace("%days%", "" + days));
+            PSL.msg(p, PSL.ADMIN_CLEANUP_HEADER.replaceAll(Map.of(
+                    "%arg%", cleanupOperation,
+                    "%days%", String.valueOf(days)
+            )));
 
             HashSet<UUID> activePlayers = new HashSet<>();
 
@@ -149,7 +150,7 @@ class ArgAdminCleanup {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () ->
                     processRegion(deleteRegionsIterator, p, isRemoveOperation), 1);
         } else { // finished region iteration
-            PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER.msg()
+            PSL.msg(p, PSL.ADMIN_CLEANUP_FOOTER
                     .replace("%arg%", isRemoveOperation ? "remove" : "preview"));
 
             // flush and close preview file

@@ -23,10 +23,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ArgName implements PSCommandArg {
     @Override
@@ -72,14 +69,19 @@ public class ArgName implements PSCommandArg {
 
         if (args[1].equals("none")) {
             r.setName(null);
-            PSL.msg(p, PSL.NAME_REMOVED.msg().replace("%id%", r.getId()));
+            PSL.msg(p, PSL.NAME_REMOVED.replace("%id%", r.getId()));
         } else {
             if (!ProtectionStones.getInstance().getConfigOptions().allowDuplicateRegionNames && ProtectionStones.isPSNameAlreadyUsed(args[1])) {
-                PSL.msg(p, PSL.NAME_TAKEN.msg().replace("%name%", args[1]));
+                PSL.msg(p, PSL.NAME_TAKEN.replace("%name%", args[1]));
                 return true;
             }
             r.setName(args[1]);
-            PSL.msg(p, PSL.NAME_SET_NAME.msg().replace("%id%", r.getId()).replace("%name%", r.getName()));
+            PSL.msg(p,
+                    PSL.NAME_SET_NAME.replaceAll(Map.of(
+                            "%id%", r.getId(),
+                            "%name%", r.getName()
+                    ))
+            );
         }
         return true;
     }

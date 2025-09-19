@@ -68,7 +68,7 @@ public class ArgPriority implements PSCommandArg {
         }
         if (args.length < 2) {
             int priority = r.getWGRegion().getPriority();
-            PSL.msg(p, PSL.PRIORITY_INFO.msg().replace("%priority%", "" + priority));
+            PSL.msg(p, PSL.PRIORITY_INFO.replace("%priority%", "" + priority));
             return true;
         }
 

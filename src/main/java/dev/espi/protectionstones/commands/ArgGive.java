@@ -18,6 +18,8 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -59,7 +61,11 @@ public class ArgGive implements PSCommandArg {
 
         // check if player online
         if (Bukkit.getPlayer(args[2]) == null)
-            return PSL.msg(p, PSL.PLAYER_NOT_FOUND.msg() + " (" + args[2] + ")");
+            return PSL.msg(p,
+                    PSL.PLAYER_NOT_FOUND.msg()
+                            .append(Component.text(" (" + args[2] + ")", NamedTextColor.GRAY))
+            );
+
 
         // check if argument is valid block
         PSProtectBlock cp = ProtectionStones.getProtectBlockFromAlias(args[1]);
@@ -82,7 +88,12 @@ public class ArgGive implements PSCommandArg {
             }
         }
 
-        return PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));
+        return PSL.msg(p,
+                PSL.GIVE_GIVEN.replaceAll(Map.of(
+                        "%block%", args[1],
+                        "%player%", Bukkit.getPlayer(args[2]).getDisplayName()
+                ))
+        );
     }
 
     // tab completion

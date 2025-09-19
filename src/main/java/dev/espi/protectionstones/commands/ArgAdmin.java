@@ -19,6 +19,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,30 +34,39 @@ import java.util.*;
 
 public class ArgAdmin implements PSCommandArg {
 
-    // has to be a method, because the base command config option is not available until the plugin is loaded
-    public static String getCleanupHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin cleanup [remove|preview] [-t typealias (optional)] [days] [world (optional)]";
+    // --- Cleanup ---
+    public static Component getCleanupHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/", NamedTextColor.GRAY))
+                .append(Component.text(ProtectionStones.getInstance().getConfigOptions().base_command + " admin cleanup [remove|preview] [-t typealias (optional)] [days] [world (optional)]", NamedTextColor.GRAY));
     }
 
-    public static String getFlagHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin flag [world] [flagname] [value|null|default]";
+    // --- Flag ---
+    public static Component getFlagHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/", NamedTextColor.GRAY))
+                .append(Component.text(ProtectionStones.getInstance().getConfigOptions().base_command + " admin flag [world] [flagname] [value|null|default]", NamedTextColor.GRAY));
     }
 
-    public static String getChangeBlockHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin changeblock [world] [oldtypealias] [newtypealias]";
+    // --- Change Block ---
+    public static Component getChangeBlockHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/", NamedTextColor.GRAY))
+                .append(Component.text(ProtectionStones.getInstance().getConfigOptions().base_command + " admin changeblock [world] [oldtypealias] [newtypealias]", NamedTextColor.GRAY));
     }
 
-    public static String getChangeRegionTypeHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin changeregiontype [world] [oldtype] [newtype]";
+    // --- Change Region Type ---
+    public static Component getChangeRegionTypeHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/", NamedTextColor.GRAY))
+                .append(Component.text(ProtectionStones.getInstance().getConfigOptions().base_command + " admin changeregiontype [world] [oldtype] [newtype]", NamedTextColor.GRAY));
     }
 
-    public static String getForceMergeHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " admin forcemerge [world]";
+    // --- Force Merge ---
+    public static Component getForceMergeHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/", NamedTextColor.GRAY))
+                .append(Component.text(ProtectionStones.getInstance().getConfigOptions().base_command + " admin forcemerge [world]", NamedTextColor.GRAY));
     }
 
     @Override
@@ -93,52 +104,73 @@ public class ArgAdmin implements PSCommandArg {
         switch (args[1].toLowerCase()) {
             case "help":
                 return ArgAdminHelp.argumentAdminHelp(s, args);
+
             case "version":
-                s.sendMessage(ChatColor.AQUA + "ProtectionStones: " + ChatColor.GRAY + ProtectionStones.getInstance().getDescription().getVersion());
-                s.sendMessage(ChatColor.AQUA + "Developers: " + ChatColor.GRAY + ProtectionStones.getInstance().getDescription().getAuthors());
-                s.sendMessage(ChatColor.AQUA + "Bukkit:  " + ChatColor.GRAY + Bukkit.getVersion());
-                s.sendMessage(ChatColor.AQUA + "WG: " + ChatColor.GRAY + WorldGuardPlugin.inst().getDescription().getVersion());
+                PSL.msg(s, Component.text("ProtectionStones: ", NamedTextColor.AQUA)
+                        .append(Component.text(ProtectionStones.getInstance().getDescription().getVersion(), NamedTextColor.GRAY)));
+                PSL.msg(s, Component.text("Developers: ", NamedTextColor.AQUA)
+                        .append(Component.text(ProtectionStones.getInstance().getDescription().getAuthors().toString(), NamedTextColor.GRAY)));
+                PSL.msg(s, Component.text("Bukkit: ", NamedTextColor.AQUA)
+                        .append(Component.text(Bukkit.getVersion(), NamedTextColor.GRAY)));
+                PSL.msg(s, Component.text("WG: ", NamedTextColor.AQUA)
+                        .append(Component.text(WorldGuardPlugin.inst().getDescription().getVersion(), NamedTextColor.GRAY)));
                 break;
+
             case "hide":
                 return ArgAdminHide.argumentAdminHide(s, args);
+
             case "unhide":
                 return ArgAdminHide.argumentAdminHide(s, args);
+
             case "cleanup":
                 return ArgAdminCleanup.argumentAdminCleanup(s, args);
+
             case "stats":
                 return ArgAdminStats.argumentAdminStats(s, args);
+
             case "lastlogon":
                 return ArgAdminLastlogon.argumentAdminLastLogon(s, args);
+
             case "lastlogons":
                 return ArgAdminLastlogon.argumentAdminLastLogons(s, args);
+
             case "flag":
                 return ArgAdminFlag.argumentAdminFlag(s, args);
+
             case "recreate":
                 return ArgAdminRecreate.argumentAdminRecreate(s, args);
+
             case "changeblock":
                 return ArgAdminChangeblock.argumentAdminChangeblock(s, args);
+
             case "changeregiontype":
                 return ArgAdminChangeType.argumentAdminChangeType(s, args);
+
             case "forcemerge":
                 return ArgAdminForceMerge.argumentAdminForceMerge(s, args);
+
             case "settaxautopayers":
                 return ArgAdminSetTaxAutopayers.argumentAdminSetTaxAutopayers(s, args);
+
             case "fixregions":
-                s.sendMessage(ChatColor.YELLOW + "Fixing...");
+                PSL.msg(s, Component.text("Fixing...", NamedTextColor.YELLOW));
                 LegacyUpgrade.upgradeRegions();
-                s.sendMessage(ChatColor.YELLOW + "Done!");
+                PSL.msg(s, Component.text("Done!", NamedTextColor.YELLOW));
                 break;
+
             case "debug":
                 if (ProtectionStones.getInstance().isDebug()) {
-                    s.sendMessage(ChatColor.YELLOW + "Debug mode is now off.");
+                    PSL.msg(s, Component.text("Debug mode is now off.", NamedTextColor.YELLOW));
                     ProtectionStones.getInstance().setDebug(false);
                 } else {
-                    s.sendMessage(ChatColor.YELLOW + "Debug mode is now on.");
+                    PSL.msg(s, Component.text("Debug mode is now on.", NamedTextColor.YELLOW));
                     ProtectionStones.getInstance().setDebug(true);
                 }
+                break;
         }
         return true;
     }
+
 
     @Override
     public List<String> tabComplete(CommandSender sender, String alias, String[] args) {

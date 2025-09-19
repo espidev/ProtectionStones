@@ -78,9 +78,9 @@ public class ArgCount implements PSCommandArg {
                 }
 
                 count = countRegionsOfPlayer(p.getUniqueId(), p.getWorld());
-                PSL.msg(p, PSL.PERSONAL_REGION_COUNT.msg().replace("%num%", "" + count[0]));
+                PSL.msg(p, PSL.PERSONAL_REGION_COUNT.replace("%num%", "" + count[0]));
                 if (count[1] != 0) {
-                    PSL.msg(p, PSL.PERSONAL_REGION_COUNT_MERGED.msg().replace("%num%", ""+count[1]));
+                    PSL.msg(p, PSL.PERSONAL_REGION_COUNT_MERGED.replace("%num%", ""+count[1]));
                 }
 
             } else if (args.length == 2) {
@@ -97,14 +97,18 @@ public class ArgCount implements PSCommandArg {
                 UUID countUuid = UUIDCache.getUUIDFromName(args[1]);
                 count = countRegionsOfPlayer(countUuid, p.getWorld());
 
-                PSL.msg(p, PSL.OTHER_REGION_COUNT.msg()
-                        .replace("%player%", UUIDCache.getNameFromUUID(countUuid))
-                        .replace("%num%", "" + count[0]));
+                PSL.msg(p, PSL.OTHER_REGION_COUNT.replaceAll(Map.of(
+                        "%player%", UUIDCache.getNameFromUUID(countUuid),
+                        "%num%", String.valueOf(count[0])
+                )));
+
                 if (count[1] != 0) {
-                    PSL.msg(p, PSL.OTHER_REGION_COUNT_MERGED.msg()
-                            .replace("%player%", UUIDCache.getNameFromUUID(countUuid))
-                            .replace("%num%", "" + count[1]));
+                    PSL.msg(p, PSL.OTHER_REGION_COUNT_MERGED.replaceAll(Map.of(
+                            "%player%", UUIDCache.getNameFromUUID(countUuid),
+                            "%num%", String.valueOf(count[1])
+                    )));
                 }
+
             } else {
                 PSL.msg(p, PSL.COUNT_HELP.msg());
             }

@@ -30,6 +30,7 @@ import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
@@ -37,10 +38,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class BlockHandler {
     private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
@@ -140,7 +138,7 @@ public class BlockHandler {
         if (ProtectionStones.getInstance().getConfigOptions().placingCooldown != -1) {
             String time = checkCooldown(p);
             if (time != null) {
-                PSL.msg(p, PSL.COOLDOWN.msg().replace("%time%", time));
+                PSL.msg(p, PSL.COOLDOWN.replace("%time%", time));
                 return false;
             }
         }
@@ -168,7 +166,7 @@ public class BlockHandler {
 
         // check if player has enough money
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
-            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+            PSL.msg(p, PSL.NOT_ENOUGH_MONEY.replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
             return false;
         }
 
@@ -183,10 +181,10 @@ public class BlockHandler {
             if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
                 EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
                 if (!er.transactionSuccess()) {
-                    PSL.msg(p, er.errorMessage);
+                    PSL.msg(p, Component.text(er.errorMessage));
                     return true;
                 }
-                PSL.msg(p, PSL.PAID_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
+                PSL.msg(p, PSL.PAID_MONEY.replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
             }
 
             return true;
@@ -214,7 +212,7 @@ public class BlockHandler {
         // check for minimum distance between claims by using fake region
         if (blockOptions.distanceBetweenClaims != -1 && !p.hasPermission("protectionstones.superowner")) {
             if (!isFarEnoughFromOtherClaims(blockOptions, p.getWorld(), lp, bx, by, bz)) {
-                PSL.msg(p, PSL.REGION_TOO_CLOSE.msg().replace("%num%", "" + blockOptions.distanceBetweenClaims));
+                PSL.msg(p, PSL.REGION_TOO_CLOSE.replace("%num%", "" + blockOptions.distanceBetweenClaims));
                 return false;
             }
         }
@@ -315,7 +313,7 @@ public class BlockHandler {
                 Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                     try {
                         WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
-                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
+                        PSL.msg(p, PSL.MERGE_AUTO_MERGED.replace("%region%", finalMergeTo.getId()));
                     } catch (WGMerge.RegionHoleException e) {
                         PSL.msg(p, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI is true
                     } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
@@ -327,14 +325,21 @@ public class BlockHandler {
 
         // show merge gui
         if (showGUI) {
-            List<TextComponent> tc = ArgMerge.getGUI(p, r);
+            List<Component> tc = ArgMerge.getGUI(p, r);
             if (!tc.isEmpty()) { // if there are regions you can merge into
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                PSL.msg(p, Component.empty());
                 PSL.msg(p, PSL.MERGE_INTO.msg());
-                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
-                for (TextComponent t : tc) p.spigot().sendMessage(t);
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                PSL.msg(p, PSL.MERGE_HEADER.replaceAll(Map.of("%region%", r.getId())));
+
+                // GUI entries
+                for (Component t : tc) {
+                    PSL.msg(p, t);
+                }
+
+                // empty line again
+                PSL.msg(p, Component.empty());
             }
         }
+
     }
 }

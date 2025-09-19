@@ -17,10 +17,12 @@ package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.TextGUI;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,10 +33,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+
 public class ArgUnclaim implements PSCommandArg {
 
     // /ps unclaim
 
+    private MiniMessage Mini;
     @Override
     public List<String> getNames() {
         return Collections.singletonList("unclaim");
@@ -132,7 +136,7 @@ public class ArgUnclaim implements PSCommandArg {
     }
 
     private void displayPSRegions(CommandSender s, List<PSRegion> regions, int page) {
-        List<TextComponent> entries = new ArrayList<>();
+        List<Component> entries = new ArrayList<>();
         for (PSRegion rs : regions) {
             String msg;
             if (rs.getName() == null) {
@@ -140,9 +144,11 @@ public class ArgUnclaim implements PSCommandArg {
             } else {
                 msg = ChatColor.GRAY + "> " + ChatColor.AQUA + rs.getName() + " (" + rs.getId() + ")";
             }
-            TextComponent tc = new TextComponent(ChatColor.AQUA + " [-] " + msg);
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unclaim " + rs.getId()).create()));
-            tc.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim " + rs.getId()));
+            Component tc = Component.text(" [-] ", NamedTextColor.AQUA)
+                    .append(Mini.deserialize(msg))
+                    .hoverEvent(HoverEvent.showText(Mini.deserialize("Click to unclaim <aqua>" + rs.getId() + "</aqua>")))
+                    .clickEvent(ClickEvent.suggestCommand("/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim " + rs.getId()));
+
             entries.add(tc);
         }
         TextGUI.displayGUI(s, PSL.UNCLAIM_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " unclaim list %page%", page, 17, entries, true);

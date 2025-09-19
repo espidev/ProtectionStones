@@ -19,13 +19,10 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -37,9 +34,9 @@ public class ArgHelp implements PSCommandArg {
 
     private static class HelpEntry {
         String[] permission;
-        TextComponent msg;
+        Component msg;
 
-        HelpEntry(TextComponent msg, String... permission) {
+        HelpEntry(Component msg, String... permission) {
             this.permission = permission;
             this.msg = msg;
         }
@@ -48,9 +45,10 @@ public class ArgHelp implements PSCommandArg {
     public static List<HelpEntry> helpMenu = new ArrayList<>();
 
     public static void initHelpMenu() {
-        String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
+        final String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
 
         helpMenu.clear();
+
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), base + "info"), "protectionstones.info"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), base), "protectionstones.members"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), base), "protectionstones.owners"));
@@ -78,6 +76,7 @@ public class ArgHelp implements PSCommandArg {
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.REGION_HELP.msg(), PSL.REGION_HELP_DESC.msg(), base + "region"), "protectionstones.region"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADMIN_HELP.msg(), PSL.ADMIN_HELP_DESC.msg(), base + "admin"), "protectionstones.admin"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.RELOAD_HELP.msg(), PSL.RELOAD_HELP_DESC.msg(), base + "reload"), "protectionstones.admin"));
+
     }
 
     @Override
@@ -109,25 +108,37 @@ public class ArgHelp implements PSCommandArg {
             page = Integer.parseInt(args[1]) - 1;
         }
 
-        List<TextComponent> entries = new ArrayList<>();
+        // Build visible entries based on permissions, skip “blank” (plain-text empty) lines
+        final PlainTextComponentSerializer plain = PlainTextComponentSerializer.plainText();
+        List<Component> entries = new ArrayList<>();
         for (HelpEntry he : helpMenu) {
-            // ignore blank lines
-            if (he.msg.getText().equals("")) {
-                continue;
-            }
+            Component line = he.msg;
+            if (line == null) continue;
+
+            // ignore blank lines (no visible text)
+            if (plain.serialize(line).isBlank()) continue;
+
             // check player permissions
             for (String perm : he.permission) {
                 if (p.hasPermission(perm)) {
-                    entries.add(he.msg);
+                    entries.add(line);
                     break;
                 }
             }
         }
 
-        TextGUI.displayGUI(p, PSL.HELP.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%", page, GUI_SIZE, entries, false);
+        TextGUI.displayGUI(
+                p,
+                PSL.HELP.msg(),
+                "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " help %page%",
+                page,
+                GUI_SIZE,
+                entries,
+                false
+        );
 
         if (page >= 0 && page * GUI_SIZE + GUI_SIZE < entries.size()) {
-            PSL.msg(p, PSL.HELP_NEXT.msg().replace("%page%", page + 2 + ""));
+            PSL.msg(p, PSL.HELP_NEXT.replace("%page%", String.valueOf(page + 2)));
         }
 
         return true;
@@ -138,10 +149,10 @@ public class ArgHelp implements PSCommandArg {
         return null;
     }
 
-    private static TextComponent sendWithPerm(String msg, String desc, String cmd) {
-        TextComponent m = new TextComponent(msg);
-        m.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd));
-        m.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(desc).create()));
-        return m;
+    /** Adventure version: clickable + hoverable line. */
+    private static Component sendWithPerm(Component title, Component description, String cmd) {
+        return title
+                .clickEvent(ClickEvent.suggestCommand(cmd))
+                .hoverEvent(HoverEvent.showText(description));
     }
 }

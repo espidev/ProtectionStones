@@ -24,6 +24,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -65,7 +68,11 @@ public class ArgInfo implements PSCommandArg {
             return PSL.NO_ACCESS.send(p);
 
         if (r.getTypeOptions() == null) {
-            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+            PSL.msg(p,
+                    Component.text("This region is problematic, and the block type (", NamedTextColor.RED)
+                            .append(Component.text(r.getType(), NamedTextColor.AQUA))
+                            .append(Component.text(") is not configured. Please contact an administrator.", NamedTextColor.RED))
+            );
             Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
             return true;
         }
@@ -88,7 +95,7 @@ public class ArgInfo implements PSCommandArg {
             if (!PSL.INFO_PRIORITY2.isEmpty()) {
                 sb.append(", ").append(PSL.INFO_PRIORITY2.format(r.getWGRegion().getPriority()));
             }
-            PSL.msg(p, sb.toString());
+            PSL.msg(p, MiniMessage.miniMessage().deserialize(sb.toString()));
 
             // type: %type%
             if (r instanceof PSGroupRegion) {
@@ -114,6 +121,7 @@ public class ArgInfo implements PSCommandArg {
             BlockVector3 min = r.getWGRegion().getMinimumPoint();
             BlockVector3 max = r.getWGRegion().getMaximumPoint();
             // only show x,z if it's at block limit
+            //noinspection removal
             if (min.getBlockY() == WGUtils.MIN_BUILD_HEIGHT && max.getBlockY() == WGUtils.MAX_BUILD_HEIGHT) {
                 PSL.INFO_BOUNDS_XZ.send(p,
                         min.getBlockX(), min.getBlockZ(),

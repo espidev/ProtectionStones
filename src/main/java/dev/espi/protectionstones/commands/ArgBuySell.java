@@ -31,6 +31,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ArgBuySell implements PSCommandArg {
     @Override
@@ -81,21 +82,27 @@ public class ArgBuySell implements PSCommandArg {
 
             // check if player reached region limit
             if (!LimitUtil.check(p, r.getTypeOptions()))
-                return PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", "" + PSPlayer.fromPlayer(p).getGlobalRegionLimits()));
+                return PSL.msg(p, PSL.REACHED_REGION_LIMIT.msg().replaceText(b -> b.matchLiteral("%limit%")
+                        .replacement(String.valueOf(PSPlayer.fromPlayer(p).getGlobalRegionLimits()))));
 
             if (!PSPlayer.fromPlayer(p).hasAmount(r.getPrice()))
-                return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", new DecimalFormat("#.##").format(r.getPrice())));
+                return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.replace("%price%", new DecimalFormat("#.##").format(r.getPrice())));
 
-            PSL.msg(p, PSL.BUY_SOLD_BUYER.msg()
-                    .replace("%region%", r.getName() == null ? r.getId() : r.getName())
-                    .replace("%price%", String.format("%.2f", r.getPrice()))
-                    .replace("%player%", UUIDCache.getNameFromUUID(r.getLandlord())));
+            PSL.msg(p, PSL.BUY_SOLD_BUYER.replaceAll(Map.of(
+                    "%region%", (r.getName() == null ? r.getId() : r.getName()),
+                    "%price%",  String.format("%.2f", r.getPrice()),
+                    "%player%", UUIDCache.getNameFromUUID(r.getLandlord())
+            )));
 
             if (Bukkit.getPlayer(r.getLandlord()) != null) {
-                PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.BUY_SOLD_SELLER.msg()
-                        .replace("%region%", r.getName() == null ? r.getId() : r.getName())
-                        .replace("%price%", String.format("%.2f", r.getPrice()))
-                        .replace("%player%", p.getName()));
+                PSL.msg(
+                        Bukkit.getPlayer(r.getLandlord()),
+                        PSL.BUY_SOLD_SELLER.replaceAll(Map.of(
+                                "%region%", (r.getName() == null ? r.getId() : r.getName()),
+                                "%price%",  String.format("%.2f", r.getPrice()),
+                                "%player%", p.getName()
+                        ))
+                );
             }
 
             r.sell(p.getUniqueId());
@@ -118,7 +125,7 @@ public class ArgBuySell implements PSCommandArg {
                 if (!NumberUtils.isNumber(args[1]))
                     return PSL.msg(p, PSL.SELL_HELP.msg());
 
-                PSL.msg(p, PSL.SELL_FOR_SALE.msg().replace("%price%", String.format("%.2f", Double.parseDouble(args[1]))));
+                PSL.msg(p, PSL.SELL_FOR_SALE.replace("%price%", String.format("%.2f", Double.parseDouble(args[1]))));
                 r.setSellable(true, p.getUniqueId(), Double.parseDouble(args[1]));
             }
         }

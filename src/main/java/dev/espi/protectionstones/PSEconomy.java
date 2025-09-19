@@ -23,12 +23,14 @@ import dev.espi.protectionstones.utils.WGUtils;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -136,9 +138,13 @@ public class PSEconomy {
                     EconomyResponse res = r.payTax(psp, psp.getBalance());
 
                     if (psp.getPlayer() != null && res.amount != 0) {
-                        PSL.msg(psp.getPlayer(), PSL.TAX_PAID.msg()
-                                .replace("%amount%", String.format("%.2f", res.amount))
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                        PSL.msg(psp.getPlayer(),
+                                PSL.TAX_PAID.replaceAll(Map.of(
+                                        "%amount%", String.format("%.2f", res.amount),
+                                        "%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"
+                                ))
+                        );
+
                     }
                 }
 
@@ -157,48 +163,79 @@ public class PSEconomy {
      * @param r the region to perform the rent payment
      */
     public static void doRentPayment(PSRegion r) {
-        PSPlayer tenant = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getTenant()));
+        PSPlayer tenant   = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getTenant()));
         PSPlayer landlord = PSPlayer.fromPlayer(Bukkit.getOfflinePlayer(r.getLandlord()));
+
+        final String regionName = (r.getName() != null ? r.getName() : r.getId());
+        final String priceStr   = String.format("%.2f", r.getPrice());
 
         // not enough money for rent
         if (!tenant.hasAmount(r.getPrice())) {
-            if (tenant.getOfflinePlayer().isOnline()) {
-                PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_EVICT_NO_MONEY_TENANT.msg()
-                        .replace("%region%", r.getName() != null ? r.getName() : r.getId())
-                        .replace("%price%", String.format("%.2f", r.getPrice())));
+            Player tenantOnline = Bukkit.getPlayer(r.getTenant());
+            if (tenantOnline != null) {
+                PSL.msg(
+                        tenantOnline,
+                        PSL.RENT_EVICT_NO_MONEY_TENANT.replaceAll(Map.of(
+                                "%region%", regionName,
+                                "%price%",  priceStr
+                        ))
+                );
             }
-            if (landlord.getOfflinePlayer().isOnline()) {
-                PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_EVICT_NO_MONEY_LANDLORD.msg()
-                        .replace("%region%", r.getName() != null ? r.getName() : r.getId())
-                        .replace("%tenant%", tenant.getName()));
+
+            Player landlordOnline = Bukkit.getPlayer(r.getLandlord());
+            if (landlordOnline != null) {
+                PSL.msg(
+                        landlordOnline,
+                        PSL.RENT_EVICT_NO_MONEY_LANDLORD.replaceAll(Map.of(
+                                "%region%", regionName,
+                                "%tenant%", tenant.getName()
+                        ))
+                );
             }
+
             r.removeRenting();
             return;
         }
 
         // send payment messages
-        if (tenant.getOfflinePlayer().isOnline()) {
-            PSL.msg(Bukkit.getPlayer(r.getTenant()), PSL.RENT_PAID_TENANT.msg()
-                    .replace("%price%", String.format("%.2f", r.getPrice()))
-                    .replace("%landlord%", landlord.getName())
-                    .replace("%region%", r.getName() != null ? r.getName() : r.getId()));
-        }
-        if (landlord.getOfflinePlayer().isOnline()) {
-            PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_PAID_LANDLORD.msg()
-                    .replace("%price%", String.format("%.2f", r.getPrice()))
-                    .replace("%tenant%", tenant.getName())
-                    .replace("%region%", r.getName() != null ? r.getName() : r.getId()));
+        Player tenantOnline = Bukkit.getPlayer(r.getTenant());
+        if (tenantOnline != null) {
+            PSL.msg(
+                    tenantOnline,
+                    PSL.RENT_PAID_TENANT.replaceAll(Map.of(
+                            "%price%",    priceStr,
+                            "%landlord%", landlord.getName(),
+                            "%region%",   regionName
+                    ))
+            );
         }
 
-        // update money must be run in main thread
-        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> tenant.pay(landlord, r.getPrice()));
+        Player landlordOnline = Bukkit.getPlayer(r.getLandlord());
+        if (landlordOnline != null) {
+            PSL.msg(
+                    landlordOnline,
+                    PSL.RENT_PAID_LANDLORD.replaceAll(Map.of(
+                            "%price%",  priceStr,
+                            "%tenant%", tenant.getName(),
+                            "%region%", regionName
+                    ))
+            );
+        }
+
+        // update balances (main thread)
+        Bukkit.getScheduler().runTask(
+                ProtectionStones.getInstance(),
+                () -> tenant.pay(landlord, r.getPrice())
+        );
+
         r.setRentLastPaid(Instant.now().getEpochSecond());
-        try { // must save region to persist last paid
+        try {
             r.getWGRegionManager().saveChanges();
         } catch (StorageException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Get list of rented regions.

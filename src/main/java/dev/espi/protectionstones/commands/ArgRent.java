@@ -22,6 +22,8 @@ import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,24 +36,24 @@ import java.util.*;
 
 public class ArgRent implements PSCommandArg {
 
-    public static String getLeaseHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " rent lease [price] [period]";
+    public static Component getLeaseHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/" + ProtectionStones.getInstance().getConfigOptions().base_command + " rent lease [price] [period]", NamedTextColor.GRAY));
     }
 
-    public static String getStopLeaseHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " rent stoplease";
+    public static Component getStopLeaseHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/" + ProtectionStones.getInstance().getConfigOptions().base_command + " rent stoplease", NamedTextColor.GRAY));
     }
 
-    public static String getRentHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " rent rent";
+    public static Component getRentHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/" + ProtectionStones.getInstance().getConfigOptions().base_command + " rent rent", NamedTextColor.GRAY));
     }
 
-    public static String getStopRentingHelp() {
-        return ChatColor.AQUA + "> " + ChatColor.GRAY + "/" + ProtectionStones.getInstance().getConfigOptions().base_command +
-                " rent stoprenting";
+    public static Component getStopRentingHelp() {
+        return Component.text("> ", NamedTextColor.AQUA)
+                .append(Component.text("/" + ProtectionStones.getInstance().getConfigOptions().base_command + " rent stoprenting", NamedTextColor.GRAY));
     }
 
     @Override
@@ -129,27 +131,30 @@ public class ArgRent implements PSCommandArg {
 
                     double price = Double.parseDouble(args[2]);
                     if (ProtectionStones.getInstance().getConfigOptions().minRentPrice != -1 && price < ProtectionStones.getInstance().getConfigOptions().minRentPrice) // if rent price is too low
-                        return PSL.msg(p, PSL.RENT_PRICE_TOO_LOW.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPrice));
+                        return PSL.msg(p, PSL.RENT_PRICE_TOO_LOW.replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPrice));
 
                     if (ProtectionStones.getInstance().getConfigOptions().maxRentPrice != -1 && price > ProtectionStones.getInstance().getConfigOptions().maxRentPrice) // if rent price is too high
-                        return PSL.msg(p, PSL.RENT_PRICE_TOO_HIGH.msg().replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPrice));
+                        return PSL.msg(p, PSL.RENT_PRICE_TOO_HIGH.replace("%price%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPrice));
 
                     String period = String.join(" ", Arrays.asList(args).subList(3, args.length));
 
                     try {
                         Duration d = MiscUtil.parseRentPeriod(period);
                         if (ProtectionStones.getInstance().getConfigOptions().minRentPeriod != -1 && d.getSeconds() < ProtectionStones.getInstance().getConfigOptions().minRentPeriod) {
-                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.msg().replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPeriod));
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_SHORT.replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().minRentPeriod));
                         }
                         if (ProtectionStones.getInstance().getConfigOptions().maxRentPeriod != -1 && d.getSeconds() > ProtectionStones.getInstance().getConfigOptions().maxRentPeriod) {
-                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.msg().replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPeriod));
+                            return PSL.msg(p, PSL.RENT_PERIOD_TOO_LONG.replace("%period%", ""+ProtectionStones.getInstance().getConfigOptions().maxRentPeriod));
                         }
                     } catch (NumberFormatException e) {
                         return PSL.msg(p, PSL.RENT_PERIOD_INVALID.msg());
                     }
 
                     r.setRentable(p.getUniqueId(), period, price);
-                    return PSL.msg(p, PSL.RENT_LEASE_SUCCESS.msg().replace("%price%", args[2]).replace("%period%", period));
+                    return PSL.msg(p, PSL.RENT_LEASE_SUCCESS.replaceAll(Map.of(
+                            "%price%", args[2],
+                            "%period%", period
+                    )));
 
                 case "stoplease":
                     if (r.getRentStage() == PSRegion.RentStage.NOT_RENTING)
@@ -170,10 +175,10 @@ public class ArgRent implements PSCommandArg {
 
                     PSL.msg(p, PSL.RENT_STOPPED.msg());
                     if (tenant != null) {
-                        PSL.msg(p, PSL.RENT_EVICTED.msg().replace("%tenant%", UUIDCache.getNameFromUUID(tenant)));
+                        PSL.msg(p, PSL.RENT_EVICTED.replace("%tenant%", UUIDCache.getNameFromUUID(tenant)));
                         Player tenantPlayer = Bukkit.getPlayer(tenant);
                         if (tenantPlayer != null && tenantPlayer.isOnline()) {
-                            PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName()));
+                            PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                         }
                     }
                     break;
@@ -183,7 +188,7 @@ public class ArgRent implements PSCommandArg {
                         return PSL.msg(p, PSL.RENT_NOT_RENTING.msg());
 
                     if (!ProtectionStones.getInstance().getVaultEconomy().has(p, r.getPrice()))
-                        return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", r.getPrice())));
+                        return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.replace("%price%", String.format("%.2f", r.getPrice())));
 
                     if (r.getLandlord().equals(p.getUniqueId()))
                         return PSL.msg(p, PSL.RENT_CANNOT_RENT_OWN_REGION.msg());
@@ -192,15 +197,17 @@ public class ArgRent implements PSCommandArg {
                         return PSL.msg(p, PSL.RENT_REACHED_LIMIT.msg());
 
                     r.rentOut(r.getLandlord(), p.getUniqueId(), r.getRentPeriod(), r.getPrice());
-                    PSL.msg(p, PSL.RENT_RENTING_TENANT.msg()
-                            .replace("%region%", r.getName() == null ? r.getId() : r.getName())
-                            .replace("%price%", String.format("%.2f", r.getPrice()))
-                            .replace("%period%", r.getRentPeriod()));
+                    PSL.msg(p, PSL.RENT_RENTING_TENANT.replaceAll(Map.of(
+                            "%region%", (r.getName() == null ? r.getId() : r.getName()),
+                            "%price%",  String.format("%.2f", r.getPrice()),
+                            "%period%", r.getRentPeriod()
+                    )));
 
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
-                        PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_RENTING_LANDLORD.msg()
-                                .replace("%player%", p.getName())
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName()));
+                        PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_RENTING_LANDLORD.replaceAll(Map.of(
+                                "%player%", p.getName(),
+                                "%region%", (r.getName() == null ? r.getId() : r.getName())
+                        )));
                     }
                     PSEconomy.doRentPayment(r);
 
@@ -216,11 +223,14 @@ public class ArgRent implements PSCommandArg {
 
                     r.setTenant(null);
 
-                    PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.msg().replace("%region%", r.getName() == null ? r.getId() : r.getName()));
+                    PSL.msg(p, PSL.RENT_TENANT_STOPPED_TENANT.replace("%region%", r.getName() == null ? r.getId() : r.getName()));
                     if (Bukkit.getPlayer(r.getLandlord()) != null) {
-                        PSL.msg(Bukkit.getPlayer(r.getLandlord()), PSL.RENT_TENANT_STOPPED_LANDLORD.msg()
-                                .replace("%player%", p.getName())
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName()));
+                        PSL.msg(Bukkit.getPlayer(r.getLandlord()),
+                                PSL.RENT_TENANT_STOPPED_LANDLORD.replaceAll(Map.of(
+                                        "%player%", p.getName(),
+                                        "%region%", (r.getName() == null ? r.getId() : r.getName())
+                                ))
+                        );
                     }
                     break;
                 default:

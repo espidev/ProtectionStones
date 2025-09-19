@@ -29,6 +29,8 @@ import dev.espi.protectionstones.event.PSRemoveEvent;
 import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -37,6 +39,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
+import org.bukkit.block.data.type.Crafter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -53,10 +56,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.CraftingRecipe;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.*;
 
 import java.util.List;
 
@@ -95,7 +95,7 @@ public class ListenerClass implements Listener {
                 }
 
                 if (amount != 0) {
-                    PSL.msg(psp, PSL.TAX_JOIN_MSG_PENDING_PAYMENTS.msg().replace("%money%", "" + amount));
+                    PSL.msg(psp.getPlayer(), PSL.TAX_JOIN_MSG_PENDING_PAYMENTS.replace("%money%", "" + amount));
                 }
             });
         }
@@ -140,7 +140,7 @@ public class ListenerClass implements Listener {
 
     // returns the error message, or "" if the player has permission to break the region
     // TODO: refactor and move this to PSRegion, so that /ps unclaim can use the same checks
-    private String checkPermissionToBreakProtection(Player p, PSRegion r) {
+    private Component checkPermissionToBreakProtection(Player p, PSRegion r) {
         // check for destroy permission
         if (!p.hasPermission("protectionstones.destroy")) {
             return PSL.NO_PERMISSION_DESTROY.msg();
@@ -156,7 +156,7 @@ public class ListenerClass implements Listener {
             return PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg();
         }
 
-        return "";
+        return Component.empty();
     }
 
     // helper method for breaking protection blocks
@@ -165,8 +165,8 @@ public class ListenerClass implements Listener {
         PSProtectBlock blockOptions = r.getTypeOptions();
 
         // check if player has permission to break the protection
-        String error = checkPermissionToBreakProtection(p, r);
-        if (!error.isEmpty()) {
+        Component error = checkPermissionToBreakProtection(p, r);
+        if (!error.contains(Component.empty())) {
             PSL.msg(p, error);
             return false;
         }
@@ -235,8 +235,8 @@ public class ListenerClass implements Listener {
             ProtectionStones.getInstance().debug("Player:"+ p.getName()+", Holding:"+ p.getPlayer().getInventory().getItemInMainHand().getType().name()+", Enchants:" +p.getPlayer().getInventory().getItemInMainHand().getEnchantments());
 
 
-            String error = checkPermissionToBreakProtection(p, r);
-            if (!error.isEmpty()) {
+            Component error = checkPermissionToBreakProtection(p, r);
+            if (!error.contains(Component.empty())) {
                 PSL.msg(p, error);
                 e.setCancelled(true);
             }
@@ -318,37 +318,42 @@ public class ListenerClass implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onCrafterCraft(CrafterCraftEvent e) {
-        ProtectionStones.getInstance().debug("ListenerClass.java, onCrafterCraft");
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCrafterClick(InventoryClickEvent e) {
+        if (!(e.getInventory().getHolder() instanceof Crafter)) return;
 
-        CraftingRecipe recipe = e.getRecipe();
-        if (recipe == null) return;
+        ItemStack item = e.getCursor(); // item being placed
+        if (item != null && ProtectionStones.getBlockOptions(item) != null) {
+            e.setCancelled(true);
+            e.getWhoClicked().sendMessage(ChatColor.RED + "You cannot insert ProtectionStone blocks into a Crafter.");
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCrafterHopperMove(InventoryMoveItemEvent e) {
+        if (!(e.getDestination().getHolder() instanceof Crafter)) return;
 
-        // Shaped recipes (grid-based)
-        if (recipe instanceof ShapedRecipe shaped) {
-            for (ItemStack ingredient : shaped.getIngredientMap().values()) {
-                if (ingredient != null) {
-                    PSProtectBlock options = ProtectionStones.getBlockOptions(ingredient);
-                    if (options != null && !options.allowUseInCrafting) {
-                        e.setResult(new ItemStack(Material.AIR));
-                        e.setCancelled(true);
-                        return;
-                    }
-                }
+        ItemStack item = e.getItem();
+        if (item != null) {
+            PSProtectBlock options = ProtectionStones.getBlockOptions(item);
+            if (options != null && !options.allowUseInCrafting) {
+                e.setCancelled(true);
             }
         }
+    }
 
-        // Shapeless recipes (unordered list)
-        if (recipe instanceof ShapelessRecipe shapeless) {
-            for (ItemStack ingredient : shapeless.getIngredientList()) {
-                if (ingredient != null) {
-                    PSProtectBlock options = ProtectionStones.getBlockOptions(ingredient);
-                    if (options != null && !options.allowUseInCrafting) {
-                        e.setResult(new ItemStack(Material.AIR));
-                        e.setCancelled(true);
-                        return;
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCrafterDrag(InventoryDragEvent e) {
+        if (!(e.getInventory().getHolder() instanceof Crafter)) return;
+
+        for (ItemStack item : e.getNewItems().values()) {
+            if (item != null) {
+                PSProtectBlock options = ProtectionStones.getBlockOptions(item);
+                if (options != null && !options.allowUseInCrafting) {
+                    e.setCancelled(true);
+                    if (e.getWhoClicked() instanceof Player player) {
+                    PSL.msg(player, Component.text("You cannot use ProtectionStones blocks in a Crafter.", NamedTextColor.RED));
                     }
+                    return;
                 }
             }
         }

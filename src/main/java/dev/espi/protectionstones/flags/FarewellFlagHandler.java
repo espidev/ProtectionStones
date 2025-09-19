@@ -25,8 +25,10 @@ import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.FlagValueChangeHandler;
 import com.sk89q.worldguard.session.handler.Handler;
 import dev.espi.protectionstones.FlagHandler;
+import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.ChatUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -63,7 +65,7 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
             }
         }
         if (p != null && lastValue != null && !lastValue.equals(currentValue)) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+            PSL.action(p, lastValue);
         }
         return true;
     }

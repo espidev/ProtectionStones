@@ -18,6 +18,8 @@ package dev.espi.protectionstones.commands;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -105,13 +107,13 @@ public class ArgTp implements PSCommandArg {
 
                 // check if region was found
                 if (regions.isEmpty()) {
-                    PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
-                            .replace("%player%", tpName));
+                    PSL.msg(p.getPlayer(), PSL.REGION_NOT_FOUND_FOR_PLAYER.replace("%player%", tpName));
                     return;
                 } else if (regionNumber > regions.size()) {
-                    PSL.msg(p, PSL.ONLY_HAS_REGIONS.msg()
-                            .replace("%player%", tpName)
-                            .replace("%num%", "" + regions.size()));
+                    PSL.msg(p.getPlayer(), PSL.ONLY_HAS_REGIONS.replaceAll(Map.of(
+                            "%player%", tpName,
+                            "%num%", String.valueOf(regions.size())
+                    )));
                     return;
                 }
 
@@ -129,7 +131,11 @@ public class ArgTp implements PSCommandArg {
 
     static void teleportPlayer(Player p, PSRegion r) {
         if (r.getTypeOptions() == null) {
-            PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+            PSL.msg(p,
+                    Component.text("This region is problematic, and the block type (", NamedTextColor.RED)
+                            .append(Component.text(r.getType(), NamedTextColor.AQUA))
+                            .append(Component.text(") is not configured. Please contact an administrator.", NamedTextColor.RED))
+            );
             Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
             return;
         }
@@ -141,7 +147,7 @@ public class ArgTp implements PSCommandArg {
             Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () -> p.teleport(r.getHome())); // run on main thread, not async
         } else if (!r.getTypeOptions().noMovingWhenTeleportWaiting) {
             // teleport delay, but doesn't care about moving
-            p.sendMessage(PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
+            PSL.msg(p, PSL.TP_IN_SECONDS.replace("%seconds%", String.valueOf(r.getTypeOptions().tpWaitingSeconds)));
 
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                 PSL.msg(p, PSL.TPING.msg());
@@ -149,7 +155,7 @@ public class ArgTp implements PSCommandArg {
             }, 20 * r.getTypeOptions().tpWaitingSeconds);
 
         } else {// delay and not allowed to move
-            PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
+            PSL.msg(p, PSL.TP_IN_SECONDS.replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
             Location l = p.getLocation().clone();
             UUID uuid = p.getUniqueId();
 

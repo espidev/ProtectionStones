@@ -19,10 +19,9 @@ import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -55,32 +54,46 @@ public class ArgGet implements PSCommandArg {
     }
 
     private boolean openGetGUI(Player p) {
+        // Send the header
         PSL.msg(p, PSL.GET_HEADER.msg());
+
         for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if ((!b.permission.equals("") && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
+            if ((!b.permission.equals("") && !p.hasPermission(b.permission))
+                    || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
                 continue; // no permission
             }
 
             String price = new DecimalFormat("#.##").format(b.price);
 
-            TextComponent tc = new TextComponent(PSL.GET_GUI_BLOCK.msg()
-                    .replace("%alias%", b.alias)
-                    .replace("%price%", price)
-                    .replace("%description%", b.description)
-                    .replace("%xradius%", ""+b.xRadius)
-                    .replace("%yradius%", ""+b.yRadius)
-                    .replace("%zradius%", ""+b.zRadius));
+            // Build the line using placeholders
+            Component line = PSL.GET_GUI_BLOCK.replaceAll(Map.of(
+                    "%alias%", b.alias,
+                    "%price%", price,
+                    "%description%", b.description,
+                    "%xradius%", String.valueOf(b.xRadius),
+                    "%yradius%", String.valueOf(b.yRadius),
+                    "%zradius%", String.valueOf(b.zRadius)
+            ));
 
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GET_GUI_HOVER.msg()
-                    .replace("%alias%", b.alias)
-                    .replace("%price%", price)
-                    .replace("%description%", b.description)
-                    .replace("%xradius%", ""+b.xRadius)
-                    .replace("%yradius%", ""+b.yRadius)
-                    .replace("%zradius%", ""+b.zRadius)).create()));
-            tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " get " + b.alias));
+            // Build hover text
+            Component hover = PSL.GET_GUI_HOVER.replaceAll(Map.of(
+                    "%alias%", b.alias,
+                    "%price%", price,
+                    "%description%", b.description,
+                    "%xradius%", String.valueOf(b.xRadius),
+                    "%yradius%", String.valueOf(b.yRadius),
+                    "%zradius%", String.valueOf(b.zRadius)
+            ));
 
-            p.spigot().sendMessage(tc);
+            // Add hover + click events
+            Component clickable = line
+                    .hoverEvent(HoverEvent.showText(hover))
+                    .clickEvent(ClickEvent.runCommand(
+                            "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " get " + b.alias
+                    ));
+
+            // Send Adventure component to player
+            PSL.msg(p, clickable);
         }
         return true;
     }
@@ -113,7 +126,7 @@ public class ArgGet implements PSCommandArg {
 
         // check if player has enough money
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0 && !psp.hasAmount(cp.price))
-            return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", cp.price)));
+            return PSL.msg(p, PSL.NOT_ENOUGH_MONEY.replace("%price%", String.format("%.2f", cp.price)));
 
         // debug message
         if (!ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
@@ -124,7 +137,7 @@ public class ArgGet implements PSCommandArg {
         if (ProtectionStones.getInstance().isVaultSupportEnabled() && cp.price != 0) {
             EconomyResponse er = psp.withdrawBalance(cp.price);
             if (!er.transactionSuccess()) {
-                return PSL.msg(p, er.errorMessage);
+                return PSL.msg(p, Component.text(er.errorMessage));
             }
         }
 
@@ -138,7 +151,7 @@ public class ArgGet implements PSCommandArg {
                 if (ProtectionStones.getInstance().isVaultSupportEnabled()) {
                     EconomyResponse er = psp.depositBalance(cp.price);
                     if (!er.transactionSuccess()) {
-                        return PSL.msg(p, er.errorMessage);
+                        return PSL.msg(p, Component.text(er.errorMessage));
                     }
                 }
             }

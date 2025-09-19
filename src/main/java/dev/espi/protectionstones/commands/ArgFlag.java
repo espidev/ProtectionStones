@@ -21,15 +21,22 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
+import static net.kyori.adventure.text.Component.space;
 
 public class ArgFlag implements PSCommandArg {
 
@@ -67,172 +74,180 @@ public class ArgFlag implements PSCommandArg {
 
     // flag gui that has ability to use pages
     private boolean openFlagGUI(Player p, PSRegion r, int page) {
-        List<String> allowedFlags = new ArrayList<>(r.getTypeOptions().allowedFlags.keySet());
+            final List<String> allowedFlags = new ArrayList<>(r.getTypeOptions().allowedFlags.keySet());
 
-        // ensure the page is valid and in range
-        if (page < 0 || (page * GUI_SIZE) > allowedFlags.size()) {
-            PSL.msg(p, PSL.PAGE_DOES_NOT_EXIST.msg());
-            return true;
-        }
+            // ensure the page is valid and in range
+            if (page < 0 || (page * GUI_SIZE) > allowedFlags.size()) {
+                PSL.msg(p, PSL.PAGE_DOES_NOT_EXIST.msg());
+                return true;
+            }
 
-        // add blank space if gui not long enough
-        for (int i = 0; i < (GUI_SIZE * page + GUI_SIZE) - (Math.min(allowedFlags.size(), GUI_SIZE * page + GUI_SIZE) - GUI_SIZE * page); i++) {
-            PSL.msg(p, ChatColor.WHITE + "");
-        }
+            // add blank space if gui not long enough
+            final int rowsStart = GUI_SIZE * page;
+            final int rowsEnd = Math.min(allowedFlags.size(), rowsStart + GUI_SIZE);
+            final int blanks = (rowsStart + GUI_SIZE) - (rowsEnd - rowsStart);
+            for (int i = 0; i < blanks; i++) {
+                PSL.msg(p, Component.text(" "));
+            }
 
-        PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
+            PSL.msg(p, PSL.FLAG_GUI_HEADER.msg());
 
-        // send actual flags
-        for (int i = GUI_SIZE * page; i < Math.min(allowedFlags.size(), GUI_SIZE * page + GUI_SIZE); i++) {
-            if (i >= allowedFlags.size()) {
-                PSL.msg(p, ChatColor.WHITE + "");
-            } else {
-                String flag = allowedFlags.get(i);
-                List<String> currentFlagGroups = r.getTypeOptions().allowedFlags.get(flag);
-                TextComponent flagLine = new TextComponent();
+            // send actual flags
+            for (int i = rowsStart; i < Math.min(allowedFlags.size(), rowsStart + GUI_SIZE); i++) {
+                if (i >= allowedFlags.size()) {
+                    PSL.msg(p, Component.text(" "));
+                    continue;
+                }
+
+                final String flagKey = allowedFlags.get(i);
+                final List<String> currentFlagGroups = r.getTypeOptions().allowedFlags.get(flagKey);
 
                 // calculate flag command
-                String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
+                final String suggestedCommand = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag ";
 
                 // match flag
-                Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flag);
+                final Flag<?> f = Flags.fuzzyMatchFlag(WGUtils.getFlagRegistry(), flagKey);
                 if (f == null) continue;
+
                 Object fValue = r.getWGRegion().getFlag(f);
 
-                // check current flag's set group
+                // sanitize § -> & in String flag values to avoid "illegal characters" kicks
+                if (fValue instanceof String) {
+                    fValue = ((String) fValue).replace("§", "&");
+                }
+
+                // current region group for this flag
                 String groupfValue = "all";
                 if (f.getRegionGroupFlag() != null && r.getWGRegion().getFlag(f.getRegionGroupFlag()) != null) {
                     groupfValue = r.getWGRegion().getFlag(f.getRegionGroupFlag()).toString()
                             .toLowerCase().replace("_", "");
                 }
 
-                // add flag group if there is one set for the flag (for use in click commands)
-                String flagGroup = "";
-                if (f.getRegionGroupFlag() != null && r.getWGRegion().getFlag(f.getRegionGroupFlag()) != null) {
-                    flagGroup = "-g " + groupfValue + " ";
-                }
+                // if a group is set, include it in click commands
+                final String flagGroupArg = (f.getRegionGroupFlag() != null && r.getWGRegion().getFlag(f.getRegionGroupFlag()) != null)
+                        ? "-g " + groupfValue + " "
+                        : "";
 
-                // replace § with & to prevent "illegal characters in chat" disconnection
-                if (fValue instanceof String) {
-                    fValue = ((String) fValue).replace("§", "&");
-                }
+                // build the line
+                Component flagLine = Component.empty();
 
-                // add line based on flag type
-                boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();;
-                if (f instanceof StateFlag) { // allow/deny
+                final boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();
 
-                    TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
-                            deny = new TextComponent((fValue == StateFlag.State.DENY ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Deny");
+                if (f instanceof StateFlag) {
+                    // allow/deny widgets
+                    final boolean isAllow = fValue == StateFlag.State.ALLOW;
+                    final boolean isDeny = fValue == StateFlag.State.DENY;
 
-                    allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
+                    Component allow = Component.text("Allow", isAllow ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY);
+                    Component deny = Component.text("Deny", isDeny ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY);
 
-                    if (fValue == StateFlag.State.ALLOW) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
-                    } else if (fValue == StateFlag.State.DENY) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
+                    allow = allow.hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_SET.msg()));
+                    deny = deny.hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_SET.msg()));
+
+                    if (isAllow) {
+                        allow = allow.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " none"));
+                        deny = deny.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " deny"));
+                    } else if (isDeny) {
+                        allow = allow.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " allow"));
+                        deny = deny.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " none"));
                     } else {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " allow"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " deny"));
+                        allow = allow.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " allow"));
+                        deny = deny.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " deny"));
                     }
 
+                    flagLine = flagLine.append(allow)
+                            .append(space())
+                            .append(deny)
+                            .append(dots(5));
+                } else if (f instanceof BooleanFlag) {
+                    // true/false widgets
+                    final boolean isTrue = fValue == Boolean.TRUE;
+                    final boolean isFalse = fValue == Boolean.FALSE;
 
-                    flagLine.addExtra(allow);
-                    flagLine.addExtra(" ");
-                    flagLine.addExtra(deny);
-                    flagLine.addExtra(getDots(5));
-                } else if (f instanceof BooleanFlag) { // true/false
-                    TextComponent allow = new TextComponent((fValue == Boolean.TRUE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "True"),
-                            deny = new TextComponent((fValue == Boolean.FALSE ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "False");
+                    Component t = Component.text("True", isTrue ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY);
+                    Component fC = Component.text("False", isFalse ? NamedTextColor.WHITE : NamedTextColor.DARK_GRAY);
 
-                    allow.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET.msg()).create()));
-                    if (fValue == Boolean.TRUE) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " false"));
-                    } else if (fValue == Boolean.FALSE) {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " true"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " none"));
+                    t = t.hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_SET.msg()));
+                    fC = fC.hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_SET.msg()));
+
+                    if (isTrue) {
+                        t = t.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " none"));
+                        fC = fC.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " false"));
+                    } else if (isFalse) {
+                        t = t.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " true"));
+                        fC = fC.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " none"));
                     } else {
-                        allow.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " true"));
-                        deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + flagGroup + page + ":" + flag + " false"));
+                        t = t.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " true"));
+                        fC = fC.clickEvent(ClickEvent.runCommand(suggestedCommand + flagGroupArg + page + ":" + flagKey + " false"));
                     }
 
-                    flagLine.addExtra(allow);
-                    flagLine.addExtra(" ");
-                    flagLine.addExtra(deny);
-                    flagLine.addExtra(getDots(5));
-                } else { // text
-                    TextComponent edit = new TextComponent(ChatColor.DARK_GRAY + "Edit");
-                    edit.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.FLAG_GUI_HOVER_SET_TEXT.msg()
-                            .replace("%value%", fValue == null ? "none" : fValue.toString())).create()));
-                    edit.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestedCommand + flagGroup + flag + " "));
-                    flagLine.addExtra(edit);
-                    flagLine.addExtra(getDots(22));
+                    flagLine = flagLine.append(t)
+                            .append(space())
+                            .append(fC)
+                            .append(dots(5));
+                } else {
+                    // text flag -> edit widget
+                    final String currentVal = (fValue == null ? "none" : fValue.toString());
+                    Component edit = Component.text("Edit", NamedTextColor.DARK_GRAY)
+                            .hoverEvent(HoverEvent.showText(
+                                    PSL.FLAG_GUI_HOVER_SET_TEXT.replace("%value%", currentVal)
+                            ))
+                            .clickEvent(ClickEvent.suggestCommand(suggestedCommand + flagGroupArg + flagKey + " "));
+                    flagLine = flagLine.append(edit)
+                            .append(dots(22));
                 }
 
-                // put group it applies to
-                TextComponent groupChange = new TextComponent(ChatColor.DARK_GRAY + " [ " + ChatColor.WHITE + groupfValue + ChatColor.DARK_GRAY + " ]");
+                // group switcher [ group ]
+                Component groupChange = Component.text(" [ ", NamedTextColor.DARK_GRAY)
+                        .append(Component.text(groupfValue, NamedTextColor.WHITE))
+                        .append(Component.text(" ]", NamedTextColor.DARK_GRAY));
 
-                String nextGroup;
-                if (currentFlagGroups.contains(groupfValue)) { // if the current flag group is an allowed flag group
+                // figure out next group
+                final String nextGroup;
+                if (currentFlagGroups.contains(groupfValue)) {
                     nextGroup = currentFlagGroups.get((currentFlagGroups.indexOf(groupfValue) + 1) % currentFlagGroups.size());
-                } else { // otherwise, just take the first allowed flag group
+                } else {
                     nextGroup = currentFlagGroups.get(0);
                 }
 
-                // set hover and click task for flag group
-                BaseComponent[] hover;
-                // HACK: Prevent pvp flag value from being changed to none/null
-                // Special handling for "pvp" flag with "all" group, disabling interaction.
-                if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
-                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
-                    // Remove click action to fully disable changing this group.
-                    groupChange.setClickEvent(null);
-                } else if (fValue == null) {
-                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create();
+                // hover/click for group change
+                // special-case pvp+all prevention
+                if (flagKey.equalsIgnoreCase("pvp") && isGroupValueAll) {
+                    groupChange = groupChange
+                            .hoverEvent(HoverEvent.showText(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()));
+                    // no click event (disabled on purpose)
                 } else {
-                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
+                    if (fValue == null) {
+                        groupChange = groupChange.hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()));
+                    } else {
+                        groupChange = groupChange
+                                .hoverEvent(HoverEvent.showText(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.replace("%group%", nextGroup)))
+                                .clickEvent(ClickEvent.runCommand(suggestedCommand + "-g " + nextGroup + " " + page + ":" + flagKey + " " + (fValue == null ? "none" : fValue)));
+                    }
                 }
 
-                // Always set hover if the flag is pvp and group is "all"
-                if (flag.equalsIgnoreCase("pvp") && groupfValue.equalsIgnoreCase("all")) {
-                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
-                    groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
-                    groupChange.setClickEvent(null); // Disable click event explicitly
-                } else if (!nextGroup.equals(groupfValue)) {
-                    groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
-                    groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
-                }
+                // append group and trailing dots + flag name
+                flagLine = flagLine.append(groupChange);
 
-                flagLine.addExtra(groupChange);
-                // send message
-                flagLine.addExtra(getDots(40 - REGION_GROUP_KERNING_LENGTHS[FLAG_GROUPS.indexOf(groupfValue)]) + ChatColor.AQUA + " " + flag);
+                // keep your kerning/dots layout
+                final int kerning = 40 - REGION_GROUP_KERNING_LENGTHS[FLAG_GROUPS.indexOf(groupfValue)];
+                flagLine = flagLine.append(dots(Math.max(0, kerning)))
+                        .append(space())
+                        .append(Component.text(flagKey, NamedTextColor.AQUA));
 
-                p.spigot().sendMessage(flagLine);
+                // send
+                ProtectionStones.getInstance().audiences().player(p).sendMessage(flagLine);
             }
+
+            return true;
         }
 
-        // create footer
-        TextComponent backPage = new TextComponent(ChatColor.AQUA + " <<"), nextPage = new TextComponent(ChatColor.AQUA + ">> ");
-        backPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_BACK_PAGE.msg()).create()));
-        nextPage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.GO_NEXT_PAGE.msg()).create()));
-        backPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page - 1)));
-        nextPage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " flag " + (page + 1)));
-
-        TextComponent footer = new TextComponent(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====" + ChatColor.RESET);
-        // add back page button if the page isn't 0
-        if (page != 0) footer.addExtra(backPage);
-        // add page number
-        footer.addExtra(new TextComponent(ChatColor.WHITE + " " + (page + 1) + " "));
-        // add forward page button if the page isn't last
-        if (page * GUI_SIZE + GUI_SIZE < r.getTypeOptions().allowedFlags.size()) footer.addExtra(nextPage);
-        footer.addExtra(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "=====");
-
-        p.spigot().sendMessage(footer);
-        return true;
+    // helpers
+    private static Component dots(final int n) {
+        return (n <= 0) ? Component.empty() : Component.text(".".repeat(n), NamedTextColor.DARK_GRAY);
+    }
+    private static Component space() {
+        return Component.text(" ");
     }
 
     @Override
@@ -382,7 +397,7 @@ public class ArgFlag implements PSCommandArg {
                     region.setFlag(flag.getRegionGroupFlag(), null);
                 }
 
-                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
+                PSL.msg(p, PSL.FLAG_SET.replace("%flag%", flagName));
 
             } else if (value.equalsIgnoreCase("null") || value.equalsIgnoreCase("none")) { // null flag (remove)
 
@@ -400,7 +415,7 @@ public class ArgFlag implements PSCommandArg {
                     region.setFlag(flag.getRegionGroupFlag(), null);
                 }
 
-                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
+                PSL.msg(p, PSL.FLAG_SET.replace("%flag%", flagName));
 
             } else { // custom set flag using WG internal
                 FlagContext fc = FlagContext.create().setInput(value).build();
@@ -408,12 +423,12 @@ public class ArgFlag implements PSCommandArg {
                 if (!groupValue.equals("") && flag.getRegionGroupFlag() != null) {
                     region.setFlag(flag.getRegionGroupFlag(), flag.getRegionGroupFlag().detectValue(groupValue));
                 }
-                PSL.msg(p, PSL.FLAG_SET.msg().replace("%flag%", flagName));
+                PSL.msg(p, PSL.FLAG_SET.replace("%flag%", flagName));
             }
 
         } catch (InvalidFlagFormat invalidFlagFormat) {
             //invalidFlagFormat.printStackTrace();
-            PSL.msg(p, PSL.FLAG_NOT_SET.msg().replace("%flag%", flagName));
+            PSL.msg(p, PSL.FLAG_NOT_SET.replace("%flag%", flagName));
         }
     }
 

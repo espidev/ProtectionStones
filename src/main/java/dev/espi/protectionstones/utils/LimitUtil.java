@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -28,7 +29,7 @@ import java.util.List;
 public class LimitUtil {
 
     // warning: group regions should be split into merged regions first
-    public static String checkAddOwner(PSPlayer psp, List<PSProtectBlock> blocksAdded) {
+    public static Component checkAddOwner(PSPlayer psp, List<PSProtectBlock> blocksAdded) {
         HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
         int maxPS = psp.getGlobalRegionLimits();
 
@@ -68,19 +69,17 @@ public class LimitUtil {
                 return PSL.ADDREMOVE_PLAYER_REACHED_LIMIT.msg();
             }
         }
-        return "";
+        return Component.empty();
     }
 
     public static boolean check(Player p, PSProtectBlock b) {
         if (!p.hasPermission("protectionstones.admin")) {
-            // check if player has limit on protection stones
-            String msg = LimitUtil.hasPlayerPassedRegionLimit(PSPlayer.fromPlayer(p), b);
-            if (!msg.isEmpty()) {
-                PSL.msg(p, msg);
+            Component msg = LimitUtil.hasPlayerPassedRegionLimit(PSPlayer.fromPlayer(p), b);
+            if (msg != null) {
+                PSL.msg(p, msg); // Component overload you already have
                 return false;
             }
         }
-
         return true;
     }
 
@@ -148,7 +147,7 @@ public class LimitUtil {
         return counts;
     }
 
-    private static String hasPlayerPassedRegionLimit(PSPlayer psp, PSProtectBlock b) {
+    private static Component hasPlayerPassedRegionLimit(PSPlayer psp, PSProtectBlock b) {
         HashMap<PSProtectBlock, Integer> regionLimits = psp.getRegionLimits();
         int maxPS = psp.getGlobalRegionLimits();
 
@@ -168,16 +167,16 @@ public class LimitUtil {
             // check if player has passed region limit
             ProtectionStones.getInstance().debug(String.format("The player will have %d regions in total. Their limit is %d.", total, maxPS));
             if (total >= maxPS && maxPS != -1) {
-                return PSL.REACHED_REGION_LIMIT.msg().replace("%limit%", ""+maxPS);
+                return PSL.REACHED_REGION_LIMIT.replace("%limit%", ""+maxPS);
             }
 
             // check if player has passed per block limit
             ProtectionStones.getInstance().debug(String.format("Of type %s: player will have %d regions - Player's limit is %d regions.", b.alias, bFound, regionLimits.get(b) == null ? -1 : regionLimits.get(b)));
             if (regionLimits.get(b) != null && bFound >= regionLimits.get(b)) {
-                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.msg().replace("%limit%", ""+regionLimits.get(b));
+                return PSL.REACHED_PER_BLOCK_REGION_LIMIT.replace("%limit%", ""+regionLimits.get(b));
             }
         }
-        return "";
+        return Component.empty();
     }
 
 }

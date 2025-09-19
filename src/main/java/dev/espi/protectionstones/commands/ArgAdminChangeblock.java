@@ -19,6 +19,8 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -37,11 +39,13 @@ class ArgAdminChangeblock {
 
         String world = args[2], fromBlockAlias = args[3], toBlockAlias = args[4];
         if (ProtectionStones.getProtectBlockFromAlias(fromBlockAlias) == null) {
-            PSL.msg(p, ChatColor.GRAY + "The type to change from is not a registered protection block!");
+            PSL.msg(p, Component.text("The type to change from is not a registered protection block!", NamedTextColor.GRAY));
+
             return true;
         }
         if (ProtectionStones.getProtectBlockFromAlias(toBlockAlias) == null) {
-            PSL.msg(p, ChatColor.GRAY + "The type to change to is not a registered protection block!");
+            PSL.msg(p, Component.text("The type to change to is not a registered protection block!", NamedTextColor.GRAY));
+
             return true;
         }
 
@@ -62,7 +66,7 @@ class ArgAdminChangeblock {
         }
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) {
-            return PSL.msg(p, ChatColor.GRAY + "The world does not have WorldGuard configured!");
+            return PSL.msg(p, Component.text("The world does not have WorldGuard configured!", NamedTextColor.GRAY));
         }
         for (ProtectedRegion r : rgm.getRegions().values()) {
             if (ProtectionStones.isPSRegion(r)) {

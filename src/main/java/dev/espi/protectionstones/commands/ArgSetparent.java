@@ -25,10 +25,7 @@ import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ArgSetparent implements PSCommandArg {
     @Override
@@ -75,7 +72,7 @@ public class ArgSetparent implements PSCommandArg {
         if (args[1].equals("none")) { // remove parent
             try {
                 r.setParent(null);
-                PSL.msg(s, PSL.SETPARENT_SUCCESS_REMOVE.msg().replace("%id%", r.getName() == null ? r.getId() : r.getName()));
+                PSL.msg(s, PSL.SETPARENT_SUCCESS_REMOVE.replace("%id%", r.getName() == null ? r.getId() : r.getName()));
             } catch (ProtectedRegion.CircularInheritanceException e) {
                 e.printStackTrace(); // won't happen ever
             }
@@ -102,8 +99,10 @@ public class ArgSetparent implements PSCommandArg {
                 return true;
             }
 
-            PSL.msg(s, PSL.SETPARENT_SUCCESS.msg().replace("%id%", r.getName() == null ? r.getId() : r.getName())
-                    .replace("%parent%", parent.get(0).getName() == null ? parent.get(0).getId() : parent.get(0).getName()));
+            PSL.msg(s, PSL.SETPARENT_SUCCESS.replaceAll(Map.of(
+                    "%id%", (r.getName() == null ? r.getId() : r.getName()),
+                    "%parent%", (parent.get(0).getName() == null ? parent.get(0).getId() : parent.get(0).getName())
+            )));
         }
         return false;
     }

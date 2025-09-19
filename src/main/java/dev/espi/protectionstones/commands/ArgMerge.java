@@ -22,10 +22,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -55,16 +55,35 @@ public class ArgMerge implements PSCommandArg {
         return null;
     }
 
-    public static List<TextComponent> getGUI(Player p, PSRegion r) {
+    public static List<Component> getGUI(Player p, PSRegion r) {
         return r.getMergeableRegions(p).stream()
                 .map(psr -> {
-                    TextComponent tc = new TextComponent(ChatColor.AQUA + "> " + ChatColor.WHITE + psr.getId());
-                    if (psr.getName() != null) tc.addExtra(" (" + psr.getName() + ")"); // name
-                    tc.addExtra(" (" + psr.getTypeOptions().alias + ")"); // region type
+                    // Base label: > id
+                    Component base = Component.text()
+                            .append(Component.text("> ").color(NamedTextColor.AQUA))
+                            .append(Component.text(psr.getId(), NamedTextColor.WHITE))
+                            .build();
 
-                    tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " merge " + r.getId() + " " + psr.getId()));
-                    tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.MERGE_CLICK_TO_MERGE.msg().replace("%region%", psr.getId())).create()));
-                    return tc;
+                    // Optional name
+                    if (psr.getName() != null) {
+                        base = base.append(Component.text(" (" + psr.getName() + ")", NamedTextColor.GRAY));
+                    }
+
+                    // Region type
+                    base = base.append(Component.text(" (" + psr.getTypeOptions().alias + ")", NamedTextColor.GRAY));
+
+                    // Add click + hover events
+                    String cmd = "/" + ProtectionStones.getInstance().getConfigOptions().base_command
+                            + " merge " + r.getId() + " " + psr.getId();
+
+                    base = base.clickEvent(ClickEvent.runCommand(cmd));
+
+                    // Hover: use your PSL message (converted to Component already)
+                    base = base.hoverEvent(HoverEvent.showText(
+                            PSL.MERGE_CLICK_TO_MERGE.replaceAll(Map.of("%region%", psr.getId()))
+                    ));
+
+                    return base;
                 })
                 .collect(Collectors.toList());
     }
@@ -85,7 +104,11 @@ public class ArgMerge implements PSCommandArg {
                 return PSL.msg(s, PSL.NOT_IN_REGION.msg());
 
             if (r.getTypeOptions() == null) {
-                PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
+                PSL.msg(p,
+                        Component.text("This region is problematic, and the block type (", NamedTextColor.RED)
+                                .append(Component.text(r.getType(), NamedTextColor.AQUA))
+                                .append(Component.text(") is not configured. Please contact an administrator.", NamedTextColor.RED))
+                );
                 Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
                 return true;
             }
@@ -93,15 +116,19 @@ public class ArgMerge implements PSCommandArg {
             if (!r.getTypeOptions().allowMerging)
                 return PSL.msg(s, PSL.MERGE_NOT_ALLOWED.msg());
 
-            List<TextComponent> components = getGUI(p, r);
+            List<Component> components = getGUI(p, r);
             if (components.isEmpty()) {
                 PSL.msg(p, PSL.MERGE_NO_REGIONS.msg());
             } else {
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
-                PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
+                PSL.msg(p, Component.empty());
+                PSL.msg(p, PSL.MERGE_HEADER.replaceAll(Map.of("%region%", r.getId())));
                 PSL.msg(p, PSL.MERGE_WARNING.msg());
-                for (TextComponent tc : components) p.spigot().sendMessage(tc);
-                p.sendMessage(ChatColor.WHITE + ""); // send empty line
+                for (Component tc : components) {
+                    PSL.msg(p, tc);
+                }
+
+                // send empty line again
+                PSL.msg(p, Component.empty());
             }
 
         } else if (args.length == 3) { // /ps merge [region] [root]
@@ -136,7 +163,7 @@ public class ArgMerge implements PSCommandArg {
                     PSL.msg(p, PSL.NO_REGION_HOLES.msg());
                     return;
                 } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
-                    PSL.msg(p, PSL.CANNOT_MERGE_RENTED_REGION.msg().replace("%region%", e.getRentedRegion().getName() == null ? e.getRentedRegion().getId() : e.getRentedRegion().getName()));
+                    PSL.msg(p, PSL.CANNOT_MERGE_RENTED_REGION.replace("%region%", e.getRentedRegion().getName() == null ? e.getRentedRegion().getId() : e.getRentedRegion().getName()));
                     return;
                 }
                 PSL.msg(p, PSL.MERGE_MERGED.msg());

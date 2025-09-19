@@ -85,13 +85,14 @@ public class ArgRegion implements PSCommandArg {
             }
 
             if (!found) {
-                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg()
+                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER
                         .replace("%player%", args[2]));
             } else {
                 regionMessage = new StringBuilder(regionMessage.substring(0, regionMessage.length() - 2) + ".");
-                PSL.msg(p, PSL.REGION_LIST.msg()
-                        .replace("%player%", args[2])
-                        .replace("%regions%", regionMessage));
+                PSL.msg(p, PSL.REGION_LIST.replaceAll(Map.of(
+                        "%player%", args[2],
+                        "%regions%", regionMessage.toString()
+                )));
             }
 
         } else if ((args[1].equalsIgnoreCase("remove")) || (args[1].equalsIgnoreCase("disown"))) {
@@ -116,14 +117,14 @@ public class ArgRegion implements PSCommandArg {
             }
 
             if (!found) {
-                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.msg().replace("%player%", args[2]));
+                PSL.msg(p, PSL.REGION_NOT_FOUND_FOR_PLAYER.replace("%player%", args[2]));
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("remove")) {
-                PSL.msg(p, PSL.REGION_REMOVE.msg().replace("%player%", args[2]));
+                PSL.msg(p, PSL.REGION_REMOVE.replace("%player%", args[2]));
             } else if (args[1].equalsIgnoreCase("disown")) {
-                PSL.msg(p, PSL.REGION_DISOWN.msg().replace("%player%", args[2]));
+                PSL.msg(p, PSL.REGION_DISOWN.replace("%player%", args[2]));
             }
         } else {
             PSL.msg(p, PSL.REGION_HELP.msg());

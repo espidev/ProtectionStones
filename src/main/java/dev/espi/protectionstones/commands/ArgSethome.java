@@ -69,7 +69,7 @@ public class ArgSethome implements PSCommandArg {
 
         Location l = p.getLocation();
         r.setHome(l.getBlockX(), l.getBlockY(), l.getBlockZ(), l.getYaw(), l.getPitch());
-        return PSL.msg(p, PSL.SETHOME_SET.msg().replace("%psid%", r.getName() != null ? String.format("%s (%s)", r.getName(), r.getId()) : r.getId()));
+        return PSL.msg(p, PSL.SETHOME_SET.replace("%psid%", r.getName() != null ? String.format("%s (%s)", r.getName(), r.getId()) : r.getId()));
     }
 
     @Override

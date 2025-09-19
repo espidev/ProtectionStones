@@ -116,12 +116,12 @@ public class ArgList implements PSCommandArg {
             if (isCurrentPlayer) {
                 PSL.msg(s, PSL.LIST_NO_REGIONS.msg());
             } else {
-                PSL.msg(s, PSL.LIST_NO_REGIONS_PLAYER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
+                PSL.msg(s, PSL.LIST_NO_REGIONS_PLAYER.replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
             }
             return;
         }
 
-        PSL.msg(s, PSL.LIST_HEADER.msg().replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
+        PSL.msg(s, PSL.LIST_HEADER.replace("%player%", UUIDCache.getNameFromUUID(pUUID)));
 
         if (!ownerOf.isEmpty()) {
             PSL.msg(s, PSL.LIST_OWNER.msg());

@@ -50,9 +50,9 @@ public class ArgToggle implements PSCommandArg {
             Player p = (Player) s;
             if (p.hasPermission("protectionstones.toggle")) {
                 ProtectionStones.toggleList.remove(p.getUniqueId());
-                p.sendMessage(PSL.TOGGLE_ON.msg());
+                PSL.msg(p, PSL.TOGGLE_ON.msg());
             } else {
-                p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_TOGGLE.msg());
             }
             return true;
         }
@@ -85,9 +85,9 @@ public class ArgToggle implements PSCommandArg {
             Player p = (Player) s;
             if (p.hasPermission("protectionstones.toggle")) {
                 ProtectionStones.toggleList.add(p.getUniqueId());
-                p.sendMessage(PSL.TOGGLE_OFF.msg());
+                PSL.msg(p, PSL.TOGGLE_OFF.msg());
             } else {
-                p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
+                PSL.msg(p, PSL.NO_PERMISSION_TOGGLE.msg());
             }
             return true;
         }
@@ -123,13 +123,13 @@ public class ArgToggle implements PSCommandArg {
         if (p.hasPermission("protectionstones.toggle")) {
             if (!ProtectionStones.toggleList.contains(p.getUniqueId())) {
                 ProtectionStones.toggleList.add(p.getUniqueId());
-                p.sendMessage(PSL.TOGGLE_OFF.msg());
+                PSL.msg(p, PSL.TOGGLE_OFF.msg());
             } else {
                 ProtectionStones.toggleList.remove(p.getUniqueId());
-                p.sendMessage(PSL.TOGGLE_ON.msg());
+                PSL.msg(p, PSL.TOGGLE_ON.msg());
             }
         } else {
-            p.sendMessage(PSL.NO_PERMISSION_TOGGLE.msg());
+            PSL.msg(p, PSL.NO_PERMISSION_TOGGLE.msg());
         }
         return true;
     }

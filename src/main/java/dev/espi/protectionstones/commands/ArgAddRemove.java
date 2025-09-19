@@ -20,6 +20,7 @@ import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -121,27 +122,37 @@ public class ArgAddRemove implements PSCommandArg {
 
                 if (operationType.equals("add") || operationType.equals("addowner")) {
                     if (flags.containsKey("-a")) {
-                        PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
-                                .replace("%player%", addPlayerName)
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                        PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.replaceAll(Map.of(
+                                "%player%", addPlayerName,
+                                "%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")")
+                        )));
                     } else {
-                        PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", addPlayerName));
+                        PSL.msg(p, PSL.ADDED_TO_REGION.replaceAll(Map.of(
+                                "%player%", addPlayerName
+                        )));
                     }
 
-                    // add to WorldGuard profile cache
-                    Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> UUIDCache.storeWGProfile(addPlayerUuid, addPlayerName));
+                    // add to WorldGuard profile cache asynchronously
+                    Bukkit.getScheduler().runTaskAsynchronously(
+                            ProtectionStones.getInstance(),
+                            () -> UUIDCache.storeWGProfile(addPlayerUuid, addPlayerName)
+                    );
 
                 } else if ((operationType.equals("remove") && r.isMember(addPlayerUuid))
                         || (operationType.equals("removeowner") && r.isOwner(addPlayerUuid))) {
 
                     if (flags.containsKey("-a")) {
-                        PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
-                                .replace("%player%", addPlayerName)
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                        PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.replaceAll(Map.of(
+                                "%player%", addPlayerName,
+                                "%region%", (r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")")
+                        )));
                     } else {
-                        PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", addPlayerName));
+                        PSL.msg(p, PSL.REMOVED_FROM_REGION.replaceAll(Map.of(
+                                "%player%", addPlayerName
+                        )));
                     }
                 }
+
 
                 switch (operationType) {
                     case "add" -> r.addMember(addPlayerUuid);
@@ -218,7 +229,7 @@ public class ArgAddRemove implements PSCommandArg {
         }
 
         // find total region amounts after player is added to the regions, and their existing total
-        String err = LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream()
+        String err = String.valueOf(LimitUtil.checkAddOwner(addedPlayer, regionsToBeAddedTo.stream()
                 .flatMap(r -> {
                     if (r instanceof PSGroupRegion) {
                         return ((PSGroupRegion) r).getMergedRegions().stream();
@@ -227,11 +238,11 @@ public class ArgAddRemove implements PSCommandArg {
                 })
                 .map(PSRegion::getTypeOptions)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())));
         if (err.equals("")) {
             return false;
         } else {
-            PSL.msg(commandSender, err);
+            PSL.msg(commandSender, Component.text(err));
             return true;
         }
     }

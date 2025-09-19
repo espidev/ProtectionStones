@@ -25,6 +25,8 @@ import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGMerge;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -87,7 +89,7 @@ public class ArgAdminForceMerge {
         Set<String> options = new HashSet<>();
         for (int i = 3; i < args.length; i++) {
             if (!flags.contains(args[i])) {
-                PSL.msg(p, ChatColor.RED + "Invalid option.");
+                PSL.msg(p, Component.text("Invalid option.", NamedTextColor.RED));
                 return true;
             } else {
                 options.add(args[i]);

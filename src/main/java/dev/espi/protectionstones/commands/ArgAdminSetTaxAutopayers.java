@@ -22,6 +22,8 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -29,10 +31,15 @@ import org.bukkit.command.CommandSender;
 class ArgAdminSetTaxAutopayers {
     static boolean argumentAdminSetTaxAutopayers(CommandSender s, String[] args) {
         if (!ProtectionStones.getInstance().getConfigOptions().taxEnabled) {
-            return PSL.msg(s, ChatColor.RED + "Taxes are disabled! Enable it in the config.");
+            return PSL.msg(s, Component.text("Taxes are disabled! Enable it in the config.", NamedTextColor.RED));
         }
 
-        PSL.msg(s, ChatColor.GRAY + "Scanning through regions, and setting tax autopayers for regions that don't have one...");
+        PSL.msg(s,
+                Component.text(
+                        "Scanning through regions, and setting tax autopayers for regions that don't have one...",
+                        NamedTextColor.GRAY
+                )
+        );
 
         Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
             WGUtils.getAllRegionManagers().forEach((w, rgm) -> {
@@ -41,14 +48,21 @@ class ArgAdminSetTaxAutopayers {
 
                     if (psr != null && psr.getTypeOptions() != null && psr.getTypeOptions().taxPeriod != -1 && psr.getTaxAutopayer() == null) {
                         if (psr.getOwners().size() >= 1) {
-                            PSL.msg(s, ChatColor.GRAY + "Configured tax autopayer to be " + psr.getOwners().get(0).toString() + " for region " + psr.getId());
+                            PSL.msg(s,
+                                    Component.text("Configured tax autopayer to be ", NamedTextColor.GRAY)
+                                            .append(Component.text(psr.getOwners().get(0).toString(), NamedTextColor.AQUA))
+                                            .append(Component.text(" for region ", NamedTextColor.GRAY))
+                                            .append(Component.text(psr.getId(), NamedTextColor.AQUA))
+                            );
+
                             psr.setTaxAutopayer(psr.getOwners().get(0));
                         }
                     }
 
                 }
             });
-            PSL.msg(s, ChatColor.GREEN + "Complete!");
+            PSL.msg(s, Component.text("Complete!", NamedTextColor.GREEN));
+
         });
 
         return true;

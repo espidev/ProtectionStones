@@ -22,6 +22,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -45,7 +46,9 @@ class ArgAdminChangeType {
 
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
         if (rgm == null) {
-            return PSL.msg(p, ChatColor.GRAY + "The world does not have WorldGuard configured!");
+            return PSL.msg(p, MiniMessage.miniMessage().deserialize(
+                    "<gray>The world does not have WorldGuard configured!"
+            ));
         }
 
         String fromType = args[3], toType = args[4];

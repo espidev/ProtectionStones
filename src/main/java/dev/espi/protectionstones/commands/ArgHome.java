@@ -19,10 +19,10 @@ import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -91,30 +91,49 @@ public class ArgHome implements PSCommandArg {
     }
 
     private static final int GUI_SIZE = 17;
+    private static final MiniMessage MM = MiniMessage.miniMessage();
 
     private void openHomeGUI(PSPlayer psp, List<PSRegion> homes, int page) {
-        List<TextComponent> entries = new ArrayList<>();
+        final String base = ProtectionStones.getInstance().getConfigOptions().base_command;
+
+        List<Component> entries = new ArrayList<>();
         for (PSRegion r : homes) {
-            String msg;
-            if (r.getName() == null) {
-                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getId();
-            } else {
-                msg = ChatColor.GRAY + "> " + ChatColor.AQUA + r.getName() + " (" + r.getId() + ")";
-            }
-            TextComponent tc = new TextComponent(msg);
-            tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(PSL.HOME_CLICK_TO_TP.msg()).create()));
-            if (r.getName() == null) {
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getId()));
-            } else {
-                tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home " + r.getName()));
-            }
-            entries.add(tc);
+            final boolean hasName = r.getName() != null && !r.getName().isEmpty();
+            // Build the visible label with MiniMessage so colors/hex work
+            final String label = hasName
+                    ? "<gray>> </gray><aqua>" + r.getName() + "</aqua><gray> (" + r.getId() + ")</gray>"
+                    : "<gray>> </gray><aqua>" + r.getId() + "</aqua>";
+
+            Component line = MM.deserialize(label)
+                    .hoverEvent(HoverEvent.showText(PSL.HOME_CLICK_TO_TP.msg()))
+                    .clickEvent(ClickEvent.runCommand(
+                            "/" + base + " home " + (hasName ? r.getName() : r.getId())
+                    ));
+
+            entries.add(line);
         }
 
-        TextGUI.displayGUI(psp.getPlayer(), PSL.HOME_HEADER.msg(), "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " home -p %page%", page, GUI_SIZE, entries, true);
+        // Header is already a Component from PSL
+        Component header = PSL.HOME_HEADER.msg();
 
-        if (page * GUI_SIZE + GUI_SIZE < entries.size())
-            PSL.msg(psp, PSL.HOME_NEXT.msg().replace("%page%", page + 2 + ""));
+        // If your TextGUI has been updated to Adventure:
+        TextGUI.displayGUI(
+                psp.getPlayer(),
+                header,
+                "/" + base + " home -p %page%",
+                page,
+                GUI_SIZE,
+                entries,
+                true
+        );
+
+        // Show "next page" helper if there are more entries beyond this page
+        if ((page + 1) * GUI_SIZE < entries.size()) {
+            Component nextMsg = PSL.HOME_NEXT.replaceAll(Map.of(
+                    "%page%", String.valueOf(page + 2)
+            ));
+            PSL.msg(psp.getPlayer(), nextMsg);
+        }
     }
 
     @Override

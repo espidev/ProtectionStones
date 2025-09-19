@@ -28,6 +28,7 @@ import dev.espi.protectionstones.utils.RecipeUtil;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.*;
@@ -44,6 +45,7 @@ import org.bukkit.inventory.meta.tags.ItemTagType;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.luckperms.api.LuckPerms;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -63,7 +65,7 @@ public class ProtectionStones extends JavaPlugin {
     public static final int CONFIG_VERSION = 16;
 
     private boolean debug = false;
-
+    private static ProtectionStones instance;
     public static File configLocation, blockDataFolder;
     public static CommentedFileConfig config;
 
@@ -75,6 +77,8 @@ public class ProtectionStones extends JavaPlugin {
     // all configuration file options are stored in here
     private PSConfig configOptions;
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
+
+    private BukkitAudiences adventure;
 
 
     // ps alias to id cache
@@ -547,8 +551,25 @@ public class ProtectionStones extends JavaPlugin {
         FlagHandler.registerFlags();
     }
 
+    public @NotNull BukkitAudiences audiences() {
+        if (adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure audiences while plugin is disabled!");
+        }
+        return adventure;
+    }
+
+    @Override
+
+    public void onDisable() {
+        if (this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
+    }
+
     @Override
     public void onEnable() {
+        this.adventure = BukkitAudiences.create(this);
         FlagHandler.registerHandlers(); // register custom WG flag handlers
 
         TomlFormat.instance();
@@ -576,7 +597,7 @@ public class ProtectionStones extends JavaPlugin {
 
         // check if Vault is enabled (for economy support)
         if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
-            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(Economy.class);
             if (econ == null) {
                 getLogger().warning("No economy plugin found by Vault! There will be no economy support!");
                 vaultSupportEnabled = false;

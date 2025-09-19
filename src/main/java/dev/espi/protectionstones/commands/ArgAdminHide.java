@@ -62,7 +62,7 @@ class ArgAdminHide {
             }
 
             String hMessage = args[1].equalsIgnoreCase("unhide") ? "unhidden" : "hidden";
-            PSL.msg(p, PSL.ADMIN_HIDE_TOGGLED.msg()
+            PSL.msg(p, PSL.ADMIN_HIDE_TOGGLED
                     .replace("%message%", hMessage));
         });
 

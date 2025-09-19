@@ -452,7 +452,7 @@ public class PSStandardRegion extends PSRegion {
                 if (getTenant() != null) {
                     PSPlayer tenant = PSPlayer.fromUUID(getTenant());
                     if (tenant.getOfflinePlayer().isOnline()) {
-                        PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT.msg()
+                        PSL.msg(Bukkit.getPlayer(getTenant()), PSL.RENT_TENANT_STOPPED_TENANT
                                 .replace("%region%", getName() != null ? getName() : getId()));
                     }
                 }

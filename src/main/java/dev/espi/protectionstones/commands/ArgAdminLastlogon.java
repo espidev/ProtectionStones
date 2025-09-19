@@ -22,6 +22,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 
 class ArgAdminLastlogon {
     // /ps admin lastlogon
@@ -34,7 +35,7 @@ class ArgAdminLastlogon {
     }
     static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
         if (args.length < 3) {
-            p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
+            PSL.msg(p, PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
             return true;
         }
         OfflinePlayer op = Bukkit.getOfflinePlayer(args[2]);
@@ -42,14 +43,15 @@ class ArgAdminLastlogon {
         String playerName = args[2];
         long lastPlayed = (System.currentTimeMillis() - op.getLastPlayed()) / 86400000L;
 
-        PSL.msg(p, PSL.ADMIN_LAST_LOGON.msg()
-                .replace("%player%", playerName)
-                .replace("%days%", "" +lastPlayed));
+        PSL.msg(p, PSL.ADMIN_LAST_LOGON.replaceAll(Map.of(
+                "%player%", playerName,
+                "%days%", String.valueOf(lastPlayed)
+        )));
 
         if (op.isBanned()) {
-            PSL.msg(p, PSL.ADMIN_IS_BANNED.msg()
-                    .replace("%player%", playerName));
+            PSL.msg(p, PSL.ADMIN_IS_BANNED.replace("%player%", playerName));
         }
+
 
         return true;
     }
@@ -67,7 +69,7 @@ class ArgAdminLastlogon {
         }
         OfflinePlayer[] offlinePlayerList = Bukkit.getServer().getOfflinePlayers().clone();
         int playerCounter = 0;
-        PSL.msg(p, PSL.ADMIN_LASTLOGONS_HEADER.msg()
+        PSL.msg(p, PSL.ADMIN_LASTLOGONS_HEADER
                 .replace("%days%", "" + days));
 
         Arrays.sort(offlinePlayerList, new PlayerComparator());
@@ -75,15 +77,17 @@ class ArgAdminLastlogon {
             long lastPlayed = (System.currentTimeMillis() - offlinePlayer.getLastPlayed()) / 86400000L;
             if (lastPlayed >= days) {
                 playerCounter++;
-                PSL.msg(p, PSL.ADMIN_LASTLOGONS_LINE.msg()
-                        .replace("%player%", offlinePlayer.getName())
-                        .replace("%time%", "" + lastPlayed));
+                PSL.msg(p, PSL.ADMIN_LASTLOGONS_LINE.replaceAll(Map.of(
+                        "%player%", offlinePlayer.getName(),
+                        "%time%", String.valueOf(lastPlayed)
+                )));
             }
         }
 
-        PSL.msg(p, PSL.ADMIN_LASTLOGONS_FOOTER.msg()
-                .replace("%count%", "" + playerCounter)
-                .replace("%checked%", "" + offlinePlayerList.length));
+        PSL.msg(p, PSL.ADMIN_LASTLOGONS_FOOTER.replaceAll(Map.of(
+                "%count%", String.valueOf(playerCounter),
+                "%checked%", String.valueOf(offlinePlayerList.length)
+        )));
 
         return true;
     }
