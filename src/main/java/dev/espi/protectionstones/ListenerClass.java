@@ -35,10 +35,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Furnace;
+import org.bukkit.block.*;
 import org.bukkit.block.data.type.Crafter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -319,42 +316,18 @@ public class ListenerClass implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onCrafterClick(InventoryClickEvent e) {
-        if (!(e.getInventory().getHolder() instanceof Crafter)) return;
-
-        ItemStack item = e.getCursor(); // item being placed
-        if (item != null && ProtectionStones.getBlockOptions(item) != null) {
-            e.setCancelled(true);
-            e.getWhoClicked().sendMessage(ChatColor.RED + "You cannot insert ProtectionStone blocks into a Crafter.");
-        }
-    }
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onCrafterHopperMove(InventoryMoveItemEvent e) {
-        if (!(e.getDestination().getHolder() instanceof Crafter)) return;
-
-        ItemStack item = e.getItem();
-        if (item != null) {
+    public void onCrafter(CrafterCraftEvent e) {
+        Block block = e.getBlock();
+        BlockState state = block.getState();
+        if (block.getType() != Material.CRAFTER) return;
+        if (!(state instanceof Container container)) return;
+        Inventory inv = container.getInventory();
+        for (ItemStack item : inv.getContents()) {
+            if (item == null) continue;
             PSProtectBlock options = ProtectionStones.getBlockOptions(item);
             if (options != null && !options.allowUseInCrafting) {
                 e.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onCrafterDrag(InventoryDragEvent e) {
-        if (!(e.getInventory().getHolder() instanceof Crafter)) return;
-
-        for (ItemStack item : e.getNewItems().values()) {
-            if (item != null) {
-                PSProtectBlock options = ProtectionStones.getBlockOptions(item);
-                if (options != null && !options.allowUseInCrafting) {
-                    e.setCancelled(true);
-                    if (e.getWhoClicked() instanceof Player player) {
-                    PSL.msg(player, Component.text("You cannot use ProtectionStones blocks in a Crafter.", NamedTextColor.RED));
-                    }
-                    return;
-                }
+                e.setResult(new ItemStack(Material.AIR));
             }
         }
     }
