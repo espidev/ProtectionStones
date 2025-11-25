@@ -18,26 +18,23 @@ package dev.espi.protectionstones.utils;
 import dev.espi.protectionstones.PSProtectBlock;
 import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.Base64;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class BlockUtil {
     static final int MAX_USERNAME_LENGTH = 16;
@@ -71,12 +68,13 @@ public class BlockUtil {
             }
 
             // PLAYER_HEAD:base64
-            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + sm.getOwningPlayer().getUniqueId()) != null) {
-                return Material.PLAYER_HEAD + ":" + sm.getOwningPlayer().getUniqueId();
+            PlayerProfile offlineProfile = sm.getOwnerProfile();
+            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" +offlineProfile.getUniqueId()) != null) {
+                return Material.PLAYER_HEAD + ":" +offlineProfile.getUniqueId();
             }
 
             // PLAYER_HEAD:name
-            return Material.PLAYER_HEAD + ":" + sm.getOwningPlayer().getName(); // return name if it doesn't exist
+            return Material.PLAYER_HEAD + ":" + offlineProfile.getName(); // return name if it doesn't exist
         }
         return i.getType().toString();
     }
@@ -86,13 +84,13 @@ public class BlockUtil {
 
             Skull s = (Skull) block.getState();
             if (s.hasOwner() && isOwnedSkullTypeConfigured()) {
-                OfflinePlayer op = s.getOwningPlayer();
-                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + op.getUniqueId()) != null) {
+                PlayerProfile offlineProfile = s.getOwnerProfile();
+                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + offlineProfile.getUniqueId()) != null) {
                     // PLAYER_HEAD:base64
-                    return Material.PLAYER_HEAD + ":" + op.getUniqueId();
+                    return Material.PLAYER_HEAD + ":" + offlineProfile.getUniqueId();
                 } else {
                     // PLAYER_HEAD:name
-                    return Material.PLAYER_HEAD + ":" + op.getName(); // return name if doesn't exist
+                    return Material.PLAYER_HEAD + ":" + offlineProfile.getName(); // return name if doesn't exist
                 }
             } else { // PLAYER_HEAD
                 return Material.PLAYER_HEAD.toString();
