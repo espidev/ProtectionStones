@@ -216,6 +216,8 @@ placing_bypasses_wg_passthrough = true
 
     # Disable returning the block when removed/unclaimed?
     no_drop = false
+    # Determines whether the block should drop as an item. Default: false. false = instantly added to the inventory.
+    drop_as_item = false
 
     # Prevents piston pushing of the block. Recommended to keep as true.
     prevent_piston_push = true

@@ -176,14 +176,18 @@ public class ListenerClass implements Listener {
 
         // return protection stone if no drop option is off
         if (blockOptions != null && !blockOptions.noDrop) {
-            if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
-                // method will return not empty if item couldn't be added
-                if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
-                    PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
-                    p.getWorld().dropItem(r.getProtectBlock().getLocation(), blockOptions.createItem());
-                } else {
-                    PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
-                    return false;
+            if(blockOptions.dropAsItem){
+                p.getWorld().dropItem(r.getProtectBlock().getLocation(), blockOptions.createItem());
+            }else {
+                if (!p.getInventory().addItem(blockOptions.createItem()).isEmpty()) {
+                    // method will return not empty if item couldn't be added
+                    if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
+                        PSL.msg(p, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                        p.getWorld().dropItem(r.getProtectBlock().getLocation(), blockOptions.createItem());
+                    } else {
+                        PSL.msg(p, PSL.NO_ROOM_IN_INVENTORY.msg());
+                        return false;
+                    }
                 }
             }
         }

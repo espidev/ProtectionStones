@@ -133,6 +133,8 @@ public class PSProtectBlock {
     public boolean autoMerge;
     @Path("behaviour.no_drop")
     public boolean noDrop;
+    @Path("behaviour.drop_as_item")
+    public boolean dropAsItem;
     @Path("behaviour.prevent_piston_push")
     public boolean preventPistonPush;
     @Path("behaviour.prevent_explode")
