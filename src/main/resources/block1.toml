@@ -25,7 +25,7 @@ restrict_obtaining = true
 # Enable or disable the use of this protection stone in specific worlds
 # "blacklist" mode prevents this protect block from being used in the worlds in "worlds"
 # "whitelist" mode allows this protect block to only be used in the worlds in "worlds"
-# Can be overriden with protectionstones.admin permission (including OP)!
+# Can be overridden with protectionstones.admin permission (including OP)!
 world_list_type = "blacklist"
 worlds = [
     "exampleworld1",
