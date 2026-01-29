@@ -36,6 +36,10 @@ aliases = [
     "protectionstones"
 ]
 
+# PS View Particle type
+# there are three options ( Redstone, Glow, EndRod )
+ps_view_particle = "Redstone"
+
 # Whether or not to drop items on the ground if the inventory is full (ex. during /ps unclaim)
 # If set to false, the event will be prevented from happening, and say that inventory is full
 drop_item_when_inventory_full = true

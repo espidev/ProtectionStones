@@ -25,8 +25,23 @@ public class ParticlesUtil {
     public static void persistRedstoneParticle(Player p, Location l, Particle.DustOptions d, int occ) {
         for (int i = 0; i < occ; i++) {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
-                if (p.isOnline()) p.spawnParticle(Particle.DUST, l, 1, d);
-            }, i*20);
+                if (!p.isOnline()) return;
+
+                // Stronger "glow marker" burst
+                p.spawnParticle(Particle.DUST, l,
+                        2,            // count (was 1)
+                        0.10, 0.15, 0.10, // offset/spread (x,y,z)
+                        0.0,
+                        d
+                );
+
+                p.spawnParticle(Particle.GLOW, l,
+                        2,
+                        0.05, 0.08, 0.05,
+                        0.0
+                );
+
+            }, i * 20L);
         }
     }
 }
