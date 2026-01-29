@@ -33,10 +33,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Furnace;
+import org.bukkit.block.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -53,6 +50,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -307,6 +305,22 @@ public class ListenerClass implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCrafter(CrafterCraftEvent e) {
+        Block block = e.getBlock();
+        BlockState state = block.getState();
+        if (block.getType() != Material.CRAFTER) return;
+        if (!(state instanceof Container container)) return;
+        Inventory inv = container.getInventory();
+        for (ItemStack item : inv.getContents()) {
+            if (item == null) continue;
+            PSProtectBlock options = ProtectionStones.getBlockOptions(item);
+            if (options != null && !options.allowUseInCrafting) {
+                e.setCancelled(true);
+                e.setResult(new ItemStack(Material.AIR));
+            }
+        }
+    }
 
     // -=-=-=- disable grindstone inventory to prevent infinite exp exploit with enchanted_effect option  -=-=-=-
     // see https://github.com/espidev/ProtectionStones/issues/324
