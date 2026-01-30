@@ -307,17 +307,15 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCrafter(CrafterCraftEvent e) {
-        Block block = e.getBlock();
-        BlockState state = block.getState();
-        if (block.getType() != Material.CRAFTER) return;
-        if (!(state instanceof Container container)) return;
-        Inventory inv = container.getInventory();
-        for (ItemStack item : inv.getContents()) {
+        if (e.getBlock().getType() != Material.CRAFTER) return;
+        if (!(e.getBlock().getState() instanceof Container container)) return;
+        for (ItemStack item : container.getInventory().getContents()) {
             if (item == null) continue;
             PSProtectBlock options = ProtectionStones.getBlockOptions(item);
             if (options != null && !options.allowUseInCrafting) {
                 e.setCancelled(true);
                 e.setResult(new ItemStack(Material.AIR));
+                return;
             }
         }
     }
