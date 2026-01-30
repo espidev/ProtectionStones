@@ -141,6 +141,29 @@ public class ConfigUpgrades {
                 ProtectionStones.config.set("allow_home_teleport_for_members", true);
                 ProtectionStones.config.setComment("allow_home_teleport_for_members", " Whether or not members of a region can /ps home to the region.");
                 break;
+            case 16:
+                ProtectionStones.config.set("config_version", 17);
+                // Inventory GUI toggles (defaults preserve current behavior)
+                ProtectionStones.config.set("gui.enabled", false);
+                ProtectionStones.config.setComment("gui.enabled", " Whether to enable inventory-based GUIs for commands. If false, commands use legacy text-based output.");
+                ProtectionStones.config.set("gui.commands.home", true);
+                ProtectionStones.config.set("gui.commands.flag", true);
+                ProtectionStones.config.set("gui.commands.add", true);
+                ProtectionStones.config.set("gui.commands.remove", true);
+                ProtectionStones.config.set("gui.commands.addowner", true);
+                ProtectionStones.config.set("gui.commands.removeowner", true);
+                ProtectionStones.config.setComment("gui.commands", " Per-command GUI toggles (only used if gui.enabled = true).\n Supported: home, flag, add, remove, addowner, removeowner");
+                // Expand GUI toggles for additional commands
+                ProtectionStones.config.set("gui.commands.list", true);
+                ProtectionStones.config.set("gui.commands.info", true);
+                ProtectionStones.config.set("gui.commands.tp", true);
+                ProtectionStones.config.set("gui.commands.unclaim", true);
+                ProtectionStones.config.set("gui.commands.priority", true);
+                ProtectionStones.config.setComment("gui.commands", " Per-command GUI toggles (only used if gui.enabled = true).\n Supported: home, flag, add, remove, addowner, removeowner, list, info, tp, unclaim, priority");
+                // Admin GUI toggle
+                ProtectionStones.config.set("gui.commands.admin", true);
+                ProtectionStones.config.setComment("gui.commands", " Per-command GUI toggles (only used if gui.enabled = true).\n Supported: home, flag, add, remove, addowner, removeowner, list, info, tp, unclaim, priority, admin");
+                break;
             case ProtectionStones.CONFIG_VERSION:
                 leaveLoop = true;
                 break;

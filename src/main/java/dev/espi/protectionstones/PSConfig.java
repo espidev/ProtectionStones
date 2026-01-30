@@ -76,6 +76,40 @@ public class PSConfig {
     @Path("allow_home_teleport_for_members")
     public Boolean allowHomeTeleportForMembers;
 
+    // ------------------------------------------------------------------
+    // Inventory GUI toggles
+    // If gui.enabled is false, all commands use legacy text-based output.
+    // If gui.enabled is true, individual commands can be enabled below.
+    @Path("gui.enabled")
+    public Boolean guiEnabled;
+    @Path("gui.commands.home")
+    public Boolean guiCommandHome;
+    @Path("gui.commands.flag")
+    public Boolean guiCommandFlag;
+    @Path("gui.commands.add")
+    public Boolean guiCommandAdd;
+    @Path("gui.commands.remove")
+    public Boolean guiCommandRemove;
+    @Path("gui.commands.addowner")
+    public Boolean guiCommandAddowner;
+    @Path("gui.commands.removeowner")
+    public Boolean guiCommandRemoveowner;
+
+    // Additional command GUIs
+    @Path("gui.commands.list")
+    public Boolean guiCommandList;
+    @Path("gui.commands.info")
+    public Boolean guiCommandInfo;
+    @Path("gui.commands.tp")
+    public Boolean guiCommandTp;
+    @Path("gui.commands.unclaim")
+    public Boolean guiCommandUnclaim;
+    @Path("gui.commands.priority")
+    public Boolean guiCommandPriority;
+
+    @Path("gui.commands.admin")
+    public Boolean guiCommandAdmin;
+
     @Path("admin.cleanup_delete_regions_with_members_but_no_owners")
     public Boolean cleanupDeleteRegionsWithMembersButNoOwners;
 
