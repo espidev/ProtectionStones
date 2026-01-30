@@ -69,12 +69,15 @@ public class BlockUtil {
 
             // PLAYER_HEAD:base64
             PlayerProfile offlineProfile = sm.getOwnerProfile();
-            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" +offlineProfile.getUniqueId()) != null) {
-                return Material.PLAYER_HEAD + ":" +offlineProfile.getUniqueId();
+            if (offlineProfile == null) {
+                return Material.PLAYER_HEAD.toString();
+            }
+            if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + offlineProfile.getUniqueId()) != null) {
+                return Material.PLAYER_HEAD + ":" + offlineProfile.getUniqueId();
             }
 
             // PLAYER_HEAD:name
-            return Material.PLAYER_HEAD + ":" + offlineProfile.getName(); // return name if it doesn't exist
+            return Material.PLAYER_HEAD + ":" + offlineProfile.getName();
         }
         return i.getType().toString();
     }
@@ -85,16 +88,15 @@ public class BlockUtil {
             Skull s = (Skull) block.getState();
             if (s.hasOwner() && isOwnedSkullTypeConfigured()) {
                 PlayerProfile offlineProfile = s.getOwnerProfile();
-                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + offlineProfile.getUniqueId()) != null) {
-                    // PLAYER_HEAD:base64
-                    return Material.PLAYER_HEAD + ":" + offlineProfile.getUniqueId();
-                } else {
-                    // PLAYER_HEAD:name
-                    return Material.PLAYER_HEAD + ":" + offlineProfile.getName(); // return name if doesn't exist
+                if (offlineProfile == null) {
+                    return Material.PLAYER_HEAD.toString();
                 }
-            } else { // PLAYER_HEAD
-                return Material.PLAYER_HEAD.toString();
+                if (ProtectionStones.getBlockOptions("PLAYER_HEAD:" + offlineProfile.getUniqueId()) != null) {
+                    return Material.PLAYER_HEAD + ":" + offlineProfile.getUniqueId();
+                }
+                return Material.PLAYER_HEAD + ":" + offlineProfile.getName();
             }
+            return Material.PLAYER_HEAD.toString();
         } else if (block.getType() == Material.CREEPER_WALL_HEAD) {
             return Material.CREEPER_HEAD.toString();
         } else if (block.getType() == Material.DRAGON_WALL_HEAD) {
