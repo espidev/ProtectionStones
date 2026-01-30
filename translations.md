@@ -8,6 +8,7 @@ If you have translated to a new language, or are upgrading an existing messages.
 
 Thank you to all those that have contributed!
 
+* [@DzikiSzogun](https://github.com/DzikiSzogun) (Polish v2.10.5)
 * [@N1xUser](https://github.com/N1xUser) (Chilean Spanish v2.10.5)
 * [@l3lack5hine](https://github.com/l3lack5hine) (Thai v2.10.3)
 * [@notsapinho](https://github.com/notsapinho) (Portuguese v2.10.3)
@@ -22,7 +23,15 @@ Thank you to all those that have contributed!
 
 <details>
 
-<summary>Chilean Spanish (v2.10.5)</summary>
+<summary>Polski / Polish (v2.10.5)</summary>
+
+[messages.yml](https://pastebin.com/ViEjxbK9)
+
+</details>
+
+<details>
+
+<summary>Española chilena / Chilean Spanish (v2.10.5)</summary>
 
 [messages.yml](https://pastebin.com/KWgv8kYq)
 
