@@ -18,6 +18,7 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.LimitUtil;
+import dev.espi.protectionstones.gui.screens.members.RegionPlayerSelectGui;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
@@ -66,6 +67,41 @@ public class ArgAddRemove implements PSCommandArg {
         }
 
         // determine player to be added or removed
+
+
+        // GUI toggle (inventory GUI vs legacy text-based output)
+        PSConfig conf = ProtectionStones.getInstance().getConfigOptions();
+        boolean guiGlobal = Boolean.TRUE.equals(conf.guiEnabled);
+        boolean guiThis = switch (operationType) {
+            case "add" -> Boolean.TRUE.equals(conf.guiCommandAdd);
+            case "remove" -> Boolean.TRUE.equals(conf.guiCommandRemove);
+            case "addowner" -> Boolean.TRUE.equals(conf.guiCommandAddowner);
+            case "removeowner" -> Boolean.TRUE.equals(conf.guiCommandRemoveowner);
+            default -> false;
+        };
+
+        // If GUI enabled for this command and no player argument provided (and not using -a), open selector GUI
+        if (guiGlobal && guiThis && args.length < 2 && !flags.containsKey("-a")) {
+            PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
+            if (r == null) {
+                return PSL.msg(p, PSL.NOT_IN_REGION.msg());
+            } else if (WGUtils.hasNoAccess(r.getWGRegion(), p, WorldGuardPlugin.inst().wrapPlayer(p), false)) {
+                return PSL.msg(p, PSL.NO_ACCESS.msg());
+            }
+
+            RegionPlayerSelectGui.Mode mode = switch (operationType) {
+                case "add" -> RegionPlayerSelectGui.Mode.ADD_MEMBER;
+                case "remove" -> RegionPlayerSelectGui.Mode.REMOVE_MEMBER;
+                case "addowner" -> RegionPlayerSelectGui.Mode.ADD_OWNER;
+                case "removeowner" -> RegionPlayerSelectGui.Mode.REMOVE_OWNER;
+                default -> RegionPlayerSelectGui.Mode.ADD_MEMBER;
+            };
+
+            ProtectionStones.getInstance().getGuiManager().open(p,
+                    new RegionPlayerSelectGui(ProtectionStones.getInstance().getGuiManager(), r, mode, 0));
+            return true;
+        }
+
         if (args.length < 2) {
             return PSL.msg(p, PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
         }
