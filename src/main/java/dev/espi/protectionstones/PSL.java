@@ -90,6 +90,8 @@ public enum PSL {
     REMOVED_FROM_REGION("psregion.removed_from_region", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region."),
     REMOVED_FROM_REGION_SPECIFIC("psregion.removed_from_region_specific", ChatColor.AQUA + "%player%" + ChatColor.GRAY + " has been removed from region %region%."),
     NOT_IN_REGION("psregion.not_in_region", ChatColor.RED + "You are not in a protection stones region!"),
+    MEMBERS_LIMIT("psregion.members_limit_reached", ChatColor.RED + "Members limit reached (%limit%) for region: %region%"),
+    OWNERS_LIMIT("psregion.owners_limit_reached", ChatColor.RED + "Owners limit reached (%limit%) for region: %region%"),
     PLAYER_NOT_FOUND("psregion.player_not_found", ChatColor.RED + "Player not found."),
     NOT_PS_REGION("psregion.not_ps_region", ChatColor.RED + "Not a protection stones region."),
     REGION_DOES_NOT_EXIST("psregion.region_does_not_exist", ChatColor.RED + "Region does not exist."),
