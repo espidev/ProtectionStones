@@ -41,28 +41,45 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockHandler {
-    private static HashMap<Player, Double> lastProtectStonePlaced = new HashMap<>();
+    // Use ConcurrentHashMap with UUID key to prevent memory leaks (Player objects
+    // are not garbage collected)
+    private static final ConcurrentHashMap<UUID, Long> lastProtectStonePlaced = new ConcurrentHashMap<>();
 
     private static String checkCooldown(Player p) {
-        double currentTime = System.currentTimeMillis();
-        if (lastProtectStonePlaced.containsKey(p)) {
+        long currentTime = System.currentTimeMillis();
+        UUID playerId = p.getUniqueId();
+        Long lastPlace = lastProtectStonePlaced.get(playerId);
+
+        if (lastPlace != null) {
             double cooldown = ProtectionStones.getInstance().getConfigOptions().placingCooldown; // seconds
-            double lastPlace = lastProtectStonePlaced.get(p); // milliseconds
 
             if (lastPlace + cooldown * 1000 > currentTime) { // if cooldown has not been finished
-                return String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000));
+                return String.format("%.1f", cooldown - ((currentTime - lastPlace) / 1000.0));
             }
-            lastProtectStonePlaced.remove(p);
         }
-        lastProtectStonePlaced.put(p, currentTime);
+        lastProtectStonePlaced.put(playerId, currentTime);
         return null;
     }
 
-    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World w, LocalPlayer lp, double bx, double by, double bz) {
-        BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
-        BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
+    /**
+     * Clears the cooldown cache for a player. Should be called when player quits.
+     * 
+     * @param playerId the UUID of the player
+     */
+    public static void clearCooldown(UUID playerId) {
+        lastProtectStonePlaced.remove(playerId);
+    }
+
+    private static boolean isFarEnoughFromOtherClaims(PSProtectBlock blockOptions, World w, LocalPlayer lp, double bx,
+            double by, double bz) {
+        BlockVector3 min = WGUtils.getMinVector(bx, by, bz, blockOptions.distanceBetweenClaims,
+                blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
+        BlockVector3 max = WGUtils.getMaxVector(bx, by, bz, blockOptions.distanceBetweenClaims,
+                blockOptions.distanceBetweenClaims, blockOptions.distanceBetweenClaims);
 
         ProtectedRegion td = new ProtectedCuboidRegion("regionRadiusTest" + (long) (bx + by + bz), true, min, max);
         td.setPriority(blockOptions.priority);
@@ -72,13 +89,16 @@ public class BlockHandler {
         if (rgm.overlapsUnownedRegion(td, lp)) {
             for (ProtectedRegion rg : rgm.getApplicableRegions(td)) {
                 // skip if the user is already an owner
-                if (rg.isOwner(lp)) continue;
+                if (rg.isOwner(lp))
+                    continue;
 
                 if (ProtectionStones.isPSRegion(rg) && rg.getFlag(Flags.PASSTHROUGH) != StateFlag.State.ALLOW) {
-                    // if it is a PS region, and "passthrough allow" is not set, then it is not far enough
+                    // if it is a PS region, and "passthrough allow" is not set, then it is not far
+                    // enough
                     return false;
                 } else if (rg.getPriority() >= td.getPriority()) {
-                    // if the priorities are the same for plain WorldGuard regions, it is not far enough
+                    // if the priorities are the same for plain WorldGuard regions, it is not far
+                    // enough
                     return false;
                 }
             }
@@ -93,15 +113,18 @@ public class BlockHandler {
         Block b = e.getBlock();
 
         // check if the block is a protection stone
-        if (!ProtectionStones.isProtectBlockType(b)) return;
+        if (!ProtectionStones.isProtectBlockType(b))
+            return;
         PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
 
         // check if the item was created by protection stones (stored in custom tag)
         // block must have restrictObtaining enabled for blocking place
-        if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(e.getItemInHand(), true)) return;
+        if (blockOptions.restrictObtaining && !ProtectionStones.isProtectBlockItem(e.getItemInHand(), true))
+            return;
 
         // check if player has toggled off placement of protection stones
-        if (ProtectionStones.toggleList.contains(p.getUniqueId())) return;
+        if (ProtectionStones.toggleList.contains(p.getUniqueId()))
+            return;
 
         // check if player can place block in that area
         if (!WorldGuardPlugin.inst().createProtectionQuery().testBlockPlace(p, b.getLocation(), b.getType())) {
@@ -112,7 +135,10 @@ public class BlockHandler {
 
         // check if it is in a WorldGuard region
         RegionManager rgm = WGUtils.getRegionManagerWithPlayer(p);
-        if (!blockOptions.allowPlacingInWild && rgm.getApplicableRegions(BlockVector3.at(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ())).size() == 0) {
+        if (!blockOptions.allowPlacingInWild && rgm
+                .getApplicableRegions(
+                        BlockVector3.at(b.getLocation().getX(), b.getLocation().getY(), b.getLocation().getZ()))
+                .size() == 0) {
             PSL.msg(p, PSL.MUST_BE_PLACED_IN_EXISTING_REGION.msg());
             e.setCancelled(true);
             return;
@@ -155,7 +181,8 @@ public class BlockHandler {
             // check if in world blacklist or not in world whitelist
             boolean containsWorld = blockOptions.worlds.contains(p.getLocation().getWorld().getName());
 
-            if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist")) || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
+            if ((containsWorld && blockOptions.worldListType.equalsIgnoreCase("blacklist"))
+                    || (!containsWorld && blockOptions.worldListType.equalsIgnoreCase("whitelist"))) {
                 if (blockOptions.preventBlockPlaceInRestrictedWorld) {
                     PSL.msg(p, PSL.WORLD_DENIED_CREATE.msg());
                     return false;
@@ -167,21 +194,24 @@ public class BlockHandler {
         } // end of non-admin checks
 
         // check if player has enough money
-        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0 && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
+        if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0
+                && !ProtectionStones.getInstance().getVaultEconomy().has(p, blockOptions.costToPlace)) {
             PSL.msg(p, PSL.NOT_ENOUGH_MONEY.msg().replace("%price%", String.format("%.2f", blockOptions.costToPlace)));
             return false;
         }
 
         // debug message
         if (!ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-            ProtectionStones.getPluginLogger().info("Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
+            ProtectionStones.getPluginLogger().info(
+                    "Vault is not enabled but there is a price set on the protection stone placement! It will not work!");
         }
 
         if (createActualRegion(p, l, blockOptions)) { // region creation successful
 
             // take money
             if (ProtectionStones.getInstance().isVaultSupportEnabled() && blockOptions.costToPlace != 0) {
-                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p, blockOptions.costToPlace);
+                EconomyResponse er = ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(p,
+                        blockOptions.costToPlace);
                 if (!er.transactionSuccess()) {
                     PSL.msg(p, er.errorMessage);
                     return true;
@@ -205,7 +235,8 @@ public class BlockHandler {
 
         String id = WGUtils.createPSID(bx, by, bz);
 
-        // if the region's id already exists, possibly placing block where a region is hidden
+        // if the region's id already exists, possibly placing block where a region is
+        // hidden
         if (rm.hasRegion(id)) {
             PSL.msg(p, PSL.REGION_ALREADY_IN_LOCATION_IS_HIDDEN.msg());
             return false;
@@ -226,7 +257,8 @@ public class BlockHandler {
         rm.addRegion(region); // added to the region manager, be careful in implementing checks
 
         // check if new region overlaps more powerful region
-        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner") && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
+        if (!blockOptions.allowOverlapUnownedRegions && !p.hasPermission("protectionstones.superowner")
+                && WGUtils.overlapsStrongerRegion(p.getWorld(), region, lp)) {
             rm.removeRegion(id);
             PSL.msg(p, PSL.REGION_OVERLAP.msg());
             return false;
@@ -242,14 +274,16 @@ public class BlockHandler {
         try {
             region.setFlags(flags);
         } catch (Exception e) {
-            ProtectionStones.getPluginLogger().severe(String.format("Region flags have failed to initialize for: %s (%s)", blockOptions.alias, blockOptions.type));
+            ProtectionStones.getPluginLogger().severe(String.format(
+                    "Region flags have failed to initialize for: %s (%s)", blockOptions.alias, blockOptions.type));
             throw e;
         }
         FlagHandler.initCustomFlagsForPS(region, l, blockOptions);
 
         // check for player's number of adjacent region groups
         if (ProtectionStones.getInstance().getConfigOptions().regionsMustBeAdjacent) {
-            if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0 && !p.hasPermission("protectionstones.admin")) {
+            if (MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1) >= 0
+                    && !p.hasPermission("protectionstones.admin")) {
                 HashMap<String, ArrayList<String>> adjGroups = WGUtils.getPlayerAdjacentRegionGroups(p, rm);
 
                 int permNum = MiscUtil.getPermissionNumber(p, "protectionstones.adjacent.", 1);
@@ -284,9 +318,11 @@ public class BlockHandler {
         }
 
         // show merge menu
-        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging && p.hasPermission("protectionstones.merge")) {
+        if (ProtectionStones.getInstance().getConfigOptions().allowMergingRegions && blockOptions.allowMerging
+                && p.hasPermission("protectionstones.merge")) {
             PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
-            if (r != null) playerMergeTask(p, r);
+            if (r != null)
+                playerMergeTask(p, r);
         }
 
         return true;
@@ -314,10 +350,12 @@ public class BlockHandler {
                 PSRegion finalMergeTo = mergeTo;
                 Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
                     try {
-                        WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo, Arrays.asList(finalMergeTo, r));
+                        WGMerge.mergeRealRegions(p.getWorld(), r.getWGRegionManager(), finalMergeTo,
+                                Arrays.asList(finalMergeTo, r));
                         PSL.msg(p, PSL.MERGE_AUTO_MERGED.msg().replace("%region%", finalMergeTo.getId()));
                     } catch (WGMerge.RegionHoleException e) {
-                        PSL.msg(p, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI is true
+                        PSL.msg(p, PSL.NO_REGION_HOLES.msg()); // TODO github issue #120, prevent holes even if showGUI
+                                                               // is true
                     } catch (WGMerge.RegionCannotMergeWhileRentedException e) {
                         // don't need to tell player that you can't merge
                     }
@@ -332,7 +370,8 @@ public class BlockHandler {
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
                 PSL.msg(p, PSL.MERGE_INTO.msg());
                 PSL.msg(p, PSL.MERGE_HEADER.msg().replace("%region%", r.getId()));
-                for (TextComponent t : tc) p.spigot().sendMessage(t);
+                for (TextComponent t : tc)
+                    p.spigot().sendMessage(t);
                 p.sendMessage(ChatColor.WHITE + ""); // send empty line
             }
         }

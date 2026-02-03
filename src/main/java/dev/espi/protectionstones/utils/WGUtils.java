@@ -37,7 +37,8 @@ import java.util.*;
 
 public class WGUtils {
 
-    // Integer.MAX_VALUE/MIN_VALUE causes strange issues with WG not detecting players in regions,
+    // Integer.MAX_VALUE/MIN_VALUE causes strange issues with WG not detecting
+    // players in regions,
     // so we use the 16 bit limit, which is more than enough.
     public static final int MAX_BUILD_HEIGHT = Short.MAX_VALUE;
     public static final int MIN_BUILD_HEIGHT = Short.MIN_VALUE;
@@ -58,13 +59,15 @@ public class WGUtils {
      */
 
     public static RegionManager getRegionManagerWithWorld(World w) {
-        if (w == null) return null;
+        if (w == null)
+            return null;
         return WorldGuard.getInstance().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(w));
     }
 
     /**
      * Get all region managers for all worlds.
-     * Use this instead of looping worlds manually because some worlds may not have a region manager.
+     * Use this instead of looping worlds manually because some worlds may not have
+     * a region manager.
      *
      * @return returns all region managers from all worlds
      */
@@ -73,7 +76,8 @@ public class WGUtils {
         HashMap<World, RegionManager> m = new HashMap<>();
         for (World w : Bukkit.getWorlds()) {
             RegionManager rgm = getRegionManagerWithWorld(w);
-            if (rgm != null) m.put(w, rgm);
+            if (rgm != null)
+                m.put(w, rgm);
         }
         return m;
     }
@@ -88,13 +92,20 @@ public class WGUtils {
 
     /**
      * Find regions that are overlapping or adjacent to the region given.
+     * 
      * @param r
      * @param rgm
      * @param w
      * @return the list of regions
      */
     public static Set<ProtectedRegion> findOverlapOrAdjacentRegions(ProtectedRegion r, RegionManager rgm, World w) {
-        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(rgm.getApplicableRegions(r).getRegions()); // we need to ensure addAll is implemented
+        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(rgm.getApplicableRegions(r).getRegions()); // we
+                                                                                                               // need
+                                                                                                               // to
+                                                                                                               // ensure
+                                                                                                               // addAll
+                                                                                                               // is
+                                                                                                               // implemented
 
         // find adjacent regions (not overlapping, but bordering)
         for (var edgeRegion : getTransientEdgeRegions(w, r)) {
@@ -102,11 +113,14 @@ public class WGUtils {
         }
 
         // HACK: WORKAROUND FOR BUG
-        // We have a major issue with detecting adjacent regions when the other regions are PSGroupRegion (the one adjacent
+        // We have a major issue with detecting adjacent regions when the other regions
+        // are PSGroupRegion (the one adjacent
         // to the current one), which is likely a WorldGuard bug?
         //
-        // If you create an adjacent region south or east of the region, it seems that it doesn't detect the adjacent edge
-        // overlap, you need to increase the edge by one more block for the north and west (2 blocks from region edge).
+        // If you create an adjacent region south or east of the region, it seems that
+        // it doesn't detect the adjacent edge
+        // overlap, you need to increase the edge by one more block for the north and
+        // west (2 blocks from region edge).
         for (var edgeRegion : getTransientEdgeRegionsHelper(w, r, true)) {
             for (var region : rgm.getApplicableRegions(edgeRegion).getRegions()) {
                 PSRegion psr = PSRegion.fromWGRegion(w, region);
@@ -121,13 +135,21 @@ public class WGUtils {
 
     /**
      * Find regions that are overlapping or adjacent to the region given.
+     * 
      * @param r
      * @param regionsToCheck
      * @param w
      * @return the list of regions
      */
-    public static Set<ProtectedRegion> findOverlapOrAdjacentRegions(ProtectedRegion r, List<ProtectedRegion> regionsToCheck, World w) {
-        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(r.getIntersectingRegions(regionsToCheck)); // we need to ensure addAll is implemented
+    public static Set<ProtectedRegion> findOverlapOrAdjacentRegions(ProtectedRegion r,
+            List<ProtectedRegion> regionsToCheck, World w) {
+        HashSet<ProtectedRegion> overlappingRegions = new HashSet<>(r.getIntersectingRegions(regionsToCheck)); // we
+                                                                                                               // need
+                                                                                                               // to
+                                                                                                               // ensure
+                                                                                                               // addAll
+                                                                                                               // is
+                                                                                                               // implemented
 
         // find adjacent regions (not overlapping, but bordering)
         for (var edgeRegion : getTransientEdgeRegions(w, r)) {
@@ -135,11 +157,14 @@ public class WGUtils {
         }
 
         // HACK: WORKAROUND FOR BUG
-        // We have a major issue with detecting adjacent regions when the other regions are PSGroupRegion (the one adjacent
+        // We have a major issue with detecting adjacent regions when the other regions
+        // are PSGroupRegion (the one adjacent
         // to the current one), which is likely a WorldGuard bug?
         //
-        // If you create an adjacent region south or east of the region, it seems that it doesn't detect the adjacent edge
-        // overlap, you need to increase the edge by one more block for the north and west (2 blocks from region edge).
+        // If you create an adjacent region south or east of the region, it seems that
+        // it doesn't detect the adjacent edge
+        // overlap, you need to increase the edge by one more block for the north and
+        // west (2 blocks from region edge).
         for (var edgeRegion : getTransientEdgeRegionsHelper(w, r, true)) {
             for (var region : edgeRegion.getIntersectingRegions(regionsToCheck)) {
                 PSRegion psr = PSRegion.fromWGRegion(w, region);
@@ -153,7 +178,9 @@ public class WGUtils {
     }
 
     /**
-     * Find the list of regions that border `r` (adjacent to the edge), but do not include the corners.
+     * Find the list of regions that border `r` (adjacent to the edge), but do not
+     * include the corners.
+     * 
      * @param r region
      * @return the list of regions
      */
@@ -161,16 +188,19 @@ public class WGUtils {
         return getTransientEdgeRegionsHelper(w, r, false);
     }
 
-    private static List<ProtectedRegion> getTransientEdgeRegionsHelper(World w, ProtectedRegion r, boolean oneBlockAdjustHack) {
+    private static List<ProtectedRegion> getTransientEdgeRegionsHelper(World w, ProtectedRegion r,
+            boolean oneBlockAdjustHack) {
         ArrayList<ProtectedRegion> toReturn = new ArrayList<>();
 
         PSRegion psr = PSRegion.fromWGRegion(w, r);
 
-        // note that PSGroupRegion is a subclass of PSStandardRegion, so we need PSGroupRegion check first
+        // note that PSGroupRegion is a subclass of PSStandardRegion, so we need
+        // PSGroupRegion check first
         if (r instanceof ProtectedPolygonalRegion && psr instanceof PSGroupRegion) {
             PSGroupRegion psgr = (PSGroupRegion) PSRegion.fromWGRegion(w, r);
             for (PSMergedRegion psmr : psgr.getMergedRegions()) {
-                var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(), WGUtils.parsePSRegionToLocation(psmr.getId()));
+                var testRegion = getDefaultProtectedRegion(psmr.getTypeOptions(),
+                        WGUtils.parsePSRegionToLocation(psmr.getId()));
                 toReturn.addAll(getTransientEdgeRegionsHelper(w, testRegion, oneBlockAdjustHack));
             }
         } else if (r instanceof ProtectedCuboidRegion || (psr instanceof PSStandardRegion)) {
@@ -179,18 +209,21 @@ public class WGUtils {
                     maxY = maxPoint.getY(), minZ = minPoint.getZ(), maxZ = maxPoint.getZ();
 
             toReturn = new ArrayList<>(
-                Arrays.asList(
-                    new ProtectedCuboidRegion(r.getId() + "-edge-0", true, BlockVector3.at(minX, minY - 1, minZ), BlockVector3.at(maxX, maxY + 1, maxZ)),
-                    new ProtectedCuboidRegion(r.getId() + "-edge-1", true, BlockVector3.at(minX - 1, minY, minZ), BlockVector3.at(maxX + 1, maxY, maxZ)),
-                    new ProtectedCuboidRegion(r.getId() + "-edge-2", true, BlockVector3.at(minX, minY, minZ - 1), BlockVector3.at(maxX, maxY, maxZ + 1))
-                )
-            );
+                    Arrays.asList(
+                            new ProtectedCuboidRegion(r.getId() + "-edge-0", true,
+                                    BlockVector3.at(minX, minY - 1, minZ), BlockVector3.at(maxX, maxY + 1, maxZ)),
+                            new ProtectedCuboidRegion(r.getId() + "-edge-1", true,
+                                    BlockVector3.at(minX - 1, minY, minZ), BlockVector3.at(maxX + 1, maxY, maxZ)),
+                            new ProtectedCuboidRegion(r.getId() + "-edge-2", true,
+                                    BlockVector3.at(minX, minY, minZ - 1), BlockVector3.at(maxX, maxY, maxZ + 1))));
 
             if (oneBlockAdjustHack) {
                 // one block extra in the north
-                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-3", true, BlockVector3.at(minX, minY, minZ - 2), BlockVector3.at(maxX, maxY, maxZ)));
+                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-3", true,
+                        BlockVector3.at(minX, minY, minZ - 2), BlockVector3.at(maxX, maxY, maxZ)));
                 // one block extra in the west
-                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-4", true, BlockVector3.at(minX - 2, minY, minZ), BlockVector3.at(maxX, maxY, maxZ)));
+                toReturn.add(new ProtectedCuboidRegion(r.getId() + "-edge-4", true,
+                        BlockVector3.at(minX - 2, minY, minZ), BlockVector3.at(maxX, maxY, maxZ)));
             }
         }
 
@@ -205,7 +238,8 @@ public class WGUtils {
 
         // loop through all regions to check for "none" option
         for (ProtectedRegion rg : rp.getRegions()) {
-            if (rg.getId().equals(r.getId())) continue;
+            if (rg.getId().equals(r.getId()))
+                continue;
 
             if (ProtectionStones.isPSRegion(rg)) {
                 PSRegion psr = PSRegion.fromWGRegion(w, rg);
@@ -220,8 +254,10 @@ public class WGUtils {
         if (rgm.overlapsUnownedRegion(r, lp)) { // check if the lp is not owner of a intersecting region
             for (ProtectedRegion rg : rp) {
                 // ignore itself it has already has been added to the rgm
-                if (rg.getId().equals(r.getId())) continue;
-                if (rg.isOwner(lp)) continue;
+                if (rg.getId().equals(r.getId()))
+                    continue;
+                if (rg.isOwner(lp))
+                    continue;
 
                 if (rg.getPriority() > r.getPriority()) { // if protection priority < overlap priority
                     return true;
@@ -232,7 +268,8 @@ public class WGUtils {
                     PSRegion pr = PSRegion.fromWGRegion(w, rg);
 
                     // don't need to check for owner, since all of these are unowned regions.
-                    if (pr.isMember(lp.getUniqueId()) && pr.getTypeOptions().allowOtherRegionsToOverlap.equals("member")) {
+                    if (pr.isMember(lp.getUniqueId())
+                            && pr.getTypeOptions().allowOtherRegionsToOverlap.equals("member")) {
                         // if members are allowed to overlap this region
                         continue;
                     }
@@ -242,7 +279,8 @@ public class WGUtils {
                     }
                     // otherwise, this region is not allowed to be overlapped
                     return true;
-                } else if (rg.getPriority() >= r.getPriority()) { // if the priorities are the same for plain WorldGuard regions, prevent overlap
+                } else if (rg.getPriority() >= r.getPriority()) { // if the priorities are the same for plain WorldGuard
+                                                                  // regions, prevent overlap
                     return true;
                 }
             }
@@ -255,6 +293,8 @@ public class WGUtils {
         BlockVector3 v = BlockVector3.at(l.getX(), l.getY(), l.getZ());
         String currentPSID = "";
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        if (rgm == null)
+            return currentPSID; // world not supported by WorldGuard
         List<String> idList = rgm.getApplicableRegionsIDs(v);
         if (idList.size() == 1) { // if the location is only in one region
             if (ProtectionStones.isPSRegionFormat(rgm.getRegion(idList.get(0)))) {
@@ -290,17 +330,20 @@ public class WGUtils {
         --chunkRadius; // this becomes chunk offset from centre chunk, not radius
         long chunkX = (long) Math.floor(bx / 16);
         long chunkZ = (long) Math.floor(bz / 16);
-        return BlockVector3.at((chunkX - chunkRadius) * 16, (yRadius == -1) ? MIN_BUILD_HEIGHT : by - yRadius, (chunkZ - chunkRadius) * 16);
+        return BlockVector3.at((chunkX - chunkRadius) * 16, (yRadius == -1) ? MIN_BUILD_HEIGHT : by - yRadius,
+                (chunkZ - chunkRadius) * 16);
     }
 
     public static BlockVector3 getMaxChunkVector(double bx, double by, double bz, long chunkRadius, long yRadius) {
         --chunkRadius; // this becomes chunk offset from centre chunk, not radius
         long chunkX = (long) Math.floor(bx / 16);
         long chunkZ = (long) Math.floor(bz / 16);
-        return BlockVector3.at((chunkX + chunkRadius) * 16 + 15, (yRadius == -1) ? MAX_BUILD_HEIGHT : by + yRadius, (chunkZ + chunkRadius) * 16 + 15);
+        return BlockVector3.at((chunkX + chunkRadius) * 16 + 15, (yRadius == -1) ? MAX_BUILD_HEIGHT : by + yRadius,
+                (chunkZ + chunkRadius) * 16 + 15);
     }
 
-    // create PS ids without making the numbers have scientific notation (addressed with long)
+    // create PS ids without making the numbers have scientific notation (addressed
+    // with long)
     public static String createPSID(double bx, double by, double bz) {
         return "ps" + (long) bx + "x" + (long) by + "y" + (long) bz + "z";
     }
@@ -310,8 +353,10 @@ public class WGUtils {
     }
 
     public static boolean hasNoAccess(ProtectedRegion region, Player p, LocalPlayer lp, boolean canBeMember) {
-        if (region == null) return true;
-        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp) && (!canBeMember || !region.isMember(lp));
+        if (region == null)
+            return true;
+        return !p.hasPermission("protectionstones.superowner") && !region.isOwner(lp)
+                && (!canBeMember || !region.isMember(lp));
     }
 
     // get the overlapping sets of groups of regions a player owns
@@ -323,19 +368,23 @@ public class WGUtils {
         HashMap<String, ArrayList<String>> groupToIDs = new HashMap<>();
 
         for (PSRegion r : pRegions) {
-            Set<ProtectedRegion> overlapping = findOverlapOrAdjacentRegions(r.getWGRegion(), r.getWGRegionManager(), r.getWorld());
+            Set<ProtectedRegion> overlapping = findOverlapOrAdjacentRegions(r.getWGRegion(), r.getWGRegionManager(),
+                    r.getWorld());
 
             // algorithm to find adjacent regions
             String adjacentGroup = idToGroup.get(r.getId());
             for (ProtectedRegion pr : overlapping) {
-                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p)) && !pr.getId().equals(r.getId())) {
+                if (ProtectionStones.isPSRegion(pr) && pr.isOwner(WorldGuardPlugin.inst().wrapPlayer(p))
+                        && !pr.getId().equals(r.getId())) {
 
                     if (adjacentGroup == null) { // if the region hasn't been found to overlap a region yet
 
                         if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group yet
                             idToGroup.put(pr.getId(), r.getId());
                             idToGroup.put(r.getId(), r.getId());
-                            groupToIDs.put(r.getId(), new ArrayList<>(Arrays.asList(pr.getId(), r.getId()))); // create new group
+                            groupToIDs.put(r.getId(), new ArrayList<>(Arrays.asList(pr.getId(), r.getId()))); // create
+                                                                                                              // new
+                                                                                                              // group
                         } else { // if the overlapped region is part of a group
                             String groupID = idToGroup.get(pr.getId());
                             idToGroup.put(r.getId(), groupID);
@@ -348,7 +397,9 @@ public class WGUtils {
                         if (idToGroup.get(pr.getId()) == null) { // if the overlapped region isn't part of a group
                             idToGroup.put(pr.getId(), adjacentGroup);
                             groupToIDs.get(adjacentGroup).add(pr.getId());
-                        } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)) { // if the overlapped region is part of a group, merge the groups
+                        } else if (!idToGroup.get(pr.getId()).equals(adjacentGroup)) { // if the overlapped region is
+                                                                                       // part of a group, merge the
+                                                                                       // groups
                             String mergeGroupID = idToGroup.get(pr.getId());
                             for (String gid : groupToIDs.get(mergeGroupID)) {
                                 idToGroup.put(gid, adjacentGroup);
@@ -384,8 +435,10 @@ public class WGUtils {
         assert r.getPoints().size() == 4;
         List<Integer> xs = new ArrayList<>(), zs = new ArrayList<>();
         for (BlockVector2 p : r.getPoints()) {
-            if (!xs.contains(p.getX())) xs.add(p.getX());
-            if (!zs.contains(p.getZ())) zs.add(p.getZ());
+            if (!xs.contains(p.getX()))
+                xs.add(p.getX());
+            if (!zs.contains(p.getZ()))
+                zs.add(p.getZ());
         }
 
         List<BlockVector2> points = new ArrayList<>();
@@ -416,21 +469,24 @@ public class WGUtils {
 
     // set a flag on a region, only saving it to db if it is actually a new value
     // prevents unnecessary messages in the console from saves
-    public static <T extends com.sk89q.worldguard.protection.flags.Flag<String>> void setFlagIfNeeded(ProtectedRegion region, T flag, String value) {
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<String>> void setFlagIfNeeded(
+            ProtectedRegion region, T flag, String value) {
         String curValue = region.getFlag(flag);
         if ((curValue == null && value == null) || (curValue != null && !curValue.equals(value))) {
             region.setFlag(flag, value);
         }
     }
 
-    public static <T extends com.sk89q.worldguard.protection.flags.Flag<Set<V>>, V> void setFlagIfNeeded(ProtectedRegion region, T flag, Set<V> value) {
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<Set<V>>, V> void setFlagIfNeeded(
+            ProtectedRegion region, T flag, Set<V> value) {
         Set<V> curValue = region.getFlag(flag);
         if (!checkCollectionEquality(curValue, value)) {
             region.setFlag(flag, value);
         }
     }
 
-    public static <T extends com.sk89q.worldguard.protection.flags.Flag<List<V>>, V> void setFlagIfNeeded(ProtectedRegion region, T flag, List<V> value) {
+    public static <T extends com.sk89q.worldguard.protection.flags.Flag<List<V>>, V> void setFlagIfNeeded(
+            ProtectedRegion region, T flag, List<V> value) {
         List<V> curValue = region.getFlag(flag);
         if (!checkCollectionEquality(curValue, value)) {
             region.setFlag(flag, value);

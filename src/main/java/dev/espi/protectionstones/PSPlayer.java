@@ -92,6 +92,7 @@ public class PSPlayer {
 
     /**
      * Get the wrapped player's uuid.
+     * 
      * @return the uuid
      */
 
@@ -107,7 +108,8 @@ public class PSPlayer {
      */
 
     public Player getPlayer() {
-        if (p == null) return Bukkit.getPlayer(uuid);
+        if (p == null)
+            return Bukkit.getPlayer(uuid);
         return p;
     }
 
@@ -120,7 +122,8 @@ public class PSPlayer {
      */
 
     public OfflinePlayer getOfflinePlayer() {
-        if (p == null) return Bukkit.getOfflinePlayer(uuid);
+        if (p == null)
+            return Bukkit.getOfflinePlayer(uuid);
         return p;
     }
 
@@ -137,7 +140,8 @@ public class PSPlayer {
      */
 
     public boolean hasAmount(double amount) {
-        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return false;
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled())
+            return false;
         return ProtectionStones.getInstance().getVaultEconomy().has(getOfflinePlayer(), amount);
     }
 
@@ -149,7 +153,8 @@ public class PSPlayer {
      */
 
     public double getBalance() {
-        if (!ProtectionStones.getInstance().isVaultSupportEnabled()) return 0;
+        if (!ProtectionStones.getInstance().isVaultSupportEnabled())
+            return 0;
         return ProtectionStones.getInstance().getVaultEconomy().getBalance(getOfflinePlayer());
     }
 
@@ -162,7 +167,8 @@ public class PSPlayer {
      */
 
     public EconomyResponse depositBalance(double amount) {
-        if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
+        if (ProtectionStones.getInstance().getVaultEconomy() == null)
+            return null;
         return ProtectionStones.getInstance().getVaultEconomy().depositPlayer(getOfflinePlayer(), amount);
     }
 
@@ -175,7 +181,8 @@ public class PSPlayer {
      */
 
     public EconomyResponse withdrawBalance(double amount) {
-        if (ProtectionStones.getInstance().getVaultEconomy() == null) return null;
+        if (ProtectionStones.getInstance().getVaultEconomy() == null)
+            return null;
         return ProtectionStones.getInstance().getVaultEconomy().withdrawPlayer(getOfflinePlayer(), amount);
     }
 
@@ -192,14 +199,20 @@ public class PSPlayer {
         payee.depositBalance(amount);
     }
 
-    static class CannotAccessOfflinePlayerPermissionsException extends RuntimeException {}
+    static class CannotAccessOfflinePlayerPermissionsException extends RuntimeException {
+    }
 
     /**
-     * Get a player's permission limits for each protection block (protectionstones.limit.alias.x)
-     * Protection blocks that aren't specified in the player's permissions will not be returned in the map.
-     * If LuckPerms support isn't enabled and the player is not online, then the method will throw a CannotAccessOfflinePlayerPermissionsException.
+     * Get a player's permission limits for each protection block
+     * (protectionstones.limit.alias.x)
+     * Protection blocks that aren't specified in the player's permissions will not
+     * be returned in the map.
+     * If LuckPerms support isn't enabled and the player is not online, then the
+     * method will throw a CannotAccessOfflinePlayerPermissionsException.
      *
-     * @return a hashmap containing a psprotectblock object to an integer, which is the number of protection regions of that type the player is allowed to place
+     * @return a hashmap containing a psprotectblock object to an integer, which is
+     *         the number of protection regions of that type the player is allowed
+     *         to place
      */
 
     public HashMap<PSProtectBlock, Integer> getRegionLimits() {
@@ -208,11 +221,14 @@ public class PSPlayer {
         List<String> permissions;
 
         if (getPlayer() != null) {
-            permissions = getPlayer().getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList());
+            permissions = getPlayer().getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission)
+                    .collect(Collectors.toList());
         } else if (getOfflinePlayer().getPlayer() != null) {
-            permissions = getOfflinePlayer().getPlayer().getEffectivePermissions().stream().map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList());
+            permissions = getOfflinePlayer().getPlayer().getEffectivePermissions().stream()
+                    .map(PermissionAttachmentInfo::getPermission).collect(Collectors.toList());
         } else if (ProtectionStones.getInstance().isLuckPermsSupportEnabled()) {
-            // use luckperms to obtain all of an offline player's permissions (vault and spigot api are unable to do this)
+            // use luckperms to obtain all of an offline player's permissions (vault and
+            // spigot api are unable to do this)
             try {
                 permissions = MiscUtil.getLuckPermsUserPermissions(getUuid());
             } catch (InterruptedException | ExecutionException e) {
@@ -228,10 +244,14 @@ public class PSPlayer {
                 String[] spl = perm.split("\\.");
 
                 if (spl.length == 4 && ProtectionStones.getProtectBlockFromAlias(spl[2]) != null) {
-                    PSProtectBlock block = ProtectionStones.getProtectBlockFromAlias(spl[2]);
-                    int limit = Integer.parseInt(spl[3]);
-                    if (regionLimits.get(block) == null || regionLimits.get(block) < limit) { // only use max limit
-                        regionLimits.put(block, limit);
+                    try {
+                        PSProtectBlock block = ProtectionStones.getProtectBlockFromAlias(spl[2]);
+                        int limit = Integer.parseInt(spl[3]);
+                        if (regionLimits.get(block) == null || regionLimits.get(block) < limit) { // only use max limit
+                            regionLimits.put(block, limit);
+                        }
+                    } catch (NumberFormatException ignored) {
+                        // skip invalid limit permissions like "protectionstones.limit.alias.*"
                     }
                 }
             }
@@ -240,17 +260,21 @@ public class PSPlayer {
     }
 
     /**
-     * Get a player's total protection limit from permission (protectionstones.limit.x)
-     * If there is no attached Player object to this PSPlayer, and LuckPerms is not enabled, this throws a CannotAccessOfflinePlayerPermissionsException.
+     * Get a player's total protection limit from permission
+     * (protectionstones.limit.x)
+     * If there is no attached Player object to this PSPlayer, and LuckPerms is not
+     * enabled, this throws a CannotAccessOfflinePlayerPermissionsException.
      *
-     * @return the number of protection regions the player can have, or -1 if there is no limit set.
+     * @return the number of protection regions the player can have, or -1 if there
+     *         is no limit set.
      */
 
     public int getGlobalRegionLimits() {
         if (getPlayer() != null) {
             return MiscUtil.getPermissionNumber(getPlayer(), "protectionstones.limit.", -1);
         } else if (ProtectionStones.getInstance().isLuckPermsSupportEnabled()) {
-            // use LuckPerms to obtain all of an offline player's permissions (vault and spigot api are unable to do this)
+            // use LuckPerms to obtain all of an offline player's permissions (vault and
+            // spigot api are unable to do this)
             try {
                 List<String> permissions = MiscUtil.getLuckPermsUserPermissions(getUuid());
                 return MiscUtil.getPermissionNumber(permissions, "protectionstones.limit.", -1);
@@ -265,7 +289,8 @@ public class PSPlayer {
 
     /**
      * Get the list of regions that a player can pay money for taxes to.
-     * Note: this should be run asynchronously, as it can be very slow with large amounts of regions.
+     * Note: this should be run asynchronously, as it can be very slow with large
+     * amounts of regions.
      *
      * @return the regions that the player owes tax money to
      */
@@ -278,7 +303,8 @@ public class PSPlayer {
             for (ProtectedRegion r : rgm.getRegions().values()) {
                 PSRegion psr = PSRegion.fromWGRegion(w, r);
 
-                if (psr != null && psr.isOwner(getUuid()) && psr.getTypeOptions() != null && psr.getTypeOptions().taxPeriod != -1) {
+                if (psr != null && psr.isOwner(getUuid()) && psr.getTypeOptions() != null
+                        && psr.getTypeOptions().taxPeriod != -1) {
                     ret.add(psr);
                 }
             }
@@ -287,17 +313,21 @@ public class PSPlayer {
     }
 
     /**
-     * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
+     * Get the list of regions that a player owns, or is a member of. It is
+     * recommended to run this asynchronously
      * since the query can be slow.
      *
      * @param w           world to search for regions in
-     * @param canBeMember whether or not to add regions where the player is a member, not owner
-     * @return list of regions that the player owns (or is a part of if canBeMember is true)
+     * @param canBeMember whether or not to add regions where the player is a
+     *                    member, not owner
+     * @return list of regions that the player owns (or is a part of if canBeMember
+     *         is true)
      */
 
     public List<PSRegion> getPSRegions(World w, boolean canBeMember) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        if (rgm == null) return new ArrayList<>();
+        if (rgm == null)
+            return new ArrayList<>();
 
         return rgm.getRegions().values().stream()
                 .filter(ProtectionStones::isPSRegion)
@@ -307,24 +337,31 @@ public class PSPlayer {
     }
 
     /**
-     * Get the list of regions that a player owns, or is a member of. It is recommended to run this asynchronously
+     * Get the list of regions that a player owns, or is a member of. It is
+     * recommended to run this asynchronously
      * since the query can be slow.
      *
-     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
+     * Note: Regions that the player owns that are named will be cross-world,
+     * otherwise this only searches in one world.
      *
      * @param w           world to search for regions in
-     * @param canBeMember whether or not to add regions where the player is a member, not owner
-     * @return list of regions that the player owns (or is a part of if canBeMember is true)
+     * @param canBeMember whether or not to add regions where the player is a
+     *                    member, not owner
+     * @return list of regions that the player owns (or is a part of if canBeMember
+     *         is true)
      */
 
     public List<PSRegion> getPSRegionsCrossWorld(World w, boolean canBeMember) {
         List<PSRegion> regions = getPSRegions(w, canBeMember);
         // set entry format: "worldName regionId"
-        Set<String> regionIdAdded = regions.stream().map(r -> w.getName() + " " + r.getId()).collect(Collectors.toSet());
+        Set<String> regionIdAdded = regions.stream().map(r -> w.getName() + " " + r.getId())
+                .collect(Collectors.toSet());
 
         // obtain cross-world named worlds
         ProtectionStones.regionNameToID.forEach((rw, rs) -> {
             World world = Bukkit.getWorld(rw);
+            if (world == null)
+                return; // skip unloaded worlds
             RegionManager rm = WGUtils.getRegionManagerWithWorld(world);
             if (rm != null) {
                 rs.values().forEach(rIds -> rIds.forEach(rId -> {
@@ -346,9 +383,11 @@ public class PSPlayer {
     }
 
     /**
-     * Get the list of homes a player owns. It is recommended to run this asynchronously.
+     * Get the list of homes a player owns. It is recommended to run this
+     * asynchronously.
      *
-     * Note: Regions that the player owns that are named will be cross-world, otherwise this only searches in one world.
+     * Note: Regions that the player owns that are named will be cross-world,
+     * otherwise this only searches in one world.
      *
      * @param w world to search for regions in
      * @return list of regions that are the player's homes
