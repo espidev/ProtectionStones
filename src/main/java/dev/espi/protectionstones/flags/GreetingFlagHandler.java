@@ -23,10 +23,9 @@ import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.FlagValueChangeHandler;
 import com.sk89q.worldguard.session.handler.Handler;
 import dev.espi.protectionstones.FlagHandler;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import dev.espi.protectionstones.ProtectionStones;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 // greeting-action flag
 public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
@@ -54,14 +53,9 @@ public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
             ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
         if (currentValue != null && !currentValue.equals(lastValue)
                 && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
-            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
-                    .miniMessage();
-            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
-            String legacy = lcs
-                    .serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(currentValue)));
-            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    new TextComponent(legacy));
+            ProtectionStones.getAdventure().player(Bukkit.getPlayer(localPlayer.getUniqueId()))
+                    .sendActionBar(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                            .deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(currentValue)));
         }
         return true;
     }

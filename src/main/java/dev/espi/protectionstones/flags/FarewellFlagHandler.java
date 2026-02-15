@@ -27,10 +27,8 @@ import com.sk89q.worldguard.session.handler.Handler;
 import dev.espi.protectionstones.FlagHandler;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import dev.espi.protectionstones.ProtectionStones;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 // farewell-action flag
@@ -66,12 +64,9 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
             }
         }
         if (p != null && lastValue != null && !lastValue.equals(currentValue)) {
-            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
-                    .miniMessage();
-            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
-            String legacy = lcs.serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(legacy));
+            ProtectionStones.getAdventure().player(p)
+                    .sendActionBar(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                            .deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
         }
         return true;
     }
@@ -81,12 +76,9 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
             ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
         Player p = Bukkit.getPlayer(localPlayer.getUniqueId());
         if (p != null && lastValue != null) {
-            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
-                    .miniMessage();
-            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
-            String legacy = lcs.serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(legacy));
+            ProtectionStones.getAdventure().player(p)
+                    .sendActionBar(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
+                            .deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
         }
         return true;
     }

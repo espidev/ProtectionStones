@@ -565,7 +565,8 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // add identifier for protection stone created items
-        im.getCustomTagContainer().setCustomTag(new NamespacedKey(plugin, "isPSBlock"), ItemTagType.BYTE, (byte) 1);
+        im.getPersistentDataContainer().set(new NamespacedKey(plugin, "isPSBlock"),
+                org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
 
         is.setItemMeta(im);
 
@@ -635,7 +636,7 @@ public class ProtectionStones extends JavaPlugin {
         try {
             new Metrics(this, 4071);
         } catch (Throwable t) {
-            getLogger().warning("bStats metrics disabled due to error: " + t.getMessage());
+            getLogger().log(java.util.logging.Level.WARNING, "bStats metrics disabled due to error", t);
         }
 
         // load command arguments
