@@ -49,11 +49,14 @@ public abstract class PSRegion {
     // ~~~~~~~~~~~~~~~~~ static ~~~~~~~~~~~~~~~~~
 
     /**
-     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
-     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or {@link PSMergedRegion}.
+     * Get the protection stone region that the location is in, or the closest one
+     * if there are overlapping regions.
+     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or
+     * {@link PSMergedRegion}.
      *
      * @param l the location
-     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     * @return the {@link PSRegion} object if the location is in a region, or null
+     *         if the location is not in a region
      */
     public static PSRegion fromLocation(Location l) {
         PSRegion r = fromLocationUnsafe(l);
@@ -61,21 +64,27 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the protection stone region that the location is in, or the closest one if there are overlapping regions.
-     * May return a region with an unconfigured block type (getTypeOptions returns null).
-     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or {@link PSMergedRegion}.
+     * Get the protection stone region that the location is in, or the closest one
+     * if there are overlapping regions.
+     * May return a region with an unconfigured block type (getTypeOptions returns
+     * null).
+     * Returns either {@link PSGroupRegion}, {@link PSStandardRegion} or
+     * {@link PSMergedRegion}.
      *
      * @param l the location
-     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     * @return the {@link PSRegion} object if the location is in a region, or null
+     *         if the location is not in a region
      */
     public static PSRegion fromLocationUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
-        if (rgm == null) return null;
+        if (rgm == null)
+            return null;
 
         // check exact location first for merged region block
         PSMergedRegion pr = PSMergedRegion.getMergedRegion(l);
-        if (pr != null) return pr;
+        if (pr != null)
+            return pr;
 
         return fromLocationGroupUnsafe(l);
     }
@@ -85,7 +94,8 @@ public abstract class PSRegion {
      * Returns either {@link PSGroupRegion} or {@link PSStandardRegion}.
      *
      * @param l the location
-     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     * @return the {@link PSRegion} object if the location is in a region, or null
+     *         if the location is not in a region
      */
     public static PSRegion fromLocationGroup(Location l) {
         PSRegion r = fromLocationGroupUnsafe(l);
@@ -94,16 +104,19 @@ public abstract class PSRegion {
 
     /**
      * Get the protection stone parent region that the location is in.
-     * May return a region with an unconfigured block type (getTypeOptions returns null).
+     * May return a region with an unconfigured block type (getTypeOptions returns
+     * null).
      * Returns either {@link PSGroupRegion} or {@link PSStandardRegion}.
      *
      * @param l the location
-     * @return the {@link PSRegion} object if the location is in a region, or null if the location is not in a region
+     * @return the {@link PSRegion} object if the location is in a region, or null
+     *         if the location is not in a region
      */
     public static PSRegion fromLocationGroupUnsafe(Location l) {
         checkNotNull(checkNotNull(l).getWorld());
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(l.getWorld());
-        if (rgm == null) return null;
+        if (rgm == null)
+            return null;
 
         // check if location is in a region
         String psID = WGUtils.matchLocationToPSID(l);
@@ -112,7 +125,9 @@ public abstract class PSRegion {
         if (r == null) {
             return null;
         } else if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
-            return new PSGroupRegion(r, rgm, l.getWorld());
+            PSGroupRegion gr = new PSGroupRegion(r, rgm, l.getWorld());
+            PSRegion mr = gr.getMergedRegion(l);
+            return mr != null ? mr : gr;
         } else {
             return new PSStandardRegion(r, rgm, l.getWorld());
         }
@@ -120,14 +135,17 @@ public abstract class PSRegion {
 
     /**
      * Get the protection stone region with the world and region.
-     * It returns a WGRegion with a null type if the block type isn't configured in the config.
+     * It returns a WGRegion with a null type if the block type isn't configured in
+     * the config.
      *
      * @param w the world
      * @param r the WorldGuard region
-     * @return the {@link PSRegion} based on the parameters, or null if the region given is not a protectionstones region
+     * @return the {@link PSRegion} based on the parameters, or null if the region
+     *         given is not a protectionstones region
      */
     public static PSRegion fromWGRegion(World w, ProtectedRegion r) {
-        if (!ProtectionStones.isPSRegionFormat(r)) return null;
+        if (!ProtectionStones.isPSRegionFormat(r))
+            return null;
         if (r.getFlag(FlagHandler.PS_MERGED_REGIONS) != null) {
             return new PSGroupRegion(r, WGUtils.getRegionManagerWithWorld(checkNotNull(w)), w);
         } else {
@@ -136,7 +154,8 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the protection stones regions that have the given name as their set nickname (/ps name)
+     * Get the protection stones regions that have the given name as their set
+     * nickname (/ps name)
      *
      * @param w    the world to look for regions in
      * @param name the nickname of the region
@@ -145,12 +164,14 @@ public abstract class PSRegion {
 
     public static List<PSRegion> fromName(World w, String name) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        if (rgm == null) return new ArrayList<>();
+        if (rgm == null)
+            return new ArrayList<>();
 
         List<PSRegion> l = new ArrayList<>();
 
         List<String> rIds = ProtectionStones.regionNameToID.get(w.getUID()).get(name);
-        if (rIds == null) return l;
+        if (rIds == null)
+            return l;
 
         for (int i = 0; i < rIds.size(); i++) {
             String id = rIds.get(i);
@@ -165,7 +186,8 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the protection stones regions that have the given name as their set nickname (/ps name), from all worlds.
+     * Get the protection stones regions that have the given name as their set
+     * nickname (/ps name), from all worlds.
      *
      * @param name the nickname of the regions
      * @return the map of worlds, to the regions that have the name
@@ -195,13 +217,16 @@ public abstract class PSRegion {
     }
 
     /**
-     * Get the WorldGuard ID of the region. Note that this is not guaranteed to be unique between worlds.
+     * Get the WorldGuard ID of the region. Note that this is not guaranteed to be
+     * unique between worlds.
+     * 
      * @return the id of the region
      */
     public abstract String getId();
 
     /**
      * Get the name (nickname) of the region from /ps name.
+     * 
      * @return the name of the region, or null if the region does not have a name
      */
 
@@ -209,6 +234,7 @@ public abstract class PSRegion {
 
     /**
      * Set the name of the region (from /ps name).
+     * 
      * @param name new name, or null to remove the name
      */
 
@@ -216,14 +242,18 @@ public abstract class PSRegion {
 
     /**
      * Set the parent of this region.
+     * 
      * @param r the region to be the parent, or null for no parent
-     * @throws ProtectedRegion.CircularInheritanceException thrown when the parent already inherits from the child
+     * @throws ProtectedRegion.CircularInheritanceException thrown when the parent
+     *                                                      already inherits from
+     *                                                      the child
      */
 
     public abstract void setParent(PSRegion r) throws ProtectedRegion.CircularInheritanceException;
 
     /**
      * Get the parent of this region, if there is one.
+     * 
      * @return the parent of the region, or null if there isn't one
      */
 
@@ -231,12 +261,14 @@ public abstract class PSRegion {
 
     /**
      * Get the location of the set home the region has (for /ps tp).
+     * 
      * @return the location of the home, or null if the ps_home flag is not set.
      */
     public abstract Location getHome();
 
     /**
      * Set the home of the region (internally changes the flag).
+     * 
      * @param blockX block x location
      * @param blockY block y location
      * @param blockZ block z location
@@ -245,11 +277,12 @@ public abstract class PSRegion {
 
     /**
      * Set the home of the region (internally changes the flag).
+     * 
      * @param blockX block x location
      * @param blockY block y location
      * @param blockZ block z location
-     * @param yaw location yaw
-     * @param pitch location pitch
+     * @param yaw    location yaw
+     * @param pitch  location pitch
      */
     public abstract void setHome(double blockX, double blockY, double blockZ, float yaw, float pitch);
 
@@ -275,6 +308,7 @@ public abstract class PSRegion {
 
     /**
      * Sells the region to a player at the price listed.
+     * 
      * @param player player to transfer the region to
      */
     public abstract void sell(UUID player);
@@ -286,36 +320,42 @@ public abstract class PSRegion {
 
     /**
      * Get the landlord of the region.
+     * 
      * @return returns the UUID of the landlord, or null if there is none.
      */
     public abstract UUID getLandlord();
 
     /**
      * Set the landlord of the region.
+     * 
      * @param landlord uuid of landlord, or null to remove
      */
     public abstract void setLandlord(UUID landlord);
 
     /**
      * Get the tenant of the region.
+     * 
      * @return returns the UUID of the tenant, or null if there is none.
      */
     public abstract UUID getTenant();
 
     /**
      * Set the tenant of the region
+     * 
      * @param tenant uuid of tenant, or null to remove
      */
     public abstract void setTenant(UUID tenant);
 
     /**
      * Get the rent period of the region
+     * 
      * @return returns the rent duration, or null if there is none
      */
     public abstract String getRentPeriod();
 
     /**
      * Set the rent period of the region
+     * 
      * @param s the duration between rent payments (d h m s), or null to remove
      */
     public abstract void setRentPeriod(String s);
@@ -324,7 +364,8 @@ public abstract class PSRegion {
      * Get the price of the region
      * This applies to either the rent or the full purchase of a region.
      *
-     * @return the price of the region during rent payments, or null if there is no rent
+     * @return the price of the region during rent payments, or null if there is no
+     *         rent
      */
     public abstract Double getPrice();
 
@@ -338,12 +379,14 @@ public abstract class PSRegion {
 
     /**
      * Set the unix timestamp of when rent was last paid.
+     * 
      * @param timestamp the unix timestamp of when rent was last paid, or null
      */
     public abstract void setRentLastPaid(Long timestamp);
 
     /**
      * Get the unix timestamp of when rent was last paid.
+     * 
      * @return the unix timestamp of when rent was last paid, or null if not renting
      */
     public abstract Long getRentLastPaid();
@@ -379,7 +422,8 @@ public abstract class PSRegion {
     public static class TaxPayment implements Comparable<TaxPayment> {
         long whenPaymentIsDue;
         double amount;
-        String regionId; // the region that caused the payment (especially applicable for group regions); also used since hashsets don't have duplicates
+        String regionId; // the region that caused the payment (especially applicable for group regions);
+                         // also used since hashsets don't have duplicates
 
         public TaxPayment(long whenPaymentIsDue, double amount, String regionId) {
             this.whenPaymentIsDue = whenPaymentIsDue;
@@ -388,13 +432,16 @@ public abstract class PSRegion {
         }
 
         /**
-         * Convert a flag entry to a tax payment object. The flag entry is in the form "timestamp amount regionId".
+         * Convert a flag entry to a tax payment object. The flag entry is in the form
+         * "timestamp amount regionId".
+         * 
          * @param s the flag value
          * @return the tax payment object, or null if the string was invalid
          */
         public static TaxPayment fromString(String s) {
             String[] arr = s.split(" ");
-            if (arr.length < 3) return null;
+            if (arr.length < 3)
+                return null;
             try {
                 return new TaxPayment(Long.parseLong(arr[0]), Double.parseDouble(arr[1]), arr[2]);
             } catch (NumberFormatException e) {
@@ -404,6 +451,7 @@ public abstract class PSRegion {
 
         /**
          * Converts the tax payment object into its flag representation.
+         * 
          * @return the flag representation of this object
          */
         public String toFlagEntry() {
@@ -450,13 +498,17 @@ public abstract class PSRegion {
         }
 
         /**
-         * Convert a flag entry to a last region tax payment entry object. The flag entry is in the form "regionId timestamp".
+         * Convert a flag entry to a last region tax payment entry object. The flag
+         * entry is in the form "regionId timestamp".
+         * 
          * @param s the flag value
-         * @return the last region tax payment entry object, or null if the string was invalid
+         * @return the last region tax payment entry object, or null if the string was
+         *         invalid
          */
         public static LastRegionTaxPaymentEntry fromString(String s) {
             String[] arr = s.split(" ");
-            if (arr.length < 2) return null;
+            if (arr.length < 2)
+                return null;
             try {
                 return new LastRegionTaxPaymentEntry(arr[0], Long.parseLong(arr[1]));
             } catch (NumberFormatException e) {
@@ -465,7 +517,9 @@ public abstract class PSRegion {
         }
 
         /**
-         * Converts the last region tax payment entry object into its flag representation.
+         * Converts the last region tax payment entry object into its flag
+         * representation.
+         * 
          * @return the flag representation of this object
          */
         public String toFlagEntry() {
@@ -491,6 +545,7 @@ public abstract class PSRegion {
 
     /**
      * Get the tax rate for this region type.
+     * 
      * @return the tax rate
      */
     public double getTaxRate() {
@@ -500,66 +555,83 @@ public abstract class PSRegion {
     /**
      * Get the formatted period(s) between tax payments for this region type.
      * If you simply wanted the number of seconds, use getTypeOptions().taxPeriod
-     * @return the duration between tax payments, or multiple if there are several different ones
+     * 
+     * @return the duration between tax payments, or multiple if there are several
+     *         different ones
      */
     public abstract String getTaxPeriod();
 
     /**
      * Get the formatted period(s) allowed for the payment of tax.
-     * If you simply wanted the number of seconds, use getTypeOptions().taxPaymentTime
-     * @return the duration of time allowed to pay a tax, or multiple if there are several different ones
+     * If you simply wanted the number of seconds, use
+     * getTypeOptions().taxPaymentTime
+     * 
+     * @return the duration of time allowed to pay a tax, or multiple if there are
+     *         several different ones
      */
     public abstract String getTaxPaymentPeriod();
 
     /**
      * Get the list of tax payments that are due.
+     * 
      * @return the list of tax payments outstanding
      */
     public abstract List<TaxPayment> getTaxPaymentsDue();
 
     /**
      * Save the list of tax payments due onto the region.
+     * 
      * @param taxPayments the full list of tax payments that are due
      */
     public abstract void setTaxPaymentsDue(List<TaxPayment> taxPayments);
 
     /**
-     * Get the list of timestamps of the last time regions and sub regions have added to the tax payments list.
-     * @return the list of the last time regions and sub regions have added to the tax payment list
+     * Get the list of timestamps of the last time regions and sub regions have
+     * added to the tax payments list.
+     * 
+     * @return the list of the last time regions and sub regions have added to the
+     *         tax payment list
      */
     public abstract List<LastRegionTaxPaymentEntry> getRegionLastTaxPaymentAddedEntries();
 
     /**
-     * Save the list of timestamps of the last time regions and sub regions have added to the tax payments list on to the base region.
+     * Save the list of timestamps of the last time regions and sub regions have
+     * added to the tax payments list on to the base region.
+     * 
      * @param entries the full list of {@link LastRegionTaxPaymentEntry} entries.
      */
     public abstract void setRegionLastTaxPaymentAddedEntries(List<LastRegionTaxPaymentEntry> entries);
 
     /**
      * Get the player that is set to autopay the tax amount.
+     * 
      * @return the player that is set as the autopayer, or null if no player is set
      */
     public abstract UUID getTaxAutopayer();
 
     /**
      * Set a player to auto-pay taxes for this region.
+     * 
      * @param player the player to use to auto-pay taxes
      */
     public abstract void setTaxAutopayer(UUID player);
 
     /**
      * Pay outstanding taxes.
-     * It will only withdraw the amount required to pay the taxes, and will take up to the amount
+     * It will only withdraw the amount required to pay the taxes, and will take up
+     * to the amount
      * specified if the outstanding payments are larger.
      *
-     * @param p the player to take money from
+     * @param p      the player to take money from
      * @param amount the amount to take
      * @return the {@link EconomyResponse} returned by Vault
      */
     public abstract EconomyResponse payTax(PSPlayer p, double amount);
 
     /**
-     * Check if any tax payments are now late (exceeded tax payment time shown in config).
+     * Check if any tax payments are now late (exceeded tax payment time shown in
+     * config).
+     * 
      * @return whether or not any tax payments are now late
      */
     public abstract boolean isTaxPaymentLate();
@@ -573,6 +645,7 @@ public abstract class PSRegion {
 
     /**
      * Must be run sync (calls Bukkit API)
+     * 
      * @return whether or not the protection block is hidden (/ps hide)
      */
     public boolean isHidden() {
@@ -581,6 +654,7 @@ public abstract class PSRegion {
 
     /**
      * Hides the protection block, if it is not hidden.
+     * 
      * @return whether or not the block was hidden
      */
     public boolean hide() {
@@ -594,6 +668,7 @@ public abstract class PSRegion {
 
     /**
      * Unhides the protection block, if it is hidden.
+     * 
      * @return whether or not the block was unhidden
      */
     public boolean unhide() {
@@ -616,12 +691,15 @@ public abstract class PSRegion {
      * Toggle whether or not the protection block is hidden.
      */
     public void toggleHide() {
-        if (!hide()) unhide();
+        if (!hide())
+            unhide();
     }
 
     /**
-     * This method returns the block that is supposed to contain the protection block.
-     * Warning: If the protection stone is hidden, this will give the block that took its place!
+     * This method returns the block that is supposed to contain the protection
+     * block.
+     * Warning: If the protection stone is hidden, this will give the block that
+     * took its place!
      *
      * @return returns the block that may contain the protection stone
      */
@@ -634,17 +712,20 @@ public abstract class PSRegion {
     public abstract PSProtectBlock getTypeOptions();
 
     /**
-     * @return returns the protect block type (may include custom player heads PLAYER_HEAD:playername) that the region is
+     * @return returns the protect block type (may include custom player heads
+     *         PLAYER_HEAD:playername) that the region is
      */
     public abstract String getType();
 
     /**
      * Change the type of the protection region.
+     * 
      * @param type the type of protection region to switch to
      */
     public void setType(PSProtectBlock type) {
         if (!isHidden()) {
-            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD : Material.matchMaterial(type.type);
+            Material set = Material.matchMaterial(type.type) == null ? Material.PLAYER_HEAD
+                    : Material.matchMaterial(type.type);
             getProtectBlock().setType(set);
             if (type.type.startsWith("PLAYER_HEAD") && type.type.split(":").length > 1) {
                 BlockUtil.setHeadType(type.type, getProtectBlock());
@@ -654,6 +735,7 @@ public abstract class PSRegion {
 
     /**
      * Get whether or not a player is an owner of this region.
+     * 
      * @param uuid the player's uuid
      * @return whether or not the player is a member
      */
@@ -662,6 +744,7 @@ public abstract class PSRegion {
 
     /**
      * Get whether or not a player is a member of this region.
+     * 
      * @param uuid the player's uuid
      * @return whether or not the player is a member
      */
@@ -680,25 +763,30 @@ public abstract class PSRegion {
 
     /**
      * Add an owner to the region.
+     * 
      * @param uuid the uuid of the player to add
      */
     public abstract void addOwner(UUID uuid);
 
     /**
      * Add a member to the region.
+     * 
      * @param uuid the uuid of the player to add
      */
     public abstract void addMember(UUID uuid);
 
     /**
      * Remove an owner of the region, and deal with side-effects.
-     * Examples of side-effects: removing player as landlord, removing player as auto taxpayer
+     * Examples of side-effects: removing player as landlord, removing player as
+     * auto taxpayer
+     * 
      * @param uuid the uuid of the player to remove
      */
     public abstract void removeOwner(UUID uuid);
 
     /**
      * Remove a member of the region, and deal with side-effects
+     * 
      * @param uuid the uuid of the player to remove
      */
     public abstract void removeMember(UUID uuid);
@@ -709,7 +797,8 @@ public abstract class PSRegion {
     public abstract List<BlockVector2> getPoints();
 
     /**
-     * Get a list of regions that the current region can merge into, taking into account a player's permissions.
+     * Get a list of regions that the current region can merge into, taking into
+     * account a player's permissions.
      *
      * @param p the player to compare permissions with
      * @return the list of regions that the current region can merge into
@@ -719,7 +808,8 @@ public abstract class PSRegion {
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
      *
-     * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
+     * @param deleteBlock whether or not to also set the protection block to air (if
+     *                    not hidden)
      * @return whether or not the region was able to be successfully removed
      */
     public abstract boolean deleteRegion(boolean deleteBlock);
@@ -727,7 +817,8 @@ public abstract class PSRegion {
     /**
      * Deletes the region forever. Can be cancelled by event cancellation.
      *
-     * @param deleteBlock whether or not to also set the protection block to air (if not hidden)
+     * @param deleteBlock whether or not to also set the protection block to air (if
+     *                    not hidden)
      * @param cause       the player that caused the region to break
      * @return whether or not the region was able to be successfully removed
      */
@@ -747,8 +838,10 @@ public abstract class PSRegion {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         PSRegion psRegion = (PSRegion) o;
         return Objects.equals(getId(), psRegion.getId()) && Objects.equals(getWorld(), psRegion.getWorld());
     }

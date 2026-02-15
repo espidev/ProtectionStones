@@ -19,6 +19,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.Objs;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -28,8 +29,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Represents a region that exists but is a group of merged {@link PSStandardRegion}s.
- * Contains multiple {@link PSMergedRegion} representing the individual merged regions (which don't technically exist in WorldGuard).
+ * Represents a region that exists but is a group of merged
+ * {@link PSStandardRegion}s.
+ * Contains multiple {@link PSMergedRegion} representing the individual merged
+ * regions (which don't technically exist in WorldGuard).
  */
 
 public class PSGroupRegion extends PSStandardRegion {
@@ -66,12 +69,14 @@ public class PSGroupRegion extends PSStandardRegion {
         long currentTime = System.currentTimeMillis();
 
         List<TaxPayment> payments = Objs.replaceNull(getTaxPaymentsDue(), new ArrayList<>());
-        List<LastRegionTaxPaymentEntry> lastAdded = Objs.replaceNull(getRegionLastTaxPaymentAddedEntries(), new ArrayList<>());
+        List<LastRegionTaxPaymentEntry> lastAdded = Objs.replaceNull(getRegionLastTaxPaymentAddedEntries(),
+                new ArrayList<>());
 
         // loop over merged regions
         for (PSMergedRegion r : getMergedRegions()) {
             // taxes disabled
-            if (getTypeOptions().taxPeriod == -1) continue;
+            if (getTypeOptions().taxPeriod == -1)
+                continue;
 
             boolean found = false;
             for (LastRegionTaxPaymentEntry last : lastAdded) {
@@ -79,8 +84,11 @@ public class PSGroupRegion extends PSStandardRegion {
                 if (last.getRegionId().equals(r.getId())) {
                     found = true;
                     // if it's time to pay
-                    if (last.getLastPaymentAdded() + Duration.ofSeconds(r.getTypeOptions().taxPeriod).toMillis() < currentTime) {
-                        payments.add(new TaxPayment(currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(), r.getTaxRate(), r.getId()));
+                    if (last.getLastPaymentAdded()
+                            + Duration.ofSeconds(r.getTypeOptions().taxPeriod).toMillis() < currentTime) {
+                        payments.add(new TaxPayment(
+                                currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(),
+                                r.getTaxRate(), r.getId()));
                         last.setLastPaymentAdded(currentTime);
                     }
                     break;
@@ -88,7 +96,9 @@ public class PSGroupRegion extends PSStandardRegion {
             }
 
             if (!found) {
-                payments.add(new TaxPayment(currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(), r.getTaxRate(), r.getId()));
+                payments.add(
+                        new TaxPayment(currentTime + Duration.ofSeconds(r.getTypeOptions().taxPaymentTime).toMillis(),
+                                r.getTaxRate(), r.getId()));
                 lastAdded.add(new LastRegionTaxPaymentEntry(r.getId(), currentTime));
             }
         }
@@ -98,13 +108,15 @@ public class PSGroupRegion extends PSStandardRegion {
 
     @Override
     public boolean hide() {
-        for (PSMergedRegion r : getMergedRegions()) r.hide();
+        for (PSMergedRegion r : getMergedRegions())
+            r.hide();
         return true;
     }
 
     @Override
     public boolean unhide() {
-        for (PSMergedRegion r : getMergedRegions()) r.unhide();
+        for (PSMergedRegion r : getMergedRegions())
+            r.unhide();
         return true;
     }
 
@@ -125,18 +137,22 @@ public class PSGroupRegion extends PSStandardRegion {
 
     /**
      * Get the merged region whose ID is the same as the group region ID.
+     * 
      * @return the root region
      */
     public PSMergedRegion getRootRegion() {
         for (PSMergedRegion r : getMergedRegions()) {
-            if (r.getId().equals(getId())) return r;
+            if (r.getId().equals(getId()))
+                return r;
         }
         return null;
     }
 
     /**
      * Check if this region contains a specific merged region
-     * @param id the psID that would've been generated if the merged region was a standard region
+     * 
+     * @param id the psID that would've been generated if the merged region was a
+     *           standard region
      * @return whether or not the id is a merged region
      */
     public boolean hasMergedRegion(String id) {
@@ -145,7 +161,9 @@ public class PSGroupRegion extends PSStandardRegion {
 
     /**
      * Removes the merged region's information from the object.
-     * Note: This DOES NOT remove the actual PSMergedRegion object, you have to call deleteRegion() on that as well.
+     * Note: This DOES NOT remove the actual PSMergedRegion object, you have to call
+     * deleteRegion() on that as well.
+     * 
      * @param id the id of the merged region
      */
     public void removeMergedRegionInfo(String id) {
@@ -166,14 +184,17 @@ public class PSGroupRegion extends PSStandardRegion {
         if (getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED) != null) {
             String entry = "";
             for (String e : getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED)) {
-                if (e.startsWith(id)) entry = e;
+                if (e.startsWith(id))
+                    entry = e;
             }
             getWGRegion().getFlag(FlagHandler.PS_TAX_LAST_PAYMENT_ADDED).remove(entry);
         }
     }
 
     /**
-     * Get the list of {@link PSMergedRegion} objects of the regions that were merged into this region.
+     * Get the list of {@link PSMergedRegion} objects of the regions that were
+     * merged into this region.
+     * 
      * @return the list of regions merged into this region
      */
     public List<PSMergedRegion> getMergedRegions() {
@@ -183,8 +204,11 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     /**
-     * Get the list of {@link PSMergedRegion} objects of the regions that were merged into this region.
-     * Note: This is unsafe as it includes {@link PSMergedRegion}s that are of types not configured in the config.
+     * Get the list of {@link PSMergedRegion} objects of the regions that were
+     * merged into this region.
+     * Note: This is unsafe as it includes {@link PSMergedRegion}s that are of types
+     * not configured in the config.
+     * 
      * @return the list of regions merged into this region
      */
     public List<PSMergedRegion> getMergedRegionsUnsafe() {
@@ -195,5 +219,18 @@ public class PSGroupRegion extends PSStandardRegion {
             l.add(new PSMergedRegion(id, this, getWGRegionManager(), getWorld()));
         }
         return l;
+    }
+
+    public PSMergedRegion getMergedRegion(Location l) {
+        if (l == null)
+            return null;
+        com.sk89q.worldedit.math.BlockVector3 v = com.sk89q.worldedit.math.BlockVector3.at(l.getX(), l.getY(),
+                l.getZ());
+        for (PSMergedRegion r : getMergedRegions()) {
+            if (r.getWGRegion().contains(v)) {
+                return r;
+            }
+        }
+        return null;
     }
 }

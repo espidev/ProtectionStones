@@ -36,6 +36,7 @@ import org.bukkit.entity.Player;
 // farewell-action flag
 public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
     public static final FarewellFlagHandler.Factory FACTORY = new FarewellFlagHandler.Factory();
+
     public static class Factory extends Handler.Factory<FarewellFlagHandler> {
         @Override
         public FarewellFlagHandler create(Session session) {
@@ -53,26 +54,39 @@ public class FarewellFlagHandler extends FlagValueChangeHandler<String> {
     }
 
     @Override
-    protected boolean onSetValue(LocalPlayer localPlayer, Location from, Location to, ApplicableRegionSet toSet, String currentValue, String lastValue, MoveType moveType) {
+    protected boolean onSetValue(LocalPlayer localPlayer, Location from, Location to, ApplicableRegionSet toSet,
+            String currentValue, String lastValue, MoveType moveType) {
         Player p = Bukkit.getPlayer(localPlayer.getUniqueId());
 
-        // the greeting action flag for the other region should show instead if it is set
+        // the greeting action flag for the other region should show instead if it is
+        // set
         for (ProtectedRegion r : toSet.getRegions()) {
             if (r.getFlag(FlagHandler.GREET_ACTION) != null) {
                 return true;
             }
         }
         if (p != null && lastValue != null && !lastValue.equals(currentValue)) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
+                    .miniMessage();
+            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+            String legacy = lcs.serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(legacy));
         }
         return true;
     }
 
     @Override
-    protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
+    protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1,
+            ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
         Player p = Bukkit.getPlayer(localPlayer.getUniqueId());
         if (p != null && lastValue != null) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', lastValue)));
+            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
+                    .miniMessage();
+            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+            String legacy = lcs.serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(lastValue)));
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(legacy));
         }
         return true;
     }

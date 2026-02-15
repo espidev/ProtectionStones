@@ -32,6 +32,7 @@ import org.bukkit.ChatColor;
 public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
 
     public static final Factory FACTORY = new Factory();
+
     public static class Factory extends Handler.Factory<GreetingFlagHandler> {
         @Override
         public GreetingFlagHandler create(Session session) {
@@ -49,15 +50,25 @@ public class GreetingFlagHandler extends FlagValueChangeHandler<String> {
     }
 
     @Override
-    protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
-        if (currentValue != null && !currentValue.equals(lastValue) && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
-            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', currentValue)));
+    protected boolean onSetValue(LocalPlayer localPlayer, Location location, Location location1,
+            ApplicableRegionSet applicableRegionSet, String currentValue, String lastValue, MoveType moveType) {
+        if (currentValue != null && !currentValue.equals(lastValue)
+                && Bukkit.getPlayer(localPlayer.getUniqueId()) != null) {
+            net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
+                    .miniMessage();
+            net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                    .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+            String legacy = lcs
+                    .serialize(mm.deserialize(dev.espi.protectionstones.PSL.legacyToMiniMessage(currentValue)));
+            Bukkit.getPlayer(localPlayer.getUniqueId()).spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new TextComponent(legacy));
         }
         return true;
     }
 
     @Override
-    protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1, ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
+    protected boolean onAbsentValue(LocalPlayer localPlayer, Location location, Location location1,
+            ApplicableRegionSet applicableRegionSet, String lastValue, MoveType moveType) {
         return true;
     }
 }

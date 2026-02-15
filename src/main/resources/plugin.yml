@@ -1,7 +1,8 @@
 name: ProtectionStones
 version: ${version}
 description: ${description}
-authors: [EspiDev]
+authors: [EspiDev 2018 - 2026, jerzean +2026, Dianelito]
+contribuitors: https://github.com/espidev/ProtectionStones/graphs/contributors
 
 depend: [WorldGuard, WorldEdit]
 softdepend: [Vault, PlaceholderAPI, LuckPerms]
