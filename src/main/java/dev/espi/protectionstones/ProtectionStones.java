@@ -52,9 +52,9 @@ import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
- * The base class for the plugin. Some utilities are static, and others are instance methods, so they need to
+ * The base class for the plugin. Some utilities are static, and others are
+ * instance methods, so they need to
  * be accessed through getInstance().
  */
 
@@ -76,7 +76,6 @@ public class ProtectionStones extends JavaPlugin {
     private PSConfig configOptions;
     static HashMap<String, PSProtectBlock> protectionStonesOptions = new HashMap<>();
 
-
     // ps alias to id cache
     // <world-name, <alias, [ids]>>
     static HashMap<UUID, HashMap<String, ArrayList<String>>> regionNameToID = new HashMap<>();
@@ -93,6 +92,15 @@ public class ProtectionStones extends JavaPlugin {
 
     // ps toggle/on/off list
     public static Set<UUID> toggleList = new HashSet<>();
+
+    private static net.kyori.adventure.platform.bukkit.BukkitAudiences adventure;
+
+    public static net.kyori.adventure.platform.bukkit.BukkitAudiences getAdventure() {
+        if (adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return adventure;
+    }
 
     /* ~~~~~~~~~~ Instance methods ~~~~~~~~~~~~ */
 
@@ -164,6 +172,7 @@ public class ProtectionStones extends JavaPlugin {
 
     /**
      * Print a debug message (only prints if the plugin is in debug mode).
+     * 
      * @param msg the message to print
      */
     public void debug(String msg) {
@@ -194,11 +203,11 @@ public class ProtectionStones extends JavaPlugin {
     public List<PSProtectBlock> getConfiguredBlocks() {
         List<PSProtectBlock> l = new ArrayList<>();
         for (PSProtectBlock b : protectionStonesOptions.values()) {
-            if (!l.contains(b)) l.add(b);
+            if (!l.contains(b))
+                l.add(b);
         }
         return l;
     }
-
 
     /* ~~~~~~~~~~ Static methods ~~~~~~~~~~~~~~ */
 
@@ -227,18 +236,21 @@ public class ProtectionStones extends JavaPlugin {
      * Get the protection block config options for the block specified.
      *
      * @param block the block to get the block options of
-     * @return the config options for the protect block specified (null if not found)
+     * @return the config options for the protect block specified (null if not
+     *         found)
      */
 
     public static PSProtectBlock getBlockOptions(Block block) {
-        if (block == null) return null;
+        if (block == null)
+            return null;
         return getBlockOptions(BlockUtil.getProtectBlockType(block));
     }
 
     /**
      * Get the protection block config options for the item specified.
      *
-     * If the options has restrict-obtaining enabled, and the item does not contain the required NBT tag, null will
+     * If the options has restrict-obtaining enabled, and the item does not contain
+     * the required NBT tag, null will
      * be returned.
      *
      * @param item the item to get the block options of
@@ -246,16 +258,20 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getBlockOptions(ItemStack item) {
-        if (!isProtectBlockItem(item)) return null;
+        if (!isProtectBlockItem(item))
+            return null;
         return getBlockOptions(BlockUtil.getProtectBlockType(item));
     }
 
     /**
-     * Gets the config options for the protection block type specified. It is recommended to use the block parameter overloaded
+     * Gets the config options for the protection block type specified. It is
+     * recommended to use the block parameter overloaded
      * method instead if possible, since it deals better with heads.
      *
-     * @param blockType the material type name (Bukkit) of the protect block to get the options for, or "PLAYER_HEAD name" for heads
-     * @return the config options for the protect block specified (null if not found)
+     * @param blockType the material type name (Bukkit) of the protect block to get
+     *                  the options for, or "PLAYER_HEAD name" for heads
+     * @return the config options for the protect block specified (null if not
+     *         found)
      */
     public static PSProtectBlock getBlockOptions(String blockType) {
         return protectionStonesOptions.get(blockType);
@@ -266,10 +282,13 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Get whether or not a material is used as a protection block. It is recommended to use the block
-     * parameter overloaded method if possible since player heads have a different format.
+     * Get whether or not a material is used as a protection block. It is
+     * recommended to use the block
+     * parameter overloaded method if possible since player heads have a different
+     * format.
      *
-     * @param material material type to check (Bukkit material name), or "PLAYER_HEAD name" for heads
+     * @param material material type to check (Bukkit material name), or
+     *                 "PLAYER_HEAD name" for heads
      * @return whether or not that material is being used for a protection block
      */
     public static boolean isProtectBlockType(String material) {
@@ -277,41 +296,52 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Check whether or not a given block is a protection block, and actually protects a region.
+     * Check whether or not a given block is a protection block, and actually
+     * protects a region.
+     * 
      * @param b the block to look at
-     * @return whether or not the block is a protection block responsible for a region.
+     * @return whether or not the block is a protection block responsible for a
+     *         region.
      */
 
     public static boolean isProtectBlock(Block b) {
-        if (!isProtectBlockType(b)) return false;
+        if (!isProtectBlockType(b))
+            return false;
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(b.getWorld());
-        if (rgm == null) return false;
-        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null || PSMergedRegion.getMergedRegion(b.getLocation()) != null;
+        if (rgm == null)
+            return false;
+        return rgm.getRegion(WGUtils.createPSID(b.getLocation())) != null
+                || PSMergedRegion.getMergedRegion(b.getLocation()) != null;
     }
 
     /**
-     * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region, and is configured in the config.
+     * Check if a WorldGuard {@link ProtectedRegion} is a ProtectionStones region,
+     * and is configured in the config.
      *
      * @param r the region to check
-     * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
+     * @return true if the WorldGuard region is a ProtectionStones region, and false
+     *         if it isn't
      */
     public static boolean isPSRegion(ProtectedRegion r) {
         return isPSRegionFormat(r) && getBlockOptions(r.getFlag(FlagHandler.PS_BLOCK_MATERIAL)) != null;
     }
 
     /**
-     * Check if a WorldGuard {@link ProtectedRegion} has the format of a ProtectionStones region, but is not necessarily configured
+     * Check if a WorldGuard {@link ProtectedRegion} has the format of a
+     * ProtectionStones region, but is not necessarily configured
      * in the config.
      *
      * @param r the region to check
-     * @return true if the WorldGuard region is a ProtectionStones region, and false if it isn't
+     * @return true if the WorldGuard region is a ProtectionStones region, and false
+     *         if it isn't
      */
     public static boolean isPSRegionFormat(ProtectedRegion r) {
         return r != null && r.getId().startsWith("ps") && r.getFlag(FlagHandler.PS_BLOCK_MATERIAL) != null;
     }
 
     /**
-     * Check if a ProtectionStones name is already used by a region globally (from /ps name)
+     * Check if a ProtectionStones name is already used by a region globally (from
+     * /ps name)
      *
      * @param name the name to search for
      * @return whether or not there is a region with this name
@@ -322,14 +352,16 @@ public class ProtectionStones extends JavaPlugin {
             RegionManager rgm = WGUtils.getRegionManagerWithWorld(Bukkit.getWorld(worldUid));
 
             List<String> l = regionNameToID.get(worldUid).get(name);
-            if (l == null) continue;
+            if (l == null)
+                continue;
             for (int i = 0; i < l.size(); i++) { // remove outdated cache
                 if (rgm.getRegion(l.get(i)) == null) {
                     l.remove(i);
                     i--;
                 }
             }
-            if (!l.isEmpty()) return true;
+            if (!l.isEmpty())
+                return true;
         }
         return false;
     }
@@ -337,14 +369,17 @@ public class ProtectionStones extends JavaPlugin {
     /**
      * Get protection stone regions using an ID or alias.
      *
-     * @param w          the world to search in (only if it is an id; aliases/names are global)
+     * @param w          the world to search in (only if it is an id; aliases/names
+     *                   are global)
      * @param identifier id or alias of the region
-     * @return a list of psregions that match the id or alias; will be empty if no regions were found
+     * @return a list of psregions that match the id or alias; will be empty if no
+     *         regions were found
      */
 
     public static List<PSRegion> getPSRegions(World w, String identifier) {
         RegionManager rgm = WGUtils.getRegionManagerWithWorld(w);
-        if (rgm == null) return new ArrayList<>();
+        if (rgm == null)
+            return new ArrayList<>();
 
         PSRegion r = PSRegion.fromWGRegion(w, rgm.getRegion(identifier));
         if (r != null) { // return id based query
@@ -357,7 +392,8 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Removes a protection stone region given its ID, and the region manager it is stored in
+     * Removes a protection stone region given its ID, and the region manager it is
+     * stored in
      * Note: Does not remove the PS block.
      *
      * @param w    the world that the region is in
@@ -366,13 +402,16 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID) {
-        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w),
+                checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
         return r != null && r.deleteRegion(false);
     }
 
     /**
-     * Removes a protection stone region given its ID, and the region manager it is stored in, with a player as its cause
-     * Note: Does not remove the PS block, and does not check if the player (cause) has permission to do this.
+     * Removes a protection stone region given its ID, and the region manager it is
+     * stored in, with a player as its cause
+     * Note: Does not remove the PS block, and does not check if the player (cause)
+     * has permission to do this.
      *
      * @param w     the world that the region is in
      * @param psID  the worldguard region ID of the region
@@ -381,7 +420,8 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static boolean removePSRegion(World w, String psID, Player cause) {
-        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w), checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
+        PSRegion r = PSRegion.fromWGRegion(checkNotNull(w),
+                checkNotNull(WGUtils.getRegionManagerWithWorld(w).getRegion(psID)));
         return r != null && r.deleteRegion(false, cause);
     }
 
@@ -393,41 +433,54 @@ public class ProtectionStones extends JavaPlugin {
      */
 
     public static PSProtectBlock getProtectBlockFromAlias(String name) {
-        if (name == null) return null;
+        if (name == null)
+            return null;
         for (PSProtectBlock cpb : ProtectionStones.protectionStonesOptions.values()) {
-            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name)) return cpb;
+            if (cpb.alias.equalsIgnoreCase(name) || cpb.type.equalsIgnoreCase(name))
+                return cpb;
         }
         return null;
     }
 
     /**
-     * Check if an item is a valid protection block, and if checkNBT is true, check if it was created by
-     * ProtectionStones. Be aware that blocks may have restrict-obtaining off, meaning that it is ignored whether or not
+     * Check if an item is a valid protection block, and if checkNBT is true, check
+     * if it was created by
+     * ProtectionStones. Be aware that blocks may have restrict-obtaining off,
+     * meaning that it is ignored whether or not
      * the item is created by ProtectionStones (in this case have checkNBT false).
      *
      * @param item     the item to check
-     * @param checkNBT whether or not to check if the plugin signed off on the item (restrict-obtaining)
-     * @return whether or not the item is a valid protection block item, and was created by protection stones
+     * @param checkNBT whether or not to check if the plugin signed off on the item
+     *                 (restrict-obtaining)
+     * @return whether or not the item is a valid protection block item, and was
+     *         created by protection stones
      */
 
     public static boolean isProtectBlockItem(ItemStack item, boolean checkNBT) {
-        if (item == null) return false;
+        if (item == null)
+            return false;
         // check basic item
-        if (!ProtectionStones.isProtectBlockType(BlockUtil.getProtectBlockType(item))) return false;
+        if (!ProtectionStones.isProtectBlockType(BlockUtil.getProtectBlockType(item)))
+            return false;
         // check for player heads
-        if (!checkNBT) return true; // if not checking nbt, you only need to check type
+        if (!checkNBT)
+            return true; // if not checking nbt, you only need to check type
 
         boolean tag = false;
 
-        // otherwise, check if the item was created by protection stones (stored in custom tag)
+        // otherwise, check if the item was created by protection stones (stored in
+        // custom tag)
         if (item.getItemMeta() != null) {
             CustomItemTagContainer tagContainer = item.getItemMeta().getCustomTagContainer();
             try { // check if tag byte is 1
-                Byte isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
+                Byte isPSBlock = tagContainer
+                        .getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.BYTE);
                 tag = isPSBlock != null && isPSBlock == 1;
             } catch (IllegalArgumentException es) {
-                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 -> 2.0.6)
-                    String isPSBlock = tagContainer.getCustomTag(new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
+                try { // some nbt data may be using a string (legacy nbt from ps version 2.0.0 ->
+                      // 2.0.6)
+                    String isPSBlock = tagContainer.getCustomTag(
+                            new NamespacedKey(ProtectionStones.getInstance(), "isPSBlock"), ItemTagType.STRING);
                     tag = isPSBlock != null && isPSBlock.equals("true");
                 } catch (IllegalArgumentException ignored) {
                 }
@@ -438,18 +491,24 @@ public class ProtectionStones extends JavaPlugin {
     }
 
     /**
-     * Check if an item is a valid protection block, and if the block type has restrict-obtaining on, check if it was
-     * created by ProtectionStones (custom NBT tag). Be aware that blocks may have restrict-obtaining
-     * off, meaning that it ignores whether or not the item is created by ProtectionStones.
+     * Check if an item is a valid protection block, and if the block type has
+     * restrict-obtaining on, check if it was
+     * created by ProtectionStones (custom NBT tag). Be aware that blocks may have
+     * restrict-obtaining
+     * off, meaning that it ignores whether or not the item is created by
+     * ProtectionStones.
      *
-     * @param item     the item to check
-     * @return whether or not the item is a valid protection block item, and was created by protection stones
+     * @param item the item to check
+     * @return whether or not the item is a valid protection block item, and was
+     *         created by protection stones
      */
 
     public static boolean isProtectBlockItem(ItemStack item) {
-        if (item == null) return false;
+        if (item == null)
+            return false;
         PSProtectBlock b = ProtectionStones.getBlockOptions(BlockUtil.getProtectBlockType(item));
-        if (b == null) return false;
+        if (b == null)
+            return false;
         return isProtectBlockItem(item, b.restrictObtaining);
     }
 
@@ -457,7 +516,8 @@ public class ProtectionStones extends JavaPlugin {
      * Get a protection block item from a protect block config object.
      *
      * @param b the config options for the protection block
-     * @return the item with NBT and other metadata to signify that it was created by protection stones
+     * @return the item with NBT and other metadata to signify that it was created
+     *         by protection stones
      */
 
     public static ItemStack createProtectBlockItem(PSProtectBlock b) {
@@ -482,11 +542,17 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // add display name and lore
+        net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage
+                .miniMessage();
+        net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer lcs = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                .builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+
         if (!b.displayName.equals("")) {
-            im.setDisplayName(ChatColor.translateAlternateColorCodes('&', b.displayName));
+            im.setDisplayName(lcs.serialize(mm.deserialize(PSL.legacyToMiniMessage(b.displayName))));
         }
         List<String> lore = new ArrayList<>();
-        for (String s : b.lore) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+        for (String s : b.lore)
+            lore.add(lcs.serialize(mm.deserialize(PSL.legacyToMiniMessage(s))));
         im.setLore(lore);
 
         // hide enchant name (cannot call addUnsafeEnchantment here)
@@ -517,7 +583,8 @@ public class ProtectionStones extends JavaPlugin {
         ArgHelp.initHelpMenu();
 
         // load economy
-        if (ProtectionStones.getInstance().economy != null) ProtectionStones.getInstance().economy.stop();
+        if (ProtectionStones.getInstance().economy != null)
+            ProtectionStones.getInstance().economy.stop();
         ProtectionStones.getInstance().economy = new PSEconomy();
 
         // add command to Bukkit (using reflection)
@@ -549,6 +616,7 @@ public class ProtectionStones extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        adventure = net.kyori.adventure.platform.bukkit.BukkitAudiences.create(this);
         FlagHandler.registerHandlers(); // register custom WG flag handlers
 
         TomlFormat.instance();
@@ -568,15 +636,19 @@ public class ProtectionStones extends JavaPlugin {
         // register event listeners
         getServer().getPluginManager().registerEvents(new ListenerClass(), this);
 
-        // check that WorldGuard and WorldEdit are enabled (WorldGuard will only be enabled if there's WorldEdit)
-        if (getServer().getPluginManager().getPlugin("WorldGuard") == null || !getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
+        // check that WorldGuard and WorldEdit are enabled (WorldGuard will only be
+        // enabled if there's WorldEdit)
+        if (getServer().getPluginManager().getPlugin("WorldGuard") == null
+                || !getServer().getPluginManager().getPlugin("WorldGuard").isEnabled()) {
             getLogger().severe("WorldGuard or WorldEdit not enabled! Disabling ProtectionStones...");
             getServer().getPluginManager().disablePlugin(this);
         }
 
         // check if Vault is enabled (for economy support)
-        if (getServer().getPluginManager().getPlugin("Vault") != null && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
-            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (getServer().getPluginManager().getPlugin("Vault") != null
+                && getServer().getPluginManager().getPlugin("Vault").isEnabled()) {
+            RegisteredServiceProvider<Economy> econ = getServer().getServicesManager()
+                    .getRegistration(net.milkbowl.vault.economy.Economy.class);
             if (econ == null) {
                 getLogger().warning("No economy plugin found by Vault! There will be no economy support!");
                 vaultSupportEnabled = false;
@@ -589,7 +661,8 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // check for PlaceholderAPI
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null
+                && getServer().getPluginManager().getPlugin("PlaceholderAPI").isEnabled()) {
             getLogger().info("PlaceholderAPI support enabled!");
             placeholderAPISupportEnabled = true;
             new PSPlaceholderExpansion().register();
@@ -598,7 +671,8 @@ public class ProtectionStones extends JavaPlugin {
         }
 
         // check for LuckPerms
-        if (getServer().getPluginManager().getPlugin("LuckPerms") != null && getServer().getPluginManager().getPlugin("LuckPerms").isEnabled()) {
+        if (getServer().getPluginManager().getPlugin("LuckPerms") != null
+                && getServer().getPluginManager().getPlugin("LuckPerms").isEnabled()) {
             try {
                 luckPermsSupportEnabled = true;
                 luckPerms = getServer().getServicesManager().load(LuckPerms.class);
@@ -659,6 +733,14 @@ public class ProtectionStones extends JavaPlugin {
             LegacyUpgrade.upgradeRegionsWithNegativeYValues();
 
         getLogger().info(ChatColor.WHITE + "ProtectionStones has successfully started!");
+    }
+
+    @Override
+    public void onDisable() {
+        if (adventure != null) {
+            adventure.close();
+            adventure = null;
+        }
     }
 
 }
