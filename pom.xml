@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.espi</groupId>
     <artifactId>protectionstones</artifactId>
-    <version>2.10.6</version>
+    <version>2.10.7</version>
     <name>ProtectionStones</name>
     <description>A grief prevention plugin for Spigot Minecraft servers.</description>
     <url>https://github.com/espidev/ProtectionStones</url>
@@ -14,25 +14,25 @@
     </properties>
 
     <licenses>
-      <license>
-        <name>GPLv3</name>
-        <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
-      </license>
+        <license>
+            <name>GPLv3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+        </license>
     </licenses>
 
     <developers>
-      <developer>
-        <name>Devin Lin</name>
-        <email>espidev@gmail.com</email>
-        <organization>EstiNet</organization>
-        <organizationUrl>https://estinet.net</organizationUrl>
-      </developer>
+        <developer>
+            <name>Devin Lin</name>
+            <email>espidev@gmail.com</email>
+            <organization>EstiNet</organization>
+            <organizationUrl>https://estinet.net</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
-      <connection>scm:git:git://github.com/espidev/ProtectionStones.git</connection>
-      <developerConnection>scm:git:ssh://github.com:espidev/ProtectionStones.git</developerConnection>
-      <url>https://github.com/espidev/ProtectionStones/tree/master</url>
+        <connection>scm:git:git://github.com/espidev/ProtectionStones.git</connection>
+        <developerConnection>scm:git:ssh://github.com:espidev/ProtectionStones.git</developerConnection>
+        <url>https://github.com/espidev/ProtectionStones/tree/master</url>
     </scm>
 
     <profiles>
@@ -89,8 +89,8 @@
                 <version>3.1</version>
                 <configuration>
 
-                    <source>16</source>
-                    <target>16</target>
+                    <source>21</source>
+                    <target>21</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
 
                 </configuration>
@@ -107,13 +107,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <configuration>
-                    <minimizeJar>true</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <minimizeJar>false</minimizeJar>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>dev.espi.protectionstones</shadedPattern>
+                            <shadedPattern>dev.espi.protectionstones.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>dev.espi.protectionstones.lib.kyori</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -201,7 +206,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -271,6 +276,16 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>4.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.3.3</version>
         </dependency>
     </dependencies>
 </project>
