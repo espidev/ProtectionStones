@@ -119,11 +119,32 @@ public class ArgAddRemove implements PSCommandArg {
             // apply operation to regions
             for (PSRegion r : regions) {
 
+                String regionName = r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")";
                 if (operationType.equals("add") || operationType.equals("addowner")) {
+
+                    // check limit members and owners for a region -> atm if more than one owner
+                    // then, if a second owner has perm with more members/owners, he can add them - possible abuse?
+                    int membersLimit = LimitUtil.getPermissionIntVariable(p, "protectionstones.members-limit.", 2, 0);
+                    int ownersLimit = LimitUtil.getPermissionIntVariable(p, "protectionstones.owners-limit.", 2, 1);
+
+                    if (operationType.equals("add") && r.getMembers().size() >= membersLimit) {
+                        PSL.msg(p, PSL.MEMBERS_LIMIT.msg()
+                                .replace("%limit%", String.valueOf(membersLimit))
+                                .replace("%region%", regionName));
+                        continue;
+                    }
+                    if (operationType.equals("addowner") && r.getOwners().size() >= ownersLimit) {
+                        PSL.msg(p, PSL.OWNERS_LIMIT.msg()
+
+                                .replace("%limit%", String.valueOf(ownersLimit))
+                                .replace("%region%", regionName));
+                        continue;
+                    }
+
                     if (flags.containsKey("-a")) {
                         PSL.msg(p, PSL.ADDED_TO_REGION_SPECIFIC.msg()
                                 .replace("%player%", addPlayerName)
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                                .replace("%region%", regionName));
                     } else {
                         PSL.msg(p, PSL.ADDED_TO_REGION.msg().replace("%player%", addPlayerName));
                     }
@@ -137,7 +158,7 @@ public class ArgAddRemove implements PSCommandArg {
                     if (flags.containsKey("-a")) {
                         PSL.msg(p, PSL.REMOVED_FROM_REGION_SPECIFIC.msg()
                                 .replace("%player%", addPlayerName)
-                                .replace("%region%", r.getName() == null ? r.getId() : r.getName() + " (" + r.getId() + ")"));
+                                .replace("%region%", regionName));
                     } else {
                         PSL.msg(p, PSL.REMOVED_FROM_REGION.msg().replace("%player%", addPlayerName));
                     }
