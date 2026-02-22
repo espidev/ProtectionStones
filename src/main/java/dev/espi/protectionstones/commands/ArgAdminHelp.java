@@ -48,8 +48,9 @@ public class ArgAdminHelp {
     }
 
     static boolean argumentAdminHelp(CommandSender p, String[] args) {
-        String bc = "/" + ProtectionStones.getInstance().getConfigOptions().base_command;
-        String tx = ChatColor.AQUA + "> " + ChatColor.GRAY + bc;
+        String baseCommand = ProtectionStones.getInstance().getConfigOptions().base_command;
+        String bc = "/" + baseCommand;
+        String tx = ChatColor.AQUA + "> " + ChatColor.GRAY +  "/" + bc;
 
         p.sendMessage(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "===============" +
                 ChatColor.RESET + " PS Admin Help " +
@@ -58,7 +59,7 @@ public class ArgAdminHelp {
         send(p,
                 tx + " admin version",
                 "Show the version number of the plugin.\n\n" + bc + " admin version",
-                bc + " admin version",
+                baseCommand + " admin version",
                 false);
 
         send(p,

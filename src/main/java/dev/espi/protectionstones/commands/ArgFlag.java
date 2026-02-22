@@ -19,6 +19,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.*;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.gui.screens.flags.FlagsGui;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGUtils;
 import net.md_5.bungee.api.chat.*;
@@ -118,7 +119,7 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 // add line based on flag type
-                boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();
+                boolean isGroupValueAll = groupfValue.equalsIgnoreCase("all") || groupfValue.isEmpty();;
                 if (f instanceof StateFlag) { // allow/deny
 
                     TextComponent allow = new TextComponent((fValue == StateFlag.State.ALLOW ? ChatColor.WHITE : ChatColor.DARK_GRAY) + "Allow"),
@@ -184,15 +185,25 @@ public class ArgFlag implements PSCommandArg {
                 }
 
                 // set hover and click task for flag group
-                // HACK: Prevent pvp flag group from being changed when set to "all" to prevent exploit
-                boolean isPvpExploitCase = flag.equalsIgnoreCase("pvp") && isGroupValueAll;
-                if (isPvpExploitCase) {
-                    BaseComponent[] hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
+                BaseComponent[] hover;
+                // HACK: Prevent pvp flag value from being changed to none/null
+                // Special handling for "pvp" flag with "all" group, disabling interaction.
+                if (flag.equalsIgnoreCase("pvp") && isGroupValueAll) {
+                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
+                    // Remove click action to fully disable changing this group.
+                    groupChange.setClickEvent(null);
+                } else if (fValue == null) {
+                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create();
+                } else {
+                    hover = new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
+                }
+
+                // Always set hover if the flag is pvp and group is "all"
+                if (flag.equalsIgnoreCase("pvp") && groupfValue.equalsIgnoreCase("all")) {
+                    hover = new ComponentBuilder(PSL.FLAG_PREVENT_EXPLOIT_HOVER.msg()).create();
                     groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
+                    groupChange.setClickEvent(null); // Disable click event explicitly
                 } else if (!nextGroup.equals(groupfValue)) {
-                    BaseComponent[] hover = fValue == null
-                            ? new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP_NULL.msg()).create()
-                            : new ComponentBuilder(PSL.FLAG_GUI_HOVER_CHANGE_GROUP.msg().replace("%group%", nextGroup)).create();
                     groupChange.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover));
                     groupChange.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand + "-g " + nextGroup + " " + page + ":" + flag + " " + fValue));
                 }
@@ -230,6 +241,10 @@ public class ArgFlag implements PSCommandArg {
         Player p = (Player) s;
         PSRegion r = PSRegion.fromLocationGroup(p.getLocation());
 
+        // GUI toggle (inventory GUI vs legacy text-based output)
+        PSConfig conf = ProtectionStones.getInstance().getConfigOptions();
+        boolean useInvGui = Boolean.TRUE.equals(conf.guiEnabled) && Boolean.TRUE.equals(conf.guiCommandFlag);
+
         if (!p.hasPermission("protectionstones.flags")) {
             PSL.msg(p, PSL.NO_PERMISSION_FLAGS.msg());
             return true;
@@ -244,12 +259,25 @@ public class ArgFlag implements PSCommandArg {
         }
 
         // /ps flag GUI
-        if (args.length == 1) return openFlagGUI(p, r, 0);
+        if (args.length == 1) {
+            if (useInvGui) {
+                ProtectionStones.getInstance().getGuiManager().open(p,
+                        new FlagsGui(ProtectionStones.getInstance().getGuiManager(), p.getWorld().getUID(), r.getId(), 0));
+                return true;
+            }
+            return openFlagGUI(p, r, 0);
+        }
 
         // go to GUI page
         if (args.length == 2) {
             if (MiscUtil.isValidInteger(args[1])) {
-                return openFlagGUI(p, r, Integer.parseInt(args[1]));
+                int page = Integer.parseInt(args[1]);
+                if (useInvGui) {
+                    ProtectionStones.getInstance().getGuiManager().open(p,
+                            new FlagsGui(ProtectionStones.getInstance().getGuiManager(), p.getWorld().getUID(), r.getId(), page));
+                    return true;
+                }
+                return openFlagGUI(p, r, page);
             }
 
             PSL.msg(p, PSL.FLAG_HELP.msg());
@@ -349,7 +377,7 @@ public class ArgFlag implements PSCommandArg {
     }
 
     // /ps flag logic (utilizing WG internal /region flag logic)
-    static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
+    public static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
         // correct the flag if gui flags are there
         String[] flagSplit = flagName.split(":");
         if (flagSplit.length == 2) flagName = flagSplit[1];

@@ -19,6 +19,8 @@ import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSPlayer;
 import dev.espi.protectionstones.PSRegion;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.gui.screens.common.LoadingGui;
+import dev.espi.protectionstones.gui.screens.regions.RegionListGui;
 import dev.espi.protectionstones.utils.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,6 +57,24 @@ public class ArgList implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         if (!s.hasPermission("protectionstones.list"))
             return PSL.msg(s, PSL.NO_PERMISSION_LIST.msg());
+
+        // GUI mode: only for /ps list (current player)
+        if (args.length == 1 && s instanceof Player p) {
+            var cfg = ProtectionStones.getInstance().getConfigOptions();
+            if (Boolean.TRUE.equals(cfg.guiEnabled) && Boolean.TRUE.equals(cfg.guiCommandList)) {
+                var gm = ProtectionStones.getInstance().getGuiManager();
+                gm.open(p, new LoadingGui(gm, "Regions"));
+
+                PSPlayer psp = PSPlayer.fromPlayer(p);
+                Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+                    List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), true);
+                    Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () ->
+                            gm.open(p, new RegionListGui(gm, RegionListGui.Mode.LIST, "Regions", regions, 0, null))
+                    );
+                });
+                return true;
+            }
+        }
 
         if (args.length == 2 && !s.hasPermission("protectionstones.list.others"))
             return PSL.msg(s, PSL.NO_PERMISSION_LIST_OTHERS.msg());

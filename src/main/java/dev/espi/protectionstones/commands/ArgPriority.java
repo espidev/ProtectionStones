@@ -18,6 +18,8 @@ package dev.espi.protectionstones.commands;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.gui.screens.regions.RegionPriorityGui;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -67,9 +69,16 @@ public class ArgPriority implements PSCommandArg {
             return true;
         }
         if (args.length < 2) {
-            int priority = r.getWGRegion().getPriority();
-            PSL.msg(p, PSL.PRIORITY_INFO.msg().replace("%priority%", "" + priority));
-            return true;
+            var cfg = ProtectionStones.getInstance().getConfigOptions();
+            if (Boolean.TRUE.equals(cfg.guiEnabled) && Boolean.TRUE.equals(cfg.guiCommandPriority)) {
+                var gm = ProtectionStones.getInstance().getGuiManager();
+                gm.open(p, new RegionPriorityGui(gm, p.getWorld().getUID(), r.getId(), null));
+                return true;
+            } else {
+                int priority = r.getWGRegion().getPriority();
+                PSL.msg(p, PSL.PRIORITY_INFO.msg().replace("%priority%", "" + priority));
+                return true;
+            }
         }
 
         try {

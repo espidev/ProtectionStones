@@ -1,5 +1,5 @@
 # Please do not change the config version unless you know what you are doing!
-config_version = 16
+config_version = 17
 uuidupdated = true
 region_negative_min_max_updated = true
 
@@ -36,6 +36,7 @@ aliases = [
     "protectionstones"
 ]
 
+
 # Whether or not to drop items on the ground if the inventory is full (ex. during /ps unclaim)
 # If set to false, the event will be prevented from happening, and say that inventory is full
 drop_item_when_inventory_full = true
@@ -67,6 +68,31 @@ allow_addowner_for_offline_players_without_lp = false
 
 # Whether or not members of a region can /ps home to the region.
 allow_home_teleport_for_members = true
+
+# ---------------------------------------------------------------------------------------
+# Inventory GUI toggles
+# If enabled, selected commands will open inventory-based GUIs.
+# If disabled, commands will use the legacy text-based output.
+# ---------------------------------------------------------------------------------------
+
+[gui]
+    # Whether to enable inventory-based GUIs for commands.
+    enabled = false
+
+    [gui.commands]
+        # Per-command GUI toggles (only used if gui.enabled = true)
+        home = true
+        flag = true
+        add = true
+        remove = true
+        addowner = true
+        removeowner = true
+        list = true
+        info = true
+        tp = true
+        unclaim = true
+        priority = true
+        admin = true
 
 [admin]
     # Whether /ps admin cleanup remove should delete regions that have members, but don't have owners (after inactive

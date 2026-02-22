@@ -19,9 +19,11 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import dev.espi.protectionstones.utils.upgrade.LegacyUpgrade;
 import dev.espi.protectionstones.PSL;
 import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.gui.screens.admin.AdminMenuGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.*;
@@ -86,6 +88,15 @@ public class ArgAdmin implements PSCommandArg {
         }
 
         if (args.length < 2) {
+            // If enabled, show GUI menu for players; otherwise fall back to text help.
+            if (s instanceof Player p) {
+                var cfg = ProtectionStones.getInstance().getConfigOptions();
+                boolean guiMode = Boolean.TRUE.equals(cfg.guiEnabled) && Boolean.TRUE.equals(cfg.guiCommandAdmin);
+                if (guiMode) {
+                    ProtectionStones.getInstance().getGuiManager().open(p, new AdminMenuGui(ProtectionStones.getInstance().getGuiManager()));
+                    return true;
+                }
+            }
             ArgAdminHelp.argumentAdminHelp(s, args);
             return true;
         }
