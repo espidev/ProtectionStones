@@ -193,7 +193,8 @@ public enum PSL {
             + ChatColor.BLUE + "Time between tax cycles: " + ChatColor.GRAY + "%taxperiod%" + "\n"
             + ChatColor.BLUE + "Time to pay taxes after cycle: " + ChatColor.GRAY + "%taxpaymentperiod%" + "\n"
             + ChatColor.BLUE + "Tax Autopayer: " + ChatColor.GRAY + "%taxautopayer%" + "\n"
-            + ChatColor.BLUE + "Taxes Owed: " + ChatColor.GRAY + "$%taxowed%"),
+            + ChatColor.BLUE + "Taxes Owed: " + ChatColor.GRAY + "$%taxowed%" + "\n"
+            + ChatColor.BLUE + "Next payment due in: " + ChatColor.GRAY + "%taxtimeleft%"),
     TAX_NEXT("tax.next_page", ChatColor.GRAY + "Do /ps tax info -p %page% to go to the next page!"),
 
     // ps buy
