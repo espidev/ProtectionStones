@@ -512,6 +512,14 @@ public abstract class PSRegion {
     public abstract String getTaxPaymentPeriod();
 
     /**
+     * Get the formatted time remaining until the next tax payment is due.
+     * If there are outstanding payments, returns the time until the earliest one expires.
+     * If no payments are outstanding, returns the time until the next tax cycle starts.
+     * @return formatted time string (e.g. "2d14h"), or "overdue" if past due
+     */
+    public abstract String getTimeTillNextPaymentDue();
+
+    /**
      * Get the list of tax payments that are due.
      * @return the list of tax payments outstanding
      */

@@ -62,6 +62,13 @@ public class PSGroupRegion extends PSStandardRegion {
     }
 
     @Override
+    public String getTimeTillNextPaymentDue() {
+        Set<String> s = new HashSet<>();
+        getMergedRegions().forEach(r -> s.add(r.getTimeTillNextPaymentDue()));
+        return MiscUtil.concatWithoutLast(new ArrayList<>(s), ", ");
+    }
+
+    @Override
     public void updateTaxPayments() {
         long currentTime = System.currentTimeMillis();
 
