@@ -16,6 +16,9 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.gui.screens.common.LoadingGui;
+import dev.espi.protectionstones.gui.screens.regions.RegionListGui;
+import dev.espi.protectionstones.gui.screens.regions.UnclaimConfirmGui;
 import dev.espi.protectionstones.utils.TextGUI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -65,6 +68,9 @@ public class ArgUnclaim implements PSCommandArg {
             return true;
         }
 
+        var cfg = ProtectionStones.getInstance().getConfigOptions();
+        boolean guiMode = Boolean.TRUE.equals(cfg.guiEnabled) && Boolean.TRUE.equals(cfg.guiCommandUnclaim);
+
         if (args.length >= 2) { // /ps unclaim [list|region-id] (unclaim remote region)
 
             if (!p.hasPermission("protectionstones.unclaim.remote")) {
@@ -78,7 +84,12 @@ public class ArgUnclaim implements PSCommandArg {
             List<PSRegion> regions = psp.getPSRegionsCrossWorld(psp.getPlayer().getWorld(), false);
 
             if (args[1].equalsIgnoreCase("list")) {
-                displayPSRegions(s, regions, args.length == 2 ? 0 : tryParseInt(args[2]) - 1);
+                if (guiMode) {
+                    var gm = ProtectionStones.getInstance().getGuiManager();
+                    gm.open(p, new RegionListGui(gm, RegionListGui.Mode.UNCLAIM, "Unclaim", regions, 0, null));
+                } else {
+                    displayPSRegions(s, regions, args.length == 2 ? 0 : tryParseInt(args[2]) - 1);
+                }
             } else {
                 for (PSRegion psr : regions) {
                     if (psr.getId().equalsIgnoreCase(args[1])) {
@@ -86,6 +97,11 @@ public class ArgUnclaim implements PSCommandArg {
                         if (psr.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
                             PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
                             return false;
+                        }
+                        if (guiMode) {
+                            var gm = ProtectionStones.getInstance().getGuiManager();
+                            gm.open(p, new UnclaimConfirmGui(gm, p.getWorld().getUID(), psr.getId(), null));
+                            return true;
                         }
                         return unclaimBlock(psr, p);
                     }
@@ -110,6 +126,11 @@ public class ArgUnclaim implements PSCommandArg {
             // cannot break region being rented (prevents splitting merged regions, and breaking as tenant owner)
             if (r.getRentStage() == PSRegion.RentStage.RENTING && !p.hasPermission("protectionstones.superowner")) {
                 PSL.msg(p, PSL.RENT_CANNOT_BREAK_WHILE_RENTING.msg());
+                return true;
+            }
+            if (guiMode) {
+                var gm = ProtectionStones.getInstance().getGuiManager();
+                gm.open(p, new UnclaimConfirmGui(gm, p.getWorld().getUID(), r.getId(), null));
                 return true;
             }
             return unclaimBlock(r, p);

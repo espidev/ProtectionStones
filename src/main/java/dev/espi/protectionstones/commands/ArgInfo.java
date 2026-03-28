@@ -24,6 +24,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.*;
 import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
+import dev.espi.protectionstones.gui.screens.flags.FlagsGui;
+import dev.espi.protectionstones.gui.screens.regions.RegionInfoGui;
+import dev.espi.protectionstones.gui.screens.regions.RegionRosterGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -68,6 +71,39 @@ public class ArgInfo implements PSCommandArg {
             PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
             Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");
             return true;
+        }
+
+        // GUI mode for info/members/owners/flags on current region
+        var cfg = ProtectionStones.getInstance().getConfigOptions();
+        if (Boolean.TRUE.equals(cfg.guiEnabled) && Boolean.TRUE.equals(cfg.guiCommandInfo)) {
+            var gm = ProtectionStones.getInstance().getGuiManager();
+            if (args.length == 1) {
+                if (!p.hasPermission("protectionstones.info"))
+                    return PSL.NO_PERMISSION_INFO.send(p);
+                gm.open(p, new RegionInfoGui(gm, p.getWorld().getUID(), r.getId(), null));
+                return true;
+            } else if (args.length == 2) {
+                switch (args[1].toLowerCase()) {
+                    case "members" -> {
+                        if (!p.hasPermission("protectionstones.members"))
+                            return PSL.NO_PERMISSION_MEMBERS.send(p);
+                        gm.open(p, new RegionRosterGui(gm, p.getWorld().getUID(), r.getId(), RegionRosterGui.Mode.MEMBERS, 0, null));
+                        return true;
+                    }
+                    case "owners" -> {
+                        if (!p.hasPermission("protectionstones.owners"))
+                            return PSL.NO_PERMISSION_OWNERS.send(p);
+                        gm.open(p, new RegionRosterGui(gm, p.getWorld().getUID(), r.getId(), RegionRosterGui.Mode.OWNERS, 0, null));
+                        return true;
+                    }
+                    case "flags" -> {
+                        if (!p.hasPermission("protectionstones.flags"))
+                            return PSL.NO_PERMISSION_FLAGS.send(p);
+                        gm.open(p, new FlagsGui(gm, p.getWorld().getUID(), r.getId(), 0));
+                        return true;
+                    }
+                }
+            }
         }
 
         if (args.length == 1) { // info of current region player is in

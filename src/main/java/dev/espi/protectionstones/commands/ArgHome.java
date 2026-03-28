@@ -16,6 +16,7 @@
 package dev.espi.protectionstones.commands;
 
 import dev.espi.protectionstones.*;
+import dev.espi.protectionstones.gui.screens.home.HomeWorldsGui;
 import dev.espi.protectionstones.utils.ChatUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.TextGUI;
@@ -121,6 +122,10 @@ public class ArgHome implements PSCommandArg {
     public boolean executeArgument(CommandSender s, String[] args, HashMap<String, String> flags) {
         Player p = (Player) s;
 
+        // GUI toggle (inventory GUI vs legacy text-based output)
+        PSConfig conf = ProtectionStones.getInstance().getConfigOptions();
+        boolean useInvGui = Boolean.TRUE.equals(conf.guiEnabled) && Boolean.TRUE.equals(conf.guiCommandHome);
+
         // prelim checks
         if (!p.hasPermission("protectionstones.home"))
             return PSL.msg(p, PSL.NO_PERMISSION_HOME.msg());
@@ -132,11 +137,27 @@ public class ArgHome implements PSCommandArg {
             PSPlayer psp = PSPlayer.fromPlayer(p);
             if (args.length == 1) {
                 // just "/ps home"
-                List<PSRegion> regions = psp.getHomes(p.getWorld());
-                if (regions.size() == 1) { // teleport to home if there is only one home
-                    ArgTp.teleportPlayer(p, regions.get(0));
-                } else { // otherwise, open the GUI
-                    openHomeGUI(psp, regions, (flags.get("-p") == null || !MiscUtil.isValidInteger(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
+                if (useInvGui) {
+                    // gather homes across all worlds; if only 1 total, teleport directly
+                    List<PSRegion> allHomes = new ArrayList<>();
+                    for (org.bukkit.World w : Bukkit.getWorlds()) {
+                        allHomes.addAll(psp.getHomes(w));
+                    }
+                    if (allHomes.size() == 1) {
+                        ArgTp.teleportPlayer(p, allHomes.get(0));
+                    } else {
+                        Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () ->
+                                ProtectionStones.getInstance().getGuiManager().open(p, new HomeWorldsGui(ProtectionStones.getInstance().getGuiManager(), 0))
+                        );
+                    }
+                } else {
+                    // legacy text-based GUI (current-world homes)
+                    List<PSRegion> regions = psp.getHomes(p.getWorld());
+                    if (regions.size() == 1) { // teleport to home if there is only one home
+                        ArgTp.teleportPlayer(p, regions.get(0));
+                    } else { // otherwise, open the text GUI
+                        openHomeGUI(psp, regions, (flags.get("-p") == null || !MiscUtil.isValidInteger(flags.get("-p")) ? 0 : Integer.parseInt(flags.get("-p")) - 1));
+                    }
                 }
             } else {// /ps home [id]
                 // get regions from the query
