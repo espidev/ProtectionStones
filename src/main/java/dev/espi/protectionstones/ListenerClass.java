@@ -37,6 +37,7 @@ import org.bukkit.block.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,7 +51,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -372,7 +372,7 @@ public class ListenerClass implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
         if (ProtectionStones.isProtectBlock(e.getBlock())) {
@@ -437,12 +437,13 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent e) {
-        explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld());
+        explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld(), false);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
-        explodeUtil(e.blockList(), e.getLocation().getWorld());
+        boolean isWindCharge = e.getEntity() instanceof WindCharge;
+        explodeUtil(e.blockList(), e.getLocation().getWorld(), isWindCharge);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -450,13 +451,13 @@ public class ListenerClass implements Listener {
         if (!ProtectionStones.isProtectBlock(e.getBlock())) return;
 
         // events like ender dragon block break, wither running into block break, etc.
-        if (!blockExplodeUtil(e.getBlock().getWorld(), e.getBlock())) {
+        if (!blockExplodeUtil(e.getBlock().getWorld(), e.getBlock(), false)) {
             // if block shouldn't be exploded, cancel the event
             e.setCancelled(true);
         }
     }
 
-    private void explodeUtil(List<Block> blockList, World w) {
+    private void explodeUtil(List<Block> blockList, World w, boolean isWindCharge) {
         // loop through exploded blocks
         for (int i = 0; i < blockList.size(); i++) {
             Block b = blockList.get(i);
@@ -467,18 +468,22 @@ public class ListenerClass implements Listener {
                 i--;
             }
 
-            blockExplodeUtil(w, b);
+            blockExplodeUtil(w, b, isWindCharge);
         }
     }
 
     // returns whether the block is exploded
-    private boolean blockExplodeUtil(World w, Block b) {
+    private boolean blockExplodeUtil(World w, Block b, boolean isWindCharge) {
         if (ProtectionStones.isProtectBlock(b)) {
             String id = WGUtils.createPSID(b.getLocation());
             PSProtectBlock blockOptions = ProtectionStones.getBlockOptions(b);
 
             // if prevent explode
             if (blockOptions.preventExplode) {
+                return false;
+            }
+
+            if (isWindCharge && blockOptions.preventWindChargeExplode) {
                 return false;
             }
 

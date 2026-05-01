@@ -137,6 +137,8 @@ public class PSProtectBlock {
     public boolean preventPistonPush;
     @Path("behaviour.prevent_explode")
     public boolean preventExplode;
+    @Path("behaviour.prevent_wind_charge_explode")
+    public boolean preventWindChargeExplode;
     @Path("behaviour.destroy_region_when_explode")
     public boolean destroyRegionWhenExplode;
     @Path("behaviour.prevent_silk_touch")
