@@ -22,10 +22,12 @@ import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.commands.ArgMerge;
 import dev.espi.protectionstones.event.PSCreateEvent;
+import dev.espi.protectionstones.utils.BackupUtil;
 import dev.espi.protectionstones.utils.LimitUtil;
 import dev.espi.protectionstones.utils.MiscUtil;
 import dev.espi.protectionstones.utils.WGMerge;
@@ -288,6 +290,18 @@ public class BlockHandler {
             PSRegion r = PSRegion.fromWGRegion(p.getWorld(), region);
             if (r != null) playerMergeTask(p, r);
         }
+
+        // async backup: flush WG to disk then copy regions file — no main thread I/O
+        final RegionManager backupRm = rm;
+        final World backupWorld = l.getWorld();
+        ProtectionStones.getScheduler().runTaskAsynchronously(() -> {
+            try {
+                backupRm.saveChanges();
+            } catch (StorageException e) {
+                e.printStackTrace();
+            }
+            BackupUtil.backupWorldRegions(backupWorld);
+        });
 
         return true;
     }
