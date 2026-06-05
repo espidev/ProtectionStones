@@ -57,7 +57,7 @@ public class ArgGet implements PSCommandArg {
     private boolean openGetGUI(Player p) {
         PSL.msg(p, PSL.GET_HEADER.msg());
         for (PSProtectBlock b : ProtectionStones.getInstance().getConfiguredBlocks()) {
-            if ((!b.permission.equals("") && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
+            if ((!b.permission.isEmpty() && !p.hasPermission(b.permission)) || (b.preventPsGet && !p.hasPermission("protectionstones.admin"))) {
                 continue; // no permission
             }
 

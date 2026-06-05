@@ -66,23 +66,37 @@ public class ArgGive implements PSCommandArg {
         if (cp == null)
             return PSL.msg(p, PSL.INVALID_BLOCK.msg());
 
-        // check if item was able to be added (inventory not full)
         Player ps = Bukkit.getPlayer(args[2]);
 
         ItemStack item = cp.createItem();
         if (args.length >= 4 && NumberUtils.isNumber(args[3]))
             item.setAmount(Integer.parseInt(args[3]));
 
-        if (!ps.getInventory().addItem(item).isEmpty()) {
+        if (!ProtectionStones.getScheduler().isEntityThread(ps)) {
+            ProtectionStones.getScheduler().runTask(ps, () -> giveItem(p, ps, args[1], item));
+            return true;
+        }
+
+        return giveItem(p, ps, args[1], item);
+    }
+
+    private boolean giveItem(CommandSender sender, Player player, String blockAlias, ItemStack item) {
+        if (!player.isOnline())
+            return PSL.msg(sender, PSL.PLAYER_NOT_FOUND.msg() + " (" + player.getName() + ")");
+
+        Map<Integer, ItemStack> leftovers = player.getInventory().addItem(item.clone());
+        if (!leftovers.isEmpty()) {
             if (ProtectionStones.getInstance().getConfigOptions().dropItemWhenInventoryFull) {
-                PSL.msg(ps, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
-                ps.getWorld().dropItem(ps.getLocation(), cp.createItem());
+                PSL.msg(player, PSL.NO_ROOM_DROPPING_ON_FLOOR.msg());
+                for (ItemStack leftover : leftovers.values()) {
+                    player.getWorld().dropItem(player.getLocation(), leftover);
+                }
             } else {
-                return PSL.msg(p, PSL.GIVE_NO_INVENTORY_ROOM.msg());
+                return PSL.msg(sender, PSL.GIVE_NO_INVENTORY_ROOM.msg());
             }
         }
 
-        return PSL.msg(p, PSL.GIVE_GIVEN.msg().replace("%block%", args[1]).replace("%player%", Bukkit.getPlayer(args[2]).getDisplayName()));
+        return PSL.msg(sender, PSL.GIVE_GIVEN.msg().replace("%block%", blockAlias).replace("%player%", player.getDisplayName()));
     }
 
     // tab completion
