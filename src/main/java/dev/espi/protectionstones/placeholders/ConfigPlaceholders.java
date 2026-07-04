@@ -218,6 +218,8 @@ class ConfigPlaceholders {
                 return b.preventPistonPush + "";
             case "behaviour_prevent_explode":
                 return b.preventExplode + "";
+            case "behaviour_prevent_wind_charge_explode":
+                return b.preventWindChargeExplode + "";
             case "behaviour_destroy_region_when_explode":
                 return b.destroyRegionWhenExplode + "";
             case "behaviour_prevent_silk_touch":
