@@ -31,13 +31,14 @@ import dev.espi.protectionstones.utils.UUIDCache;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.ExplosionResult;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractWindCharge;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.WindCharge;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -437,12 +438,13 @@ public class ListenerClass implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent e) {
-        explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld(), false);
+        boolean isWindCharge = e.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK;
+        this.explodeUtil(e.blockList(), e.getBlock().getLocation().getWorld(), isWindCharge);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
-        boolean isWindCharge = e.getEntity() instanceof WindCharge;
+        boolean isWindCharge = e.getEntity() instanceof AbstractWindCharge || e.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK;
         explodeUtil(e.blockList(), e.getLocation().getWorld(), isWindCharge);
     }
 

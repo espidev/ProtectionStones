@@ -224,7 +224,7 @@ placing_bypasses_wg_passthrough = true
     # Recommended to keep true to prevent players from exploiting more protection stones with /ps unhide (when the block is destroyed)
     prevent_explode = true
 
-    # Prevents the block from being destroyed when exploded wind charge.
+    # Prevents the block from being destroyed when exploded wind charge, this also affects explosions from enchantments wind_burst.
     # Recommended to keep true if you don't want to ban all explosions, but don't want the region to explode using this method
     prevent_wind_charge_explode = true
 
