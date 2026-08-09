@@ -151,7 +151,8 @@ public class ArgTax implements PSCommandArg {
                         .replace("%taxperiod%", r.getTaxPeriod())
                         .replace("%taxpaymentperiod%", r.getTaxPaymentPeriod())
                         .replace("%taxautopayer%", r.getTaxAutopayer() == null ? "none" : UUIDCache.getNameFromUUID(r.getTaxAutopayer()))
-                        .replace("%taxowed%", String.format("%.2f", taxesOwed)));
+                        .replace("%taxowed%", String.format("%.2f", taxesOwed))
+                        .replace("%taxtimeleft%", r.getTimeTillNextPaymentDue()));
         } else {
             PSL.msg(p, INFO_HELP);
         }

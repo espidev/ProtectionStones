@@ -253,6 +253,39 @@ public class PSStandardRegion extends PSRegion {
     }
 
     @Override
+    public String getTimeTillNextPaymentDue() {
+        updateTaxPayments();
+        long currentTime = System.currentTimeMillis();
+
+        List<TaxPayment> payments = getTaxPaymentsDue();
+        if (payments != null && !payments.isEmpty()) {
+            long earliest = payments.stream()
+                    .mapToLong(TaxPayment::getWhenPaymentIsDue)
+                    .min().getAsLong();
+            long msLeft = earliest - currentTime;
+            if (msLeft <= 0) return "overdue";
+            return MiscUtil.describeDuration(Duration.ofMillis(msLeft));
+        }
+
+        // No outstanding payments — show time until next cycle
+        List<LastRegionTaxPaymentEntry> lastAdded = getRegionLastTaxPaymentAddedEntries();
+        if (lastAdded != null) {
+            Optional<LastRegionTaxPaymentEntry> entry = lastAdded.stream()
+                    .filter(e -> e.getRegionId().equals(getId()))
+                    .findFirst();
+            if (entry.isPresent()) {
+                long msLeft = entry.get().getLastPaymentAdded()
+                        + Duration.ofSeconds(getTypeOptions().taxPeriod).toMillis()
+                        - currentTime;
+                if (msLeft <= 0) return "soon";
+                return MiscUtil.describeDuration(Duration.ofMillis(msLeft));
+            }
+        }
+
+        return "unknown";
+    }
+
+    @Override
     public List<TaxPayment> getTaxPaymentsDue() {
         // taxes disabled
         if (getTypeOptions().taxPeriod == -1) return new ArrayList<>();

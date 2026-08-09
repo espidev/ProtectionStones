@@ -34,6 +34,8 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 
@@ -234,6 +236,41 @@ public class PSMergedRegion extends PSRegion {
     @Override
     public String getTaxPaymentPeriod() {
         return MiscUtil.describeDuration(Duration.ofSeconds(getTypeOptions().taxPaymentTime));
+    }
+
+    @Override
+    public String getTimeTillNextPaymentDue() {
+        long currentTime = System.currentTimeMillis();
+
+        List<TaxPayment> payments = getTaxPaymentsDue();
+        if (payments != null) {
+            OptionalLong earliest = payments.stream()
+                    .filter(tp -> tp.getRegionId().equals(getId()))
+                    .mapToLong(TaxPayment::getWhenPaymentIsDue)
+                    .min();
+            if (earliest.isPresent()) {
+                long msLeft = earliest.getAsLong() - currentTime;
+                if (msLeft <= 0) return "overdue";
+                return MiscUtil.describeDuration(Duration.ofMillis(msLeft));
+            }
+        }
+
+        // No outstanding payments for this region — show time until next cycle
+        List<LastRegionTaxPaymentEntry> lastAdded = getRegionLastTaxPaymentAddedEntries();
+        if (lastAdded != null) {
+            Optional<LastRegionTaxPaymentEntry> entry = lastAdded.stream()
+                    .filter(e -> e.getRegionId().equals(getId()))
+                    .findFirst();
+            if (entry.isPresent()) {
+                long msLeft = entry.get().getLastPaymentAdded()
+                        + Duration.ofSeconds(getTypeOptions().taxPeriod).toMillis()
+                        - currentTime;
+                if (msLeft <= 0) return "soon";
+                return MiscUtil.describeDuration(Duration.ofMillis(msLeft));
+            }
+        }
+
+        return "unknown";
     }
 
     @Override
