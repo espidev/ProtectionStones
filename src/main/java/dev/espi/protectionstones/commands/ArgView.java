@@ -131,19 +131,19 @@ public class ArgView implements PSCommandArg {
 
     private static boolean handlePinkParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > PARTICLE_VIEW_DISTANCE_LIMIT || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 2), 30);
+        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(233, 30, 99), 2.0f), 30);
         return true;
     }
 
     private static boolean handleBlueParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > PARTICLE_VIEW_DISTANCE_LIMIT || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 2), 30);
+        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(0, 255, 255), 2.0f), 30);
         return true;
     }
 
     private static boolean handlePurpleParticle(Player p, Location l) {
         if (p.getLocation().distance(l) > PARTICLE_VIEW_DISTANCE_LIMIT || Math.abs(l.getY()-p.getLocation().getY()) > 30) return false;
-        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 10), 30);
+        ParticlesUtil.persistRedstoneParticle(p, l, new Particle.DustOptions(Color.fromRGB(255, 0, 255), 4.0f), 30);
         return true;
     }
 }

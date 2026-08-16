@@ -15,23 +15,33 @@
 
 package dev.espi.protectionstones.commands;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import dev.espi.protectionstones.PSL;
+import dev.espi.protectionstones.PSRegion;
+import dev.espi.protectionstones.ProtectionStones;
+import dev.espi.protectionstones.utils.UUIDCache;
+import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 class ArgAdminLastlogon {
-    // /ps admin lastlogon
+    private static final int LINES_PER_TICK = 100;
 
-    static class PlayerComparator implements Comparator<OfflinePlayer> {
-        @Override
-        public int compare(OfflinePlayer o1, OfflinePlayer o2) {
-            return o1.getName().compareTo(o2.getName());
+    private static final class LastLogonEntry {
+        private final String playerName;
+        private final long daysSinceLastPlayed;
+
+        private LastLogonEntry(String playerName, long daysSinceLastPlayed) {
+            this.playerName = playerName;
+            this.daysSinceLastPlayed = daysSinceLastPlayed;
         }
     }
+
     static boolean argumentAdminLastLogon(CommandSender p, String[] args) {
         if (args.length < 3) {
             p.sendMessage(PSL.COMMAND_REQUIRES_PLAYER_NAME.msg());
@@ -44,7 +54,7 @@ class ArgAdminLastlogon {
 
         PSL.msg(p, PSL.ADMIN_LAST_LOGON.msg()
                 .replace("%player%", playerName)
-                .replace("%days%", "" +lastPlayed));
+                .replace("%days%", "" + lastPlayed));
 
         if (op.isBanned()) {
             PSL.msg(p, PSL.ADMIN_IS_BANNED.msg()
@@ -54,7 +64,6 @@ class ArgAdminLastlogon {
         return true;
     }
 
-    // /ps admin lastlogons
     static boolean argumentAdminLastLogons(CommandSender p, String[] args) {
         int days = 0;
         if (args.length > 2) {
@@ -65,27 +74,79 @@ class ArgAdminLastlogon {
                 return true;
             }
         }
-        OfflinePlayer[] offlinePlayerList = Bukkit.getServer().getOfflinePlayers().clone();
-        int playerCounter = 0;
+
+        final int minDays = days;
         PSL.msg(p, PSL.ADMIN_LASTLOGONS_HEADER.msg()
-                .replace("%days%", "" + days));
+                .replace("%days%", "" + minDays));
 
-        Arrays.sort(offlinePlayerList, new PlayerComparator());
-        for (OfflinePlayer offlinePlayer : offlinePlayerList) {
-            long lastPlayed = (System.currentTimeMillis() - offlinePlayer.getLastPlayed()) / 86400000L;
-            if (lastPlayed >= days) {
-                playerCounter++;
-                PSL.msg(p, PSL.ADMIN_LASTLOGONS_LINE.msg()
-                        .replace("%player%", offlinePlayer.getName())
-                        .replace("%time%", "" + lastPlayed));
+        Bukkit.getScheduler().runTaskAsynchronously(ProtectionStones.getInstance(), () -> {
+            Set<UUID> ownerUuids = collectRegionOwnerUuids();
+            List<LastLogonEntry> matchingEntries = new ArrayList<>();
+            long now = System.currentTimeMillis();
+
+            for (UUID uuid : ownerUuids) {
+                try {
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                    long lastPlayed = (now - offlinePlayer.getLastPlayed()) / 86400000L;
+                    if (lastPlayed >= minDays) {
+                        matchingEntries.add(new LastLogonEntry(resolvePlayerName(uuid), lastPlayed));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        PSL.msg(p, PSL.ADMIN_LASTLOGONS_FOOTER.msg()
-                .replace("%count%", "" + playerCounter)
-                .replace("%checked%", "" + offlinePlayerList.length));
+            matchingEntries.sort(Comparator.comparing(entry -> entry.playerName, String.CASE_INSENSITIVE_ORDER));
+
+            Bukkit.getScheduler().runTask(ProtectionStones.getInstance(), () ->
+                    sendLastLogonEntries(p, matchingEntries, ownerUuids.size(), 0));
+        });
 
         return true;
     }
 
+    private static void sendLastLogonEntries(CommandSender sender, List<LastLogonEntry> entries, int checkedCount, int startIndex) {
+        int endIndex = Math.min(entries.size(), startIndex + LINES_PER_TICK);
+        for (int i = startIndex; i < endIndex; i++) {
+            LastLogonEntry entry = entries.get(i);
+            PSL.msg(sender, PSL.ADMIN_LASTLOGONS_LINE.msg()
+                    .replace("%player%", entry.playerName)
+                    .replace("%time%", "" + entry.daysSinceLastPlayed));
+        }
+
+        if (endIndex < entries.size()) {
+            int nextIndex = endIndex;
+            Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(),
+                    () -> sendLastLogonEntries(sender, entries, checkedCount, nextIndex), 1L);
+            return;
+        }
+
+        PSL.msg(sender, PSL.ADMIN_LASTLOGONS_FOOTER.msg()
+                .replace("%count%", "" + entries.size())
+                .replace("%checked%", "" + checkedCount));
+    }
+
+    private static Set<UUID> collectRegionOwnerUuids() {
+        Set<UUID> owners = new HashSet<>();
+        for (Map.Entry<World, RegionManager> entry : WGUtils.getAllRegionManagers().entrySet()) {
+            World world = entry.getKey();
+            RegionManager regionManager = entry.getValue();
+            if (world == null || regionManager == null) continue;
+
+            for (ProtectedRegion protectedRegion : regionManager.getRegions().values()) {
+                PSRegion region = PSRegion.fromWGRegion(world, protectedRegion);
+                if (region == null) continue;
+                owners.addAll(region.getOwners());
+            }
+        }
+        return owners;
+    }
+
+    private static String resolvePlayerName(UUID uuid) {
+        String name = UUIDCache.getNameFromUUID(uuid);
+        if (name == null || name.isEmpty() || name.equalsIgnoreCase("null")) {
+            name = uuid.toString().substring(0, 8);
+        }
+        return name;
+    }
 }
