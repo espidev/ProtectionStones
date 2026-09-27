@@ -146,7 +146,7 @@ public class ArgTp implements PSCommandArg {
             Bukkit.getScheduler().runTaskLater(ProtectionStones.getInstance(), () -> {
                 PSL.msg(p, PSL.TPING.msg());
                 p.teleport(r.getHome());
-            }, 20 * r.getTypeOptions().tpWaitingSeconds);
+            }, 20L * r.getTypeOptions().tpWaitingSeconds);
 
         } else {// delay and not allowed to move
             PSL.msg(p, PSL.TP_IN_SECONDS.msg().replace("%seconds%", "" + r.getTypeOptions().tpWaitingSeconds));
