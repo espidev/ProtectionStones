@@ -41,15 +41,20 @@ public class FlagHandler {
     // Custom WorldGuard Flags
     public static final Flag<String> GREET_ACTION = new StringFlag("greeting-action");
     public static final Flag<String> FAREWELL_ACTION = new StringFlag("farewell-action");
+    public static final Flag<String> PS_GREETING = new StringFlag("ps-greeting");
+    public static final Flag<String> PS_FAREWELL = new StringFlag("ps-farewell");
 
     // Custom WorldGuard Flags used by ProtectionStones
     // Added to blocks on BlockPlaceEvent Listener
-    // When adding flags, you may want to add them to the hidden_flags_from_info config option list
+    // When adding flags, you may want to add them to the hidden_flags_from_info
+    // config option list
     public static final Flag<String> PS_HOME = new StringFlag("ps-home");
     public static final Flag<String> PS_BLOCK_MATERIAL = new StringFlag("ps-block-material");
     public static final Flag<String> PS_NAME = new StringFlag("ps-name");
-    public static final Flag<Set<String>> PS_MERGED_REGIONS = new SetFlag<>("ps-merged-regions", new StringFlag("ps-merged-region"));
-    public static final Flag<Set<String>> PS_MERGED_REGIONS_TYPES = new SetFlag<>("ps-merged-regions-types", new StringFlag("ps-merged-region-type")); // each entry: "[psID] [type]"
+    public static final Flag<Set<String>> PS_MERGED_REGIONS = new SetFlag<>("ps-merged-regions",
+            new StringFlag("ps-merged-region"));
+    public static final Flag<Set<String>> PS_MERGED_REGIONS_TYPES = new SetFlag<>("ps-merged-regions-types",
+            new StringFlag("ps-merged-region-type")); // each entry: "[psID] [type]"
 
     public static final Flag<String> PS_LANDLORD = new StringFlag("ps-landlord");
     public static final Flag<String> PS_TENANT = new StringFlag("ps-tenant");
@@ -57,9 +62,12 @@ public class FlagHandler {
     public static final Flag<Double> PS_PRICE = new DoubleFlag("ps-price");
     public static final Flag<Double> PS_RENT_LAST_PAID = new DoubleFlag("ps-rent-last-paid");
     public static final Flag<Boolean> PS_FOR_SALE = new BooleanFlag("ps-for-sale");
-    public static final Flag<Set<String>> PS_RENT_SETTINGS = new SetFlag<>("ps-rent-settings", new StringFlag("ps-rent-setting")); // TODO
-    public static final Flag<Set<String>> PS_TAX_PAYMENTS_DUE = new SetFlag<>("ps-tax-payments-due", new StringFlag("ps-tax-payment"));
-    public static final Flag<Set<String>> PS_TAX_LAST_PAYMENT_ADDED = new SetFlag<>("ps-tax-last-payment-added", new StringFlag("ps-tax-last-payment-entry"));
+    public static final Flag<Set<String>> PS_RENT_SETTINGS = new SetFlag<>("ps-rent-settings",
+            new StringFlag("ps-rent-setting")); // TODO
+    public static final Flag<Set<String>> PS_TAX_PAYMENTS_DUE = new SetFlag<>("ps-tax-payments-due",
+            new StringFlag("ps-tax-payment"));
+    public static final Flag<Set<String>> PS_TAX_LAST_PAYMENT_ADDED = new SetFlag<>("ps-tax-last-payment-added",
+            new StringFlag("ps-tax-last-payment-entry"));
     public static final Flag<String> PS_TAX_AUTOPAYER = new StringFlag("ps-tax-autopayer");
 
     // called on initial start
@@ -83,7 +91,8 @@ public class FlagHandler {
             registry.register(PS_TAX_LAST_PAYMENT_ADDED);
             registry.register(PS_TAX_AUTOPAYER);
         } catch (FlagConflictException e) {
-            Bukkit.getLogger().severe("Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
+            Bukkit.getLogger().severe(
+                    "Flag conflict found! The plugin will not work properly! Please contact the developers of the plugin.");
             e.printStackTrace();
         }
 
@@ -91,6 +100,8 @@ public class FlagHandler {
         try {
             registry.register(GREET_ACTION);
             registry.register(FAREWELL_ACTION);
+            registry.register(PS_GREETING);
+            registry.register(PS_FAREWELL);
         } catch (FlagConflictException ignored) {
             // ignore if flag conflict
         }
@@ -98,8 +109,15 @@ public class FlagHandler {
 
     static void registerHandlers() {
         SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
-        sessionManager.registerHandler(GreetingFlagHandler.FACTORY, ExitFlag.FACTORY);
-        sessionManager.registerHandler(FarewellFlagHandler.FACTORY, ExitFlag.FACTORY);
+        sessionManager.registerHandler(
+                new dev.espi.protectionstones.flags.PSMessageFlagHandler.Factory(GREET_ACTION, true), ExitFlag.FACTORY);
+        sessionManager.registerHandler(
+                new dev.espi.protectionstones.flags.PSMessageFlagHandler.Factory(FAREWELL_ACTION, true),
+                ExitFlag.FACTORY);
+        sessionManager.registerHandler(
+                new dev.espi.protectionstones.flags.PSMessageFlagHandler.Factory(PS_GREETING, false), ExitFlag.FACTORY);
+        sessionManager.registerHandler(
+                new dev.espi.protectionstones.flags.PSMessageFlagHandler.Factory(PS_FAREWELL, false), ExitFlag.FACTORY);
     }
 
     // adds flag permissions for ALL registered WorldGuard flags
@@ -123,12 +141,14 @@ public class FlagHandler {
     }
 
     public static List<String> getPlayerPlaceholderFlags() {
-        return Arrays.asList("greeting", "greeting-title", "greeting-action", "farewell", "farewell-title", "farewell-action");
+        return Arrays.asList("greeting", "greeting-title", "greeting-action", "farewell", "farewell-title",
+                "farewell-action", "ps-greeting", "ps-farewell");
     }
 
     // Edit flags that require placeholders (variables)
     public static void initDefaultFlagPlaceholders(HashMap<Flag<?>, Object> flags, Player p) {
-        for (Flag<?> f : getPlayerPlaceholderFlags().stream().map(WGUtils.getFlagRegistry()::get).collect(Collectors.toList())) {
+        for (Flag<?> f : getPlayerPlaceholderFlags().stream().map(WGUtils.getFlagRegistry()::get)
+                .collect(Collectors.toList())) {
             if (flags.get(f) != null) {
                 String s = (String) flags.get(f);
 
@@ -153,7 +173,8 @@ public class FlagHandler {
                     String[] splGroups = spl[1].split(",");
                     List<String> groups = new ArrayList<>();
                     for (String g : splGroups) {
-                        if (FLAG_GROUPS.contains(g)) groups.add(g);
+                        if (FLAG_GROUPS.contains(g))
+                            groups.add(g);
                     }
 
                     b.allowedFlags.put(spl[2], groups);
@@ -161,7 +182,8 @@ public class FlagHandler {
                     b.allowedFlags.put(f, FLAG_GROUPS);
                 }
             } catch (Exception e) {
-                ProtectionStones.getInstance().getLogger().warning("Skipping flag " + f + ". Did you configure the allowed_flags section correctly?");
+                ProtectionStones.getInstance().getLogger()
+                        .warning("Skipping flag " + f + ". Did you configure the allowed_flags section correctly?");
                 e.printStackTrace();
             }
         }
@@ -190,7 +212,8 @@ public class FlagHandler {
                 }
 
                 // get settings (after flag name)
-                for (int i = startInd; i < split.length; i++) settings += split[i] + " ";
+                for (int i = startInd; i < split.length; i++)
+                    settings += split[i] + " ";
                 settings = settings.trim();
 
                 // if the setting is set to -e, change to empty flag
@@ -204,7 +227,9 @@ public class FlagHandler {
 
                 // warn if flag setting has already been set
                 if (b.regionFlags.containsKey(flag)) {
-                    ProtectionStones.getPluginLogger().warning(String.format("Duplicate default flags found (only one flag setting can be applied for each flag)! Overwriting the previous value set for %s with \"%s\" ...", flagName, flagraw));
+                    ProtectionStones.getPluginLogger().warning(String.format(
+                            "Duplicate default flags found (only one flag setting can be applied for each flag)! Overwriting the previous value set for %s with \"%s\" ...",
+                            flagName, flagraw));
                 }
 
                 // apply flag
@@ -214,7 +239,8 @@ public class FlagHandler {
 
                     RegionGroup rGroup = flag.getRegionGroupFlag().detectValue(group);
                     if (rGroup == null) {
-                        ProtectionStones.getPluginLogger().severe(String.format("Error parsing flag \"%s\", the group value is invalid!", flagraw));
+                        ProtectionStones.getPluginLogger().severe(
+                                String.format("Error parsing flag \"%s\", the group value is invalid!", flagraw));
                         continue;
                     }
 
